@@ -1,0 +1,16 @@
+{
+  "name": "swarm-advisor-modelcheck",
+  "private": true,
+  "description": "Runs the real Swarm Simulator game services in plain Node to check advisor/sim/sim.py against the game.",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "coffee-script": "1.12.4",
+    "decimal.js": "7.1.1",
+    "jasmine": "2.5.3",
+    "jasmine-core": "2.5.2",
+    "lodash": "4.17.10",
+    "lz-string": "1.4.4",
+    "moment": "2.17.1",
+    "seedrandom": "2.4.2"
+  }
+}

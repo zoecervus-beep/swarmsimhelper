@@ -1,34 +1,77 @@
-import json, math, copy, sys
+import json, math, copy, sys, os
+HERE=os.path.dirname(os.path.abspath(__file__))
+GAME_DATA=os.path.join(HERE,'..','..','swarmsim-coffee','app','scripts','spreadsheetpreload','v0.2.js')
+_ACH=None
+def _achievements():
+    """{name: (points, unit or upgrade it requires, required value)} from the game's own data table."""
+    global _ACH
+    if _ACH is None:
+        t=open(GAME_DATA).read(); key="'spreadsheetPreload-v0.2',"
+        data=json.loads(t[t.index(key)+len(key):t.rindex('});')+1])
+        _ACH={e['name']:(e['points'],e['requires.unittype'] or e['requires.upgradetype'],e['requires.val'])
+              for e in data['achievements']['elements'] if e.get('name')}
+    return _ACH
+def achievement_points(d):
+    """Achievement points earned in a decoded save, as game.achievementPoints() counts them: the sum of
+    `points` over the achievements present in d['achievements']."""
+    return sum(_achievements().get(n,(0,))[0] for n in d.get('achievements',{}))
+EARN_ACH=True   # award achievements the run earns; more points raise larva production via accomplished ancestry
+def earn_achievements(s):
+    """The game awards unit achievements on the number of units *bought* (statistics twinnum, so mirror
+    clones and production do not count) and upgrade achievements on the level. Only units and upgrades
+    the simulator models are checked: meat chain, territory units, expansion, nexus5."""
+    if not EARN_ACH or ACH is not None: return
+    for name in list(s.unearned):
+        pts,req,val=_achievements()[name]
+        if req=='expansion': have=s.exp
+        elif req=='nexus5': have=1 if s.nexus>=5 else 0
+        else: have=s.bought.get(req,0.0)
+        if have>=float(val): s.unearned.remove(name); s.achpts+=pts
+def buy_stat(s,name,twinnum): s.bought[name]=s.bought.get(name,0.0)+twinnum
 K=12  # meat tiers 1..K (drone=1)
 NAMES=['meat','drone','queen','nest','greaterqueen','hive','hivequeen','empress','prophet','goddess','pantheon','pantheon2','pantheon3']
 BASEP=[0]+list(range(1,K+1))                 # tier k makes k of tier k-1 /s
-MEATC=[0]+[10*81**(k-1) for k in range(1,K+1)]
-UNITC=[0,0]+[10.0**k for k in range(2,K+1)]  # cost in tier k-1 units
+# Checked against the game (advisor/MODEL-CHECK.md). Meat cost per hatch: drone 10, queen 810, then x90 per tier.
+MEATC=[0,10]+[810*90**(k-2) for k in range(2,K+1)]
+# Cost in tier k-1 units: 10^k up to pantheon (k=10); pantheon2 and pantheon3 cost 10^12 and 10^14.
+UNITC=[0,0]+[10.0**k for k in range(2,11)]+[1e12,1e14]
 TN=['swarmling','stinger','spider','mosquito','locust','roach','giantspider','centipede','wasp','devourer','goon']
 TC=[750*450.0**j for j in range(11)]
 TP=[0.07*45.0**j for j in range(11)]
-ACH=380
+ACH=None   # achievement points; None = read from the save (see achievement_points). Set a number to override.
 LMULT=1.0
 MMULT=1.0
 class S: pass
 def load():
-    d=json.load(open(__import__('os').environ.get('SAVE','/tmp/save.json'))); u=d['unittypes']; g=d['upgrades']
+    d=json.load(open(os.environ.get('SAVE','/tmp/save.json'))); u=d['unittypes']; g=d['upgrades']
     s=S(); s.c=[float(u[n]) for n in NAMES]            # c[0]=meat
+    s.achpts=ACH if ACH is not None else achievement_points(d)
+    s.bought={n:float(v.get('twinnum',0)) for n,v in d.get('statistics',{}).get('byUnit',{}).items()}
+    modelled=set(NAMES[1:]+TN+['expansion','nexus5'])
+    s.unearned=[n for n,(pts,req,val) in _achievements().items()
+                if n not in d.get('achievements',{}) and req in modelled and pts>0 and val!='']
     s.larva=float(u['larva']); s.terr=float(u['territory'])
     s.prod=[0]*(K+2); s.twin=[0]*(K+2)
     for k in range(1,K+1):
         s.prod[k]=int(g.get(NAMES[k]+'prod',0)); s.twin[k]=int(g.get(NAMES[k]+'twin',0))
     s.t=[float(u[n]) for n in TN]; s.tt=[int(g.get(n+'twin',0)) for n in TN]
     s.hatch=int(g['hatchery']); s.exp=int(g['expansion']); s.ach=int(g['achievementbonus'])
-    s.energy=float(u.get('energy',0)); s.nexus=int(float(u.get('nexus',0))); s.moth=float(u.get('moth',0)); s.bat=float(u.get('bat',0)); s.hatched=[0.0]*(K+2); s.hprev=[0.0]*(K+2); s.carry=[0.0]*(K+2); s.reserve=0.0; s.nexres=0.0; s.casts={}; s.earned=0.0
+    s.energy=float(u.get('energy',0)); s.nexus=int(float(u.get('nexus',0))); s.moth=float(u.get('moth',0)); s.bat=float(u.get('bat',0)); s.nightbug=float(u.get('nightbug',0)); s.hatched=[0.0]*(K+2); s.hprev=[0.0]*(K+2); s.carry=[0.0]*(K+2); s.reserve=0.0; s.nexres=0.0; s.casts={}; s.earned=0.0
     s.lastbuy=[-1e18]*(K+2); s.purse=0.0; s.time=0.0; s.spent=[0.0]*(K+1); s.spentT=0.0
     return s
-def lam(s): return LMULT*(1+s.hatch)*1.1**s.exp*(1+0.001*ACH)**s.ach
+def lam(s): return LMULT*(1+s.hatch)*1.1**s.exp*(1+0.001*s.achpts)**s.ach
 def P(s,k): return BASEP[k]*2.0**s.prod[k]*(MMULT if k==1 else 1)
 def trate(s): return sum(s.t[j]*TP[j] for j in range(11))
+# Upgrade prices (checked against the game's totalCost() in MODEL-CHECK.md).
+def anc_cost(s): return 5e6*1e4**s.ach, 500*1e4**s.ach          # accomplished ancestry: meat, territory
+def exp_cost(s): return 10*2.45**s.exp                           # expansion: territory
+def hatch_cost(s): return 300*10.0**s.hatch                      # hatchery: meat
+def prod_cost(s,k): return 66*666.0**s.prod[k]                   # faster tier k: units of tier k
+def twin_cost(s,k): return 10.0**s.twin[k]                       # twin tier k: units of tier k+1 (k<=11)
+def tt_cost(s,j): return 100*500.0**s.tt[j], 50.0**s.tt[j]       # territory twin: meat, larvae
 def epow(s): return 1+0.6*(1-1/(1+0.001*s.bat))
 def erate(s): return 0.1*s.nexus*(1+(1-1/(1+0.001*s.moth)))
-def ecap(s): return 10000.0*s.nexus
+def ecap(s): return 10000.0*s.nexus*(1+5*(1-1/(1+0.001*getattr(s,'nightbug',0.0))))   # nightbugs: cap toward 6x (none bought by the policy)
 NEX={1:(3.33333e15,625,0,4000),2:(3.33333e18,2500,3333333,6000),3:(3.33333e21,10000,33333330,8000),4:(3.33333e24,36000,3333333000,10000)}
 SPELL={'warp':(2000,1),'larvarush':(1600,1),'meatrush':(1600,2),'terrrush':(1600,3),'clone':(12000,4),'mirror':(2500,5)}
 def energy_policy(s,p,gained):
@@ -87,7 +130,7 @@ def advance(s,dt,skip=False):
     s.earned=getattr(s,'earned',0.0)+new[0]-s.c[0]
     s.c=new
     return L
-def H(s,k): return 10.0**k/2.0**(s.prod[k]+s.twin[k])   # meat break-even horizon of tier k (s)
+def H(s,k): return UNITC[k]/2.0**(s.prod[k]+s.twin[k])   # meat break-even horizon of tier k (s) = k x cost/(twin x prodEach)
 def allowed(s,p,k):
     if k<2: return True
     ts=p.get('tier_start')
@@ -103,24 +146,24 @@ def policy(s,p,gained):
     # --- larva multipliers
     while True:
         b=False
-        am,at=5e6*1e4**s.ach,500*1e4**s.ach
+        am,at=anc_cost(s)
         if s.ach<5 and s.c[0]>=am and s.terr>=at: s.c[0]-=am; s.terr-=at; s.ach+=1; b=True
-        ec=10*2.45**s.exp
+        ec=exp_cost(s)
         if s.terr>=ec*p.get('exp_mult',1): s.terr-=ec; s.exp+=1; b=True
-        hc=300*10.0**s.hatch
+        hc=hatch_cost(s)
         if s.c[0]>=hc*p['hatch_mult']: s.c[0]-=hc; s.hatch+=1; b=True
         if not b: break
     top=max(k for k in range(1,K+1) if s.c[k]>0)
     # --- prod upgrades
     for k in range(1,K+1):
         while True:
-            cost=66*666.0**s.prod[k]
+            cost=prod_cost(s,k)
             if s.c[k]>=p['prod_mult']*cost: s.c[k]-=cost; s.prod[k]+=1
             else: break
     # --- twin upgrades (twin of tier k costs tier k+1)
     for k in range(1,K):
         while True:
-            cost=10.0**s.twin[k]
+            cost=twin_cost(s,k)
             if k>=13: break
             if p.get('twin_used') and s.time-s.lastbuy[k]>p['twin_used']: break
             if p.get('twin_r') and s.c[k+1]*P(s,k+1) > p['twin_r']*lam(s)*(1-p['f'])*2.0**s.twin[k]/2.0**s.twin[k+1]: break
@@ -134,15 +177,15 @@ def policy(s,p,gained):
     if p.get('twinseek'):
         for k in range(1,K):
             if allowed(s,p,k+1): continue
-            need=10.0**s.twin[k]-s.c[k+1]
+            need=twin_cost(s,k)-s.c[k+1]
             if need<=0 or s.c[k]<=0: continue
             nb=math.ceil(need/2.0**s.twin[k+1]); costk=nb*UNITC[k+1]
             inc=(s.c[k]*P(s,k)/UNITC[k]) if k>=2 else 1e99
             R=2.0**s.twin[k]*min(lam(s)*(1-p['f']),inc)
             if R<=0: continue
             if (k+1)*costk/R<p['theta']*p.get('seek_f',1) and s.c[k]>=costk*p.get('seek_mult',1) and s.larva-s.reserve-s.nexres>=nb and s.c[0]>=nb*MEATC[k+1]:
-                s.c[k]-=costk; s.c[0]-=nb*MEATC[k+1]; s.larva-=nb; s.c[k+1]+=nb*2.0**s.twin[k+1]
-                s.c[k+1]-=10.0**s.twin[k]; s.twin[k]+=1
+                s.c[k]-=costk; s.c[0]-=nb*MEATC[k+1]; s.larva-=nb; s.c[k+1]+=nb*2.0**s.twin[k+1]; buy_stat(s,NAMES[k+1],nb*2.0**s.twin[k+1])
+                s.c[k+1]-=twin_cost(s,k); s.twin[k]+=1
     # --- territory
     f=p['f']
     if s.casts.get('mirror') and 'f_mirror' in p: f=p['f_mirror']
@@ -158,7 +201,7 @@ def policy(s,p,gained):
         # twin for js
         saving=False
         for j in ([js,js+1] if js<10 else [js]):
-            tl=50.0**s.tt[j]; tm=100*500.0**s.tt[j]
+            tm,tl=tt_cost(s,j)
             if tl<=tts*lr and tm<=Mb and TC[j]<=Mb:
                 if Lb>=tl: s.larva-=tl; s.purse-=tl; Lb-=tl; s.c[0]-=tm; Mb-=tm; s.tt[j]+=1
                 else: saving=True
@@ -172,7 +215,7 @@ def policy(s,p,gained):
             for j,n in buys:
                 n=math.floor(n)
                 if n<=0: continue
-                s.t[j]+=n*2.0**s.tt[j]; s.c[0]-=n*TC[j]; s.larva-=n; s.purse-=n; s.spentT+=n
+                s.t[j]+=n*2.0**s.tt[j]; s.c[0]-=n*TC[j]; s.larva-=n; s.purse-=n; s.spentT+=n; buy_stat(s,TN[j],n*2.0**s.tt[j])
     # --- climb, top down
     avail=(s.larva-s.purse if f>0 else s.larva)-s.reserve-s.nexres
     first=True
@@ -186,7 +229,7 @@ def policy(s,p,gained):
         if first and p.get('share_top'): sh=p['share_top']
         if k>=2 and p.get('alpha'): sh=1-math.exp(-p['alpha']*p['ci']/(H(s,k)/k))
         if k>=2 and p.get('prod_reserve'):
-            pc=2*66*666.0**s.prod[k-1]
+            pc=2*prod_cost(s,k-1)
             if p['prod_reserve']*pc<=s.c[k-1]<pc: continue
         if k>=2: n=min(n,(s.c[k-1]*sh)/UNITC[k])
         n=min(n,s.c[0]*p.get('meatshare',0.5)/MEATC[k])
@@ -208,7 +251,8 @@ def policy(s,p,gained):
         if n<=0: continue
         first=False
         if k>=2: s.c[k-1]-=n*UNITC[k]
-        s.c[0]-=n*MEATC[k]; s.c[k]+=n*2.0**s.twin[k]; s.larva-=n; avail-=n; s.spent[k]+=n; s.lastbuy[k]=s.time; s.hatched[k]+=n*2.0**s.twin[k]
+        s.c[0]-=n*MEATC[k]; s.c[k]+=n*2.0**s.twin[k]; s.larva-=n; avail-=n; s.spent[k]+=n; s.lastbuy[k]=s.time; s.hatched[k]+=n*2.0**s.twin[k]; buy_stat(s,NAMES[k],n*2.0**s.twin[k])
+    earn_achievements(s)
 def run(p,hours,ci,marks,s0=None):
     p=dict(p,ci=ci); s=copy.deepcopy(s0) if s0 is not None else load()
     if s0 is not None: s.time=0.0; s.earned=0.0; s.lastbuy=[t-s0.time for t in s.lastbuy]
