@@ -1,0 +1,28 @@
+{
+ "hatch_mult": 1,
+ "prod_mult": 2,
+ "twin_mult": 1,
+ "twin_flow": 1,
+ "twin_used": 600,
+ "f": 0.1,
+ "g": 0.9,
+ "terr": "balanced",
+ "tt_secs": 600,
+ "theta_age": 5,
+ "twinseek": true,
+ "share": 0.5,
+ "bank": 3,
+ "seek_mult": 2,
+ "energy": true,
+ "spells": [
+  "mirror",
+  "larvarush"
+ ],
+ "moth_N": 4000,
+ "nexus_secs": 20000.0,
+ "nexus_soon": 1,
+ "inc_share": 1.0,
+ "stock_rel": 1,
+ "twin_r": 1,
+ "theta": 0
+}
