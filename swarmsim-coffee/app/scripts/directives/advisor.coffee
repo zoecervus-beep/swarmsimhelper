@@ -9,7 +9,7 @@
  # The advisor's own render* functions are the reference wording and the fallback for any record
  # this doesn't know.
 ###
-angular.module('swarmApp').factory 'advisorView', (game, advisor, $filter) ->
+angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerritory, $filter) ->
   bignum = (n, maxSmall=0) -> $filter('bignum')(n, maxSmall)
   time = advisor.formatTime
 
@@ -29,6 +29,12 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, $filter) ->
     if u?.tab? and u.isVisible()
       return '#' + u.url()
     return null
+  # An upgrade's page is its unit's page (hatchery and expansion are on the larva page).
+  upgradeHref = (name) ->
+    try
+      return href game.upgrade(name).unit.name
+    catch e
+      return null
   upgradeLabel = (name, fallback) ->
     try
       return game.upgrade(name)?.type?.label ? fallback
@@ -142,39 +148,99 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, $filter) ->
           larvaRate: bignum r.larvaRate, 1
         rows: rows
         tips: (tip(t) for t in r.tips)
-        energy: energy r.energy
+        # an energy failure costs only this line, as in the console script
+        energy: if r.energyError? then {type: 'error', error: true, text: errorText(r.energyError)} else energy r.energy
         summary: if buys.length then {label: buys[0].label, action: buys[0].action} else null
       }
     catch e
       return {error: errorText e}
 
-  # The buy-box button's view for one unit, or null when the advisor doesn't list it.
+  # One territory record as a panel line: text from the record's fields with the game's labels and
+  # number format, a link where the game has a page for it, and `buy` for what to hatch.
+  territoryLine = (rec) ->
+    line = {type: rec.type, href: null, buy: false}
+    switch rec.type
+      when 'setShare'
+        line.text = 'set the territory share to ' + rec.to + ' in Options (now ' + rec.share + ')'
+        line.href = '#/options'
+      when 'mirrors'
+        line.text = 'House of Mirrors is running: hatch no more territory units'
+        line.href = href 'energy'
+      when 'upgrade'
+        line.text = 'buy ' + rec.label + (if rec.levels > 1 then ' ×' + rec.levels else '') + ' (' + (count(c.val, c.unit) for c in rec.costs).join(', ') + ')'
+        line.href = upgradeHref rec.name
+      when 'twin'
+        line.text = 'buy ' + rec.label + ' (' + count(rec.larvae, 'larva') + ', ' + count(rec.meat, 'meat') + ')'
+        line.href = href rec.unit
+      when 'saveForTwin'
+        line.text = 'save larvae for ' + rec.label + ': ' + bignum(rec.have) + '/' + count(rec.larvae, 'larva')
+        line.href = href rec.unit
+      when 'hatch'
+        line.text = 'hatch ' + count(rec.buys, rec.unit) + (if rec.twin.greaterThan(1) then ' (×' + bignum(rec.twin) + ' twins)' else '')
+        line.href = href rec.unit
+        line.buy = true
+      when 'idle'
+        if rec.reason == 'noMeat'
+          line.text = 'need ' + count(rec.cost, 'meat') + ' per ' + label(rec.unit) + ' (can spend ' + bignum(rec.meat) + ')'
+          line.href = href rec.unit
+        else
+          line.text = advisorTerritory.render rec
+      else
+        line.text = advisorTerritory.render rec
+    return line
+
+  # From `advisorTerritory.current()` to the panel's territory lines. Never throws.
+  territory = (cur) ->
+    if not cur?
+      return null
+    if cur.error?
+      return {error: errorText cur.error, lines: []}
+    try
+      return {error: null, lines: (territoryLine(rec) for rec in cur.advice.records)}
+    catch e
+      return {error: errorText e, lines: []}
+
+  buyView = (buys, unitName) ->
+    buys: buys
+    buyCount: buyCountString buys
+    amount: bignum buys
+    exact: exactText buys
+    noun: if buys.equals(1) then label(unitName) else plural(unitName)
+    reason: null
+
+  # The buy-box button's view for one meat unit, or null when the advisor doesn't list it.
   suggestion = (cur, unitName) ->
     t = advisor.suggestionFor cur?.advice, unitName
     if not t?
       return null
     if t.kind == 'buy' and t.buys.greaterThanOrEqualTo 1
-      return {
-        buys: t.buys
-        buyCount: buyCountString t.buys
-        amount: bignum t.buys
-        exact: exactText t.buys
-        noun: if t.buys.equals(1) then label(unitName) else plural(unitName)
-        reason: null
-      }
+      return buyView t.buys, unitName
     return {buys: null, reason: action t}
+
+  # The same for a territory unit: its `hatch` record, else the reason nothing is hatched (House of
+  # Mirrors running, saving for a twin, no larvae or meat), else null (another unit is advised).
+  territorySuggestion = (cur, unitName) ->
+    a = cur?.advice
+    if not a?
+      return null
+    for rec in a.hatch when rec.unit == unitName and rec.buys.greaterThanOrEqualTo 1
+      return buyView rec.buys, unitName
+    why = if a.status?.type == 'mirrors' then a.status else if a.twin?.type == 'saveForTwin' then a.twin else if a.status?.type == 'idle' then a.status else null
+    if why?
+      return {buys: null, reason: territoryLine(why).text}
+    return null
 
   return {
     panel: panel
     suggestion: suggestion
+    territory: territory
+    territorySuggestion: territorySuggestion
     buyCountString: buyCountString
     action: action
     tip: tip
     energy: energy
   }
 
-# Re-run the advice at most this often; views are refreshed from the game's own `tick` event.
-angular.module('swarmApp').constant 'ADVISOR_REFRESH_MILLIS', 1000
 
 ###*
  # @ngdoc directive
@@ -183,7 +249,7 @@ angular.module('swarmApp').constant 'ADVISOR_REFRESH_MILLIS', 1000
  # The climbing advisor's panel: run age and larvae, a table of meat tiers with what to do with
  # each, upgrade tips and the energy line. Collapsible; hidden while the advisor is off.
 ###
-angular.module('swarmApp').directive 'advisorPanel', ($rootScope, $log, advisor, advisorView, options, ADVISOR_REFRESH_MILLIS) ->
+angular.module('swarmApp').directive 'advisorPanel', ($rootScope, $log, advisor, advisorTerritory, advisorView, options, ADVISOR_REFRESH_MILLIS) ->
   restrict: 'E'
   scope: {}
   template: """
@@ -224,34 +290,43 @@ angular.module('swarmApp').directive 'advisorPanel', ($rootScope, $log, advisor,
       </tbody>
     </table>
   </div>
-  <ul class="list-group" ng-if="!collapsed() && (view.tips.length || view.energy)">
+  <ul class="list-group" ng-if="!collapsed() && (view.tips.length || view.energy || terr.error || terr.lines.length)">
     <li class="list-group-item advisor-tip" ng-repeat="tip in view.tips">
       <span class="glyphicon glyphicon-circle-arrow-up" aria-hidden="true"></span>
       <a ng-if="tip.href" ng-href="{{tip.href}}">{{tip.text}}</a><span ng-if="!tip.href">{{tip.text}}</span>
     </li>
-    <li class="list-group-item advisor-energy" ng-if="view.energy">
+    <li class="list-group-item advisor-energy" ng-if="view.energy" ng-class="{'text-danger': view.energy.error}">
       <span class="glyphicon glyphicon-flash text-info" aria-hidden="true"></span> Energy:
       <a ng-if="view.energy.href" ng-href="{{view.energy.href}}">{{view.energy.text}}</a><span ng-if="!view.energy.href">{{view.energy.text}}</span>
+    </li>
+    <li class="list-group-item advisor-territory text-danger" ng-if="terr.error">
+      <span class="glyphicon glyphicon-flag" aria-hidden="true"></span> Territory: {{terr.error}}
+    </li>
+    <li class="list-group-item advisor-territory" ng-repeat="line in terr.lines" ng-class="{'list-group-item-success': line.buy}">
+      <span class="glyphicon glyphicon-flag" aria-hidden="true"></span> <span ng-if="$first">Territory:</span>
+      <a ng-if="line.href" ng-href="{{line.href}}"><strong ng-if="line.buy">{{line.text}}</strong><span ng-if="!line.buy">{{line.text}}</span></a><span ng-if="!line.href">{{line.text}}</span>
     </li>
   </ul>
 </div>
 """
   link: (scope, element, attrs) ->
     scope.view = null
+    scope.terr = null
     scope.enabled = -> options.advisorEnabled()
     scope.collapsed = -> options.advisorCollapsed()
     scope.toggle = -> options.advisorCollapsed not options.advisorCollapsed()
 
     lastAt = null
-    # Called on every game tick (each animation frame); `advisor.current` re-runs the rules at most
-    # once per ADVISOR_REFRESH_MILLIS and the view is only rebuilt when it did. Runs while collapsed
-    # too, so purchases keep being noticed. Never throws: an exception here would stop the game loop.
+    lastTerrAt = null
+    # Called on every game tick (each animation frame). The advice itself is kept current by the
+    # service-level tick (advisor.coffee); `current()` here normally just returns that cached result,
+    # and the view is only rebuilt when it changed. The meat and territory parts are built separately,
+    # so a failure in one leaves the other. Never throws: an exception here would stop the game loop.
     scope.refresh = ->
+      if not options.advisorEnabled()
+        scope.view = scope.terr = lastAt = lastTerrAt = null
+        return
       try
-        if not options.advisorEnabled()
-          scope.view = null
-          lastAt = null
-          return
         cur = advisor.current ADVISOR_REFRESH_MILLIS
         if cur.at != lastAt or not scope.view?
           lastAt = cur.at
@@ -259,6 +334,14 @@ angular.module('swarmApp').directive 'advisorPanel', ($rootScope, $log, advisor,
       catch e
         $log.warn 'advisor panel', e
         scope.view = {error: String(e?.message ? e)}
+      try
+        tcur = advisorTerritory.current ADVISOR_REFRESH_MILLIS
+        if tcur.at != lastTerrAt or not scope.terr?
+          lastTerrAt = tcur.at
+          scope.terr = advisorView.territory tcur
+      catch e
+        $log.warn 'advisor territory', e
+        scope.terr = {error: String(e?.message ? e), lines: []}
       return
     scope.refresh()
     scope.$on '$destroy', $rootScope.$on 'tick', scope.refresh
@@ -270,7 +353,7 @@ angular.module('swarmApp').directive 'advisorPanel', ($rootScope, $log, advisor,
  # Beside the buy box: when the climbing advisor suggests hatching this unit, a button that puts
  # the suggested amount into the box. It only fills the box; buying is still the game's button.
 ###
-angular.module('swarmApp').directive 'advisorSuggest', ($rootScope, $log, advisor, advisorView, options, ADVISOR_REFRESH_MILLIS) ->
+angular.module('swarmApp').directive 'advisorSuggest', ($rootScope, $log, advisor, advisorTerritory, advisorView, options, ADVISOR_REFRESH_MILLIS) ->
   restrict: 'E'
   scope:
     unit: '='
@@ -288,23 +371,40 @@ angular.module('swarmApp').directive 'advisorSuggest', ($rootScope, $log, adviso
   link: (scope, element, attrs) ->
     scope.view = null
     lastAt = null
+    # Meat units take the climbing advice, territory units the territory advice; others get nothing.
+    source = ->
+      name = scope.unit?.name
+      if name in advisor.CHAIN
+        return {service: advisor, view: advisorView.suggestion}
+      if name in advisorTerritory.UNITS
+        return {service: advisorTerritory, view: advisorView.territorySuggestion}
+      return null
+    read = (maxAgeMs) ->
+      src = source()
+      if not (options.advisorEnabled() and src?)
+        lastAt = null
+        return scope.view = null
+      cur = src.service.current maxAgeMs
+      if cur.at != lastAt or maxAgeMs == 0
+        lastAt = cur.at
+        scope.view = src.view cur, scope.unit.name
+      return scope.view
     scope.refresh = ->
       try
-        if not (options.advisorEnabled() and scope.unit? and scope.unit.name in advisor.CHAIN)
-          scope.view = null
-          lastAt = null
-          return
-        cur = advisor.current ADVISOR_REFRESH_MILLIS
-        if cur.at != lastAt
-          lastAt = cur.at
-          scope.view = advisorView.suggestion cur, scope.unit.name
+        read ADVISOR_REFRESH_MILLIS
       catch e
         $log.warn 'advisor suggestion', e
         scope.view = null
       return
+    # Writes the count from advice taken now, not the up-to-a-second-old one on the button.
     scope.use = ->
-      if scope.view?.buys and scope.form?
-        scope.form.buyCount = scope.view.buyCount
+      try
+        view = read 0
+      catch e
+        $log.warn 'advisor suggestion', e
+        view = scope.view = null
+      if view?.buys and scope.form?
+        scope.form.buyCount = view.buyCount
     scope.refresh()
     scope.$on '$destroy', $rootScope.$on 'tick', scope.refresh
 

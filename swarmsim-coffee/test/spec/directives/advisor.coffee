@@ -22,14 +22,24 @@ fakeAdvice = (over={}) ->
     energy: {type: 'cast', spell: 'clonearmy', label: 'House of Mirrors', cost: 2500, casts: D(3)}
   }, over
 
+# Hand-built territory advice in the shape `advisorTerritory.update()` returns.
+fakeTerritory = (over={}) ->
+  D = (x) -> new Decimal x
+  hatch = [
+    {type: 'hatch', unit: 'wasp', label: 'wasps', role: 'main', buys: D(315778), twin: D(16)}
+    {type: 'hatch', unit: 'devourer', label: 'devourers', role: 'spare', buys: D(18210), twin: D(32)}
+  ]
+  _.extend {records: hatch.slice(), hatch: hatch, twin: null, status: null, setting: null}, over
+
 text = (el) -> (el?.textContent ? '').replace(/\s+/g, ' ').trim()
 
 describe 'Directive: advisorPanel', ->
   beforeEach module 'swarmApp', 'mockFlashStorage'
 
-  scope = advisor = options = game = $compile = $rootScope = bignum = null
-  beforeEach inject (_$compile_, _$rootScope_, _advisor_, _options_, _game_, $filter) ->
+  scope = advisor = advisorTerritory = options = game = $compile = $rootScope = bignum = null
+  beforeEach inject (_$compile_, _$rootScope_, _advisor_, _advisorTerritory_, _options_, _game_, $filter) ->
     bignum = $filter 'bignum'
+    advisorTerritory = _advisorTerritory_
     $compile = _$compile_
     $rootScope = _$rootScope_
     advisor = _advisor_
@@ -110,6 +120,69 @@ describe 'Directive: advisorPanel', ->
     advisor.invalidate()
     expect(-> $rootScope.$emit 'tick').not.toThrow()
 
+  it 'shows an energy failure on the energy line only', ->
+    spyOn(advisor, 'update').and.returnValue fakeAdvice {energy: null, energyError: new Error 'no nexus data'}
+    el = render()
+    expect(el.querySelectorAll('tbody tr').length).toBe 3
+    expect(el.querySelectorAll('.advisor-tip').length).toBe 2
+    line = el.querySelector '.advisor-energy'
+    expect(text line).toBe 'Energy: no nexus data'
+    expect(line.className).toContain 'text-danger'
+
+  it 'renders the territory advice from its records, with game labels and links', ->
+    spyOn(advisor, 'update').and.returnValue fakeAdvice()
+    spyOn(advisorTerritory, 'update').and.returnValue fakeTerritory()
+    spyOn(game.unit('wasp'), 'isVisible').and.returnValue true
+    el = render()
+    lines = el.querySelectorAll '.advisor-territory'
+    expect(lines.length).toBe 2
+    expect(text lines[0]).toBe 'Territory: hatch ' + bignum(new Decimal 315778) + ' wasps (×16 twins)'
+    expect(text lines[1]).toBe 'hatch ' + bignum(new Decimal 18210) + ' devourers (×32 twins)'
+    expect(lines[0].className).toContain 'list-group-item-success'
+    expect(lines[0].querySelector('a').getAttribute 'href').toBe '#/tab/territory/unit/wasp'
+    expect(lines[0].querySelector 'strong').not.toBe null
+
+  it 'renders the other territory records', ->
+    D = (x) -> new Decimal x
+    spyOn(advisor, 'update').and.returnValue fakeAdvice()
+    records = [
+      {type: 'setShare', share: 0.1, to: 0}
+      {type: 'mirrors', casts: 2}
+      {type: 'upgrade', name: 'expansion', label: 'expansion', levels: 2, from: 50, costs: [{unit: 'territory', val: D(1e9)}]}
+      {type: 'twin', unit: 'spider', unitLabel: 'arachnomorphs', name: 'spidertwin', label: 'twin arachnomorphs', larvae: D(2500), meat: D(1)}
+      {type: 'saveForTwin', unit: 'spider', name: 'spidertwin', label: 'twin arachnomorphs', larvae: D(2500), meat: D(1e6), have: D(2000)}
+      {type: 'idle', reason: 'noMeat', unit: 'swarmling', label: 'swarmling', cost: D(750), meat: D(10)}
+      {type: 'idle', reason: 'locked'}
+    ]
+    spyOn(advisorTerritory, 'update').and.returnValue fakeTerritory {records: records, hatch: []}
+    el = render()
+    lines = (text l for l in el.querySelectorAll '.advisor-territory')
+    expect(lines).toEqual [
+      'Territory: set the territory share to 0 in Options (now 0.1)'
+      'House of Mirrors is running: hatch no more territory units'
+      'buy expansion ×2 (' + bignum(D 1e9) + ' territory)'
+      'buy twin arachnomorphs (' + bignum(D 2500) + ' larvae, 1 meat)'
+      'save larvae for twin arachnomorphs: ' + bignum(D 2000) + '/' + bignum(D 2500) + ' larvae'
+      'need 750 meat per swarmling (can spend 10)'
+      'no territory units yet'
+    ]
+    expect(el.querySelector('.advisor-territory a').getAttribute 'href').toBe '#/options'
+
+  it 'keeps the meat advice when the territory advice fails, and the other way round', ->
+    spyOn(advisor, 'update').and.returnValue fakeAdvice()
+    spyOn(advisorTerritory, 'update').and.throwError 'no territory data'
+    el = render()
+    expect(el.querySelectorAll('tbody tr').length).toBe 3
+    expect(text el.querySelector '.advisor-territory').toBe 'Territory: no territory data'
+    advisor.update.and.throwError 'no hive data'
+    advisorTerritory.update.and.returnValue fakeTerritory()
+    advisor.invalidate()
+    advisorTerritory.invalidate()
+    $rootScope.$emit 'tick'
+    $rootScope.$digest()
+    expect(text el.querySelector '.advisor-error').toBe 'Advisor error: no hive data'
+    expect(el.querySelectorAll('.advisor-territory').length).toBe 2
+
   it 'collapses to a one-line summary and remembers that with the save', ->
     spyOn(advisor, 'update').and.returnValue fakeAdvice()
     el = render()
@@ -126,8 +199,10 @@ describe 'Directive: advisorPanel', ->
 describe 'Directive: advisorSuggest', ->
   beforeEach module 'swarmApp', 'mockFlashStorage'
 
-  scope = advisor = advisorView = options = game = parseNumber = $compile = $rootScope = null
-  beforeEach inject (_$compile_, _$rootScope_, _advisor_, _advisorView_, _options_, _game_, _parseNumber_) ->
+  scope = advisor = advisorTerritory = advisorView = options = game = parseNumber = $compile = $rootScope = bignum = null
+  beforeEach inject (_$compile_, _$rootScope_, _advisor_, _advisorTerritory_, _advisorView_, _options_, _game_, _parseNumber_, $filter) ->
+    advisorTerritory = _advisorTerritory_
+    bignum = $filter 'bignum'
     $compile = _$compile_
     $rootScope = _$rootScope_
     advisor = _advisor_
@@ -203,6 +278,47 @@ describe 'Directive: advisorSuggest', ->
     spyOn(advisor, 'update').and.returnValue fakeAdvice()
     expect(render('nest').querySelector 'button').toBe null
     expect(advisor.update).not.toHaveBeenCalled()
+
+  it 'writes the count from advice taken at the click, not the one on screen', ->
+    spyOn(advisor, 'update').and.returnValue fakeAdvice()
+    el = render 'nest'
+    expect(text el.querySelector 'button').toBe 'Use suggested: 12 nests'
+    # a second later the advice has moved on, before the next refresh
+    advisor.update.and.returnValue withBuys 40
+    angular.element(el.querySelector 'button').triggerHandler 'click'
+    expect(scope.form.buyCount).toBe '40'
+    $rootScope.$digest()
+    expect(text el.querySelector 'button').toBe 'Use suggested: 40 nests'
+    # and writes nothing if the advice no longer says buy
+    scope.form.buyCount = ''
+    advisor.update.and.returnValue fakeAdvice {tiers: [fakeAdvice().tiers[0]]}
+    angular.element(el.querySelector 'button').triggerHandler 'click'
+    expect(scope.form.buyCount).toBe ''
+
+  it 'suggests territory units from the territory advice', ->
+    spyOn(advisorTerritory, 'update').and.returnValue fakeTerritory()
+    el = render 'wasp'
+    button = el.querySelector 'button'
+    expect(text button).toBe 'Use suggested: ' + bignum(new Decimal 315778) + ' wasps'
+    angular.element(button).triggerHandler 'click'
+    expect(scope.form.buyCount).toBe '315778'
+    expect(parseNumber(scope.form.buyCount, scope.unit).equals 315778).toBe true
+    # a territory unit the advice doesn't hatch gets nothing
+    expect(render('swarmling').querySelector 'button').toBe null
+
+  it 'gives the reason when no territory units should be hatched', ->
+    D = (x) -> new Decimal x
+    status = {type: 'mirrors', casts: 1}
+    spyOn(advisorTerritory, 'update').and.returnValue fakeTerritory {records: [status], hatch: [], status: status}
+    el = render 'wasp'
+    expect(el.querySelector('button').disabled).toBe true
+    expect(text el.querySelector 'small').toBe 'Advisor: House of Mirrors is running: hatch no more territory units'
+    twin = {type: 'saveForTwin', unit: 'wasp', label: 'twin wasps', larvae: D(5000), meat: D(1), have: D(1000)}
+    advisorTerritory.update.and.returnValue fakeTerritory {records: [twin], hatch: [], twin: twin}
+    advisorTerritory.invalidate()
+    $rootScope.$emit 'tick'
+    $rootScope.$digest()
+    expect(text el.querySelector 'small').toBe 'Advisor: save larvae for twin wasps: ' + bignum(D 1000) + '/' + bignum(D 5000) + ' larvae'
 
   it 'follows the advice as it changes', ->
     spyOn(advisor, 'update').and.returnValue fakeAdvice()
