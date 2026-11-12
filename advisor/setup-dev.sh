@@ -10,9 +10,13 @@
 #     which Ruby 3.2 removed)
 #   - env.sh, which every new shell must source before using yarn/grunt/karma
 # then runs `yarn install --frozen-lockfile` at the repo root. If
-# codeload.github.com is unreachable it instead installs swarmsim-coffee via
-# advisor/npm-bower-fallback.sh (npm-registry copies) and exits 3 when that
-# fallback leaves gaps.
+# codeload.github.com is unreachable:
+#   - with SWARMSIM_GIT_CLONES=<dir> holding <owner>/<repo> clones that contain
+#     every lockfile-pinned commit: builds a yarn offline mirror from them
+#     (advisor/github-pins-mirror.sh) and runs the same unmodified
+#     `yarn install --frozen-lockfile` against it (exit 0);
+#   - otherwise: installs swarmsim-coffee via advisor/npm-bower-fallback.sh
+#     (npm-registry copies; six libraries stay missing) and exits 3.
 #
 # Usage:  advisor/setup-dev.sh            (full setup)
 #         advisor/setup-dev.sh --no-install   (toolchain + env.sh only)
@@ -121,9 +125,18 @@ if [ "$code" = "200" ]; then
   exit 0
 fi
 
+echo "WARNING: GitHub tarball download returned HTTP $code ($probe)." >&2
+if [ -n "${SWARMSIM_GIT_CLONES:-}" ]; then
+  log "Building a yarn offline mirror of the pinned GitHub tarballs from $SWARMSIM_GIT_CLONES"
+  "$REPO/advisor/github-pins-mirror.sh" "$SWARMSIM_GIT_CLONES" "$TC/github-mirror"
+  log "yarn install --frozen-lockfile (offline mirror $TC/github-mirror for the GitHub pins)"
+  YARN_YARN_OFFLINE_MIRROR="$TC/github-mirror" yarn install --frozen-lockfile
+  log "Done (GitHub pins from local clones). In each new shell:  . \"$TC/env.sh\""
+  exit 0
+fi
+
 # FALLBACK: GitHub tarballs unreachable. Do what the root `install` script does,
 # but install swarmsim-coffee through advisor/npm-bower-fallback.sh.
-echo "WARNING: GitHub tarball download returned HTTP $code ($probe)." >&2
 echo "Using the npm-registry fallback for swarmsim-coffee (advisor/npm-bower-fallback.sh)." >&2
 log "yarn install (root, scripts off) + yarn link + tables + swarmsim-ts"
 yarn install --frozen-lockfile --ignore-scripts

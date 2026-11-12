@@ -2,26 +2,17 @@
 
 ## Status (Nov 12 2026)
 
-On a normal network (your machine, CI) none of the container caveats below apply:
-`yarn install` fetches the real pinned GitHub sources. That path has **not** been run
-by us; it is what upstream CI does.
-
-In the Claude Code cloud container used to set this up, `codeload.github.com` is
-refused (HTTP 403), so `swarmsim-coffee`'s 39 GitHub-pinned dependencies were
-installed from **npm-registry copies** by `advisor/npm-bower-fallback.sh`. Six have no
-npm copy at the pinned version and are missing there:
-
-| Missing in the container | Blocks |
-| --- | --- |
-| `swarm-numberformat` 0.2.1 (npm has 0.2.0, 0.3.0) | Karma unit and integration suites (abort at load: `Can't find variable: numberformat`), number display in the game |
-| `swarm-persist` 0.0.3 (unpublished from npm) and its dep `playfab-sdk-browser` | 5 unit specs (command, mtx, playfab); game bootstrap (`window.persist.chunker`) |
-| `playfab-sdk` = PlayFab/JavaScriptSDK 1.0.170130 (not on npm) | PlayFab login/save at run time |
-| `flash-cookies` 2.2.3 (npm has 2.2.1) | Flash storage fallback |
-| `grunt-wiredep-away` (gscavalcante fork, not on npm) | `grunt build` and `grunt serve` (`Task "wiredep" not found`) |
-
-So in the container: install, the `tables`/`swarmsim-ts` tests and the `grunt pretest`
-step are verified; the Karma suites, build, serve and boot are blocked by the gaps
-above. Each step below says what was actually run.
+- **Your own machine / CI (codeload.github.com reachable):** plain
+  `yarn install --frozen-lockfile` fetches everything, GitHub pins included. Not run by
+  us on such a network, but it is the same unmodified command as below.
+- **The Claude Code cloud container this was set up in:** codeload.github.com is
+  refused (HTTP 403). All 39 GitHub-pinned dependencies were installed **from local
+  git clones at the exact lockfile-pinned commits**: `advisor/github-pins-mirror.sh`
+  turns them into a yarn offline mirror, and the normal, unmodified
+  `yarn install --frozen-lockfile` runs against it. Yarn does resolution, linking
+  and lifecycle scripts as usual. `package.json` and `yarn.lock` are not touched.
+  No npm substitutes and no near versions are in that tree.
+- Everything below marked "Container run" was actually run there.
 
 ## What you need
 
@@ -35,45 +26,12 @@ above. Each step below says what was actually run.
 
 Two compatibility workarounds, both applied by the `env.sh` that `advisor/setup-dev.sh` writes:
 
-- Ruby 3.2+ removed `File.exists?`, which compass/sass 3.4 call; a two-line shim is loaded through `RUBYOPT`.
-- PhantomJS 2.1.1 aborts on modern OpenSSL configs ("Auto configuration failed ... libproviders.so"), so `OPENSSL_CONF=/dev/null` is exported (upstream's Dockerfile does the same).
+- Ruby 3.2+ removed `File.exists?`, which compass/sass 3.4 call. A two-line shim is loaded through `RUBYOPT`.
+- PhantomJS 2.1.1 aborts on modern OpenSSL configs ("Auto configuration failed ... libproviders.so"), so `OPENSSL_CONF=/dev/null` is exported. Upstream's Dockerfile does the same.
 
-## (a) Linux container (like the Claude Code cloud sandbox)
+## Setup
 
-Pick a toolchain directory outside the repo:
-
-```bash
-export SWARMSIM_TOOLCHAIN_DIR="$HOME/.cache/swarmsim-toolchain"
-```
-
-```bash
-advisor/setup-dev.sh
-```
-
-It downloads Node 16.20.2 (checksum-verified), installs compass into
-`$SWARMSIM_TOOLCHAIN_DIR/gems`, writes `$SWARMSIM_TOOLCHAIN_DIR/env.sh`, then:
-
-- if `codeload.github.com` works: `yarn install --frozen-lockfile` (exit 0);
-- otherwise: installs root/`tables`/`swarmsim-ts` normally and `swarmsim-coffee` through
-  `advisor/npm-bower-fallback.sh`, prints the gaps, and exits 3.
-
-Idempotent. Verified in the container from an empty tree: ~46s (fallback path, exit 3).
-The fallback never leaves `swarmsim-coffee/package.json` or `yarn.lock` changed (it
-edits package.json only temporarily, restores it from an EXIT trap, and runs yarn with
-`--pure-lockfile`; checked with `git status`, including when yarn fails).
-A later plain `yarn install` in `swarmsim-coffee` will try GitHub again; re-run the
-setup script instead.
-
-In **every new shell** (Node 16 is not the system Node):
-
-```bash
-. "$SWARMSIM_TOOLCHAIN_DIR/env.sh"
-```
-
-`env.sh` also strips `--use-openssl-ca` from `NODE_OPTIONS` (the sandbox sets it; Node
-16 rejects it in worker threads, which breaks Parcel) and sets `CHROME_BIN` if unset.
-
-## (b) Your own machine
+### (a) Your own machine
 
 ```bash
 nvm install 16 && nvm use 16
@@ -83,7 +41,8 @@ nvm install 16 && nvm use 16
 npm install -g yarn@1.22.22
 ```
 
-Then the same script (finds Node 16 on PATH; installs compass and the Ruby 3.2+ shim if needed):
+Then the setup script. It finds Node 16 on PATH and installs compass, plus the Ruby 3.2+
+shim if needed. With codeload reachable it then runs plain `yarn install --frozen-lockfile`:
 
 ```bash
 advisor/setup-dev.sh
@@ -96,81 +55,180 @@ advisor/setup-dev.sh
 The script's own Node download is Linux x64 only; on macOS use nvm as above.
 PhantomJS on Apple Silicon may need Rosetta.
 
+### (b) Linux container without codeload.github.com
+
+Pick a toolchain directory outside the repo:
+
+```bash
+export SWARMSIM_TOOLCHAIN_DIR="$HOME/.cache/swarmsim-toolchain"
+```
+
+If you have local clones of the 39 pinned repos, laid out as `<dir>/<owner>/<repo>`
+(name match is case-insensitive) and each containing its pinned commit (shallow
+clones are fine), point the script at them:
+
+```bash
+SWARMSIM_GIT_CLONES=/home/user advisor/setup-dev.sh
+```
+
+Container run: about 39s from an empty tree, exit 0. It downloads Node 16.20.2
+(checksum-verified) and installs compass into `$SWARMSIM_TOOLCHAIN_DIR/gems`. It writes
+`$SWARMSIM_TOOLCHAIN_DIR/env.sh`. Then it builds `$SWARMSIM_TOOLCHAIN_DIR/github-mirror`:
+one `git archive` tarball per pinned commit, named the way yarn looks it up (about 3s).
+Finally it runs `YARN_YARN_OFFLINE_MIRROR=… yarn install --frozen-lockfile`. The clones
+are only read. The lockfile has no integrity hashes for these 39 entries, so git's commit
+hash is the integrity check. Yarn also copies registry tarballs into that mirror (~170 MB).
+The script is idempotent. The mirror step on its own:
+
+```bash
+advisor/github-pins-mirror.sh /home/user "$SWARMSIM_TOOLCHAIN_DIR/github-mirror"
+```
+
+To populate the clones on a network that blocks codeload but serves plain `git fetch`
+from github.com (this container was one), fetch just the pinned commits, one repository
+at a time:
+
+```bash
+advisor/fetch-github-pins.sh /home/user
+```
+
+It reads the 39 `owner/repo` and commit pairs from `swarmsim-coffee/yarn.lock` and skips
+any that are already present. In the container all 39 fetched without error.
+
+Without clones, the script falls back to `advisor/npm-bower-fallback.sh`. That fallback
+installs npm-registry copies of 33 of the 39 at their pinned versions. Six have no npm
+copy and stay missing: swarm-numberformat 0.2.1, swarm-persist 0.0.3,
+playfab-sdk-browser, PlayFab JavaScriptSDK 1.0.170130, flash-cookies 2.2.3 and
+grunt-wiredep-away. The script then exits 3. With those gaps, Karma aborts at load,
+`grunt build`/`serve` stop at `Task "wiredep" not found`, and the app cannot start
+(`window.persist` is undefined). The opt-in flag below installs stand-ins that are
+**not** the pinned versions: swarm-numberformat 0.2.0 and flash-cookies 2.2.1. Each one
+gets a `NOT-THE-PINNED-VERSION.txt` marker. Without the flag, any earlier stand-ins
+are removed. Even with them, swarm-persist is still missing, so 5 upstream unit specs
+fail (`window.persist.chunker`): command "should do something", "can undo", "undoes
+visibility. #639"; mtx "should do something"; playfab "should do something". The
+app still cannot fully start.
+
+```bash
+advisor/setup-dev.sh --near-versions
+```
+
+In **every new shell** (Node 16 is not the system Node):
+
+```bash
+. "$SWARMSIM_TOOLCHAIN_DIR/env.sh"
+```
+
+`env.sh` also strips `--use-openssl-ca` from `NODE_OPTIONS`. The sandbox sets that flag,
+and Node 16 rejects it in worker threads, which breaks Parcel. It also sets
+`CHROME_BIN` if unset.
+
 ## Install
 
 ```bash
 yarn install --frozen-lockfile
 ```
 
-From the repo root (normal network only). `swarmsim-coffee/bower_components` becomes a
-symlink to `node_modules/@bower_components`.
+From the repo root, on a network that reaches codeload. `swarmsim-coffee/bower_components`
+becomes a symlink to `node_modules/@bower_components`.
 
 ## Tests
 
-Everything (tables jest, swarmsim-ts jest, swarmsim-coffee `grunt pretest` + Karma unit + Karma integration):
+Everything: tables jest, swarmsim-ts jest, then swarmsim-coffee `grunt pretest` + Karma unit + Karma integration.
+`yarn test` stops at the first failing step:
 
 ```bash
 yarn test
 ```
 
-Container run (~44s): `tables` 10 passed, 3 skipped (2 suites skipped upstream);
-`swarmsim-ts` 11 passed; `grunt pretest` OK (69 files lint free); Karma unit then aborts
-at load on the `swarm-numberformat` gap, so 0 Karma specs run. The
-`Loading "cdnify.js" tasks...ERROR primordials` line is harmless (that task is unused).
-
-swarmsim-coffee only. `yarn _pretest` generates `.tmp/scripts/env.js`, which Karma loads; run it once per checkout (~8s):
+swarmsim-coffee only. `yarn _pretest` (~8s) generates `.tmp/scripts/env.js`, which Karma loads; run it once per checkout:
 
 ```bash
 cd swarmsim-coffee && yarn _pretest && yarn test:unit && yarn test:integration
 ```
 
-Karma runs PhantomJS 2.1.1 (works in the container with `OPENSSL_CONF=/dev/null`);
-the upstream config is unchanged. Karma warns that `konami-js/` and `appcache-nanny/`
-don't match any file: upstream lists them but never installs them.
+Karma runs PhantomJS 2.1.1 with the upstream configuration, plus one served fixture
+(`../advisor/sim/example_save_14h.json`, for the advisor spec). Karma warns that
+`konami-js/` and `appcache-nanny/` match no file: upstream lists them but never installs them.
+
+Container run (~41s for `yarn test`):
+
+- `tables`: 10 passed, 3 skipped.
+- `swarmsim-ts`: 11 passed.
+- Karma unit, upstream baseline at commit 3a161e7: 168 specs, 141 passed, 27 skipped, 0 failed.
+- Karma unit with the advisor feature: 239 specs, 193 passed, 27 skipped, 19 failed.
+  All 19 failures are in the new `test/spec/directives/advisor.coffee`.
+- Karma integration: 4 passed, 1 skipped (~6s).
 
 ### One spec file
 
 `advisor/karma-spec.conf.coffee` wraps the upstream Karma config and swaps the spec glob
-for `$SPEC` (file or glob, relative to `swarmsim-coffee/`); app code, mocks and
-libraries load as in the full suite. After `yarn _pretest` once:
+for `$SPEC`, a file or glob relative to `swarmsim-coffee/`; a path outside that
+folder is not compiled. App code, mocks, libraries and served fixtures load as in the
+full suite. After `yarn _pretest` once:
 
 ```bash
-cd swarmsim-coffee && SPEC=test/spec/services/unit.coffee yarn karma start ../advisor/karma-spec.conf.coffee
+cd swarmsim-coffee && SPEC=test/spec/services/advisor.coffee yarn karma start ../advisor/karma-spec.conf.coffee
 ```
 
-Ran in the container (~3s, 30 passed, 1 skipped) only with the `swarm-numberformat`
-gap temporarily filled by npm 0.2.0, which is not the pinned version; with the gap,
-it aborts at load like the full suite. To focus on single `it`s, temporarily use
-`fit` / `fdescribe` (Jasmine 2.5) and don't commit them.
+Container run: about 3s; services/advisor 46 of 46 passed; services/options 8 of 8 passed.
+To focus on single `it`s, temporarily use `fit` / `fdescribe` (Jasmine 2.5) and don't commit them.
 
-## Build and serve *(not run in the container: blocked by the grunt-wiredep-away gap)*
+## Build
 
-Production bundle, copied to `dist/` at the repo root:
+Production bundle, also copied to `dist/` at the repo root (container run: ~46s, wiredep included, `app/index.html` left unchanged):
 
 ```bash
 yarn build
 ```
 
-Serve `dist/` on http://localhost:3000. The prod build redirects plain http to https
-unless the URL carries `allowinsecure`, so open `http://localhost:3000/#/?allowinsecure=1`
-(or build with `yarn build:docker`, which allows http):
+The `Loading "cdnify.js" tasks...ERROR primordials` line is harmless; that task is unused.
+
+## Serve and check
+
+### Built `dist/` (port 3000)
+
+The prod build redirects plain http to https unless the URL carries `allowinsecure`, so open
+`http://localhost:3000/#/?allowinsecure=1`. Alternatively build with `yarn build:docker`, which allows http.
 
 ```bash
 yarn start:dist
 ```
 
-Non-interactive start/stop (from the repo root):
+Non-interactive start/stop, from the repo root:
 
 ```bash
-nohup node_modules/.bin/serve -n -l tcp://127.0.0.1:3000 dist > /tmp/swarmsim-serve.log 2>&1 & echo $! > /tmp/swarmsim-serve.pid
+nohup node_modules/.bin/serve -n -l tcp://127.0.0.1:3000 dist > /tmp/swarmsim-dist.log 2>&1 & echo $! > /tmp/swarmsim-dist.pid
 ```
 
 ```bash
-kill "$(cat /tmp/swarmsim-serve.pid)"
+kill "$(cat /tmp/swarmsim-dist.pid)"
 ```
 
-Dev server with live reload (`grunt serve`, port 9000 or `$PORT`) plus Parcel watching `swarmsim-ts`:
+### Dev server (port 9000; use this for feature work)
+
+`grunt serve` serves the un-minified per-file scripts. It recompiles CoffeeScript on save
+(about 3s, coffeelint included) and live-reloads on port 35728; Parcel watches `swarmsim-ts`.
+Container run: up in about 12s at `http://localhost:9000/#/`, with no `allowinsecure` needed.
 
 ```bash
 yarn start
 ```
+
+Non-interactive start/stop. It runs several processes, so stop it as a process group:
+
+```bash
+setsid bash -c 'echo $$ > /tmp/swarmsim-dev.pgid; exec yarn start' > /tmp/swarmsim-dev.log 2>&1 < /dev/null &
+```
+
+```bash
+kill -- -"$(cat /tmp/swarmsim-dev.pgid)"
+```
+
+### Headless boot check
+
+Container run, against both servers, using Playwright's Chromium (Node 20+ is needed for
+Playwright, so this ran with the system Node, not Node 16). The game service returned an
+object with meat 35 and larvae ~11. Units were listed and no raw `{{…}}` bindings remained.
+The Climbing Advisor panel was rendered on the main view. There were no console errors apart
+from the external requests the check itself blocks (Google Analytics, a Freshdesk stylesheet).
