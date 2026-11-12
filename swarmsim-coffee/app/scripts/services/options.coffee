@@ -201,6 +201,12 @@ angular.module('swarmApp').factory 'Options', ($log, util, env, game, $location,
       @set 'advisorEnabled', !!enabled
     return @get('advisorEnabled') != false
 
+  # Whether the advisor panel is folded down to its title bar. Default expanded.
+  advisorCollapsed: (collapsed) ->
+    if collapsed?
+      @set 'advisorCollapsed', !!collapsed
+    return !!@get 'advisorCollapsed'
+
   # Climbing advisor settings are stored together, as options.advisor = {ageMultiple:3, ...}.
   # Missing, unparseable or out-of-range stored values read as the default or are clamped, so old
   # and hand-edited saves load cleanly.

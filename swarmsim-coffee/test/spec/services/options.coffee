@@ -71,3 +71,10 @@ describe 'Service: options', ->
     loaded = options.session._loads options.session._saves()
     expect(loaded.options.advisor).toEqual {share: 0.3, moths: 2000}
     expect(loaded.options.advisorEnabled).toBe false
+
+  it 'remembers whether the advisor panel is collapsed, with the save', ->
+    expect(options.advisorCollapsed()).toBe false
+    expect(options.advisorCollapsed true).toBe true
+    loaded = options.session._loads options.session._saves()
+    expect(loaded.options.advisorCollapsed).toBe true
+    expect(options.advisorCollapsed false).toBe false

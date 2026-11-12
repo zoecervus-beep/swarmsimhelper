@@ -3,8 +3,11 @@
 <tabs cur="cur.tab"></tabs>
 
 <div class="tab-content">
+  <!-- The climbing advisor sits to the right of the unit list on wide screens and below it on narrow ones,
+       so its changing height never moves the list. -->
+  <div class="tab-pane active row">
   <!-- without this, dropdown creates vertical scrollbar due to table-responsive. we want horiz scrollbars on small screens, not vert on big screens! -->
-  <div class="tab-pane active table-responsive" style="padding-bottom: 250px">
+  <div class="col-xs-12 table-responsive" ng-class="{'col-md-7': options.advisorEnabled()}" style="padding-bottom: 250px">
     <table class="table unit-table table-hover" style="width:auto; float:left">
       <!-- filthy hack to show achievements on larvae page -->
       <tr ng-if="cur.tab.name == 'larva' && game.upgrade('achievementbonus').count().greaterThan(0)">
@@ -43,5 +46,9 @@
         </td>
       </tr>
     </table>
+  </div>
+  <div class="col-xs-12 col-md-5" ng-if="options.advisorEnabled()">
+    <advisor-panel></advisor-panel>
+  </div>
   </div>
 </div>

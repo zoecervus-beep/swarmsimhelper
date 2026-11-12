@@ -19,6 +19,7 @@ Numbers with suffixes work: '23 billion', '23b', or '23e9'.">
       <cost costlist="unit.eachCost()" num="buyCount()"></cost>
     </form>
   </p>
+  <advisor-suggest unit="unit" form="form"></advisor-suggest>
   <p ng-if="options.showAdvancedUnitData()">
     <span ng-if="unit.maxCostMet().greaterThan(0)">
       <span class="titlecase">{{unit.unittype.verbing}}</span> your maximum of

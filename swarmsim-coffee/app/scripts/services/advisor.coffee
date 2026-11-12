@@ -463,8 +463,18 @@ angular.module('swarmApp').factory 'advisor', (game, options, ADVISOR_SETTINGS) 
   # Live wiring for the panel: one remembered state per page load.
 
   liveMemory = null
+  # Shared by the panel and the buy-box button, so the rules run at most once per `maxAgeMs`
+  # however many views ask. Wall-clock time, so a page left in the background doesn't skew it.
+  cached = null
 
-  return {
+  # The advice record for one unit (by name), or null when that unit isn't among the listed tiers.
+  suggestionFor = (advice, name) ->
+    for t in advice?.tiers ? []
+      if t.name == name
+        return t
+    return null
+
+  svc = {
     CHAIN: CHAIN
     DEFAULTS: DEFAULTS
     # pure
@@ -488,5 +498,20 @@ angular.module('swarmApp').factory 'advisor', (game, options, ADVISOR_SETTINGS) 
       liveMemory = result.memory
       return result
     memory: -> liveMemory
-    resetMemory: -> liveMemory = null
+    resetMemory: ->
+      liveMemory = null
+      cached = null
+    suggestionFor: suggestionFor
+    # The latest advice, re-running `update()` only when the cached result is at least `maxAgeMs`
+    # old. Never throws: returns {at, advice, error}, with `error` set (and `advice` null) when
+    # `update()` threw. `wallNow` is for tests.
+    current: (maxAgeMs=1000, wallNow=Date.now()) ->
+      if not cached? or wallNow - cached.at >= maxAgeMs or wallNow < cached.at
+        try
+          cached = {at: wallNow, advice: svc.update(), error: null}
+        catch e
+          cached = {at: wallNow, advice: null, error: e}
+      return cached
+    invalidate: -> cached = null
   }
+  return svc

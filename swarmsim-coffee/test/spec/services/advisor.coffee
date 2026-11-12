@@ -471,6 +471,34 @@ describe 'Service: advisor', ->
       advisor.resetMemory()
       expect(advisor.memory()).toBe null
 
+    it 'caches the live advice for the views, at most once per interval', ->
+      spyOn(advisor, 'update').and.callThrough()
+      a = advisor.current 1000, 5000
+      expect(a.error).toBe null
+      expect(_.map a.advice.tiers, 'name').toEqual ['queen', 'nest']
+      expect(advisor.current(1000, 5999)).toBe a
+      expect(advisor.update.calls.count()).toBe 1
+      b = advisor.current 1000, 6000
+      expect(b).not.toBe a
+      expect(advisor.update.calls.count()).toBe 2
+      # a clock that went backwards refreshes too
+      expect(advisor.current(1000, 100)).not.toBe b
+      advisor.invalidate()
+      advisor.current 1000, 100
+      expect(advisor.update.calls.count()).toBe 4
+
+    it 'reports an exception from the rules instead of throwing it', ->
+      spyOn(advisor, 'update').and.throwError 'boom'
+      cur = advisor.current 1000, 1
+      expect(cur.advice).toBe null
+      expect(cur.error.message).toBe 'boom'
+
+    it 'finds the advice for one unit', ->
+      r = advisor.update()
+      expect(advisor.suggestionFor(r, 'nest').name).toBe 'nest'
+      expect(advisor.suggestionFor(r, 'hive')).toBe null
+      expect(advisor.suggestionFor(null, 'nest')).toBe null
+
 describe 'Service: advisor on a real save', ->
 
   beforeEach module 'swarmApp'
