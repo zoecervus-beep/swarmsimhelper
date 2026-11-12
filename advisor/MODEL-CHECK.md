@@ -30,6 +30,7 @@ git show e34fc82:advisor/sim/sim.py > advisor/modelcheck/out/sim_original.py
 python3 -I advisor/modelcheck/compare.py --sim advisor/modelcheck/out/sim_original.py   # the same against the unfixed sim
 python3 -I advisor/modelcheck/sensitivity.py --states  # the sensitivity tables below, about 50 s
 node advisor/modelcheck/run_specs.js test/spec/services/advisorfacts.coffee            # the pinned game facts
+node advisor/modelcheck/script_vs_port.js 1 300 20      # console script vs native port, below; about 25 s
 ```
 
 Speed: one 14-day simulator run with the tuned policy takes about 1 second.
@@ -197,6 +198,28 @@ Two points that are not false facts but are worth knowing:
 - accomplished ancestry as (1 + 0.001 × points)^level
 
 It passes in the Node harness (`node advisor/modelcheck/run_specs.js test/spec/services/advisorfacts.coffee`; the game's own effect, unit and upgrade specs also pass there, 57 passed and 2 pending). **Karma was not run.**
+
+## The console script and its port give the same advice
+
+`advisor/modelcheck/script_vs_port.js` is a regression check for the port of the console script's rules (`swarmsim-coffee/app/scripts/services/advisor.coffee`). It runs both against the same real game (`lib/game.js`). The script's rules are taken straight from `advisor/swarm-climb-live.js`, with `Date.now()` swapped for the game clock.
+
+- **What it tests:** random mutations of the example save, seeded and deterministic. These cover unit counts up to overmind VI, faster and twin levels, larvae, meat, nexus 0 to 5, energy, lepidoptera, run ages from 36 s to 2 years, and every setting.
+- **How it steps:** each state is stepped forward in game time, and suggested purchases are sometimes recorded in the game's statistics, so cooldowns, the purchase memory and the spare-stock rule all take part.
+- **What it compares:** at each step, every tier action with its exact buy count, every tip and the energy line, as text.
+- **Exit code:** 1 on any difference.
+
+```sh
+node advisor/modelcheck/script_vs_port.js [seed=1] [states=300] [steps=20]
+```
+
+Result on Nov 12, 2026:
+
+- Seeds 1 and 2, 300 states × 20 steps each: 6,000 comparisons per seed, no differences.
+- An earlier independent run on about 1,300 states found the same.
+- Covered: buy, skip, all four wait reasons, faster, twin and twin-plan tips, and all six energy lines.
+- A deliberately altered port was caught: exit 1.
+
+It never ascends. The port deliberately starts a fresh purchase memory after an ascension; the script keeps the last run's stock levels and purchase times.
 
 ## What remains unverified
 
