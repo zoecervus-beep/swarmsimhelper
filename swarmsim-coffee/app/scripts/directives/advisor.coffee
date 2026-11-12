@@ -20,6 +20,8 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, $filter) ->
       return null
   label = (name) -> unitOf(name)?.unittype?.label ? name
   plural = (name) -> unitOf(name)?.unittype?.plural ? name
+  # "1 hive queen", "2 hive queens"
+  count = (n, name) -> bignum(n) + ' ' + (if new Decimal(n).equals(1) then label(name) else plural(name))
   # Link to a unit's page, or null if the unit doesn't exist or isn't visible yet (the game
   # redirects away from hidden units).
   href = (name) ->
@@ -51,14 +53,14 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, $filter) ->
   step = (s) ->
     if s.type == 'twin'
       return upgradeLabel s.unit + 'twin', 'twin ' + plural(s.unit)
-    return 'hatch ' + bignum(s.count) + ' ' + (if s.count.equals(1) then label(s.unit) else plural(s.unit))
+    return 'hatch ' + count(s.count, s.unit)
 
   tip = (t) ->
     text = switch t.type
       when 'faster'
-        'buy ' + upgradeLabel(t.unit + 'prod', 'faster ' + plural(t.unit)) + ' (' + bignum(t.cost) + ' ' + plural(t.unit) + ')'
+        'buy ' + upgradeLabel(t.unit + 'prod', 'faster ' + plural(t.unit)) + ' (' + count(t.cost, t.unit) + ')'
       when 'twin'
-        'buy ' + upgradeLabel(t.unit + 'twin', 'twin ' + plural(t.unit)) + ' (' + bignum(t.cost) + ' ' + plural(t.payIn) + ')'
+        'buy ' + upgradeLabel(t.unit + 'twin', 'twin ' + plural(t.unit)) + ' (' + count(t.cost, t.payIn) + ')'
       when 'twinPlan'
         steps = (step(s) for s in t.steps)
         steps.push upgradeLabel(t.unit + 'twin', 'twin ' + plural(t.unit))
@@ -67,7 +69,7 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, $filter) ->
     return {type: t.type, unit: t.unit, text: text, href: href(t.unit)}
 
   saving = (rec) ->
-    'save for nexus ' + rec.level + ': ' + ((bignum(m.have) + '/' + bignum(m.need) + ' ' + plural(m.unit)) for m in rec.missing).join(', ')
+    'save for nexus ' + rec.level + ': ' + ((bignum(m.have) + '/' + count(m.need, m.unit)) for m in rec.missing).join(', ')
 
   energy = (rec) ->
     if not rec?
@@ -141,7 +143,7 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, $filter) ->
         rows: rows
         tips: (tip(t) for t in r.tips)
         energy: energy r.energy
-        summary: if buys.length then (buys[0].label + ': ' + buys[0].action) else null
+        summary: if buys.length then {label: buys[0].label, action: buys[0].action} else null
       }
     catch e
       return {error: errorText e}
@@ -188,51 +190,50 @@ angular.module('swarmApp').directive 'advisorPanel', ($rootScope, $log, advisor,
 <div class="panel panel-default advisor-panel" ng-if="enabled()">
   <div class="panel-heading">
     <h4 class="panel-title">
-      <a href="javascript:" ng-click="toggle()" aria-controls="advisor-panel-body" aria-expanded="{{!collapsed()}}">
+      <a href="javascript:" ng-click="toggle()" aria-expanded="{{!collapsed()}}">
         <span class="glyphicon" ng-class="collapsed() ? 'glyphicon-chevron-right' : 'glyphicon-chevron-down'" aria-hidden="true"></span>
         Climbing advisor
       </a>
-      <small ng-if="collapsed() && view.summary" class="advisor-summary titlecase">&mdash; {{view.summary}}</small>
+      <small ng-if="collapsed() && view.summary" class="advisor-summary">&mdash; <span class="titlecase">{{view.summary.label}}</span>: {{view.summary.action}}</small>
     </h4>
   </div>
-  <div id="advisor-panel-body" ng-if="!collapsed()">
-    <div class="panel-body text-danger advisor-error" ng-if="view.error">
-      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Advisor error: {{view.error}}
-    </div>
-    <div class="panel-body text-muted" ng-if="!view">Working it out&hellip;</div>
-    <div class="panel-body small advisor-header" ng-if="view.header">
-      Run {{view.header.age}} &middot; climb if H &lt; {{view.header.horizon}} &middot;
-      <span class="text-nowrap">{{view.header.larvae}} larvae (+{{view.header.larvaRate}}/sec)</span>
-    </div>
-    <div class="table-responsive" ng-if="view.rows">
-      <table class="table table-condensed advisor-table">
-        <thead><tr>
-          <th>Unit</th>
-          <th class="text-right">Owned</th>
-          <th class="text-right" title="Break-even time: hatching this leaves you with less meat than not hatching until about this long afterward">H</th>
-          <th>Now</th>
-        </tr></thead>
-        <tbody>
-          <tr ng-repeat="row in view.rows track by row.name" ng-class="{success: row.kind == 'buy'}" class="advisor-row advisor-{{row.kind}}">
-            <td class="titlecase text-nowrap"><a ng-if="row.href" ng-href="{{row.href}}">{{row.label}}</a><span ng-if="!row.href">{{row.label}}</span></td>
-            <td class="text-right text-nowrap">{{row.count|bignum:0}}</td>
-            <td class="text-right text-nowrap">{{row.H}}</td>
-            <td ng-class="{'text-muted': row.kind != 'buy'}"><strong ng-if="row.kind == 'buy'">{{row.action}}</strong><span ng-if="row.kind != 'buy'">{{row.action}}</span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <ul class="list-group" ng-if="view.tips.length || view.energy">
-      <li class="list-group-item advisor-tip" ng-repeat="tip in view.tips">
-        <span class="glyphicon glyphicon-circle-arrow-up" aria-hidden="true"></span>
-        <a ng-if="tip.href" ng-href="{{tip.href}}">{{tip.text}}</a><span ng-if="!tip.href">{{tip.text}}</span>
-      </li>
-      <li class="list-group-item advisor-energy text-info" ng-if="view.energy">
-        <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Energy:
-        <a ng-if="view.energy.href" ng-href="{{view.energy.href}}">{{view.energy.text}}</a><span ng-if="!view.energy.href">{{view.energy.text}}</span>
-      </li>
-    </ul>
+  <!-- the body parts are direct children of .panel so Bootstrap's panel table/list-group styles apply -->
+  <div class="panel-body text-danger advisor-error" ng-if="!collapsed() && view.error">
+    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Advisor error: {{view.error}}
   </div>
+  <div class="panel-body text-muted" ng-if="!collapsed() && !view">Working it out&hellip;</div>
+  <div class="panel-body small advisor-header" ng-if="!collapsed() && view.header">
+    Run {{view.header.age}} &middot; climb if H &lt; {{view.header.horizon}} &middot;
+    <span class="text-nowrap">{{view.header.larvae}} larvae (+{{view.header.larvaRate}}/sec)</span>
+  </div>
+  <div class="table-responsive advisor-body" ng-if="!collapsed() && view.rows">
+    <table class="table table-condensed advisor-table">
+      <thead><tr>
+        <th>Unit</th>
+        <th class="text-right">Owned</th>
+        <th class="text-right" title="Break-even time: hatching this leaves you with less meat than not hatching until about this long afterward">H</th>
+        <th>Now</th>
+      </tr></thead>
+      <tbody>
+        <tr ng-repeat="row in view.rows track by row.name" ng-class="{success: row.kind == 'buy'}" class="advisor-row advisor-{{row.kind}}">
+          <td class="titlecase text-nowrap"><a ng-if="row.href" ng-href="{{row.href}}">{{row.label}}</a><span ng-if="!row.href">{{row.label}}</span></td>
+          <td class="text-right text-nowrap">{{row.count|bignum:0}}</td>
+          <td class="text-right text-nowrap">{{row.H}}</td>
+          <td class="advisor-action" ng-class="{'text-muted': row.kind != 'buy'}"><strong ng-if="row.kind == 'buy'">{{row.action}}</strong><span ng-if="row.kind != 'buy'">{{row.action}}</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <ul class="list-group" ng-if="!collapsed() && (view.tips.length || view.energy)">
+    <li class="list-group-item advisor-tip" ng-repeat="tip in view.tips">
+      <span class="glyphicon glyphicon-circle-arrow-up" aria-hidden="true"></span>
+      <a ng-if="tip.href" ng-href="{{tip.href}}">{{tip.text}}</a><span ng-if="!tip.href">{{tip.text}}</span>
+    </li>
+    <li class="list-group-item advisor-energy" ng-if="view.energy">
+      <span class="glyphicon glyphicon-flash text-info" aria-hidden="true"></span> Energy:
+      <a ng-if="view.energy.href" ng-href="{{view.energy.href}}">{{view.energy.text}}</a><span ng-if="!view.energy.href">{{view.energy.text}}</span>
+    </li>
+  </ul>
 </div>
 """
   link: (scope, element, attrs) ->
@@ -339,7 +340,7 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
   link: (scope, element, attrs) ->
     scope.defaults = ADVISOR_SETTINGS.defaults
     scope.fields = [
-      {key: 'ageMultiple', label: 'Climb multiple', help: "Start hatching a tier once its break-even time (H) is under this many times the age of your run. Use 5 for multi-day runs."}
+      {key: 'ageMultiple', label: 'Climb multiple', help: "Start hatching a tier once its break-even time (H) is under this many times the age of your run. 3 suits runs of a day or so; 5 suits runs lasting several days (two days or more)."}
       {key: 'share', label: 'Share per minute', help: "Fraction of the tier below that may be converted for each minute since you last hatched a unit (0.5 = half)."}
       {key: 'cooldown', label: 'Cooldown (seconds)', help: "After you hatch a unit, wait this many seconds before suggesting it again."}
       {key: 'bank', label: 'Banking threshold', help: "Stop hatching a unit, and save its larvae, once the tier above already makes this many times what larvae could."}

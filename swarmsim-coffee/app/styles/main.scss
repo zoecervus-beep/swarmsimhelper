@@ -332,3 +332,16 @@ body {
   height: 100%;
   overflow: hidden;
 }
+// Climbing advisor (directives/advisor.coffee, views/main.html)
+// Below md the panel stacks under the unit list. The list keeps 250px of empty padding so its
+// buy dropdowns aren't clipped by .table-responsive; let the panel sit over that space instead of
+// below it (an open dropdown is positioned, so it still draws over the panel).
+@media (max-width: 991px) {
+  .advisor-col {
+    margin-top: -235px;
+  }
+}
+// .table-responsive stops cells wrapping on phones; let the action text wrap instead of scrolling.
+.advisor-panel .table-responsive > .table > tbody > tr > td.advisor-action {
+  white-space: normal;
+}
