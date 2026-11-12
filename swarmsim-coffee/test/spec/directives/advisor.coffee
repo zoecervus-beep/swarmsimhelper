@@ -25,10 +25,11 @@ fakeAdvice = (over={}) ->
 text = (el) -> (el?.textContent ? '').replace(/\s+/g, ' ').trim()
 
 describe 'Directive: advisorPanel', ->
-  beforeEach module 'swarmApp'
+  beforeEach module 'swarmApp', 'mockFlashStorage'
 
-  scope = advisor = options = game = $compile = $rootScope = null
-  beforeEach inject (_$compile_, _$rootScope_, _advisor_, _options_, _game_) ->
+  scope = advisor = options = game = $compile = $rootScope = bignum = null
+  beforeEach inject (_$compile_, _$rootScope_, _advisor_, _options_, _game_, $filter) ->
+    bignum = $filter 'bignum'
     $compile = _$compile_
     $rootScope = _$rootScope_
     advisor = _advisor_
@@ -60,7 +61,8 @@ describe 'Directive: advisorPanel', ->
     header = text el.querySelector '.advisor-header'
     expect(header).toContain 'Run 60 min'
     expect(header).toContain 'climb if H < 3.0 h'
-    expect(header).toContain '1,234 larvae (+5/sec)'
+    # the game's own number format, whatever it looks like in this browser
+    expect(header).toContain bignum(new Decimal 1234) + ' larvae (+5/sec)'
     tips = (text t for t in el.querySelectorAll '.advisor-tip')
     expect(tips).toEqual ['buy faster queens (66 queens)', 'buy twin nests (10 greater queens)']
     expect(text el.querySelector '.advisor-energy').toBe 'Energy: cast House of Mirrors ×3'
@@ -109,7 +111,7 @@ describe 'Directive: advisorPanel', ->
     expect(el.querySelectorAll('tbody tr').length).toBe 3
 
 describe 'Directive: advisorSuggest', ->
-  beforeEach module 'swarmApp'
+  beforeEach module 'swarmApp', 'mockFlashStorage'
 
   scope = advisor = advisorView = options = game = parseNumber = $compile = $rootScope = null
   beforeEach inject (_$compile_, _$rootScope_, _advisor_, _advisorView_, _options_, _game_, _parseNumber_) ->
@@ -199,7 +201,7 @@ describe 'Directive: advisorSuggest', ->
     expect(text el.querySelector 'button').toBe 'Use suggested: 30 nests'
 
 describe 'Directive: advisorOptions', ->
-  beforeEach module 'swarmApp'
+  beforeEach module 'swarmApp', 'mockFlashStorage'
 
   scope = options = $compile = $rootScope = null
   beforeEach inject (_$compile_, _$rootScope_, _options_) ->
