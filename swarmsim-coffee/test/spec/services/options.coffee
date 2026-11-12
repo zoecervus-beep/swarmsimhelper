@@ -28,3 +28,46 @@ describe 'Service: options', ->
       # energy is a special case: swarmwarp generates no energy
       expect(options.getVelocityUnit(unit:'energy').name).toBe 'sec'
       expect(options.getVelocityUnit(unit:'energy').mult+'').toBe '1'
+
+  it 'defaults the advisor settings', ->
+    expect(options.advisorConfig()).toEqual {ageMultiple: 3, share: 0.5, cooldown: 60, bank: 3, territory: 0.1, moths: 4000}
+    expect(options.advisorEnabled()).toBe true
+
+  it 'sets, clamps and validates advisor settings', ->
+    expect(options.advisorSetting 'share', 0.25).toBe 0.25
+    expect(options.advisorSetting 'share').toBe 0.25
+    expect(options.advisorSetting 'ageMultiple', '5').toBe 5
+    expect(options.advisorSetting 'territory', 2).toBe 0.95
+    expect(options.advisorSetting 'cooldown', -5).toBe 0
+    expect(options.advisorSetting 'moths', 2500.7).toBe 2500
+    expect(-> options.advisorSetting 'share', 'lots').toThrow()
+    expect(-> options.advisorSetting 'share', '').toThrow()
+    expect(-> options.advisorSetting 'bogus', 1).toThrow()
+    expect(-> options.advisorSetting 'bogus').toThrow()
+    expect(options.advisorSetting 'share').toBe 0.25
+    # all or nothing
+    expect(-> options.advisorConfig {bank: 4, share: 'x'}).toThrow()
+    expect(options.advisorSetting 'bank').toBe 3
+    expect(options.advisorConfig({bank: 4, moths: 2000}).bank).toBe 4
+    expect(options.advisorConfig()).toEqual {ageMultiple: 5, share: 0.25, cooldown: 0, bank: 4, territory: 0.95, moths: 2000}
+    options.advisorEnabled false
+    expect(options.advisorEnabled()).toBe false
+    options.advisorEnabled true
+    expect(options.advisorEnabled()).toBe true
+    options.resetAdvisorConfig()
+    expect(options.advisorSetting 'share').toBe 0.5
+
+  it 'reads missing or corrupt stored advisor settings as defaults', ->
+    options.session.state.options.advisor = {share: 'garbage', bank: null, cooldown: 1e9, moths: '1000'}
+    expect(options.advisorConfig()).toEqual {ageMultiple: 3, share: 0.5, cooldown: 86400, bank: 3, territory: 0.1, moths: 1000}
+    options.session.state.options.advisor = 'not an object'
+    expect(options.advisorConfig().share).toBe 0.5
+    delete options.session.state.options.advisor
+    expect(options.advisorConfig().share).toBe 0.5
+
+  it 'saves advisor settings with the game', ->
+    options.advisorConfig {share: 0.3, moths: 2000}
+    options.advisorEnabled false
+    loaded = options.session._loads options.session._saves()
+    expect(loaded.options.advisor).toEqual {share: 0.3, moths: 2000}
+    expect(loaded.options.advisorEnabled).toBe false

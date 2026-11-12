@@ -7,7 +7,7 @@
  # # options
  # Service in the swarmApp.
 ###
-angular.module('swarmApp').factory 'Options', ($log, util, env, game, $location) -> class Options
+angular.module('swarmApp').factory 'Options', ($log, util, env, game, $location, ADVISOR_SETTINGS) -> class Options
   constructor: (@session) ->
     @VELOCITY_UNITS = byName:{}, list:[]
     addvunit = (name, label, plural, mult) =>
@@ -194,6 +194,66 @@ angular.module('swarmApp').factory 'Options', ($log, util, env, game, $location)
   isAprilFoolsTheme: (enabled) ->
     @maybeSet 'aprilFoolsTheme', enabled
     return @get('aprilFoolsTheme') ? false
+
+  # Climbing advisor panel on/off. Default on.
+  advisorEnabled: (enabled) ->
+    if enabled?
+      @set 'advisorEnabled', !!enabled
+    return @get('advisorEnabled') != false
+
+  # Climbing advisor settings are stored together, as options.advisor = {ageMultiple:3, ...}.
+  # Missing, unparseable or out-of-range stored values read as the default or are clamped, so old
+  # and hand-edited saves load cleanly.
+  _advisorParse: (key, val) ->
+    limit = ADVISOR_SETTINGS.limits[key]
+    if _.isNumber val
+      num = val
+    else if _.isString(val) and val.trim() != ''
+      num = Number val
+    else
+      return undefined
+    if not _.isFinite num
+      return undefined
+    if limit.integer
+      num = Math.floor num
+    return Math.min limit.max, Math.max limit.min, num
+  _advisorAssertKey: (key) ->
+    if not ADVISOR_SETTINGS.defaults.hasOwnProperty key
+      throw new Error "unknown advisor setting: #{key}"
+
+  # Getter/setter for one advisor setting. Setting a non-number throws; out-of-range values are clamped.
+  advisorSetting: (key, val) ->
+    @_advisorAssertKey key
+    if val?
+      vals = {}
+      vals[key] = val
+      @advisorConfig vals
+    return @advisorConfig()[key]
+
+  # Getter/setter for all advisor settings at once. Setting only changes the keys given; all are
+  # validated before any is saved. Returns every setting.
+  advisorConfig: (vals) ->
+    if vals?
+      stored = @get 'advisor'
+      next = if _.isPlainObject(stored) then _.clone(stored) else {}
+      for key, val of vals
+        @_advisorAssertKey key
+        parsed = @_advisorParse key, val
+        if not parsed?
+          throw new Error "invalid advisor setting #{key}: #{val}"
+        next[key] = parsed
+      @set 'advisor', next
+    stored = @get 'advisor'
+    if not _.isPlainObject stored
+      stored = {}
+    ret = {}
+    for key, default_ of ADVISOR_SETTINGS.defaults
+      ret[key] = @_advisorParse(key, stored[key]) ? default_
+    return ret
+
+  resetAdvisorConfig: ->
+    @reset 'advisor'
+    @session.save()
 
 
 angular.module('swarmApp').factory 'options', (Options, session) ->
