@@ -462,6 +462,34 @@ describe 'Service: advisor', ->
       expect(advisor.advise(snap, null, {}).energy.type).toBe 'cast'
 
   describe 'live wiring', ->
+    it 'keeps the live advice current on the game tick, with no view on screen', inject ($rootScope, options) ->
+      spyOn(advisor, 'update').and.callThrough()
+      $rootScope.$emit 'tick'
+      expect(advisor.update.calls.count()).toBe 1
+      # at most once a second
+      $rootScope.$emit 'tick'
+      expect(advisor.update.calls.count()).toBe 1
+      expect(advisor.memory()).not.toBe null
+      # and not at all while the advisor is off
+      options.advisorEnabled false
+      advisor.invalidate()
+      $rootScope.$emit 'tick'
+      expect(advisor.update.calls.count()).toBe 1
+
+    it 'never lets an exception out of the tick', inject ($rootScope, options) ->
+      spyOn(options, 'advisorEnabled').and.throwError 'broken'
+      expect(-> $rootScope.$emit 'tick').not.toThrow()
+
+    it 'forgets purchase history only after a successful import', inject ($rootScope) ->
+      advisor.update()
+      $rootScope.$broadcast 'import', {source: 'options', success: false}
+      expect(advisor.memory()).not.toBe null
+      $rootScope.$broadcast 'import', {source: 'options', success: true}
+      expect(advisor.memory()).toBe null
+      advisor.update()
+      $rootScope.$broadcast 'reset', {}
+      expect(advisor.memory()).toBe null
+
     it 'advises on the live game and remembers between updates', ->
       r = advisor.update()
       expect(r.config).toEqual advisor.DEFAULTS
@@ -606,3 +634,54 @@ describe 'Service: advisor on a real save', ->
     expect(advisor.renderEnergy r.energy).toBe 'buy 10 lepidoptera (lepidoptera 2,416/4,000)'
     # 30 x 1.1^57 x 1.69^5 = 94610.17 larvae/s
     expect(advisor.renderHeader r).toBe 'run 14.5 h | climb if H < 43.4 h | larvae 3.34e6 (+94,610/s)'
+
+  it 'starts a fresh purchase memory after an ascension', ->
+    game = loadGame()
+    now = game.now.getTime()
+    r1 = advisor.advise advisor.snapshot(game, now), null, {}
+    # the hatching tiers have recorded purchase times and stock levels for this run
+    expect(_.keys(r1.memory.stockAt).length).toBeGreaterThan 0
+    expect(r1.memory.restartedAt).toBe advisor.snapshot(game, now).restartedAt
+    game.now = new Date now + 600e3
+    game.ascend true
+    game.unit('drone')._setCount 1e9
+    game.unit('queen')._setCount 1e6
+    game.unit('nest')._setCount 3e3
+    game.unit('greaterqueen')._setCount 1
+    later = now + 900e3
+    snap = advisor.snapshot game, later
+    expect(snap.restartedAt).toBe now + 600e3
+    carried = advisor.advise snap, r1.memory, {}
+    fresh = advisor.advise snap, null, {}
+    expect(carried.memory.startedAt).toBe later
+    expect(carried.memory.restartedAt).toBe snap.restartedAt
+    expect((advisor.renderAction t for t in carried.tiers)).toEqual (advisor.renderAction t for t in fresh.tiers)
+    expect(carried.memory).toEqual fresh.memory
+
+  it 'keeps the memory within a run', ->
+    game = loadGame()
+    now = game.now.getTime()
+    r1 = advisor.advise advisor.snapshot(game, now), null, {}
+    r2 = advisor.advise advisor.snapshot(game, now + 1000), r1.memory, {}
+    expect(r2.memory.startedAt).toBe r1.memory.startedAt
+    expect(r2.memory.stockAt).toEqual r1.memory.stockAt
+
+  it 'loses only the energy line when energy cannot be read', ->
+    game = loadGame()
+    spyOn(game.unit('moth'), 'count').and.throwError 'no moths'
+    snap = advisor.snapshot game
+    expect(snap.energyError.message).toBe 'no moths'
+    r = advisor.advise snap, null, {}
+    expect(r.energy).toBe null
+    expect(r.energyError.message).toBe 'no moths'
+    expect(_.find(r.tiers, name: 'hive').kind).toBe 'buy'
+
+  it 'loses only the energy line when the energy rules fail', ->
+    game = loadGame()
+    snap = advisor.snapshot game
+    snap.energy.next = {costs: 'not a list'}
+    snap.energy.nexus = 3
+    r = advisor.advise snap, null, {}
+    expect(r.energyError).toBeTruthy()
+    expect(r.energy).toBe null
+    expect(r.tiers.length).toBe 6

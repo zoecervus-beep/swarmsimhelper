@@ -29,6 +29,9 @@ angular.module('swarmApp').constant 'ADVISOR_SETTINGS',
  # state (`createMemory()`, returned updated by `advise()`), the settings, and the snapshot's time.
  # `update()` wires those to the live game for the UI.
 ###
+# The live advice is re-run at most this often.
+angular.module('swarmApp').constant 'ADVISOR_REFRESH_MILLIS', 1000
+
 angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISOR_SETTINGS) ->
   ZERO = new Decimal 0
   ONE = new Decimal 1
@@ -116,13 +119,24 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
       prodCost: if prodUp then D(prodUp.totalCost()[0].val) else null # faster upgrade price, in this unit
       purchases: String(if stats[name] then stats[name].num else 0)
 
-    nexus = D(g.unit('nexus').count()).toNumber()
-    next = null
-    if nexus < 5 and (up = g.upgrade 'nexus' + (nexus + 1))
-      next =
-        name: up.name
-        level: nexus + 1
-        costs: ({unit: c.unit.name, val: D(c.val), have: D(c.unit.count())} for c in up.totalCost())
+    # Energy is read separately, as the script did, so a failure there only loses the energy line.
+    energy = null
+    energyError = null
+    try
+      nexus = D(g.unit('nexus').count()).toNumber()
+      next = null
+      if nexus < 5 and (up = g.upgrade 'nexus' + (nexus + 1))
+        next =
+          name: up.name
+          level: nexus + 1
+          costs: ({unit: c.unit.name, val: D(c.val), have: D(c.unit.count())} for c in up.totalCost())
+      energy =
+        nexus: nexus
+        energy: D g.unit('energy').count()
+        moths: D g.unit('moth').count()
+        next: next
+    catch e
+      energyError = e
 
     return {
       now: now
@@ -130,27 +144,29 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
       larvae: D larva.count()
       larvaRate: D larva.velocity()
       units: units
-      energy:
-        nexus: nexus
-        energy: D g.unit('energy').count()
-        moths: D g.unit('moth').count()
-        next: next
+      energy: energy
+      energyError: energyError
     }
 
   # ---------------------------------------------------------------------------
   # Remembered state: per unit, the purchase statistic last seen, when it last changed, and the stock
   # of the tier below at that moment.
 
-  createMemory = (now) ->
+  createMemory = (now, restartedAt) ->
     startedAt: now
+    restartedAt: restartedAt
     seen: {}
     boughtAt: {}
     stockAt: {}
 
-  copyMemory = (memory, now) ->
-    if not memory?
-      return createMemory now
+  # A memory belongs to one run: after an ascension (a new `restartedAt`) it starts afresh, so the
+  # last run's purchase times and stock levels don't leak into the new one. (The console script
+  # kept them; this is the one deliberate difference.)
+  copyMemory = (memory, now, restartedAt) ->
+    if not memory? or (memory.restartedAt? and restartedAt? and memory.restartedAt != restartedAt)
+      return createMemory now, restartedAt
     startedAt: if memory.startedAt? then memory.startedAt else now
+    restartedAt: if memory.restartedAt? then memory.restartedAt else restartedAt
     seen: copyMap memory.seen
     boughtAt: copyMap memory.boughtAt
     stockAt: copyMap memory.stockAt
@@ -225,7 +241,7 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
   advise = (snap, memory, cfg) ->
     cfg = withDefaults cfg
     now = snap.now
-    mem = copyMemory memory, now
+    mem = copyMemory memory, now, snap.restartedAt
     age = (now - snap.restartedAt) / 1000
     horizon = age * cfg.ageMultiple
     larvae = snap.larvae
@@ -351,6 +367,13 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
         if u.count.greaterThanOrEqualTo(costInU.times(2)) and twinPayback.times(u.tier + 1).lessThan(horizon)
           tips.push {type: 'twinPlan', unit: u.name, payIn: payIn.name, cost: tc, steps: steps, planCost: costInU, payback: twinPayback}
 
+    energy = null
+    energyError = snap.energyError ? null
+    if not energyError?
+      try
+        energy = energyAdvice snap, cfg
+      catch e
+        energyError = e
     return {
       now: now
       age: age
@@ -361,7 +384,8 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
       top: CHAIN[top]
       tiers: tiers
       tips: tips
-      energy: energyAdvice snap, cfg
+      energy: energy
+      energyError: energyError
       config: cfg
       memory: mem
     }
@@ -516,6 +540,24 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
   }
   # A different save (imported, or the game reset) must not inherit this one's purchase history:
   # its statistics would read as a purchase just made, and put every unit on cooldown.
-  $rootScope.$on 'import', -> svc.resetMemory()
+  # Every sender of 'import' passes {success}; a failed import leaves the old save in place.
+  $rootScope.$on 'import', (event, args) ->
+    if args?.success
+      svc.resetMemory()
   $rootScope.$on 'reset', -> svc.resetMemory()
   return svc
+
+# Keep the live advice (and the purchase memory behind it) current on every page, not only while an
+# advisor view is showing, as the console script's timer did. Runs on the game's own tick, at most
+# once per ADVISOR_REFRESH_MILLIS, only while the advisor is on; views just read the cached result.
+# The services are looked up on the first tick, so loading the module creates nothing. Never throws:
+# an exception here would stop the game loop.
+angular.module('swarmApp').run ($rootScope, $injector, $log, ADVISOR_REFRESH_MILLIS) ->
+  $rootScope.$on 'tick', ->
+    try
+      if $injector.get('options').advisorEnabled()
+        $injector.get('advisor').current ADVISOR_REFRESH_MILLIS
+        $injector.get('advisorTerritory').current ADVISOR_REFRESH_MILLIS
+    catch e
+      $log.warn 'advisor tick', e
+    return
