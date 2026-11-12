@@ -54,6 +54,8 @@ module.exports = (config) ->
       '.tmp/scripts/env.js'
       'test/mock/**/*.coffee'
       'test/spec/**/*.coffee'
+      # fixture for test/spec/services/advisor.coffee, fetched by the spec via XHR
+      {pattern: '../advisor/sim/example_save_14h.json', included: false, served: true, watched: false}
     ],
 
     # list of files / patterns to exclude

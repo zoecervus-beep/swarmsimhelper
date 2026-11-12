@@ -16,6 +16,9 @@
 #
 # Usage:  advisor/setup-dev.sh            (full setup)
 #         advisor/setup-dev.sh --no-install   (toolchain + env.sh only)
+#         advisor/setup-dev.sh --near-versions  (OPT-IN, fallback path only: also
+#             install npm stand-ins that are NOT the pinned versions; see
+#             advisor/npm-bower-fallback.sh)
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -23,7 +26,14 @@ TC="${SWARMSIM_TOOLCHAIN_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/swarmsim-toolchain
 NODE_VERSION=16.20.2
 YARN_VERSION=1.22.22
 DO_INSTALL=1
-[ "${1:-}" = "--no-install" ] && DO_INSTALL=0
+FALLBACK_ARGS=()
+for a in "$@"; do
+  case "$a" in
+    --no-install) DO_INSTALL=0 ;;
+    --near-versions) FALLBACK_ARGS+=(--near-versions) ;;
+    *) echo "unknown argument: $a" >&2; exit 64 ;;
+  esac
+done
 mkdir -p "$TC"
 log() { printf '\n== %s\n' "$*"; }
 
@@ -120,7 +130,7 @@ yarn install --frozen-lockfile --ignore-scripts
 yarn run install:link
 (cd tables && yarn install --frozen-lockfile)
 (cd swarmsim-ts && yarn install --frozen-lockfile)
-"$REPO/advisor/npm-bower-fallback.sh"
+"$REPO/advisor/npm-bower-fallback.sh" ${FALLBACK_ARGS[@]+"${FALLBACK_ARGS[@]}"}
 echo >&2
 echo "Installed WITH GAPS: some GitHub-pinned libraries have no npm copy (listed above)." >&2
 echo "In each new shell:  . \"$TC/env.sh\"" >&2

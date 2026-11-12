@@ -10,17 +10,40 @@
 #      yarn runs with --pure-lockfile, so neither is ever rewritten;
 #   2. fills node_modules/@bower_components/<name> from npm-registry packages at
 #      the version the lockfile pins (table below);
-#   3. leaves the GAP entries empty and says so. Nothing is substituted for them.
+#   3. leaves the GAP entries empty and says so. Nothing is substituted for them,
+#      unless you pass --near-versions (see NEAR below).
 #
 # Results obtained this way are "with npm-registry copies", not with the real
 # pinned sources. On a normal network, use plain `yarn install` instead.
 #
+# Usage: advisor/npm-bower-fallback.sh [--near-versions]
+#   --near-versions  OPT-IN: also install the NEAR stand-ins below, which are NOT
+#                    the pinned versions. Each gets a NOT-THE-PINNED-VERSION.txt
+#                    marker. Without the flag, stand-ins from an earlier run are removed.
+#
 # Needs Node 16 + yarn 1 on PATH (source the env.sh written by setup-dev.sh).
 set -euo pipefail
+
+NEAR_VERSIONS=0
+for a in "$@"; do
+  case "$a" in
+    --near-versions) NEAR_VERSIONS=1 ;;
+    *) echo "unknown argument: $a" >&2; exit 64 ;;
+  esac
+done
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 COFFEE="$REPO/swarmsim-coffee"
 BC="$COFFEE/node_modules/@bower_components"
+MARKER="NOT-THE-PINNED-VERSION.txt"
+
+# Opt-in stand-ins (--near-versions): name | npm stand-in | pinned version | why
+# swarm-persist, playfab-sdk, grunt-wiredep-away, playfab-sdk-browser have no npm
+# copy at ANY version and stay missing even with the flag.
+NEAR='
+swarm-numberformat|swarm-numberformat@0.2.0|0.2.1|0.2.1 only adds "Support undefined/null/zero sigfigs" (upstream changelog)
+flash-cookies|flash-cookies@2.2.1|2.2.3|npm has only 2.2.0 and 2.2.1
+'
 
 # name | pinned GitHub source (lockfile) | npm source | note
 # npm source "GAP" = no npm package at the pinned version; left uninstalled.
@@ -94,6 +117,20 @@ trap 'rm -rf "$TMPD"' EXIT
 
 echo "== [npm fallback] filling node_modules/@bower_components from the npm registry"
 mkdir -p "$BC"
+fetch() { # fetch <name> <npm spec>: (re)install @bower_components/<name> unless already that spec
+  local dest="$BC/$1"
+  if [ -f "$dest/.npm-fallback" ] && [ "$(cat "$dest/.npm-fallback")" = "$2" ]; then
+    return 1
+  fi
+  rm -rf "$dest"
+  local tgz
+  tgz="$(cd "$TMPD" && npm pack --silent "$2")"   # npm checks the registry integrity hash
+  mkdir -p "$dest"
+  tar --warning=no-unknown-keyword -xzf "$TMPD/$tgz" -C "$dest" --strip-components=1
+  rm -f "$TMPD/$tgz"
+  echo "$2" > "$dest/.npm-fallback"
+  echo "   $1 <- $2"
+}
 gaps=()
 while IFS='|' read -r name pinned spec note; do
   [ -n "$name" ] || continue
@@ -101,18 +138,27 @@ while IFS='|' read -r name pinned spec note; do
     gaps+=("$name ($pinned): $note")
     continue
   fi
-  dest="$BC/$name"
-  if [ -f "$dest/.npm-fallback" ] && [ "$(cat "$dest/.npm-fallback")" = "$spec" ]; then
-    continue
-  fi
-  rm -rf "$dest"
-  tgz="$(cd "$TMPD" && npm pack --silent "$spec")"   # npm checks the registry integrity hash
-  mkdir -p "$dest"
-  tar --warning=no-unknown-keyword -xzf "$TMPD/$tgz" -C "$dest" --strip-components=1
-  rm -f "$TMPD/$tgz"
-  echo "$spec" > "$dest/.npm-fallback"
-  echo "   $name <- $spec"
+  fetch "$name" "$spec" || true
 done <<< "$MAP"
+
+near_used=()
+while IFS='|' read -r name spec pinned why; do
+  [ -n "$name" ] || continue
+  dest="$BC/$name"
+  if [ "$NEAR_VERSIONS" = 1 ]; then
+    fetch "$name" "$spec" || true
+    cat > "$dest/$MARKER" <<EOF
+NOT THE PINNED VERSION. Installed by advisor/npm-bower-fallback.sh --near-versions.
+This directory holds npm $spec as a stand-in for the pinned GitHub version $pinned,
+which has no npm copy ($why). Test or app results that use it are not
+results with the pinned dependency. Re-run the fallback without --near-versions to remove it.
+EOF
+    near_used+=("$name: npm $spec installed in place of pinned $pinned ($why)")
+  elif [ -f "$dest/$MARKER" ]; then
+    rm -rf "$dest"
+    echo "   removed stand-in $name (run without --near-versions)"
+  fi
+done <<< "$NEAR"
 
 # Layout: every bower_components path used by test/karma-*.conf.coffee, app/index.html,
 # app/styles/*.scss, Gruntfile.js (copy, compass importPath) and options.coffee
@@ -125,6 +171,17 @@ done <<< "$MAP"
 
 echo
 echo "== [npm fallback] done. NOT installed (no npm package at the pinned version):"
-for g in "${gaps[@]}"; do echo "   GAP $g"; done
+for g in "${gaps[@]}"; do
+  n="${g%% *}"
+  if [ -f "$BC/$n/$MARKER" ]; then echo "   GAP $g  [stand-in installed, see below]"; else echo "   GAP $g"; fi
+done
 echo "   GAP grunt-wiredep-away (gscavalcante/grunt-wiredep-away @6b010f5d): not on npm; grunt 'wiredep' task missing"
 echo "   GAP playfab-sdk-browser (erosson/playfab-sdk-browser @d20778f5): not on npm; only used by swarm-persist"
+if [ "${#near_used[@]}" -gt 0 ]; then
+  echo
+  echo "!! --near-versions: these are NOT the pinned versions (marker: $MARKER in each):"
+  for n in "${near_used[@]}"; do echo "!!   $n"; done
+  echo "!! Results with these stand-ins are not results with the pinned dependencies."
+  echo "!! swarm-persist, playfab-sdk (PlayFab JavaScriptSDK), playfab-sdk-browser and"
+  echo "!! grunt-wiredep-away have no npm copy at any version and remain missing."
+fi
