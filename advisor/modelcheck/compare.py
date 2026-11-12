@@ -217,6 +217,12 @@ for lvl, r in game['ancestry']['byLevel'].items():
     rows.append(('larvae gained in 60 s at ancestry %s' % lvl, F(r['gained60s']), lam(s) * 60))
 mismatches['ancestry'] = table('Accomplished ancestry', rows)
 
+C = game['cocoons']
+mismatches['cocoons'] = table('Cocoons (from 1e6 larvae: cocoon 400k, then uncocoon 100k)', [
+    ('larvae + cocoons after cocooning', F(C['afterCocooning400k']['larva']) + F(C['afterCocooning400k']['cocoon']), 1e6),
+    ('larvae + cocoons after uncocooning', F(C['afterUncocooning100k']['larva']) + F(C['afterUncocooning100k']['cocoon']), 1e6),
+    ('cocoon production / s', F(C['cocoonVelocity']), 0.0)])
+
 # 7. Achievements earned during a run -----------------------------------------------------------
 A = game['achievements']
 s = sim.load(); s.exp = 100; s.t[sim.TN.index('swarmling')] = 1e16

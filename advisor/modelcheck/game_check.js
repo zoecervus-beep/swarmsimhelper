@@ -154,6 +154,18 @@ out.ancestry = {byLevel: {}, noAchievements: {}};
   out.ancestry.noAchievements[lvl] = {rate: rates(g2).larva, points: g2.achievementPoints()};
 });
 
+// 6b. Cocoons: turning larvae into cocoons and back, 1:1 both ways, and cocoons' own production.
+(function () {
+  var g = load(function (j) { j.unittypes.larva = '1000000'; j.unittypes.cocoon = '0'; });
+  var cocoon = g.unit('cocoon'), larva = g.unit('larva');
+  cocoon.buy(400000);
+  var mid = {larva: S(larva.count()), cocoon: S(cocoon.count())};
+  larva.buy(100000);
+  out.cocoons = {afterCocooning400k: mid, afterUncocooning100k: {larva: S(larva.count()), cocoon: S(cocoon.count())},
+    cocoonVelocity: S(cocoon.velocity()), cocoonsCost: S(cocoon.eachCost()[0].val), larvaCost: S(larva.eachCost()[0].val),
+    larvaTwin: S(larva.twinMult()), cocoonTwin: S(cocoon.twinMult())};
+})();
+
 // 7. Achievements earned during a run, through the game's own AchievementsListener (the check it runs
 //    after every purchase command). Unit achievements count units *bought* (statistics twinnum), not owned.
 out.achievements = {};

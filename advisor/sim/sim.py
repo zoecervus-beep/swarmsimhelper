@@ -50,7 +50,9 @@ def load():
     modelled=set(NAMES[1:]+TN+['expansion','nexus5'])
     s.unearned=[n for n,(pts,req,val) in _achievements().items()
                 if n not in d.get('achievements',{}) and req in modelled and pts>0 and val!='']
-    s.larva=float(u['larva']); s.terr=float(u['territory'])
+    # Cocoons are larvae parked 1:1 (the game converts both ways for free; they make nothing and count
+    # toward clone larvae like larvae), so the simulator holds them as larvae.
+    s.larva=float(u['larva'])+float(u.get('cocoon',0)); s.terr=float(u['territory'])
     s.prod=[0]*(K+2); s.twin=[0]*(K+2)
     for k in range(1,K+1):
         s.prod[k]=int(g.get(NAMES[k]+'prod',0)); s.twin[k]=int(g.get(NAMES[k]+'twin',0))
