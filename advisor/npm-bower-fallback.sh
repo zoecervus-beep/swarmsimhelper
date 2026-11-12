@@ -10,19 +10,13 @@
 #      yarn runs with --pure-lockfile, so neither is ever rewritten;
 #   2. fills node_modules/@bower_components/<name> from npm-registry packages at
 #      the version the lockfile pins (table below);
-#   3. for the six with no npm copy (GIT table below): if SWARMSIM_GIT_CLONES names
-#      a directory holding local clones laid out as <owner>/<repo> (name match is
-#      case-insensitive), exports each at the commit the lockfile pins (checked
-#      against yarn.lock; `git archive`, the same tree the codeload tarball has,
-#      clones are only read) and lets yarn install that tarball in place of the
-#      GitHub URL, so their own dependencies come from the lockfile as usual;
-#   4. leaves whatever is still missing empty and says so. Nothing is substituted,
+#   3. leaves the GAP entries empty and says so. Nothing is substituted for them,
 #      unless you pass --near-versions (see NEAR below).
 #
 # Results obtained this way are "with npm-registry copies", not with the real
 # pinned sources. On a normal network, use plain `yarn install` instead.
 #
-# Usage: [SWARMSIM_GIT_CLONES=<dir>] advisor/npm-bower-fallback.sh [--near-versions]
+# Usage: advisor/npm-bower-fallback.sh [--near-versions]
 #   --near-versions  OPT-IN: also install the NEAR stand-ins below, which are NOT
 #                    the pinned versions. Each gets a NOT-THE-PINNED-VERSION.txt
 #                    marker. Without the flag, stand-ins from an earlier run are removed.
@@ -42,19 +36,6 @@ REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 COFFEE="$REPO/swarmsim-coffee"
 BC="$COFFEE/node_modules/@bower_components"
 MARKER="NOT-THE-PINNED-VERSION.txt"
-GIT_CLONES="${SWARMSIM_GIT_CLONES:-}"
-
-# No npm copy at the pinned version; installable from a local clone:
-# package.json key (swarmsim-coffee) | GitHub owner/repo | lockfile entry it must match
-# playfab-sdk-browser is a dependency of swarm-persist (applied via yarn "resolutions").
-GIT='
-@bower_components/swarm-persist|erosson/swarm-persist|"@bower_components/swarm-persist@erosson/swarm-persist#0.0.3":
-@bower_components/swarm-numberformat|erosson/swarm-numberformat|"@bower_components/swarm-numberformat@erosson/swarm-numberformat#0.2.1":
-@bower_components/playfab-sdk|PlayFab/JavaScriptSDK|"@bower_components/playfab-sdk@PlayFab/JavaScriptSDK#1.0.170130":
-@bower_components/flash-cookies|nfriedly/Javascript-Flash-Cookies|"@bower_components/flash-cookies@nfriedly/Javascript-Flash-Cookies#2.2.3":
-grunt-wiredep-away|gscavalcante/grunt-wiredep-away|grunt-wiredep-away@gscavalcante/grunt-wiredep-away:
-playfab-sdk-browser|erosson/playfab-sdk-browser|"playfab-sdk-browser@github:erosson/playfab-sdk-browser":
-'
 
 # Opt-in stand-ins (--near-versions): name | npm stand-in | pinned version | why
 # swarm-persist, playfab-sdk, grunt-wiredep-away, playfab-sdk-browser have no npm
@@ -120,57 +101,15 @@ restore() {
 }
 trap restore EXIT INT TERM
 
-# ---- local git clones for the no-npm six (optional)
-FROM_GIT="$TMPD/from-git.tsv"   # key <TAB> tarball <TAB> owner/repo <TAB> sha
-: > "$FROM_GIT"
-if [ -n "$GIT_CLONES" ]; then
-  echo "== [npm fallback] looking for local clones under $GIT_CLONES"
-  while IFS='|' read -r key slug entry; do
-    [ -n "$key" ] || continue
-    # pinned commit = last path part of the lockfile's codeload URL for that entry
-    sha="$(grep -F -x -A3 -- "$entry" "$BACKUP/yarn.lock" | sed -n 's#^  resolved "https://codeload.github.com/.*/tar.gz/\([0-9a-f]\{40\}\)"$#\1#p' | head -1)"
-    [ -n "$sha" ] || { echo "ERROR: no codeload pin for $key in yarn.lock" >&2; exit 1; }
-    clone="$(find "$GIT_CLONES" -mindepth 2 -maxdepth 2 -type d -ipath "$GIT_CLONES/$slug" | head -1)"
-    if [ -z "$clone" ]; then echo "   no clone for $slug"; continue; fi
-    if [ "$(git -C "$clone" cat-file -t "$sha" 2>/dev/null)" != commit ]; then
-      echo "   $clone lacks pinned commit $sha; not used"; continue
-    fi
-    tgz="$TMPD/$(echo "$slug" | tr / -)-$sha.tgz"
-    git -C "$clone" archive --format=tar.gz --prefix="$(basename "$slug")-$sha/" "$sha" > "$tgz"
-    printf '%s\t%s\t%s\t%s\n' "$key" "$tgz" "$slug" "$sha" >> "$FROM_GIT"
-    echo "   $key <- $clone @ $sha (lockfile pin)"
-  done <<< "$GIT"
-  # swarm-persist needs playfab-sdk-browser from GitHub; without its clone yarn would
-  # try GitHub, so use neither.
-  if grep -q $'^@bower_components/swarm-persist\t' "$FROM_GIT" && ! grep -q $'^playfab-sdk-browser\t' "$FROM_GIT"; then
-    echo "   swarm-persist needs playfab-sdk-browser's clone too; leaving swarm-persist out"
-    sed -i $'/^@bower_components\/swarm-persist\t/d' "$FROM_GIT"
-  fi
-fi
-
-if [ -s "$FROM_GIT" ]; then
-  echo "== [npm fallback] yarn install (registry deps + local-clone tarballs) in swarmsim-coffee"
-else
-  echo "== [npm fallback] yarn install (registry deps only) in swarmsim-coffee"
-fi
-# Stand-ins from an earlier --near-versions run must not survive under the real names.
-for d in "$BC"/*/; do [ -f "$d$MARKER" ] && rm -rf "$d"; done 2>/dev/null || true
+echo "== [npm fallback] yarn install (registry deps only) in swarmsim-coffee"
 node -e '
   const fs = require("fs"), f = process.argv[1], p = JSON.parse(fs.readFileSync(f, "utf8"));
-  const fromGit = {};
-  for (const line of fs.readFileSync(process.argv[2], "utf8").split("\n").filter(Boolean)) {
-    const [key, tgz] = line.split("\t"); fromGit[key] = "file:" + tgz;
-  }
   for (const sec of ["dependencies", "devDependencies"])
     for (const k of Object.keys(p[sec] || {}))
-      if (k.startsWith("@bower_components/") || k === "grunt-wiredep-away") {
-        if (fromGit[k]) p[sec][k] = fromGit[k]; else delete p[sec][k];
-      }
-  if (fromGit["playfab-sdk-browser"]) p.resolutions = Object.assign({}, p.resolutions, {"playfab-sdk-browser": fromGit["playfab-sdk-browser"]});
+      if (k.startsWith("@bower_components/") || k === "grunt-wiredep-away") delete p[sec][k];
   fs.writeFileSync(f, JSON.stringify(p, null, 2) + "\n");
-' "$COFFEE/package.json" "$FROM_GIT"
+' "$COFFEE/package.json"
 (cd "$COFFEE" && yarn install --pure-lockfile --non-interactive)
-cp "$FROM_GIT" "$COFFEE/node_modules/.swarmsim-from-git.tsv"
 restore
 trap - EXIT INT TERM
 TMPD="$(mktemp -d)"
@@ -192,26 +131,19 @@ fetch() { # fetch <name> <npm spec>: (re)install @bower_components/<name> unless
   echo "$2" > "$dest/.npm-fallback"
   echo "   $1 <- $2"
 }
-FROM_GIT_DONE="$COFFEE/node_modules/.swarmsim-from-git.tsv"
-from_git() { grep -q "^$1	" "$FROM_GIT_DONE" 2>/dev/null; }
-
 gaps=()
 while IFS='|' read -r name pinned spec note; do
   [ -n "$name" ] || continue
   if [ "$spec" = GAP ]; then
-    from_git "@bower_components/$name" || gaps+=("$name ($pinned): $note")
+    gaps+=("$name ($pinned): $note")
     continue
   fi
   fetch "$name" "$spec" || true
 done <<< "$MAP"
-for k in grunt-wiredep-away playfab-sdk-browser; do
-  from_git "$k" || gaps+=("$k ($(grep "^$k|" <<< "$GIT" | cut -d'|' -f2)): not on npm")
-done
 
 near_used=()
 while IFS='|' read -r name spec pinned why; do
   [ -n "$name" ] || continue
-  from_git "@bower_components/$name" && continue   # real pinned copy installed
   dest="$BC/$name"
   if [ "$NEAR_VERSIONS" = 1 ]; then
     fetch "$name" "$spec" || true
@@ -238,24 +170,18 @@ done <<< "$NEAR"
 (cd "$COFFEE" && node -e "try { require('fs').symlinkSync(require('path').resolve('node_modules/@bower_components'), 'bower_components', 'junction') } catch (e) { }")
 
 echo
-echo "== [npm fallback] done."
-echo "   33 GitHub-pinned libraries: npm-registry copies at the pinned versions (table in this script)."
-if [ -s "$FROM_GIT_DONE" ]; then
-  echo "   From local git clones at the lockfile-pinned commit:"
-  while IFS=$'\t' read -r key _ slug sha; do echo "     $key <- $slug @ $sha"; done < "$FROM_GIT_DONE"
-fi
-if [ "${#gaps[@]}" -gt 0 ]; then
-  echo "   NOT installed (no npm copy at the pinned version, no local clone):"
-  for g in "${gaps[@]}"; do
-    n="${g%% *}"
-    if [ -f "$BC/$n/$MARKER" ]; then echo "     GAP $g  [stand-in installed, see below]"; else echo "     GAP $g"; fi
-  done
-  echo "   Set SWARMSIM_GIT_CLONES=<dir with owner/repo clones> to install them from local clones."
-fi
+echo "== [npm fallback] done. NOT installed (no npm package at the pinned version):"
+for g in "${gaps[@]}"; do
+  n="${g%% *}"
+  if [ -f "$BC/$n/$MARKER" ]; then echo "   GAP $g  [stand-in installed, see below]"; else echo "   GAP $g"; fi
+done
+echo "   GAP grunt-wiredep-away (gscavalcante/grunt-wiredep-away @6b010f5d): not on npm; grunt 'wiredep' task missing"
+echo "   GAP playfab-sdk-browser (erosson/playfab-sdk-browser @d20778f5): not on npm; only used by swarm-persist"
 if [ "${#near_used[@]}" -gt 0 ]; then
   echo
   echo "!! --near-versions: these are NOT the pinned versions (marker: $MARKER in each):"
   for n in "${near_used[@]}"; do echo "!!   $n"; done
   echo "!! Results with these stand-ins are not results with the pinned dependencies."
+  echo "!! swarm-persist, playfab-sdk (PlayFab JavaScriptSDK), playfab-sdk-browser and"
+  echo "!! grunt-wiredep-away have no npm copy at any version and remain missing."
 fi
-[ "${#gaps[@]}" -eq 0 ] || exit 3
