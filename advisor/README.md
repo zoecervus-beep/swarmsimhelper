@@ -18,6 +18,7 @@ The climbing advisor is a panel in this fork of Swarm Simulator. It suggests wha
 - **Tips**: faster and twin upgrades worth buying now, and multi-step plans to get a twin upgrade.
 - **Energy**: what to do with energy. In order: build the next nexus, save for it, buy lepidoptera up to your target, then cast House of Mirrors (larva rush before nexus 4).
 - **Territory**: which territory units to hatch and how many, territory twins to buy or save for, and hatchery, expansion and accomplished ancestry levels to buy. Once House of Mirrors is running, it says to stop hatching territory units and to set the territory share to 0.
+  - The first suggestion after the page loads uses the territory share of the larvae you have. Once you hatch a territory unit or buy a territory twin, the next suggestions only use the territory share of the larvae made since then, so hatching again straight away is not offered ("territory larvae spent for now"). A minute later it offers about a minute's worth.
 
 Advice refreshes about once a second. If something goes wrong, the panel shows the error text instead of the advice.
 

@@ -26,6 +26,7 @@ describe 'Service: advisorTerritory', ->
       tier: j
       visible: visible
       count: D(u.count ? 0)
+      purchases: String(u.purchases ? 0)
       twin: D(u.twin ? 1)
       meat: D(u.meat ? Math.pow(10, j + 1))
       prodEach: D(1)
@@ -45,7 +46,8 @@ describe 'Service: advisorTerritory', ->
       visible: up.visible ? true
       costs: up.costs ? [{unit: 'meat', val: D(1e300), factor: D(10)}]
     return {
-      now: 1000e3
+      now: opts.now ? 1000e3
+      restartedAt: opts.restartedAt ? 0
       larvae: D(opts.larvae ? 0)
       larvaRate: D(opts.larvaRate ? 0)
       meat: D(opts.meat ? 0)
@@ -65,7 +67,7 @@ describe 'Service: advisorTerritory', ->
       # larvae for territory: 1000 - floor(1000 x 0.9) = 100; meat budget 0.9 x 50000 = 45000.
       # spider: 100 x 1000 > 45000; stinger: 100 x 100 <= 45000 => stinger, spare to spiders:
       # y = (45000 - 100 x 100) / (1000 - 100) = 38.9 spiders, x = 100 - 38.9 = 61.1 stingers.
-      r = territory.advise mksnap(larvae: 1000, meat: 50000), {}
+      r = territory.advise mksnap(larvae: 1000, meat: 50000), null, {}
       expect(r.larvae.toNumber()).toBe 100
       expect(r.meatBudget.toNumber()).toBe 45000
       expect(counts r).toEqual [['stinger', 61], ['spider', 38]]
@@ -77,20 +79,20 @@ describe 'Service: advisorTerritory', ->
 
     it 'puts everything into the top shown unit when meat allows', ->
       # spider: 100 x 1000 <= 9e8, and mosquitoes are not shown: min(100, 9e8 / 1000) = 100 spiders
-      r = territory.advise mksnap(larvae: 1000, meat: 1e9), {}
+      r = territory.advise mksnap(larvae: 1000, meat: 1e9), null, {}
       expect(counts r).toEqual [['spider', 100]]
       # once mosquitoes are shown, they take everything
-      r = territory.advise mksnap(larvae: 1000, meat: 1e9, shown: 4), {}
+      r = territory.advise mksnap(larvae: 1000, meat: 1e9, shown: 4), null, {}
       expect(counts r).toEqual [['mosquito', 100]]
 
     it 'reads the territory share setting', ->
       # 1000 - floor(1000 x 0.7) = 300 larvae; spiders: 300 x 1000 <= 9e8
-      r = territory.advise mksnap(larvae: 1000, meat: 1e9), {territory: 0.3}
+      r = territory.advise mksnap(larvae: 1000, meat: 1e9), null, {territory: 0.3}
       expect(counts r).toEqual [['spider', 300]]
       expect(r.share).toBe 0.3
 
     it 'counts the units each larva makes', ->
-      r = territory.advise mksnap(larvae: 1000, meat: 1e9, units: {spider: {twin: 8}}), {}
+      r = territory.advise mksnap(larvae: 1000, meat: 1e9, units: {spider: {twin: 8}}), null, {}
       expect(r.hatch[0].buys.toNumber()).toBe 100 # the buy box takes larvae, before twins
       expect(r.hatch[0].units.toNumber()).toBe 800
       expect(texts r).toEqual ['hatch 100 spiders (x8 twins)']
@@ -99,22 +101,22 @@ describe 'Service: advisorTerritory', ->
       # budget 100 larvae, meat budget 450. swarmlings: 100 x 10 > 450, so the smallest unit is used;
       # stingers cost 100 <= 450 but y = (450 - 1000) / 90 < 0 => none. Swarmlings: 450 / 10 = 45.
       # (sim.py would buy all 100 swarmlings here and let meat go negative.)
-      r = territory.advise mksnap(larvae: 1000, meat: 500), {}
+      r = territory.advise mksnap(larvae: 1000, meat: 500), null, {}
       expect(counts r).toEqual [['swarmling', 45]]
 
     it 'says so when there is not meat for even one', ->
-      r = territory.advise mksnap(larvae: 1000, meat: 10), {}
+      r = territory.advise mksnap(larvae: 1000, meat: 10), null, {}
       expect(r.hatch).toEqual []
       expect(r.status.reason).toBe 'noMeat'
       expect(texts r).toEqual ['need 10 meat per swarmling (can spend 9)']
 
     it 'says so when no larvae are left for territory', ->
       # floor(0.5) - floor(0.45) = 0
-      r = territory.advise mksnap(larvae: 0.5, meat: 1e9), {}
+      r = territory.advise mksnap(larvae: 0.5, meat: 1e9), null, {}
       expect(r.status.reason).toBe 'noLarvae'
       expect(texts r).toEqual ['no larvae left for territory']
       # 5 - floor(4.5) = 1
-      r = territory.advise mksnap(larvae: 5, meat: 1e9), {}
+      r = territory.advise mksnap(larvae: 5, meat: 1e9), null, {}
       expect(counts r).toEqual [['spider', 1]]
 
   describe 'territory twins', ->
@@ -123,7 +125,7 @@ describe 'Service: advisorTerritory', ->
     opts = (twin, extra={}) -> _.extend {larvae: 30000, larvaRate: 100, meat: 1e9, units: {spider: twin}}, extra
 
     it 'buys the twin first when its larva price is under the limit, then hatches with the rest', ->
-      r = territory.advise mksnap(opts {twinLevel: 2, twinLarvae: 2500, twinMeat: 2.5e7}), {}
+      r = territory.advise mksnap(opts {twinLevel: 2, twinLarvae: 2500, twinMeat: 2.5e7}), null, {}
       expect(r.twin.type).toBe 'twin'
       expect(r.twin.name).toBe 'spidertwin'
       expect(r.twin.limit.toNumber()).toBe 6000
@@ -140,7 +142,7 @@ describe 'Service: advisorTerritory', ->
       # The live stall: territory larvae 20000 - 18000 = 2000 < 2500, which sim.py would save up for
       # from its purse. All 20000 larvae on hand cover it, so buy it now: 2000 come from the territory
       # share, 500 more from the larvae the meat advice counts on; nothing is left to hatch.
-      r = territory.advise mksnap(opts {twinLarvae: 2500, twinMeat: 2.5e7}, larvae: 20000), {}
+      r = territory.advise mksnap(opts {twinLarvae: 2500, twinMeat: 2.5e7}, larvae: 20000), null, {}
       expect(r.twin.type).toBe 'twin'
       expect(r.twin.have.toNumber()).toBe 20000
       expect(r.twin.budget.toNumber()).toBe 2000
@@ -151,7 +153,7 @@ describe 'Service: advisorTerritory', ->
 
     it 'saves for the twin, hatching nothing, while all larvae on hand fall short', ->
       # 2000 larvae on hand < 2500 (territory share 2000 - 1800 = 200)
-      r = territory.advise mksnap(opts {twinLarvae: 2500}, larvae: 2000), {}
+      r = territory.advise mksnap(opts {twinLarvae: 2500}, larvae: 2000), null, {}
       expect(r.twin.type).toBe 'saveForTwin'
       expect(r.twin.have.toNumber()).toBe 2000
       expect(r.hatch).toEqual []
@@ -159,18 +161,18 @@ describe 'Service: advisorTerritory', ->
       expect(texts r).toEqual ['save larvae for twin spiders: 2,000/2,500']
 
     it 'skips a twin over the limit', ->
-      r = territory.advise mksnap(opts {twinLarvae: 6001}), {}
+      r = territory.advise mksnap(opts {twinLarvae: 6001}), null, {}
       expect(r.twin).toBe null
       expect(counts r).toEqual [['spider', 3000]]
 
     it 'measures the limit in the territory share of larva income', ->
       # share 0.05: limit 600 x 100 x 0.05 = 3000 < 4000; territory larvae 30000 - 28500 = 1500
-      r = territory.advise mksnap(opts {twinLarvae: 4000}), {territory: 0.05}
+      r = territory.advise mksnap(opts {twinLarvae: 4000}), null, {territory: 0.05}
       expect(r.twin).toBe null
       expect(counts r).toEqual [['spider', 1500]]
       # share 0.1: limit 6000 >= 4000; 30000 larvae on hand cover it: buy it with the 3000 territory
       # larvae and 1000 more, leaving none to hatch
-      r = territory.advise mksnap(opts {twinLarvae: 4000}), {}
+      r = territory.advise mksnap(opts {twinLarvae: 4000}), null, {}
       expect(r.twin.type).toBe 'twin'
       expect(r.twin.overcommit.toNumber()).toBe 1000
       expect(r.hatch).toEqual []
@@ -181,14 +183,14 @@ describe 'Service: advisorTerritory', ->
       # Left: 2000 larvae, 1.8e7 - 100 meat. y = (17999900 - 2000 x 1000) / 9000 = 1777.8 mosquitoes,
       # x = 2000 - 1777.8 = 222.2 spiders.
       snap = mksnap shown: 4, larvae: 30000, larvaRate: 100, meat: 2e7, units: {mosquito: {twinLarvae: 1000}}
-      r = territory.advise snap, {}
+      r = territory.advise snap, null, {}
       expect(r.twin.name).toBe 'mosquitotwin'
       expect(counts r).toEqual [['spider', 222], ['mosquito', 1777]]
       expect(r.hatch[1].twin.toNumber()).toBe 2
       expect(texts r).toEqual ['buy twin mosquitos (1,000 larvae, 100 meat)', 'hatch 222 spiders', 'hatch 1,777 mosquitos (x2 twins)']
 
     it 'ignores twin upgrades the game does not show', ->
-      r = territory.advise mksnap(opts {twinLarvae: 2500, twinVisible: false}), {}
+      r = territory.advise mksnap(opts {twinLarvae: 2500, twinVisible: false}), null, {}
       expect(r.twin).toBe null
       expect(counts r).toEqual [['spider', 3000]]
 
@@ -202,22 +204,22 @@ describe 'Service: advisorTerritory', ->
 
     it 'buys accomplished ancestry before an expansion', ->
       # 505 territory: ancestry takes 500, the 5 left cannot pay for an expansion (10)
-      r = territory.advise mksnap(meat: 1e7, territory: 505, upgrades: {achievementbonus: ancestry(), expansion: expansion()}), {}
+      r = territory.advise mksnap(meat: 1e7, territory: 505, upgrades: {achievementbonus: ancestry(), expansion: expansion()}), null, {}
       expect(_.map r.upgrades, 'name').toEqual ['achievementbonus']
       expect(texts r).toEqual ['buy accomplished ancestry (5.00e6 meat, 500 territory)', 'no larvae left for territory']
 
     it 'buys an expansion when ancestry is maxed or hidden', ->
-      r = territory.advise mksnap(meat: 1e7, territory: 505, upgrades: {achievementbonus: ancestry(visible: false), expansion: expansion()}), {}
+      r = territory.advise mksnap(meat: 1e7, territory: 505, upgrades: {achievementbonus: ancestry(visible: false), expansion: expansion()}), null, {}
       # 10 + 24.5 + 60.0 + 147.1 = 241.6 <= 505; the next, 360.3, is not
       expect(r.upgrades[0].levels).toBe 4
       expect(r.upgrades[0].costs[0].val.toNumber()).toBeCloseTo 241.6, 1
-      r = territory.advise mksnap(meat: 1e7, territory: 505, upgrades: {achievementbonus: ancestry(level: 5), expansion: expansion()}), {}
+      r = territory.advise mksnap(meat: 1e7, territory: 505, upgrades: {achievementbonus: ancestry(level: 5), expansion: expansion()}), null, {}
       expect(_.map r.upgrades, 'name').toEqual ['expansion']
 
     it 'buys as many levels as are affordable, and leaves territory units the meat that is left', ->
       # hatcheries: 300 + 3000 = 3300 of 3500 meat; the next costs 30000. Meat budget 0.9 x 200 = 180.
       # 100 territory larvae: swarmlings 100 x 10 > 180 => swarmlings, capped by meat at 18.
-      r = territory.advise mksnap(larvae: 1000, meat: 3500, upgrades: {hatchery: hatchery()}), {}
+      r = territory.advise mksnap(larvae: 1000, meat: 3500, upgrades: {hatchery: hatchery()}), null, {}
       expect(r.upgrades[0].levels).toBe 2
       expect(r.upgrades[0].from).toBe 0
       expect(r.meatBudget.toNumber()).toBe 180
@@ -227,13 +229,77 @@ describe 'Service: advisorTerritory', ->
       # pass 1: ancestry (5e6 meat, 500 territory), expansion (10), hatchery (300);
       # pass 2: expansion (24.5), hatchery (3000); pass 3: nothing (expansion 60 > 25.5 left, hatchery 3e4)
       up = {achievementbonus: ancestry(), expansion: expansion(), hatchery: hatchery()}
-      r = territory.advise mksnap(meat: 5e6 + 3300 + 1, territory: 560, upgrades: up), {}
+      r = territory.advise mksnap(meat: 5e6 + 3300 + 1, territory: 560, upgrades: up), null, {}
       expect(([u.name, u.levels] for u in r.upgrades)).toEqual [['achievementbonus', 1], ['expansion', 2], ['hatchery', 2]]
+
+  describe 'the territory purse after a purchase', ->
+    # Larva income 100/s, share 0.1: the purse refills at 10 territory larvae a second.
+    # Meat 1e9 => spiders take everything (shown: swarmling, stinger, spider).
+    at = (secs, larvae, spiders, extra={}) ->
+      mksnap _.extend {now: 1000e3 + secs * 1000, larvae: larvae, larvaRate: 100, meat: 1e9, units: {spider: _.extend({purchases: spiders}, extra)}}, extra.snap
+    first = -> territory.advise at(0, 30000, 5000), null, {}
+
+    it 'offers the share of the larvae on hand while no purchase has been seen', ->
+      r = first()
+      # 30000 - floor(27000) = 3000; the statistic's first sighting is not a purchase
+      expect(counts r).toEqual [['spider', 3000]]
+      expect(r.memory.boughtAt).toBe null
+      expect(r.memory.seen.spider).toBe '5000'
+
+    it 'does not offer another share right after the suggestion was bought', ->
+      # One second later: 3000 spiders hatched (statistic 5000 -> 8000), 30000 - 3000 + 100 larvae.
+      # The share of those would be 27100 - floor(24390) = 2710, but the purse restarts at the purchase.
+      r = territory.advise at(1, 27100, 8000), first().memory, {}
+      expect(r.memory.boughtAt).toBe 1001e3
+      expect(r.larvae.toNumber()).toBe 0
+      expect(r.hatch).toEqual []
+      expect(r.status.reason).toBe 'refilling'
+      # one larva at 10 a second
+      expect(r.status.seconds).toBeCloseTo 0.1, 9
+      expect(texts r).toEqual ['territory larvae spent for now, more in 1 s']
+
+    it 'refills with the share of larva income since the purchase', ->
+      m = territory.advise(at(1, 27100, 8000), first().memory, {}).memory
+      # 2.5 s after the purchase: floor(10 x 2.5) = 25
+      r = territory.advise at(3.5, 27350, 8000), m, {}
+      expect(counts r).toEqual [['spider', 25]]
+      # a minute after: 600
+      r = territory.advise at(61, 33100, 8000), m, {}
+      expect(counts r).toEqual [['spider', 600]]
+      # buying those restarts it again
+      r = territory.advise at(62, 32600, 8600), territory.advise(at(61, 33100, 8000), m, {}).memory, {}
+      expect(r.memory.boughtAt).toBe 1062e3
+      expect(r.hatch).toEqual []
+
+    it 'never offers more than the share of the larvae on hand', ->
+      m = territory.advise(at(1, 27100, 8000), first().memory, {}).memory
+      # 1000 s later the purse holds 10000, but only 5000 larvae are on hand: 5000 - 4500 = 500
+      r = territory.advise at(1001, 5000, 8000), m, {}
+      expect(counts r).toEqual [['spider', 500]]
+      expect(r.status).toBe null
+
+    it 'counts a territory twin bought as a purchase, and unit counts not at all', ->
+      m = first().memory
+      # House of Mirrors doubles counts without a purchase: still the full share
+      r = territory.advise at(1, 30000, 5000, {count: 1e6}), m, {}
+      expect(r.memory.boughtAt).toBe null
+      expect(counts r).toEqual [['spider', 3000]]
+      # the spider twin went from level 0 to 1
+      r = territory.advise at(1, 30000, 5000, {twinLevel: 1}), m, {}
+      expect(r.memory.boughtAt).toBe 1001e3
+      expect(r.status.reason).toBe 'refilling'
+
+    it 'starts afresh in a new run', ->
+      m = territory.advise(at(1, 27100, 8000), first().memory, {}).memory
+      r = territory.advise at(2, 27100, 0, {snap: {restartedAt: 1500e3}}), m, {}
+      expect(r.memory.boughtAt).toBe null
+      expect(r.memory.restartedAt).toBe 1500e3
+      expect(counts r).toEqual [['spider', 2710]]
 
   describe 'once House of Mirrors has been cast', ->
     it 'advises no territory units and a territory share of 0', ->
       snap = mksnap larvae: 30000, larvaRate: 100, meat: 1e9, mirrorCasts: 3, units: {spider: {twinLarvae: 10}}
-      r = territory.advise snap, {}
+      r = territory.advise snap, null, {}
       expect(r.mirrors).toBe true
       expect(r.hatch).toEqual []
       expect(r.twin).toBe null
@@ -242,18 +308,18 @@ describe 'Service: advisorTerritory', ->
 
     it 'drops the setting advice once the share is 0, and still advises larva upgrades', ->
       snap = mksnap meat: 1e4, mirrorCasts: 1, upgrades: {hatchery: {costs: [{unit: 'meat', val: D(300), factor: D(10)}]}}
-      r = territory.advise snap, {territory: 0}
+      r = territory.advise snap, null, {territory: 0}
       expect(r.setting).toBe null
       expect(texts r).toEqual ['House of Mirrors is running: hatch no more territory units', 'buy hatchery x2 (3,300 meat)']
 
   describe 'early game', ->
     it 'says when no territory unit is shown yet', ->
-      r = territory.advise mksnap(larvae: 1000, meat: 1e9, shown: 0), {}
+      r = territory.advise mksnap(larvae: 1000, meat: 1e9, shown: 0), null, {}
       expect(r.status.reason).toBe 'locked'
       expect(texts r).toEqual ['no territory units yet']
 
     it 'does nothing for territory at a share of 0', ->
-      r = territory.advise mksnap(larvae: 1000, meat: 1e9), {territory: 0}
+      r = territory.advise mksnap(larvae: 1000, meat: 1e9), null, {territory: 0}
       expect(r.hatch).toEqual []
       expect(texts r).toEqual ['territory share is 0: no territory units']
 
@@ -281,7 +347,7 @@ describe 'Service: advisorTerritory', ->
       expect(snap.larvaRate.toNumber()).toBe 1
       # hatchery 300 + 3000 meat => meat budget 0.9 x 6700 = 6030. Swarmling twin: 1 larva <= 600 s x 1/s
       # x 0.1 = 60, 100 meat: bought. Then 10 - 1 = 9 larvae, 5930 meat: 750 x 9 > 5930 => 7 swarmlings.
-      r = territory.advise snap, {}
+      r = territory.advise snap, null, {}
       expect(texts r).toEqual ['buy hatchery x2 (3,300 meat)', 'buy twin swarmlings (1 larva, 100 meat)', 'hatch 7 swarmlings (x2 twins)']
 
     it 'knows House of Mirrors was cast this run, until the next ascension', ->
@@ -289,9 +355,43 @@ describe 'Service: advisorTerritory', ->
       expect(territory.snapshot(game).mirrorCasts).toBe 0
       game.upgrade('clonearmy').buy 2
       expect(territory.snapshot(game).mirrorCasts).toBe 2
-      expect(territory.advise(territory.snapshot(game), {}).mirrors).toBe true
+      expect(territory.advise(territory.snapshot(game), null, {}).mirrors).toBe true
       game.ascend true
       expect(territory.snapshot(game).mirrorCasts).toBe 0
+
+    it 'remembers a purchase made through the game between live updates', inject (game, commands, statistics) ->
+      game.reset true
+      game.unit('queen')._setCount 5
+      game.unit('meat')._setCount 1e4
+      game.unit('larva')._setCount 1000
+      game.upgrade('swarmlingtwin')._setCount 10 # twin too dear to be advised
+      game.upgrade('hatchery')._setCount 20 # hatchery too dear to be advised
+      r = territory.update()
+      # 1000 - 900 = 100 territory larvae; meat budget 9000: 750 x 100 > 9000, so swarmlings capped at 12
+      expect(counts r).toEqual [['swarmling', 12]]
+      commands.buyUnit {unit: game.unit('swarmling'), num: r.hatch[0].buys}
+      expect(game.unit('swarmling').statistics().num.toString()).toBe '12'
+      r = territory.update()
+      expect(r.hatch).toEqual []
+      expect(r.status.reason).toBe 'refilling'
+      expect(territory.memory()).toBe r.memory
+
+    it 'forgets the purchase memory on import and reset', inject ($rootScope) ->
+      territory.update()
+      expect(territory.memory()).not.toBe null
+      $rootScope.$broadcast 'import', {success: false}
+      expect(territory.memory()).not.toBe null
+      $rootScope.$broadcast 'import', {success: true}
+      expect(territory.memory()).toBe null
+      territory.update()
+      $rootScope.$broadcast 'reset'
+      expect(territory.memory()).toBe null
+
+    it 'advises afresh after any purchase instead of serving the cached advice', inject ($rootScope) ->
+      a = territory.current 1000, 5000
+      expect(territory.current(1000, 5001)).toBe a
+      $rootScope.$emit 'command', {name: 'buyUnit'}
+      expect(territory.current(1000, 5002)).not.toBe a
 
     it 'caches the live advice, at most once per interval', ->
       spyOn(territory, 'update').and.callThrough()
@@ -356,7 +456,7 @@ describe 'Service: advisorTerritory on a real save', ->
     expect(ups.hatchery.costs[0].val.toNumber()).toBe 3e31
 
   it 'gives the advice the simulator gives', ->
-    r = territory.advise territory.snapshot(loadGame()), {}
+    r = territory.advise territory.snapshot(loadGame()), null, {}
     # Territory larvae: 3339890 - floor(3339890.25 x 0.9) = 333989; meat budget 0.9 x 1.1925e31 = 1.0733e31.
     # Devourers: 333989 x 5.6751e26 > budget; wasps: 333989 x 1.26113e24 = 4.21e29 fits, so wasps,
     # spare meat to devourers: y = (1.0733e31 - 4.212e29) / (5.6751e26 - 1.26113e24) = 18210.5.

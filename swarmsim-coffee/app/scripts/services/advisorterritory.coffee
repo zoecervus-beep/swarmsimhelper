@@ -10,15 +10,18 @@
  # A port of the territory part of the simulator's policy (advisor/sim/sim.py, `policy()`, sections
  # "larva multipliers" and "territory", with advisor/sim/policy.json: f=0.1, g=0.9, terr='balanced',
  # tt_secs=600). Same design as the `advisor` service: `snapshot()` is the only place live game objects
- # are read; `advise()` is a pure function of that plain snapshot and the settings.
+ # are read; `advise()` is a pure function of that plain snapshot, a small remembered state
+ # (`createMemory()`, returned updated by `advise()`) and the settings.
  #
  # Translations from the simulator, which acts once a minute with a remembered territory "purse":
  # - The purse (f x larvae gained since the last check-in, kept until spent) becomes the share of the
- #   larvae on hand that the meat advice leaves unspent: floor(larvae) - floor(larvae x (1 - share)).
+ #   larvae on hand that the meat advice leaves unspent, floor(larvae) - floor(larvae x (1 - share)),
+ #   until a territory purchase is seen; after that, the share of the larva income since that
+ #   purchase, capped by the share of the larvae on hand (see `purseBudget`).
  # - Fractional purchases are floored, as the simulator floors them before buying.
  # - Only units and upgrades the game shows (isVisible) are considered; the simulator has all 11.
 ###
-angular.module('swarmApp').factory 'advisorTerritory', (game, advisor) ->
+angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScope) ->
   ZERO = new Decimal 0
   D = (x) -> new Decimal(if x? then x else 0)
 
@@ -63,6 +66,9 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor) ->
       tier: j # 0 = swarmling, as sim.py's TN index
       visible: unit.isVisible()
       count: D unit.count()
+      # times hatched (larvae spent, before twins), from the game's statistics: buying through the
+      # hatch button and the buy-max buttons both add to it; House of Mirrors does not
+      purchases: String(unit.statistics().num ? 0)
       twin: D unit.twinMult() # units per larva
       meat: cost.meat # meat per larva, with any cost modifiers
       prodEach: D unit.eachProduction().territory
@@ -81,8 +87,10 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor) ->
       maxLevel: up.type.maxlevel or null
       visible: up.isVisible()
       costs: costsOf up
+    dates = g.session.state.date
     return {
       now: now
+      restartedAt: new Date(dates.restarted or dates.started).getTime()
       larvae: D g.unit('larva').count()
       larvaRate: D g.unit('larva').velocity()
       meat: D g.unit('meat').count()
@@ -93,6 +101,63 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor) ->
       units: units
       upgrades: upgrades
     }
+
+  # ---------------------------------------------------------------------------
+  # Remembered state: the territory purchase statistics and twin levels last seen, and when the last
+  # territory purchase (a unit hatched or a territory twin bought) was seen. One memory per run.
+
+  createMemory = (now, restartedAt) ->
+    restartedAt: restartedAt
+    seen: {}
+    boughtAt: null
+
+  copyMemory = (memory, now, restartedAt) ->
+    if not memory? or (memory.restartedAt? and restartedAt? and memory.restartedAt != restartedAt)
+      return createMemory now, restartedAt
+    seen = {}
+    for own key, val of memory.seen
+      seen[key] = val
+    return {restartedAt: (if memory.restartedAt? then memory.restartedAt else restartedAt), seen: seen, boughtAt: memory.boughtAt}
+
+  # Notes in `mem` the time of any territory purchase since the last call. Purchases are read from the
+  # units' purchase statistics and the twin upgrades' levels, never from unit counts, which House of
+  # Mirrors doubles. The first sighting of a value is not a purchase. Mutates `mem`.
+  seePurchases = (mem, snap) ->
+    for u in snap.units
+      for [key, val] in [[u.name, u.purchases], [u.twinUpgrade.name, String u.twinUpgrade.level]]
+        if mem.seen[key] is undefined
+          mem.seen[key] = val
+        else if mem.seen[key] isnt val
+          mem.seen[key] = val
+          mem.boughtAt = snap.now
+    return mem
+
+  # Live translation of sim.py's territory purse. The simulator adds f x the larvae gained since the
+  # last check-in and keeps them until spent. Live, with no purchase seen yet (page load, new run,
+  # import), the purse is the share of the larvae on hand, as before. Once a territory purchase has
+  # been seen at t0, it is the share of the larva income since then, share x larva rate x (now - t0),
+  # never more than the share of the larvae on hand, and it starts again from zero at the next
+  # purchase. Without this, every hatch would at once be followed by another share of what is left,
+  # and a few clicks would spend far more than the share. Unspent purse is not carried over a
+  # purchase. A territory twin counts as a purchase too, so buying one restarts the purse rather than
+  # leaving units the full share of the larvae on hand.
+  purseBudget = (snap, mem, share) ->
+    onHand = snap.larvae.floor().minus snap.larvae.times(1 - share).floor()
+    if not mem.boughtAt?
+      return {budget: onHand, refill: null}
+    since = Math.max 0, (snap.now - mem.boughtAt) / 1000
+    rate = snap.larvaRate.times share
+    purse = rate.times(since).floor()
+    if purse.greaterThanOrEqualTo onHand
+      return {budget: onHand, refill: null}
+    refill =
+      type: 'idle'
+      reason: 'refilling'
+      since: since
+      rate: rate # territory larvae per second
+      # seconds until the purse holds one larva (null with no larva income)
+      seconds: if rate.greaterThan(0) then Math.max(0, purse.plus(1).dividedBy(rate).toNumber() - since) else null
+    return {budget: purse, refill: refill}
 
   # ---------------------------------------------------------------------------
   # Rules.
@@ -225,13 +290,16 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor) ->
     idle = if hatch.length or twin? then null else {type: 'idle', reason: 'noMeat', meat: meatBudget, cost: unit.meat, unit: unit.name, label: unit.label1}
     return {twin: twin, hatch: hatch, idle: idle}
 
-  # Territory advice for a snapshot and the advisor settings (only `territory`, the larva share, is read).
-  advise = (snap, cfg) ->
+  # Territory advice for a snapshot, the remembered state and the advisor settings (only `territory`,
+  # the larva share, is read). Returns the advice with the updated memory as `memory`; the inputs are
+  # not modified.
+  advise = (snap, memory, cfg) ->
     cfg = withDefaults cfg
     share = cfg.territory
     mirrors = snap.mirrorCasts > 0
-    # What the meat advice leaves unspent: it hatches from floor(larvae x (1 - share)).
-    budget = snap.larvae.floor().minus snap.larvae.times(1 - share).floor()
+    mem = seePurchases copyMemory(memory, snap.now, snap.restartedAt), snap
+    purse = purseBudget snap, mem, share
+    budget = purse.budget
 
     up = larvaUpgrades snap
     meatBudget = up.meat.times MEAT_SHARE
@@ -253,6 +321,9 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor) ->
       twin = res.twin
       hatch = res.hatch
       status = res.idle
+      # nothing to hatch because the purse is still refilling after a purchase: say so
+      if status?.reason == 'noLarvae' and purse.refill?
+        status = purse.refill
 
     records = []
     if setting?
@@ -278,6 +349,7 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor) ->
       setting: setting
       records: records
       config: cfg
+      memory: mem
     }
 
   # ---------------------------------------------------------------------------
@@ -305,6 +377,8 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor) ->
           when 'locked' then 'no territory units yet'
           when 'shareZero' then 'territory share is 0: no territory units'
           when 'noLarvae' then 'no larvae left for territory'
+          when 'refilling'
+            'territory larvae spent for now' + (if rec.seconds? then ', more in ' + advisor.formatTime(Math.max 1, Math.ceil rec.seconds) else '')
           when 'noMeat' then 'need ' + fmt(rec.cost) + ' meat per ' + rec.label + ' (can spend ' + fmt(rec.meat) + ')'
           else ''
       else ''
@@ -312,6 +386,7 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor) ->
   # ---------------------------------------------------------------------------
   # Live wiring.
 
+  liveMemory = null
   cached = null
 
   svc = {
@@ -321,10 +396,18 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor) ->
     TWIN_SECS: TWIN_SECS
     # pure
     snapshot: snapshot
+    createMemory: createMemory
     advise: advise
     render: render
     # live
-    update: (now) -> advise snapshot(game, now), advisor.config()
+    update: (now) ->
+      result = advise snapshot(game, now), liveMemory, advisor.config()
+      liveMemory = result.memory
+      return result
+    memory: -> liveMemory
+    resetMemory: ->
+      liveMemory = null
+      cached = null
     # The latest advice, re-running `update()` only when the cached result is at least `maxAgeMs`
     # old. Never throws: returns {at, advice, error}, as `advisor.current()`.
     current: (maxAgeMs=1000, wallNow=Date.now()) ->
@@ -336,4 +419,12 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor) ->
       return cached
     invalidate: -> cached = null
   }
+  # A different save (imported, or the game reset) starts a fresh memory, as the meat advice's does.
+  $rootScope.$on 'import', (event, args) ->
+    if args?.success
+      svc.resetMemory()
+  $rootScope.$on 'reset', -> svc.resetMemory()
+  # After any purchase through the game's buttons, advise afresh at the next call instead of serving
+  # advice cached from before it for up to a second (which would offer the bought share again).
+  $rootScope.$on 'command', -> cached = null
   return svc
