@@ -128,15 +128,32 @@ describe 'Service: advisorTerritory', ->
       expect(r.twin.name).toBe 'spidertwin'
       expect(r.twin.limit.toNumber()).toBe 6000
       expect(r.twin.seconds).toBe 25 # 2500 larvae / 100 per second
+      expect(r.twin.have.toNumber()).toBe 30000
+      expect(r.twin.budget.toNumber()).toBe 3000
+      expect(r.twin.overcommit.toNumber()).toBe 0
       # 3000 - 2500 = 500 spiders, two units per larva after the twin
       expect(counts r).toEqual [['spider', 500]]
       expect(r.hatch[0].units.toNumber()).toBe 1000
       expect(texts r).toEqual ['buy twin spiders (2,500 larvae, 2.50e7 meat)', 'hatch 500 spiders (x2 twins)']
 
-    it 'saves for the twin, hatching nothing, while the territory larvae fall short', ->
-      # 20000 - 18000 = 2000 < 2500
-      r = territory.advise mksnap(opts {twinLarvae: 2500}, larvae: 20000), {}
+    it 'buys the twin from all larvae on hand when the territory share cannot cover it', ->
+      # The live stall: territory larvae 20000 - 18000 = 2000 < 2500, which sim.py would save up for
+      # from its purse. All 20000 larvae on hand cover it, so buy it now: 2000 come from the territory
+      # share, 500 more from the larvae the meat advice counts on; nothing is left to hatch.
+      r = territory.advise mksnap(opts {twinLarvae: 2500, twinMeat: 2.5e7}, larvae: 20000), {}
+      expect(r.twin.type).toBe 'twin'
+      expect(r.twin.have.toNumber()).toBe 20000
+      expect(r.twin.budget.toNumber()).toBe 2000
+      expect(r.twin.overcommit.toNumber()).toBe 500
+      expect(r.hatch).toEqual []
+      expect(r.status).toBe null
+      expect(texts r).toEqual ['buy twin spiders (2,500 larvae, 2.50e7 meat)']
+
+    it 'saves for the twin, hatching nothing, while all larvae on hand fall short', ->
+      # 2000 larvae on hand < 2500 (territory share 2000 - 1800 = 200)
+      r = territory.advise mksnap(opts {twinLarvae: 2500}, larvae: 2000), {}
       expect(r.twin.type).toBe 'saveForTwin'
+      expect(r.twin.have.toNumber()).toBe 2000
       expect(r.hatch).toEqual []
       expect(r.status).toBe null
       expect(texts r).toEqual ['save larvae for twin spiders: 2,000/2,500']
@@ -151,9 +168,12 @@ describe 'Service: advisorTerritory', ->
       r = territory.advise mksnap(opts {twinLarvae: 4000}), {territory: 0.05}
       expect(r.twin).toBe null
       expect(counts r).toEqual [['spider', 1500]]
-      # share 0.1: limit 6000 >= 4000, but only 3000 larvae => save
+      # share 0.1: limit 6000 >= 4000; 30000 larvae on hand cover it: buy it with the 3000 territory
+      # larvae and 1000 more, leaving none to hatch
       r = territory.advise mksnap(opts {twinLarvae: 4000}), {}
-      expect(r.twin.type).toBe 'saveForTwin'
+      expect(r.twin.type).toBe 'twin'
+      expect(r.twin.overcommit.toNumber()).toBe 1000
+      expect(r.hatch).toEqual []
 
     it 'considers the next unit up when the main unit has no cheap twin', ->
       # Meat 2e7 => budget 1.8e7. Spiders: 3000 x 1000 <= 1.8e7, mosquitoes: 3000 x 1e4 > 1.8e7.
@@ -174,27 +194,30 @@ describe 'Service: advisorTerritory', ->
 
   describe 'hatchery, expansion, accomplished ancestry', ->
     ancestry = (extra={}) -> _.extend {costs: [{unit: 'meat', val: D(5e6), factor: D(1e4)}, {unit: 'territory', val: D(500), factor: D(1e4)}]}, extra
-    expansion = {costs: [{unit: 'territory', val: D(10), factor: D(2.45)}]}
-    hatchery = {costs: [{unit: 'meat', val: D(300), factor: D(10)}]}
+    # Functions, not values: under Karma, Decimal only becomes a global once the app's run block has
+    # run (app.coffee; angular-mocks' window.module makes decimal.js export to module.exports instead),
+    # i.e. inside it/beforeEach, not while describe bodies are declared.
+    expansion = -> {costs: [{unit: 'territory', val: D(10), factor: D(2.45)}]}
+    hatchery = -> {costs: [{unit: 'meat', val: D(300), factor: D(10)}]}
 
     it 'buys accomplished ancestry before an expansion', ->
       # 505 territory: ancestry takes 500, the 5 left cannot pay for an expansion (10)
-      r = territory.advise mksnap(meat: 1e7, territory: 505, upgrades: {achievementbonus: ancestry(), expansion: expansion}), {}
+      r = territory.advise mksnap(meat: 1e7, territory: 505, upgrades: {achievementbonus: ancestry(), expansion: expansion()}), {}
       expect(_.map r.upgrades, 'name').toEqual ['achievementbonus']
       expect(texts r).toEqual ['buy accomplished ancestry (5.00e6 meat, 500 territory)', 'no larvae left for territory']
 
     it 'buys an expansion when ancestry is maxed or hidden', ->
-      r = territory.advise mksnap(meat: 1e7, territory: 505, upgrades: {achievementbonus: ancestry(visible: false), expansion: expansion}), {}
+      r = territory.advise mksnap(meat: 1e7, territory: 505, upgrades: {achievementbonus: ancestry(visible: false), expansion: expansion()}), {}
       # 10 + 24.5 + 60.0 + 147.1 = 241.6 <= 505; the next, 360.3, is not
       expect(r.upgrades[0].levels).toBe 4
       expect(r.upgrades[0].costs[0].val.toNumber()).toBeCloseTo 241.6, 1
-      r = territory.advise mksnap(meat: 1e7, territory: 505, upgrades: {achievementbonus: ancestry(level: 5), expansion: expansion}), {}
+      r = territory.advise mksnap(meat: 1e7, territory: 505, upgrades: {achievementbonus: ancestry(level: 5), expansion: expansion()}), {}
       expect(_.map r.upgrades, 'name').toEqual ['expansion']
 
     it 'buys as many levels as are affordable, and leaves territory units the meat that is left', ->
       # hatcheries: 300 + 3000 = 3300 of 3500 meat; the next costs 30000. Meat budget 0.9 x 200 = 180.
       # 100 territory larvae: swarmlings 100 x 10 > 180 => swarmlings, capped by meat at 18.
-      r = territory.advise mksnap(larvae: 1000, meat: 3500, upgrades: {hatchery: hatchery}), {}
+      r = territory.advise mksnap(larvae: 1000, meat: 3500, upgrades: {hatchery: hatchery()}), {}
       expect(r.upgrades[0].levels).toBe 2
       expect(r.upgrades[0].from).toBe 0
       expect(r.meatBudget.toNumber()).toBe 180
@@ -203,7 +226,7 @@ describe 'Service: advisorTerritory', ->
     it 'goes round again while each pass buys something', ->
       # pass 1: ancestry (5e6 meat, 500 territory), expansion (10), hatchery (300);
       # pass 2: expansion (24.5), hatchery (3000); pass 3: nothing (expansion 60 > 25.5 left, hatchery 3e4)
-      up = {achievementbonus: ancestry(), expansion: expansion, hatchery: hatchery}
+      up = {achievementbonus: ancestry(), expansion: expansion(), hatchery: hatchery()}
       r = territory.advise mksnap(meat: 5e6 + 3300 + 1, territory: 560, upgrades: up), {}
       expect(([u.name, u.levels] for u in r.upgrades)).toEqual [['achievementbonus', 1], ['expansion', 2], ['hatchery', 2]]
 

@@ -153,8 +153,18 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor) ->
 
     # Twin for that unit, else for the next one up: the first whose larva price is under TWIN_SECS of
     # the territory share's larva income, and whose meat price and unit price fit the meat budget.
-    # Bought when the territory larvae cover it; otherwise save for it and hatch nothing.
+    #
+    # Deliberate departure from sim.py: there the twin is paid from the territory purse, which builds up
+    # over check-ins while it saves. Live play has no such purse: the territory budget is the share of
+    # the larvae on hand and the meat advice spends the rest, so a twin priced near the limit could never
+    # be reached and the advice would save for it forever. So the twin counts as affordable when ALL the
+    # larvae on hand cover it (meat as in sim.py). Its larvae come first out of the territory budget; the
+    # part beyond it (`overcommit`) is larvae the meat advice is also counting on this visit, which is
+    # acceptable since both re-read the game every second. Only when the larvae on hand fall short is
+    # the advice to save for it, hatching nothing meanwhile as sim.py does; that is short-lived, as the
+    # price is at most TWIN_SECS x share of larva income (about a minute of it at share 0.1).
     twin = null
+    onHand = snap.larvae.floor()
     limit = snap.larvaRate.times(share).times(TWIN_SECS)
     for u in (if next? then [unit, next] else [unit])
       t = u.twinUpgrade
@@ -162,7 +172,7 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor) ->
         continue
       if t.larvae.lessThanOrEqualTo(limit) and t.meat.lessThanOrEqualTo(meatBudget) and u.meat.lessThanOrEqualTo(meatBudget)
         twin =
-          type: if budget.greaterThanOrEqualTo(t.larvae) then 'twin' else 'saveForTwin'
+          type: if onHand.greaterThanOrEqualTo(t.larvae) then 'twin' else 'saveForTwin'
           unit: u.name
           unitLabel: u.label
           name: t.name
@@ -170,14 +180,16 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor) ->
           level: t.level
           larvae: t.larvae
           meat: t.meat
-          have: budget
+          have: onHand # all larvae on hand
+          budget: budget # the territory share of them
+          overcommit: Decimal.max 0, t.larvae.minus(budget) # larvae taken beyond the territory share
           limit: limit
           seconds: if snap.larvaRate.greaterThan(0) then t.larvae.dividedBy(snap.larvaRate).toNumber() else null
         break
     if twin?.type == 'saveForTwin'
       return {twin: twin, hatch: [], idle: null}
     if twin?
-      budget = budget.minus twin.larvae
+      budget = Decimal.max 0, budget.minus(twin.larvae)
       meatBudget = meatBudget.minus twin.meat
       # the units bought below come out twinned at the new level
       if twin.unit == unit.name
