@@ -345,3 +345,7 @@ body {
 .advisor-panel .table-responsive > .table > tbody > tr > td.advisor-action {
   white-space: normal;
 }
+// The panel title is an h4, which the game title-cases; keep the collapsed summary's action as written.
+.advisor-panel .advisor-summary {
+  text-transform: none;
+}
