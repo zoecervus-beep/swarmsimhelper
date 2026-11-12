@@ -217,7 +217,10 @@ describe 'Directive: advisorOptions', ->
   type = (el, key, val) ->
     input = el.querySelector '#advisor-' + key
     angular.element(input).val val
+    # settings are saved when the box loses focus, not on every keystroke
+    angular.element(input).triggerHandler 'input'
     angular.element(input).triggerHandler 'change'
+    angular.element(input).triggerHandler 'blur'
     $rootScope.$digest()
     return input
   group = (input) -> input.parentNode
@@ -246,12 +249,11 @@ describe 'Directive: advisorOptions', ->
     expect(options.advisorConfig().bank).toBe 3
     expect(group(input).className).toContain 'has-error'
     expect(text group input).toContain 'Enter a number from 0 to 1000000. Still using 3.'
+    expect(input.value).toBe 'lots'
     type el, 'bank', ''
     expect(options.advisorConfig().bank).toBe 3
-    # leaving the box puts the stored value back
-    angular.element(input).triggerHandler 'blur'
-    $rootScope.$digest()
-    expect(input.value).toBe '3'
+    type el, 'bank', '4'
+    expect(options.advisorConfig().bank).toBe 4
     expect(group(input).className).not.toContain 'has-error'
 
   it 'survives a setter that throws', ->
@@ -269,8 +271,23 @@ describe 'Directive: advisorOptions', ->
     input = type el, 'share', '5'
     expect(options.advisorConfig().share).toBe 1
     expect(text group input).toContain 'Saved as 1'
+    expect(input.value).toBe '1'
     input = type el, 'moths', '2500.7'
     expect(options.advisorConfig().moths).toBe 2500
+
+  it 'does not save while typing, only when the box is left or Enter is pressed', ->
+    spyOn(options, 'advisorSetting').and.callThrough()
+    el = render()
+    input = el.querySelector '#advisor-share'
+    angular.element(input).val '0.'
+    angular.element(input).triggerHandler 'input'
+    angular.element(input).triggerHandler 'change'
+    $rootScope.$digest()
+    expect(options.advisorSetting).not.toHaveBeenCalledWith 'share', jasmine.anything()
+    expect(options.advisorConfig().share).toBe 0.5
+    spyOn input, 'blur'
+    angular.element(input).triggerHandler {type: 'keydown', keyCode: 13}
+    expect(input.blur).toHaveBeenCalled()
 
   it 'turns the advisor on and off', ->
     el = render()

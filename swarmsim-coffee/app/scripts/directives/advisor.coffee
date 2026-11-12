@@ -327,7 +327,7 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
     <div class="form-group" ng-repeat="field in fields" ng-class="{'has-error': !!errors[field.key], 'has-warning': !errors[field.key] && !!notes[field.key]}">
       <label class="control-label" for="advisor-{{field.key}}">{{field.label}}</label>
       <input type="text" inputmode="decimal" class="form-control input-sm advisor-setting" id="advisor-{{field.key}}" style="max-width:10em"
-        ng-model="form.values[field.key]" ng-change="setValue(field.key)" ng-blur="resync(field.key)">
+        ng-model="form.values[field.key]" ng-model-options="{updateOn: 'blur'}" ng-change="setValue(field.key)" ng-keydown="enterCommits($event)">
       <p class="help-block">{{field.help}} Default {{defaults[field.key]}}.</p>
       <p class="help-block" ng-if="errors[field.key]">{{errors[field.key]}}</p>
       <p class="help-block" ng-if="!errors[field.key] && notes[field.key]">{{notes[field.key]}}</p>
@@ -363,7 +363,9 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
       options.advisorEnabled !!enabled
       advisor.invalidate()
 
-    # Save one setting from its text box. Bad input shows an error and leaves the stored value as it was.
+    # Save one setting from its text box, when the box loses focus or on Enter (not per keystroke,
+    # so half-typed values are never stored). Bad input shows an error and leaves the stored value
+    # as it was; a clamped value is written back into the box with a note.
     scope.setValue = (key) ->
       text = scope.form.values[key]
       delete scope.errors[key]
@@ -382,13 +384,14 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
       advisor.invalidate()
       if stored != Number text
         scope.notes[key] = "Saved as #{stored} (allowed: #{range}#{if limit.integer then ', whole numbers' else ''})."
+      scope.form.values[key] = String stored
       return
 
-    # Leaving a box shows what is actually stored.
-    scope.resync = (key) ->
-      scope.form.values[key] = String options.advisorSetting key
-      delete scope.errors[key]
-      delete scope.notes[key]
+    # The boxes aren't in a form, so make Enter commit like leaving the box does.
+    scope.enterCommits = ($event) ->
+      if $event?.keyCode == 13
+        $event.target?.blur?()
+      return
 
     scope.reset = ->
       options.resetAdvisorConfig()
