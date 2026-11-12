@@ -9,7 +9,10 @@
 #     plus a small shim when Ruby >= 3.2 (compass/sass call File.exists?,
 #     which Ruby 3.2 removed)
 #   - env.sh, which every new shell must source before using yarn/grunt/karma
-# then runs `yarn install --frozen-lockfile` at the repo root.
+# then runs `yarn install --frozen-lockfile` at the repo root. If
+# codeload.github.com is unreachable it instead installs swarmsim-coffee via
+# advisor/npm-bower-fallback.sh (npm-registry copies) and exits 3 when that
+# fallback leaves gaps.
 #
 # Usage:  advisor/setup-dev.sh            (full setup)
 #         advisor/setup-dev.sh --no-install   (toolchain + env.sh only)
@@ -100,13 +103,25 @@ log "Wrote $TC/env.sh"
 # swarmsim-coffee's bower deps are GitHub tarballs (codeload.github.com).
 probe="https://codeload.github.com/angular/bower-angular/tar.gz/3828060389c83384b0a162eea82b21f183aa060c"
 code="$(curl -sS -o /dev/null -w '%{http_code}' "$probe" || true)"
-if [ "$code" != "200" ]; then
-  echo "ERROR: GitHub tarball download returned HTTP $code ($probe)." >&2
-  echo "swarmsim-coffee needs ~39 such tarballs; yarn install cannot finish." >&2
-  echo "In a sandbox, ask for GitHub read access to those repos (see advisor/BUILDING.md)." >&2
-  exit 2
-fi
-log "yarn install --frozen-lockfile (root + tables + swarmsim-ts + swarmsim-coffee)"
 cd "$REPO"
-yarn install --frozen-lockfile
-log "Done. In each new shell:  . \"$TC/env.sh\""
+if [ "$code" = "200" ]; then
+  log "yarn install --frozen-lockfile (root + tables + swarmsim-ts + swarmsim-coffee)"
+  yarn install --frozen-lockfile
+  log "Done. In each new shell:  . \"$TC/env.sh\""
+  exit 0
+fi
+
+# FALLBACK: GitHub tarballs unreachable. Do what the root `install` script does,
+# but install swarmsim-coffee through advisor/npm-bower-fallback.sh.
+echo "WARNING: GitHub tarball download returned HTTP $code ($probe)." >&2
+echo "Using the npm-registry fallback for swarmsim-coffee (advisor/npm-bower-fallback.sh)." >&2
+log "yarn install (root, scripts off) + yarn link + tables + swarmsim-ts"
+yarn install --frozen-lockfile --ignore-scripts
+yarn run install:link
+(cd tables && yarn install --frozen-lockfile)
+(cd swarmsim-ts && yarn install --frozen-lockfile)
+"$REPO/advisor/npm-bower-fallback.sh"
+echo >&2
+echo "Installed WITH GAPS: some GitHub-pinned libraries have no npm copy (listed above)." >&2
+echo "In each new shell:  . \"$TC/env.sh\"" >&2
+exit 3

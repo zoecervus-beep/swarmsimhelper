@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+# FALLBACK ONLY: install swarmsim-coffee when codeload.github.com is unreachable.
+#
+# swarmsim-coffee/package.json pins its browser libraries ("@bower_components/*")
+# and grunt-wiredep-away to GitHub tarballs. This script, run by setup-dev.sh only
+# when the GitHub check fails:
+#   1. installs every *other* swarmsim-coffee dependency normally (yarn, lockfile
+#      versions), using a temporary copy of package.json without the GitHub entries;
+#      the committed package.json and yarn.lock are restored by an EXIT trap and
+#      yarn runs with --pure-lockfile, so neither is ever rewritten;
+#   2. fills node_modules/@bower_components/<name> from npm-registry packages at
+#      the version the lockfile pins (table below);
+#   3. leaves the GAP entries empty and says so. Nothing is substituted for them.
+#
+# Results obtained this way are "with npm-registry copies", not with the real
+# pinned sources. On a normal network, use plain `yarn install` instead.
+#
+# Needs Node 16 + yarn 1 on PATH (source the env.sh written by setup-dev.sh).
+set -euo pipefail
+
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+COFFEE="$REPO/swarmsim-coffee"
+BC="$COFFEE/node_modules/@bower_components"
+
+# name | pinned GitHub source (lockfile) | npm source | note
+# npm source "GAP" = no npm package at the pinned version; left uninstalled.
+MAP='
+SHA-1|linkgod/SHA-1#* @b51b81ce (v1.0.0)|sha-1@1.0.0|npm gitHead 16d9a413 != pinned commit
+angular|angular/bower-angular#1.6.1 @38280603|angular@1.6.1|gitHead matches
+angular-animate|angular/bower-angular-animate#1.6.1 @49a93460|angular-animate@1.6.1|gitHead matches
+angular-cookies|angular/bower-angular-cookies#1.6.1 @7abd6b51|angular-cookies@1.6.1|gitHead matches
+angular-google-chart|angular-google-chart/angular-google-chart#0.1.0 @fa139db5|angular-google-chart@0.1.0|gitHead matches
+angular-hotkeys|chieffancypants/angular-hotkeys#1.7.0 @07251370|angular-hotkeys@1.7.0|gitHead matches
+angular-mocks|angular/bower-angular-mocks#1.6.1 @d8ac5a20|angular-mocks@1.6.1|gitHead matches
+angular-resource|angular/bower-angular-resource#1.6.1 @d203a7da|angular-resource@1.6.1|gitHead matches
+angular-route|angular/bower-angular-route#1.6.1 @409c45cf|angular-route@1.6.1|gitHead matches
+angular-sanitize|angular/bower-angular-sanitize#1.6.1 @4ca63807|angular-sanitize@1.6.1|gitHead matches
+angular-scenario|angular/bower-angular-scenario#1.6.1 @21d00b69|angular-scenario@1.6.1|gitHead matches
+angular-touch|angular/bower-angular-touch#1.6.1 @85eb1243|angular-touch@1.6.1|gitHead matches
+angulartics|angulartics/angulartics#1.3.0 @10d5be2f|angulartics@1.3.0|gitHead matches
+angulartics-google-analytics|angulartics/angulartics-google-analytics#0.4.0 @080eb7c8|angulartics-google-analytics@0.4.0|gitHead matches
+bootstrap|twbs/bootstrap#~3.3.7 @0b9c4a40|bootstrap@3.3.7|gitHead matches
+bootstrap-sass|twbs/bootstrap-sass#3.3.7 @5d6b2ebb|bootstrap-sass@3.3.7|gitHead matches
+bootswatch|thomaspark/bootswatch#3.3.7 @4b0d3762|bootswatch@3.3.7|gitHead matches
+decimal.js|MikeMcl/decimal.js#7.1.1 @45eec0b8|decimal.js@7.1.1|gitHead matches
+es5-shim|es-shims/es5-shim#4.5.9 @30ebdda8|es5-shim@4.5.9|gitHead matches
+favico.js|ejci/favico.js#0.3.10 @f612afcb|favico.js@0.3.10|gitHead matches
+flash-cookies|nfriedly/Javascript-Flash-Cookies#2.2.3 @07c3a6e2|GAP|npm flash-cookies has only 2.2.0, 2.2.1
+font-awesome|FortAwesome/Font-Awesome#4.7.0 @a8386aae|font-awesome@4.7.0|gitHead matches
+jquery|jquery/jquery-dist#3.1.1 @1b30f3ad|jquery@3.1.1|gitHead matches
+jquery-cookie|carhartl/jquery-cookie#1.4.1 @7f88a4e6|jquery.cookie@1.4.1|npm gitHead bd3c9713 != pinned commit
+json3|bestiejs/json3#3.3.2 @dec5c2a5|json3@3.3.2|npm has no gitHead; version matches
+lodash|lodash/lodash#4.17.10 @67389a8c|lodash@4.17.10|npm has no gitHead; version matches
+lz-string|pieroxy/lz-string#1.4.4 @cf06e9a0|lz-string@1.4.4|gitHead matches
+mathjs|josdejong/mathjs#3.8.1 @29da2b04|mathjs@3.8.1|gitHead matches
+moment|moment/moment#2.17.1 @b8a297c1|moment@2.17.1|npm has no gitHead; version matches
+moment-duration-format|jsmreese/moment-duration-format#1.3.0 @8d0bf29a|moment-duration-format@1.3.0|npm has no gitHead; version matches
+numeral|adamwdraper/Numeral-js#2.0.4 @a7a2dedd|numeral@2.0.4|gitHead matches
+playfab-sdk|PlayFab/JavaScriptSDK#1.0.170130 @236b18be|GAP|not on npm; playfab-web-sdk starts at 1.17.171127, playfab-sdk is the Node SDK
+qs|hapijs/qs#^6.4.0 @56763c12 (v6.11.0)|qs@6.11.0|gitHead matches
+seedrandom|davidbau/seedrandom#2.4.2 @1b530945|seedrandom@2.4.2|gitHead matches
+sjcl|bitwiseshiftleft/sjcl#1.0.6 @51ae8f8c|sjcl@1.0.6|npm gitHead 00bd42da != pinned commit
+swarm-numberformat|erosson/swarm-numberformat#0.2.1 @038998d8|GAP|npm has 0.2.0 and 0.3.0, not 0.2.1
+swarm-persist|erosson/swarm-persist#0.0.3 @b7a3f859|GAP|all npm versions unpublished (2024-01-05)
+'
+# Not under @bower_components (also GAPs, no npm package):
+#   grunt-wiredep-away  gscavalcante/grunt-wiredep-away @6b010f5d  -> provides the grunt `wiredep` task
+#   playfab-sdk-browser erosson/playfab-sdk-browser @d20778f5       -> dependency of swarm-persist only
+
+TMPD="$(mktemp -d)"
+BACKUP="$TMPD/backup"
+mkdir -p "$BACKUP"
+cp -p "$COFFEE/package.json" "$COFFEE/yarn.lock" "$BACKUP/"
+restore() {
+  cp -p "$BACKUP/package.json" "$COFFEE/package.json"
+  cp -p "$BACKUP/yarn.lock" "$COFFEE/yarn.lock"
+  rm -rf "$TMPD"
+}
+trap restore EXIT INT TERM
+
+echo "== [npm fallback] yarn install (registry deps only) in swarmsim-coffee"
+node -e '
+  const fs = require("fs"), f = process.argv[1], p = JSON.parse(fs.readFileSync(f, "utf8"));
+  for (const sec of ["dependencies", "devDependencies"])
+    for (const k of Object.keys(p[sec] || {}))
+      if (k.startsWith("@bower_components/") || k === "grunt-wiredep-away") delete p[sec][k];
+  fs.writeFileSync(f, JSON.stringify(p, null, 2) + "\n");
+' "$COFFEE/package.json"
+(cd "$COFFEE" && yarn install --pure-lockfile --non-interactive)
+restore
+trap - EXIT INT TERM
+TMPD="$(mktemp -d)"
+trap 'rm -rf "$TMPD"' EXIT
+
+echo "== [npm fallback] filling node_modules/@bower_components from the npm registry"
+mkdir -p "$BC"
+gaps=()
+while IFS='|' read -r name pinned spec note; do
+  [ -n "$name" ] || continue
+  if [ "$spec" = GAP ]; then
+    gaps+=("$name ($pinned): $note")
+    continue
+  fi
+  dest="$BC/$name"
+  if [ -f "$dest/.npm-fallback" ] && [ "$(cat "$dest/.npm-fallback")" = "$spec" ]; then
+    continue
+  fi
+  rm -rf "$dest"
+  tgz="$(cd "$TMPD" && npm pack --silent "$spec")"   # npm checks the registry integrity hash
+  mkdir -p "$dest"
+  tar --warning=no-unknown-keyword -xzf "$TMPD/$tgz" -C "$dest" --strip-components=1
+  rm -f "$TMPD/$tgz"
+  echo "$spec" > "$dest/.npm-fallback"
+  echo "   $name <- $spec"
+done <<< "$MAP"
+
+# Layout: every bower_components path used by test/karma-*.conf.coffee, app/index.html,
+# app/styles/*.scss, Gruntfile.js (copy, compass importPath) and options.coffee
+# (bootswatch themes) was checked against the npm packages above: all present at
+# the same paths, so no fix-ups are needed. Missing paths are only the GAPs, plus
+# konami-js/ and appcache-nanny/, which the karma configs list but package.json
+# never installed (upstream too; Karma just warns).
+
+(cd "$COFFEE" && node -e "try { require('fs').symlinkSync(require('path').resolve('node_modules/@bower_components'), 'bower_components', 'junction') } catch (e) { }")
+
+echo
+echo "== [npm fallback] done. NOT installed (no npm package at the pinned version):"
+for g in "${gaps[@]}"; do echo "   GAP $g"; done
+echo "   GAP grunt-wiredep-away (gscavalcante/grunt-wiredep-away @6b010f5d): not on npm; grunt 'wiredep' task missing"
+echo "   GAP playfab-sdk-browser (erosson/playfab-sdk-browser @d20778f5): not on npm; only used by swarm-persist"
