@@ -138,7 +138,6 @@ describe 'Directive: advisorPanel', ->
     expect(lines.length).toBe 2
     expect(text lines[0]).toBe 'Territory: hatch ' + bignum(new Decimal 315778) + ' wasps (×16 twins)'
     expect(text lines[1]).toBe 'hatch ' + bignum(new Decimal 18210) + ' devourers (×32 twins)'
-    expect(lines[0].className).toContain 'list-group-item-success'
     expect(lines[0].querySelector('a').getAttribute 'href').toBe '#/tab/territory/unit/wasp'
     expect(lines[0].querySelector 'strong').not.toBe null
 

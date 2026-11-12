@@ -302,7 +302,8 @@ angular.module('swarmApp').directive 'advisorPanel', ($rootScope, $log, advisor,
     <li class="list-group-item advisor-territory text-danger" ng-if="terr.error">
       <span class="glyphicon glyphicon-flag" aria-hidden="true"></span> Territory: {{terr.error}}
     </li>
-    <li class="list-group-item advisor-territory" ng-repeat="line in terr.lines" ng-class="{'list-group-item-success': line.buy}">
+    <!-- hatch lines are bold, not tinted: a tinted item hides its link on some dark themes (darkly) -->
+    <li class="list-group-item advisor-territory" ng-repeat="line in terr.lines">
       <span class="glyphicon glyphicon-flag" aria-hidden="true"></span> <span ng-if="$first">Territory:</span>
       <a ng-if="line.href" ng-href="{{line.href}}"><strong ng-if="line.buy">{{line.text}}</strong><span ng-if="!line.buy">{{line.text}}</span></a><span ng-if="!line.href">{{line.text}}</span>
     </li>
