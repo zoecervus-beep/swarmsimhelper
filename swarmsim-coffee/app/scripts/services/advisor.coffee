@@ -29,7 +29,7 @@ angular.module('swarmApp').constant 'ADVISOR_SETTINGS',
  # state (`createMemory()`, returned updated by `advise()`), the settings, and the snapshot's time.
  # `update()` wires those to the live game for the UI.
 ###
-angular.module('swarmApp').factory 'advisor', (game, options, ADVISOR_SETTINGS) ->
+angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISOR_SETTINGS) ->
   ZERO = new Decimal 0
   ONE = new Decimal 1
   D = (x) -> new Decimal(if x? then x else 0)
@@ -514,4 +514,8 @@ angular.module('swarmApp').factory 'advisor', (game, options, ADVISOR_SETTINGS) 
       return cached
     invalidate: -> cached = null
   }
+  # A different save (imported, or the game reset) must not inherit this one's purchase history:
+  # its statistics would read as a purchase just made, and put every unit on cooldown.
+  $rootScope.$on 'import', -> svc.resetMemory()
+  $rootScope.$on 'reset', -> svc.resetMemory()
   return svc

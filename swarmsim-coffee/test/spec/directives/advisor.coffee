@@ -67,6 +67,19 @@ describe 'Directive: advisorPanel', ->
     expect(tips).toEqual ['buy faster queens (66 queens)', 'buy twin nests (10 greater queens)']
     expect(text el.querySelector '.advisor-energy').toBe 'Energy: cast House of Mirrors ×3'
 
+  it 'names one unit in the singular', ->
+    advice = fakeAdvice()
+    advice.tips = [{type: 'twin', unit: 'hive', payIn: 'hivequeen', cost: new Decimal 1}]
+    spyOn(advisor, 'update').and.returnValue advice
+    el = render()
+    expect(text el.querySelector '.advisor-tip').toBe 'buy twin hives (1 hive queen)'
+
+  it 'forgets purchase history when another save is imported', ->
+    advisor.update()
+    expect(advisor.memory()).not.toBe null
+    $rootScope.$broadcast 'import', {source: 'options', success: true}
+    expect(advisor.memory()).toBe null
+
   it 'renders the live advice for a new game', ->
     el = render()
     expect(el.querySelector '.advisor-error').toBe null
@@ -232,7 +245,7 @@ describe 'Directive: advisorOptions', ->
     expect(el.querySelector('#advisor-ageMultiple').value).toBe '5'
     expect(el.querySelector('#advisor-territory').value).toBe '0.1'
     expect(text el).toContain 'Set to 0 once House of Mirrors is casting'
-    expect(text el).toContain 'Use 5 for multi-day runs'
+    expect(text el).toContain '5 suits runs lasting several days'
 
   it 'saves valid input through the option setter', ->
     spyOn(options, 'advisorSetting').and.callThrough()
