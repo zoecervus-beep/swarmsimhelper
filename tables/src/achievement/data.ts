@@ -1159,7 +1159,7 @@ const list: C.Achievement[] = [
   {
     "name": "overmind2_1",
     "l": {
-      "description": "Grow your first overmind II",
+      "description": "Grow your first ascended",
       "label": "transcendent thought",
       "longdesc": ""
     },
@@ -1180,7 +1180,7 @@ const list: C.Achievement[] = [
   {
     "name": "overmind2_2",
     "l": {
-      "description": "Grow $REQUIRED overmind IIs",
+      "description": "Grow $REQUIRED ascended",
       "label": "transcendent thought",
       "longdesc": ""
     },
@@ -1201,7 +1201,7 @@ const list: C.Achievement[] = [
   {
     "name": "overmind2_3",
     "l": {
-      "description": "Grow $REQUIRED overmind IIs",
+      "description": "Grow $REQUIRED ascended",
       "label": "transcendent thought",
       "longdesc": ""
     },
@@ -1222,7 +1222,7 @@ const list: C.Achievement[] = [
   {
     "name": "overmind3_1",
     "l": {
-      "description": "Grow your first overmind III",
+      "description": "Grow your first cosmic network",
       "label": "transcendent thought",
       "longdesc": ""
     },
@@ -1243,7 +1243,7 @@ const list: C.Achievement[] = [
   {
     "name": "overmind3_2",
     "l": {
-      "description": "Grow $REQUIRED overmind IIIs",
+      "description": "Grow $REQUIRED cosmic networks",
       "label": "transcendent thought",
       "longdesc": ""
     },
@@ -1264,7 +1264,7 @@ const list: C.Achievement[] = [
   {
     "name": "overmind3_3",
     "l": {
-      "description": "Grow $REQUIRED overmind IIIs",
+      "description": "Grow $REQUIRED cosmic networks",
       "label": "transcendent thought",
       "longdesc": ""
     },
@@ -1285,7 +1285,7 @@ const list: C.Achievement[] = [
   {
     "name": "overmind4_1",
     "l": {
-      "description": "Grow your first overmind IV",
+      "description": "Grow your first galactic cluster",
       "label": "transcendent thought",
       "longdesc": ""
     },
@@ -1306,7 +1306,7 @@ const list: C.Achievement[] = [
   {
     "name": "overmind4_2",
     "l": {
-      "description": "Grow $REQUIRED overmind IVs",
+      "description": "Grow $REQUIRED galactic clusters",
       "label": "transcendent thought",
       "longdesc": ""
     },
@@ -1327,7 +1327,7 @@ const list: C.Achievement[] = [
   {
     "name": "overmind4_3",
     "l": {
-      "description": "Grow $REQUIRED overmind IVs",
+      "description": "Grow $REQUIRED galactic clusters",
       "label": "transcendent thought",
       "longdesc": ""
     },
@@ -1348,7 +1348,7 @@ const list: C.Achievement[] = [
   {
     "name": "overmind5_1",
     "l": {
-      "description": "Grow your first overmind V",
+      "description": "Grow your first universal cortex",
       "label": "transcendent thought",
       "longdesc": ""
     },
@@ -1369,7 +1369,7 @@ const list: C.Achievement[] = [
   {
     "name": "overmind5_2",
     "l": {
-      "description": "Grow $REQUIRED overmind Vs",
+      "description": "Grow $REQUIRED universal cortices",
       "label": "transcendent thought",
       "longdesc": ""
     },
@@ -1390,7 +1390,7 @@ const list: C.Achievement[] = [
   {
     "name": "overmind5_3",
     "l": {
-      "description": "Grow $REQUIRED overmind Vs",
+      "description": "Grow $REQUIRED universal cortices",
       "label": "transcendent thought",
       "longdesc": ""
     },
@@ -1411,7 +1411,7 @@ const list: C.Achievement[] = [
   {
     "name": "overmind6_1",
     "l": {
-      "description": "Grow your first overmind VI",
+      "description": "Grow your first endless",
       "label": "transcendent thought",
       "longdesc": ""
     },
@@ -1432,7 +1432,7 @@ const list: C.Achievement[] = [
   {
     "name": "overmind6_2",
     "l": {
-      "description": "Grow $REQUIRED overmind VIs",
+      "description": "Grow $REQUIRED endless",
       "label": "transcendent thought",
       "longdesc": ""
     },
@@ -1453,7 +1453,7 @@ const list: C.Achievement[] = [
   {
     "name": "overmind6_3",
     "l": {
-      "description": "Grow $REQUIRED overmind VIs",
+      "description": "Grow $REQUIRED endless",
       "label": "transcendent thought",
       "longdesc": ""
     },

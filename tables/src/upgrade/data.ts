@@ -604,8 +604,8 @@ const list: C.Upgrade[] = [
   {
     "name": "overmind2prod",
     "l": {
-      "description": "Overmind IIs produce more overminds.",
-      "label": "faster overmind IIs",
+      "description": "Ascended produce more overminds.",
+      "label": "faster ascended",
       "lol": ""
     },
     "class": "upgrade",
@@ -635,8 +635,8 @@ const list: C.Upgrade[] = [
   {
     "name": "overmind3prod",
     "l": {
-      "description": "Overmind IIIs produce more overmind IIs.",
-      "label": "faster overmind IIIs",
+      "description": "Cosmic networks produce more ascended.",
+      "label": "faster cosmic networks",
       "lol": ""
     },
     "class": "upgrade",
@@ -666,8 +666,8 @@ const list: C.Upgrade[] = [
   {
     "name": "overmind4prod",
     "l": {
-      "description": "Overmind IVs produce more overmind IIIs.",
-      "label": "faster overmind IVs",
+      "description": "Galactic clusters produce more cosmic networks.",
+      "label": "faster galactic clusters",
       "lol": ""
     },
     "class": "upgrade",
@@ -697,8 +697,8 @@ const list: C.Upgrade[] = [
   {
     "name": "overmind5prod",
     "l": {
-      "description": "Overmind Vs produce more overmind IVs.",
-      "label": "faster overmind Vs",
+      "description": "Universal cortices produce more galactic clusters.",
+      "label": "faster universal cortices",
       "lol": ""
     },
     "class": "upgrade",
@@ -728,8 +728,8 @@ const list: C.Upgrade[] = [
   {
     "name": "overmind6prod",
     "l": {
-      "description": "Overmind VIs produce more overmind Vs.",
-      "label": "faster overmind VIs",
+      "description": "Endless produce more universal cortices.",
+      "label": "faster endless",
       "lol": ""
     },
     "class": "upgrade",
@@ -1193,7 +1193,7 @@ const list: C.Upgrade[] = [
   {
     "name": "overmindtwin",
     "l": {
-      "description": "Multiple overminds are created from each larva. (This does not affect overmind II production.)",
+      "description": "Multiple overminds are created from each larva. (This does not affect ascended production.)",
       "label": "twin overminds",
       "lol": ""
     },
@@ -1224,8 +1224,8 @@ const list: C.Upgrade[] = [
   {
     "name": "overmind2twin",
     "l": {
-      "description": "Multiple overmind IIs are created from each larva. (This does not affect overmind III production.)",
-      "label": "twin overmind IIs",
+      "description": "Multiple ascended are created from each larva. (This does not affect cosmic network production.)",
+      "label": "twin ascended",
       "lol": ""
     },
     "class": "upgrade",
@@ -1255,8 +1255,8 @@ const list: C.Upgrade[] = [
   {
     "name": "overmind3twin",
     "l": {
-      "description": "Multiple overmind IIIs are created from each larva. (This does not affect overmind IV production.)",
-      "label": "twin overmind IIIs",
+      "description": "Multiple cosmic networks are created from each larva. (This does not affect galactic cluster production.)",
+      "label": "twin cosmic networks",
       "lol": ""
     },
     "class": "upgrade",
@@ -1286,8 +1286,8 @@ const list: C.Upgrade[] = [
   {
     "name": "overmind4twin",
     "l": {
-      "description": "Multiple overmind IVs are created from each larva. (This does not affect overmind V production.)",
-      "label": "twin overmind IVs",
+      "description": "Multiple galactic clusters are created from each larva. (This does not affect universal cortex production.)",
+      "label": "twin galactic clusters",
       "lol": ""
     },
     "class": "upgrade",
@@ -1317,8 +1317,8 @@ const list: C.Upgrade[] = [
   {
     "name": "overmind5twin",
     "l": {
-      "description": "Multiple overmind Vs are created from each larva. (This does not affect overmind VI production.)",
-      "label": "twin overmind Vs",
+      "description": "Multiple universal cortices are created from each larva. (This does not affect endless production.)",
+      "label": "twin universal cortices",
       "lol": ""
     },
     "class": "upgrade",
@@ -1348,8 +1348,8 @@ const list: C.Upgrade[] = [
   {
     "name": "overmind6twin",
     "l": {
-      "description": "Multiple overmind VIs are created from each larva.",
-      "label": "twin overmind VIs",
+      "description": "Multiple endless are created from each larva.",
+      "label": "twin endless",
       "lol": ""
     },
     "class": "upgrade",
