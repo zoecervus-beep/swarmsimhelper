@@ -177,7 +177,8 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
         line.text = 'save larvae for ' + rec.label + ': ' + bignum(rec.have) + '/' + count(rec.larvae, 'larva')
         line.href = href rec.unit
       when 'hatch'
-        line.text = 'hatch ' + count(rec.buys, rec.unit) + (if rec.twin.greaterThan(1) then ' (×' + bignum(rec.twin) + ' twins)' else '')
+        line.amount = count(rec.buys, rec.unit) + (if rec.twin.greaterThan(1) then ' (×' + bignum(rec.twin) + ' twins)' else '')
+        line.text = 'hatch ' + line.amount
         line.href = href rec.unit
         line.buy = true
       when 'idle'
@@ -191,15 +192,51 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
     return line
 
   # From `advisorTerritory.current()` to the panel's territory lines. Never throws.
+  # The `hatch` records (main and spare) are one plan, bought in either order, so they make one line:
+  # "hatch 184 stingers (×8 twins) and 94 arachnomorphs (×8 twins), in any order", each unit its own
+  # link. Other records keep a line each.
   territory = (cur) ->
     if not cur?
       return null
     if cur.error?
       return {error: errorText cur.error, lines: []}
     try
-      return {error: null, lines: (territoryLine(rec) for rec in cur.advice.records)}
+      notePlan cur
+      lines = []
+      plan = null
+      for rec in cur.advice.records
+        line = territoryLine rec
+        if rec.type != 'hatch'
+          lines.push line
+        else if plan?
+          plan.parts.push line
+          plan.units.push line.unit
+        else
+          plan = {type: 'hatchPlan', parts: [line], units: [line.unit], buy: true}
+          lines.push plan
+      if plan?
+        plan.text = 'hatch ' + (p.amount for p in plan.parts).join(' and ') + (if plan.parts.length > 1 then ', in any order' else '')
+      return {error: null, lines: lines}
     catch e
       return {error: errorText e, lines: []}
+
+  # Territory units in the current plan whose line was bought: a unit the plan named is remembered
+  # with its purchase count at the time; once it has been hatched since and the plan no longer names
+  # it, its page says "done here" instead of nothing. Forgotten when the plan runs out (no hatch
+  # lines), so units the plan never named, or named in an earlier cycle, show nothing.
+  planned = {}
+  plannedAt = null # the advice last noted (each update is a new object, so compare by identity)
+  purchases = (name) -> new Decimal(unitOf(name)?.statistics?()?.num ? 0)
+  notePlan = (cur) ->
+    if not cur?.advice? or cur == plannedAt
+      return
+    plannedAt = cur
+    if not cur.advice.hatch.length
+      planned = {}
+      return
+    for rec in cur.advice.hatch when not planned[rec.unit]?
+      planned[rec.unit] = purchases rec.unit
+    return
 
   buyView = (buys, unitName) ->
     buys: buys
@@ -224,8 +261,12 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
     a = cur?.advice
     if not a?
       return null
+    notePlan cur
     for rec in a.hatch when rec.unit == unitName and rec.buys.greaterThanOrEqualTo 1
       return buyView rec.buys, unitName
+    if a.hatch.length and planned[unitName]? and purchases(unitName).greaterThan(planned[unitName])
+      next = territoryLine a.hatch[0]
+      return {buys: null, reason: 'done here; next', next: {text: next.text, href: next.href}}
     why = if a.status?.type == 'mirrors' then a.status else if a.twin?.type == 'saveForTwin' then a.twin else if a.status?.type == 'idle' then a.status else null
     if why?
       return {buys: null, reason: territoryLine(why).text}
@@ -306,10 +347,16 @@ angular.module('swarmApp').directive 'advisorPanel', ($rootScope, $log, advisor,
       <span class="glyphicon glyphicon-flag" aria-hidden="true"></span> Territory: {{terr.error}}
     </li>
     <!-- hatch lines are bold, not tinted: a tinted item hides its link on some dark themes (darkly) -->
-    <li class="list-group-item advisor-territory" ng-repeat="line in terr.lines" ng-class="{'advisor-current': line.unit && line.unit == currentUnit}">
+    <li class="list-group-item advisor-territory" ng-repeat="line in terr.lines" ng-class="{'advisor-current': (line.unit && line.unit == currentUnit) || (line.units && line.units.indexOf(currentUnit) >= 0), 'advisor-plan': line.parts}">
       <span class="glyphicon glyphicon-flag" aria-hidden="true"></span> <span ng-if="$first">Territory:</span>
-      <span ng-if="line.unit && line.unit == currentUnit" class="glyphicon glyphicon-map-marker advisor-here" title="The unit on this page"></span><span ng-if="line.unit && line.unit == currentUnit" class="sr-only">(this page) </span>
-      <a ng-if="line.href" ng-href="{{line.href}}"><strong ng-if="line.buy">{{line.text}}</strong><span ng-if="!line.buy">{{line.text}}</span></a><span ng-if="!line.href">{{line.text}}</span>
+      <span ng-if="!line.parts">
+        <span ng-if="line.unit && line.unit == currentUnit" class="glyphicon glyphicon-map-marker advisor-here" title="The unit on this page"></span><span ng-if="line.unit && line.unit == currentUnit" class="sr-only">(this page) </span>
+        <a ng-if="line.href" ng-href="{{line.href}}"><strong ng-if="line.buy">{{line.text}}</strong><span ng-if="!line.buy">{{line.text}}</span></a><span ng-if="!line.href">{{line.text}}</span>
+      </span>
+      <span ng-if="line.parts" title="One plan: the territory larvae go into the biggest unit they can all afford, and spare meat moves some of them up to the next unit. Buy both, in either order.">
+        <strong>hatch</strong>
+        <span ng-repeat="part in line.parts" class="advisor-plan-part" ng-class="{'advisor-current': part.unit == currentUnit}"><span ng-if="!$first"> and </span><span ng-if="part.unit == currentUnit" class="glyphicon glyphicon-map-marker advisor-here" title="The unit on this page"></span><span ng-if="part.unit == currentUnit" class="sr-only">(this page) </span><a ng-if="part.href" ng-href="{{part.href}}"><strong>{{part.amount}}</strong></a><strong ng-if="!part.href">{{part.amount}}</strong></span><span ng-if="line.parts.length > 1" class="text-muted">, in any order</span>
+      </span>
     </li>
   </ul>
 </div>
@@ -333,16 +380,16 @@ angular.module('swarmApp').directive 'advisorPanel', ($rootScope, $log, advisor,
         return
       try
         cur = advisor.current ADVISOR_REFRESH_MILLIS
-        if cur.at != lastAt or not scope.view?
-          lastAt = cur.at
+        if cur != lastAt or not scope.view?
+          lastAt = cur
           scope.view = advisorView.panel cur
       catch e
         $log.warn 'advisor panel', e
         scope.view = {error: String(e?.message ? e)}
       try
         tcur = advisorTerritory.current ADVISOR_REFRESH_MILLIS
-        if tcur.at != lastTerrAt or not scope.terr?
-          lastTerrAt = tcur.at
+        if tcur != lastTerrAt or not scope.terr?
+          lastTerrAt = tcur
           scope.terr = advisorView.territory tcur
       catch e
         $log.warn 'advisor territory', e
@@ -365,12 +412,12 @@ angular.module('swarmApp').directive 'advisorSuggest', ($rootScope, $log, adviso
     form: '='
   template: """
 <div class="advisor-suggest form-group" ng-if="view">
-  <button type="button" class="btn btn-sm" ng-class="view.buys ? 'btn-success' : 'btn-default'" ng-disabled="!view.buys" ng-click="use()"
+  <button type="button" class="btn btn-sm" ng-class="view.buys ? 'btn-success' : 'btn-default'" ng-disabled="!view.buys" ng-click="use()" ng-mouseenter="peek()" ng-focus="peek()"
       title="{{view.buys ? 'Climbing advisor: put ' + view.exact + ' in the box. You still choose when to buy.' : 'The climbing advisor has no suggestion for this unit right now.'}}">
     <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
     Use suggested<span ng-if="view.buys">: {{view.amount}} {{view.noun}}</span>
   </button>
-  <small class="text-muted" ng-if="!view.buys">Advisor: {{view.reason}}</small>
+  <small class="text-muted" ng-if="!view.buys" title="Advisor: {{view.reason}}{{view.next ? ' ' + view.next.text : ''}}">Advisor: {{view.reason}}<span ng-if="view.next"> <a ng-if="view.next.href" ng-href="{{view.next.href}}">{{view.next.text}}</a><span ng-if="!view.next.href">{{view.next.text}}</span></span></small>
 </div>
 """
   link: (scope, element, attrs) ->
@@ -390,8 +437,8 @@ angular.module('swarmApp').directive 'advisorSuggest', ($rootScope, $log, adviso
         lastAt = null
         return scope.view = null
       cur = src.service.current maxAgeMs
-      if cur.at != lastAt or maxAgeMs == 0
-        lastAt = cur.at
+      if cur != lastAt or maxAgeMs == 0
+        lastAt = cur
         scope.view = src.view cur, scope.unit.name
       return scope.view
     scope.refresh = ->
@@ -401,10 +448,20 @@ angular.module('swarmApp').directive 'advisorSuggest', ($rootScope, $log, adviso
         $log.warn 'advisor suggestion', e
         scope.view = null
       return
-    # Writes the count from advice taken now, not the up-to-a-second-old one on the button.
+    # Pointing at (or tabbing to) the button refreshes its amount, so the number read just before the
+    # click is the one the click writes: one extra rule run per hover, nothing per frame.
+    scope.peek = ->
+      try
+        read 0
+      catch e
+        $log.warn 'advisor suggestion', e
+      return
+    # Writes the count from advice at most a quarter of a second old: normally exactly the amount on
+    # the button, which the hover just refreshed; else (keyboard, touch) fresh advice, never the
+    # up-to-a-second-old amount the button may still show.
     scope.use = ->
       try
-        view = read 0
+        view = read 250
       catch e
         $log.warn 'advisor suggestion', e
         view = scope.view = null

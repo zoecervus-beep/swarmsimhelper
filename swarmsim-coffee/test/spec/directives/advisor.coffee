@@ -135,11 +135,20 @@ describe 'Directive: advisorPanel', ->
     spyOn(game.unit('wasp'), 'isVisible').and.returnValue true
     el = render()
     lines = el.querySelectorAll '.advisor-territory'
-    expect(lines.length).toBe 2
-    expect(text lines[0]).toBe 'Territory: hatch ' + bignum(new Decimal 315778) + ' wasps (×16 twins)'
-    expect(text lines[1]).toBe 'hatch ' + bignum(new Decimal 18210) + ' devourers (×32 twins)'
+    # main and spare are one plan: one line, both wanted, either order
+    expect(lines.length).toBe 1
+    expect(text lines[0]).toBe 'Territory: hatch ' + bignum(new Decimal 315778) + ' wasps (×16 twins) and ' + bignum(new Decimal 18210) + ' devourers (×32 twins), in any order'
     expect(lines[0].querySelector('a').getAttribute 'href').toBe '#/tab/territory/unit/wasp'
+    expect(lines[0].querySelectorAll('.advisor-plan-part').length).toBe 2
     expect(lines[0].querySelector 'strong').not.toBe null
+
+  it 'says nothing about order for a plan of one unit', ->
+    spyOn(advisor, 'update').and.returnValue fakeAdvice()
+    t = fakeTerritory()
+    t.hatch = t.records = t.hatch.slice 0, 1
+    spyOn(advisorTerritory, 'update').and.returnValue t
+    el = render()
+    expect(text el.querySelector '.advisor-territory').toBe 'Territory: hatch ' + bignum(new Decimal 315778) + ' wasps (×16 twins)'
 
   it 'renders the other territory records', ->
     D = (x) -> new Decimal x
@@ -180,7 +189,7 @@ describe 'Directive: advisorPanel', ->
     $rootScope.$emit 'tick'
     $rootScope.$digest()
     expect(text el.querySelector '.advisor-error').toBe 'Advisor error: no hive data'
-    expect(el.querySelectorAll('.advisor-territory').length).toBe 2
+    expect(el.querySelectorAll('.advisor-territory').length).toBe 1
 
   it 'marks the unit of the page it is on, separately from the buy emphasis', ->
     spyOn(advisor, 'update').and.returnValue fakeAdvice()
@@ -205,7 +214,12 @@ describe 'Directive: advisorPanel', ->
     el = el[0]
     marked = el.querySelectorAll '.advisor-territory.advisor-current'
     expect(marked.length).toBe 1
-    expect(text marked[0]).toContain 'devourers'
+    # within the plan line, only the page's unit carries the marker
+    parts = el.querySelectorAll '.advisor-plan-part'
+    expect(parts[0].querySelector '.advisor-here').toBe null
+    expect(parts[1].querySelector '.advisor-here').not.toBe null
+    expect(text parts[1]).toContain '(this page)'
+    expect(text parts[1]).toContain 'devourers'
     expect(el.querySelectorAll('tr.advisor-current').length).toBe 0
     # follows the page's unit
     scope.unitName = 'queen'
@@ -337,6 +351,7 @@ describe 'Directive: advisorSuggest', ->
     expect(text el.querySelector 'button').toBe 'Use suggested: 12 nests'
     # a second later the advice has moved on, before the next refresh
     advisor.update.and.returnValue withBuys 40
+    advisor.current(1000, Date.now() - 5000) # the cached advice is older than a quarter second
     angular.element(el.querySelector 'button').triggerHandler 'click'
     expect(scope.form.buyCount).toBe '40'
     $rootScope.$digest()
@@ -344,8 +359,22 @@ describe 'Directive: advisorSuggest', ->
     # and writes nothing if the advice no longer says buy
     scope.form.buyCount = ''
     advisor.update.and.returnValue fakeAdvice {tiers: [fakeAdvice().tiers[0]]}
+    advisor.current(1000, Date.now() - 5000)
     angular.element(el.querySelector 'button').triggerHandler 'click'
     expect(scope.form.buyCount).toBe ''
+
+  it 'brings the amount up to date when the pointer reaches the button', ->
+    spyOn(advisor, 'update').and.returnValue fakeAdvice()
+    el = render 'nest'
+    advisor.update.and.returnValue withBuys 40
+    button = el.querySelector 'button'
+    angular.element(button).triggerHandler 'mouseenter'
+    $rootScope.$digest()
+    expect(text button).toBe 'Use suggested: 40 nests'
+    # a click right after writes exactly the amount shown, even if the advice has moved on since
+    advisor.update.and.returnValue withBuys 41
+    angular.element(button).triggerHandler 'click'
+    expect(scope.form.buyCount).toBe '40'
 
   it 'suggests territory units from the territory advice', ->
     spyOn(advisorTerritory, 'update').and.returnValue fakeTerritory()
@@ -371,6 +400,45 @@ describe 'Directive: advisorSuggest', ->
     $rootScope.$emit 'tick'
     $rootScope.$digest()
     expect(text el.querySelector 'small').toBe 'Advisor: save larvae for twin wasps: ' + bignum(D 1000) + '/' + bignum(D 5000) + ' larvae'
+
+  it 'says "done here" on a plan unit whose line was bought, pointing to the rest of the plan', ->
+    spyOn(game.unit('devourer'), 'isVisible').and.returnValue true
+    spyOn(advisorTerritory, 'update').and.returnValue fakeTerritory()
+    el = render 'wasp'
+    expect(el.querySelector('button').disabled).toBe false
+    # the player hatches the wasps; the plan now only names devourers
+    spyOn(game.unit('wasp'), 'statistics').and.returnValue {num: 315778, twinnum: 315778 * 16}
+    rest = fakeTerritory()
+    rest.hatch = rest.records = rest.hatch.slice 1
+    advisorTerritory.update.and.returnValue rest
+    advisorTerritory.invalidate()
+    $rootScope.$emit 'tick'
+    $rootScope.$digest()
+    expect(el.querySelector('button').disabled).toBe true
+    expect(text el.querySelector 'small').toBe 'Advisor: done here; next hatch ' + bignum(new Decimal 18210) + ' devourers (×32 twins)'
+    expect(el.querySelector('small a').getAttribute 'href').toBe '#/tab/territory/unit/devourer'
+
+  it 'says nothing on a territory unit the plan never named, nor once the plan is used up', ->
+    D = (x) -> new Decimal x
+    spyOn(advisorTerritory, 'update').and.returnValue fakeTerritory()
+    expect(render('swarmling').querySelector 'button').toBe null
+    el = render 'wasp'
+    # named but not bought, and dropped from the plan (meat moved it up): no "done here"
+    t = fakeTerritory()
+    t.hatch = t.records = t.hatch.slice 1
+    advisorTerritory.update.and.returnValue t
+    advisorTerritory.invalidate()
+    $rootScope.$emit 'tick'
+    $rootScope.$digest()
+    expect(el.querySelector 'button').toBe null
+    # bought, then the plan runs out: the purse's reason, not "done here"
+    spyOn(game.unit('wasp'), 'statistics').and.returnValue {num: 5, twinnum: 80}
+    status = {type: 'idle', reason: 'refilling', purse: D(0.2), rate: D(5), seconds: 30}
+    advisorTerritory.update.and.returnValue fakeTerritory {records: [status], hatch: [], status: status}
+    advisorTerritory.invalidate()
+    $rootScope.$emit 'tick'
+    $rootScope.$digest()
+    expect(text el.querySelector 'small').toBe 'Advisor: territory larvae spent for now, more in 30 s'
 
   it 'follows the advice as it changes', ->
     spyOn(advisor, 'update').and.returnValue fakeAdvice()

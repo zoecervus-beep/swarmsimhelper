@@ -359,3 +359,10 @@ body {
 .advisor-panel .advisor-here {
   margin-right: 0.25em;
 }
+// The "use suggested" line sits above the game's buy buttons: keep it one line whatever the reason
+// beside the button says, so it can never push the buttons down (the full text is in its title).
+.advisor-suggest {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
