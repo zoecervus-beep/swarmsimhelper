@@ -573,9 +573,11 @@ angular.module('swarmApp').directive 'advisorPanel', ($rootScope, $log, advisor,
  # @name swarmApp.directive:advisorSuggest
  # @description
  # Beside the buy box: when the climbing advisor suggests hatching this unit, a button that puts
- # the suggested amount into the box. It only fills the box; buying is still the game's button.
+ # the suggested amount into the box. Holding Shift does the same for as long as it is held, and
+ # releasing it puts back what the box held before. It only fills the box; buying is still the
+ # game's button.
 ###
-angular.module('swarmApp').directive 'advisorSuggest', ($rootScope, $log, advisor, advisorTerritory, advisorView, options, ADVISOR_REFRESH_MILLIS) ->
+angular.module('swarmApp').directive 'advisorSuggest', ($rootScope, $log, $window, $document, advisor, advisorTerritory, advisorView, options, ADVISOR_REFRESH_MILLIS) ->
   restrict: 'E'
   scope:
     unit: '='
@@ -587,6 +589,7 @@ angular.module('swarmApp').directive 'advisorSuggest', ($rootScope, $log, adviso
     <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
     Use suggested<span ng-if="view.buys">: {{view.amount}} {{view.noun}}</span>
   </button>
+  <small class="text-muted advisor-shift-hint" ng-if="view.buys" title="Holding Shift puts the suggested amount in the box (Shift-click the game's button to buy it); releasing Shift puts back what the box held. Typing a character with Shift leaves the box as you typed it.">or hold Shift</small>
   <small class="text-muted" ng-if="!view.buys" title="Advisor: {{view.reason}}{{view.next ? ' ' + view.next.text : ''}}">Advisor: {{view.reason}}<span ng-if="view.next"> <a ng-if="view.next.href" ng-href="{{view.next.href}}">{{view.next.text}}</a><span ng-if="!view.next.href">{{view.next.text}}</span></span></small>
 </div>
 """
@@ -637,8 +640,140 @@ angular.module('swarmApp').directive 'advisorSuggest', ($rootScope, $log, adviso
         view = scope.view = null
       if view?.buys and scope.form?
         scope.form.buyCount = view.buyCount
+
+    # Holding Shift fills the box with the suggestion and keeps it on the suggestion while held;
+    # releasing Shift (or leaving the window, the tab or the page) puts back exactly what the box
+    # held before. Shift is also how `%`, `@` and `=` are typed into the box, so a Shift that is
+    # used for typing must never touch it: if any other key goes down while Shift is held, the fill
+    # is undone at once (before that key's character lands) and Shift does nothing more until it
+    # is released. A Shift pressed while another key or modifier is already down is typing too.
+    # `filled` is the text Shift wrote, `saved` what the box held before; null while not filling.
+    shift = {held: false, typing: false, filled: null, saved: null, caret: null}
+    # Other keys down now, with when each last went down. A held key repeats its keydown, so an
+    # entry older than a second is a key whose keyup was lost; it no longer counts.
+    otherKeys = {}
+    KEY_HELD_MILLIS = 1000
+    isShift = (e) -> e.key == 'Shift' or e.keyCode == 16
+    keyId = (e) -> e.code or e.key or String e.keyCode
+    otherKeyDown = ->
+      now = Date.now()
+      for id, at of otherKeys when now - at < KEY_HELD_MILLIS
+        return true
+      return false
+    # Where the caret was in the focused buy box before the fill, so undoing the fill for a
+    # Shift-ed character puts it back there and the character lands where the player meant.
+    caretBefore = ->
+      try
+        el = $document[0].activeElement
+        if el?.tagName == 'INPUT' and el.value == String(scope.form.buyCount ? '')
+          return {el: el, start: el.selectionStart, end: el.selectionEnd}
+      catch e
+      return null
+    restoreCaret = (caret) ->
+      try
+        if caret? and $document[0].activeElement == caret.el and caret.el.value == String(scope.form?.buyCount ? '')
+          caret.el.setSelectionRange caret.start, caret.end
+      catch e
+      return
+    # Puts back what the box held, unless something else (the player) has changed it since the
+    # fill: then what is there now stays.
+    unfill = ->
+      caret = null
+      if shift.filled? and scope.form? and scope.form.buyCount == shift.filled
+        scope.form.buyCount = shift.saved
+        caret = shift.caret
+      shift.filled = shift.saved = shift.caret = null
+      return caret
+    # Keeps the box on the suggestion while Shift is held. With no suggestion (none for this unit,
+    # the advisor off, or a purchase just made and the unit now cooling down) the box goes back to
+    # what it held before Shift, never a stale number; it fills again if a suggestion comes back.
+    follow = (view) ->
+      return if not (shift.held and not shift.typing and scope.form?)
+      if shift.filled? and scope.form.buyCount != shift.filled
+        # changed some other way while held (the "use suggested" button, a paste): that stays
+        shift.filled = shift.saved = shift.caret = null
+        shift.typing = true
+        return
+      if view?.buys
+        if not shift.filled?
+          shift.caret = caretBefore()
+          shift.saved = scope.form.buyCount
+        scope.form.buyCount = shift.filled = view.buyCount
+      else
+        unfill()
+      return
+    readFresh = (maxAgeMs) ->
+      try
+        return read maxAgeMs
+      catch e
+        $log.warn 'advisor suggestion', e
+        return scope.view = null
+    release = ->
+      shift.held = shift.typing = false
+      return unfill()
+    apply = (fn) ->
+      if $rootScope.$$phase then fn() else scope.$apply fn
+      return
+
+    onKeyDown = (e) ->
+      if not isShift e
+        otherKeys[keyId e] = Date.now()
+        if shift.held and not shift.typing
+          # Shift is being used with another key: put the box back before this key acts
+          shift.typing = true
+          if shift.filled?
+            caret = null
+            apply -> caret = unfill()
+            restoreCaret caret
+        return
+      # a repeat is Shift still held from before (from another page, say): only a new press fills
+      return if shift.held or e.repeat
+      shift.held = true
+      if e.ctrlKey or e.altKey or e.metaKey or otherKeyDown() or not options.advisorEnabled()
+        shift.typing = true
+        return
+      # fresh advice, as for the button
+      apply -> follow readFresh 250
+      return
+    onKeyUp = (e) ->
+      if not isShift e
+        delete otherKeys[keyId e]
+        return
+      if shift.held or shift.filled?
+        apply release
+      return
+    onBlur = ->
+      otherKeys = {}
+      if shift.held or shift.filled?
+        apply release
+      return
+    onVisibility = ->
+      if $document[0].hidden
+        onBlur()
+      return
+    $window.addEventListener 'keydown', onKeyDown, true
+    $window.addEventListener 'keyup', onKeyUp, true
+    $window.addEventListener 'blur', onBlur
+    $document[0].addEventListener 'visibilitychange', onVisibility
+    scope.$on '$destroy', ->
+      $window.removeEventListener 'keydown', onKeyDown, true
+      $window.removeEventListener 'keyup', onKeyUp, true
+      $window.removeEventListener 'blur', onBlur
+      $document[0].removeEventListener 'visibilitychange', onVisibility
+      release()
+      return
+    # A purchase while held (Shift-click on the game's button): the advice after it, at once, so
+    # the box never offers the same amount again from advice made before the purchase.
+    scope.$on '$destroy', $rootScope.$on 'command', ->
+      if shift.held and not shift.typing
+        follow readFresh 0
+      return
+
     scope.refresh()
-    scope.$on '$destroy', $rootScope.$on 'tick', scope.refresh
+    scope.$on '$destroy', $rootScope.$on 'tick', ->
+      scope.refresh()
+      follow scope.view
+      return
 
 ###*
  # @ngdoc directive

@@ -5,7 +5,7 @@ The climbing advisor is a panel in this fork of Swarm Simulator. It suggests wha
 ## Where it appears
 
 - **Unit list pages**: a panel titled "Climbing advisor". On wide screens it sits beside the unit list; on phones and narrow windows it sits below it. Click the title to fold it to one line. The game remembers this with your save.
-- **Unit pages**: a "Use suggested" button under the hatch box, on meat units and territory units the advisor lists. It puts the suggested count into the box. You still press the game's own button to buy. When the advisor says not to hatch that unit, the button is greyed out and the reason is shown beside it.
+- **Unit pages**: a "Use suggested" button under the hatch box, on meat units and territory units the advisor lists. It puts the suggested count into the box. You still press the game's own button to buy. When the advisor says not to hatch that unit, the button is greyed out and the reason is shown beside it. Or hold Shift: the box shows the suggested count for as long as Shift is held (so Shift-click the game's hatch button to buy it), and releasing Shift puts back what the box held. Typing a Shift character such as `%` or `@` into the box cancels this until Shift is released, so typed input is never changed.
 - **Options page**: the on/off switch and the settings, under "Climbing advisor".
 
 ## What the panel says

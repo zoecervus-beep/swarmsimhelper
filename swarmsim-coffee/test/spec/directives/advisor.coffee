@@ -649,6 +649,225 @@ describe 'Directive: advisorSuggest', ->
     $rootScope.$digest()
     expect(text el.querySelector 'button').toBe 'Use suggested: 30 nests'
 
+  describe 'holding Shift', ->
+    # Key events as the browser sends them to the window; `key` is all the directive reads.
+    key = (type, name, extra={}) ->
+      ev = document.createEvent 'Event'
+      ev.initEvent type, true, true
+      ev.key = name
+      _.extend ev, extra
+      window.dispatchEvent ev
+      return ev
+    down = (name, extra) -> key 'keydown', name, extra
+    up = (name, extra) -> key 'keyup', name, extra
+    tick = ->
+      $rootScope.$emit 'tick'
+      $rootScope.$digest()
+    stale = -> advisor.current 1000, Date.now() - 5000 # the cached advice is older than a quarter second
+    attached = []
+    afterEach ->
+      # every directive rendered here goes, and its window listeners with it
+      scope.$destroy()
+      for node in attached
+        node.parentNode?.removeChild node
+      attached = []
+      up 'Shift'
+
+    it 'fills the box with the suggestion from fresh advice, and puts back what it held on release', ->
+      spyOn(advisor, 'update').and.returnValue fakeAdvice()
+      el = render 'nest'
+      expect(text el.querySelector '.advisor-shift-hint').toBe 'or hold Shift'
+      advisor.update.and.returnValue withBuys 40
+      stale()
+      down 'Shift'
+      expect(scope.form.buyCount).toBe '40'
+      # the same string the button writes
+      expect(scope.form.buyCount).toBe advisorView.suggestion(advisor.current(1000), 'nest').buyCount
+      up 'Shift'
+      expect(scope.form.buyCount).toBe ''
+      scope.form.buyCount = '=500'
+      down 'Shift'
+      expect(scope.form.buyCount).toBe '40'
+      up 'Shift'
+      expect(scope.form.buyCount).toBe '=500'
+
+    it 'follows the suggestion while held, and goes back to the old value while there is none', ->
+      spyOn(advisor, 'update').and.returnValue fakeAdvice()
+      render 'nest'
+      scope.form.buyCount = '3'
+      down 'Shift'
+      down 'Shift', {repeat: true} # a held key repeats its keydown
+      expect(scope.form.buyCount).toBe '12'
+      advisor.update.and.returnValue withBuys 30
+      advisor.invalidate()
+      tick()
+      expect(scope.form.buyCount).toBe '30'
+      # no longer suggested (cooling down after a purchase): never a stale number
+      advisor.update.and.returnValue fakeAdvice {tiers: [fakeAdvice().tiers[0]]}
+      advisor.invalidate()
+      tick()
+      expect(scope.form.buyCount).toBe '3'
+      advisor.update.and.returnValue withBuys 31
+      advisor.invalidate()
+      tick()
+      expect(scope.form.buyCount).toBe '31'
+      up 'Shift'
+      expect(scope.form.buyCount).toBe '3'
+
+    it 'takes the advice after a purchase at once, so a second Shift-click cannot repeat it', ->
+      spyOn(advisor, 'update').and.returnValue fakeAdvice()
+      render 'nest'
+      down 'Shift'
+      expect(scope.form.buyCount).toBe '12'
+      # the purchase puts nests on cooldown; no tick has run since
+      advisor.update.and.returnValue fakeAdvice {tiers: [fakeAdvice().tiers[0], _.extend(fakeAdvice().tiers[1], {kind: 'wait', reason: 'cooldown', buys: new Decimal(0), waitSeconds: 60})]}
+      $rootScope.$emit 'command', {name: 'buyUnit'}
+      expect(scope.form.buyCount).toBe ''
+      up 'Shift'
+      expect(scope.form.buyCount).toBe ''
+
+    it 'does nothing without a suggestion for this unit', ->
+      spyOn(advisor, 'update').and.returnValue fakeAdvice()
+      render 'greaterqueen'
+      scope.form.buyCount = '7'
+      down 'Shift'
+      expect(scope.form.buyCount).toBe '7'
+      up 'Shift'
+      expect(scope.form.buyCount).toBe '7'
+      render 'hive'
+      down 'Shift'
+      expect(scope.form.buyCount).toBe '7'
+      up 'Shift'
+      expect(scope.form.buyCount).toBe '7'
+
+    it 'fills territory units from the territory advice', ->
+      spyOn(advisorTerritory, 'update').and.returnValue fakeTerritory()
+      render 'wasp'
+      down 'Shift'
+      expect(scope.form.buyCount).toBe '315778'
+      up 'Shift'
+      expect(scope.form.buyCount).toBe ''
+
+    it 'never touches what is typed with Shift: another key undoes the fill before it lands', ->
+      spyOn(advisor, 'update').and.returnValue fakeAdvice()
+      wrap = $compile('<div><input type="text" ng-model="form.buyCount"><advisor-suggest unit="unit" form="form"></advisor-suggest></div>') _.extend scope, {unit: game.unit 'nest'}
+      $rootScope.$digest()
+      document.body.appendChild wrap[0]
+      attached.push wrap[0]
+      input = wrap[0].querySelector 'input'
+      input.focus()
+      scope.form.buyCount = '15'
+      $rootScope.$digest()
+      input.setSelectionRange 0, 0
+      down 'Shift'
+      $rootScope.$digest()
+      expect(input.value).toBe '12'
+      # '@' needs Shift: the box (and the caret) are back before the character goes in
+      down '@'
+      expect(scope.form.buyCount).toBe '15'
+      expect(input.value).toBe '15'
+      expect(input.selectionStart).toBe 0
+      # the player's text, typed while Shift is still held
+      input.value = '@15'
+      angular.element(input).triggerHandler 'input'
+      up '@'
+      advisor.update.and.returnValue withBuys 30
+      advisor.invalidate()
+      tick()
+      expect(scope.form.buyCount).toBe '@15'
+      # no fill on the next Shift-ed key either, and none on release
+      down '%'
+      up '%'
+      expect(scope.form.buyCount).toBe '@15'
+      up 'Shift'
+      expect(scope.form.buyCount).toBe '@15'
+      # the next press fills again
+      down 'Shift'
+      expect(scope.form.buyCount).toBe '30'
+      up 'Shift'
+      expect(scope.form.buyCount).toBe '@15'
+
+    it 'counts Shift pressed after another key or with a modifier as typing', ->
+      spyOn(advisor, 'update').and.returnValue fakeAdvice()
+      render 'nest'
+      down '1'
+      down 'Shift'
+      expect(scope.form.buyCount).toBe ''
+      up '1'
+      up 'Shift'
+      down 'Shift', {ctrlKey: true}
+      expect(scope.form.buyCount).toBe ''
+      up 'Shift'
+      # Shift then Tab (focus moves back): the fill is undone and stays undone
+      down 'Shift'
+      expect(scope.form.buyCount).toBe '12'
+      down 'Tab'
+      expect(scope.form.buyCount).toBe ''
+      up 'Tab'
+      tick()
+      expect(scope.form.buyCount).toBe ''
+      up 'Shift'
+      expect(scope.form.buyCount).toBe ''
+
+    it 'forgets a key whose keyup was lost once it stops repeating', ->
+      spyOn(advisor, 'update').and.returnValue fakeAdvice()
+      render 'nest'
+      spyOn(Date, 'now').and.returnValue 1000000
+      down 'a'
+      Date.now.and.returnValue 1000000 + 1500
+      down 'Shift'
+      expect(scope.form.buyCount).toBe '12'
+
+    it 'keeps a value written another way while held, such as the button', ->
+      spyOn(advisor, 'update').and.returnValue fakeAdvice()
+      el = render 'nest'
+      down 'Shift'
+      advisor.update.and.returnValue withBuys 40
+      stale()
+      angular.element(el.querySelector 'button').triggerHandler 'click'
+      expect(scope.form.buyCount).toBe '40'
+      up 'Shift'
+      expect(scope.form.buyCount).toBe '40'
+
+    it 'puts the box back when the window loses focus', ->
+      spyOn(advisor, 'update').and.returnValue fakeAdvice()
+      render 'nest'
+      scope.form.buyCount = '2'
+      down 'Shift'
+      expect(scope.form.buyCount).toBe '12'
+      blur = document.createEvent 'Event'
+      blur.initEvent 'blur', false, false
+      window.dispatchEvent blur
+      expect(scope.form.buyCount).toBe '2'
+      # the Shift keyup went elsewhere; the next press works
+      down 'Shift'
+      expect(scope.form.buyCount).toBe '12'
+
+    it 'puts the box back when destroyed, and stops listening', ->
+      spyOn(advisor, 'update').and.returnValue fakeAdvice()
+      render 'nest'
+      down 'Shift'
+      expect(scope.form.buyCount).toBe '12'
+      scope.$destroy()
+      expect(scope.form.buyCount).toBe ''
+      up 'Shift'
+      down 'Shift'
+      expect(scope.form.buyCount).toBe ''
+
+    it 'does nothing while the advisor is off, and lets go when it is switched off', ->
+      spyOn(advisor, 'update').and.returnValue fakeAdvice()
+      render 'nest'
+      down 'Shift'
+      expect(scope.form.buyCount).toBe '12'
+      options.advisorEnabled false
+      tick()
+      expect(scope.form.buyCount).toBe ''
+      up 'Shift'
+      advisor.update.calls.reset()
+      down 'Shift'
+      expect(scope.form.buyCount).toBe ''
+      expect(advisor.update).not.toHaveBeenCalled()
+
 describe 'Directive: advisorOptions', ->
   beforeEach module 'swarmApp', 'mockFlashStorage'
 
