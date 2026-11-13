@@ -200,10 +200,28 @@ def num(x):
         f = math.inf
     if not _is_bad(f): return F(f)
     import decimal
-    d = decimal.Decimal(str(x))
-    ex = d.adjusted()
-    mant = float(d.scaleb(-ex))
-    return Big.of(mant) * (Big.of(10.0) ** ex)
+    ctx = decimal.Context(prec=40, Emax=10 ** 12, Emin=-10 ** 12)
+    d = ctx.create_decimal(str(x))
+    if d == 0: return F(0.0)
+    sign = -1 if d < 0 else 1; d = abs(d)
+    e = int(math.floor(float(d.adjusted()) * math.log2(10))) - 2      # a binary exponent just below the value's
+    m = ctx.divide(d, ctx.power(decimal.Decimal(2), e))                 # 1 <= m < 16, exact to 40 digits
+    return Big.make(sign * float(m), e)
+
+
+def dec(x, digits=17):
+    """A decimal string of x (float or Big) with `digits` significant digits, e.g. '1.2345678901234567e+1234'.
+    Exact to the double's own precision: Big's mantissa and binary exponent go through Python's decimal."""
+    import decimal
+    if not isinstance(x, Big):
+        x = float(x)
+        if x == 0: return '0'
+        return repr(x) if abs(x) < 1e16 and x == int(x) else '%.*e' % (digits - 1, x)
+    if x.m == 0: return '0'
+    ctx = decimal.Context(prec=digits + 5, Emax=10 ** 12, Emin=-10 ** 12)
+    v = ctx.multiply(decimal.Decimal(x.m), ctx.power(decimal.Decimal(2), x.e))
+    s = '{:.{p}e}'.format(ctx.create_decimal(v), p=digits - 1)
+    return s
 
 
 def big(x):

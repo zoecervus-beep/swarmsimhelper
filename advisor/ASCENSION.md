@@ -277,9 +277,9 @@ What it is:
 
 The mode is opt-in. With it off, the advisor is exactly what it is now. With it on, the advisor applies the existing rules unchanged, plus the following. In each rule, tier k counts drone as 1 (endless is 20), and "below" means tier k − 1.
 
-**LR-0. When the mode acts.** From a run age of 2 days. Before that the mode changes nothing (measured: identical advice on days 1–2 from a fresh run, from the save and after an ascension). This also makes a mode left on after an ascension harmless for the first two days.
+**LR-0. When the mode acts.** From a run age of 2 days (run age ≥ 172,800 s; the gate is open at exactly 2 days). Before that the mode changes nothing (measured: identical advice on days 1–2 from a fresh run, from the save and after an ascension). This also makes a mode left on after an ascension harmless for the first two days.
 
-**LR-1. Climbing with several faster levels (extends rule 1).** For a tier k that fails the climb test (H > horizon) and is affordable:
+**LR-1. Climbing with several faster levels (extends rule 1).** Consider each tier the climb table considers: up to one above the highest owned tier. LR-1 applies to a tier k ≥ 2 that fails the climb test (H > horizon), is affordable, and is not banked (rule 4 still applies first):
 
 | Quantity | Definition |
 | --- | --- |
@@ -290,17 +290,19 @@ The mode is opt-in. With it off, the advisor is exactly what it is now. With it 
 
 - **Test:** the tier passes if some L ≥ 1 gives N_L ≥ 1 and H × (N_L + F_L)/(N_L × 2^L) ≤ horizon. Use the smallest such L.
 - **The sunk price counts.** (N + F)/N is the honest-accounting factor. The naive H/2^L made no difference in pass 2's checks but is not recommended.
-- **The player is told:** `buy n X, then L× faster X`. After the hatch, the faster tip shows at 1× its price for those L levels, not 2×.
+- **The player is told:** `buy n X, then faster X`. After the hatch, buy faster levels of X one at a time at 1× their price (not rule 5's 2×), until X passes the plain test or the next level costs more than X holds. That is usually L levels, but it can be more or fewer: the simulator does exactly this, and the reference cases record the levels it bought.
 - **Evidence:** with push but without LR-1 the result is the same at every5 and human (first endless 52), but it fails at 2-hour single visits (no universal cortex). It is cheap insurance.
 
 **LR-2. Feeding the tiers above the frontier ("push"; new action).**
 
-- The **frontier** is the highest owned tier that passes the climb test (rule 1 or LR-1).
+- The **frontier** is the highest owned tier that passes the **plain** climb test (rule 1: H ≤ horizon); LR-1 passes do not count. It is taken after this visit's climbing suggestions are applied (the panel recomputes once they are bought), so a tier the climb has just started, or whose faster levels the climb has just bought, can raise it.
 - For each tier k from endless down to frontier + 1, with any of the tier below held: hatch n = floor(share × below.count / cost), where:
   - share = **0.5** for k ≥ frontier + 2;
   - share = **0.02** for k = frontier + 1, because that price comes out of the top growing tier.
-- Cap n by the larvae left after the climbing tiers and the territory share, and by half the meat.
-- Top-down, once per visit. Cooldown 60 s per unit, as for climbing.
+- Skip the tier when none of the tier below is held, or when fewer than 1 larva is left.
+- Cap n by the larvae left (larvae − what the climbing tiers take − the territory share − larvae held for the next nexus) and by half the meat (meat / 2 / the tier's meat price), and take the floor. No line when n < 1.
+- Top-down, once per visit. Each line takes its larvae and meat before the next one is worked out.
+- No line for a tier hatched less than 60 s ago, by the climb or by a push line (cooldown, as for climbing).
 - **The player is told:** `feed upward: hatch 3.2e15 universal cortex (half your galactic clusters)`.
 - **Which parts carry it** (first endless, every5 / human):
 
@@ -314,11 +316,11 @@ The mode is opt-in. With it off, the advisor is exactly what it is now. With it 
 
   Keep top-down. The share values hardly matter.
 
-**LR-3. Do not spend pushed units on twins below (changes rule 6).** A twin of tier k − 1 that is paid in units of a pushed tier k (k above the frontier) is suggested only while tier k holds at least **10^6 ×** the twin's price.
+**LR-3. Do not spend pushed units on twins below (changes rule 6).** A twin of tier k − 1 that is paid in units of a pushed tier k (k above the frontier of the state as it is, before this visit's purchases) is suggested only while tier k holds at least **10^6 ×** the twin's price. Otherwise rule 6 decides as now.
 - With twins allowed to take them, the first endless comes at day 66 instead of 52 (every5); with 10^3, day 52.
 - This also covers the overmind twins (×12 to ×20 per level): they are bought from surplus, never from the climb.
 
-**LR-4. Lepidoptera target 30,000 from a run age of 3 days** (the existing setting raised by the mode). It brings the first endless 9 days and 5,000 expansions 7 days earlier than 4,000. From the start of a run it costs meat early (see A.10.4), so it waits 3 days.
+**LR-4. Lepidoptera target 30,000 from a run age of 3 days** (≥ 259,200 s) (the existing setting raised by the mode). It brings the first endless 9 days and 5,000 expansions 7 days earlier than 4,000. From the start of a run it costs meat early (see A.10.4), so it waits 3 days.
 
 **Kept as they are:**
 - **Age multiple.** Your setting. In this mode it makes no difference: 1, 5 and 20 all give first endless 52–55 and 1e62 59–63. The horizon only decides rule 1, and push does the climbing.
@@ -403,7 +405,7 @@ The policy option `empower` follows the native advisor's `empowerAdvice` rule: e
 | Everything else | – | unchanged: rule 3 sizing, cooldown, banking, twin plans, energy, territory, empower |
 
 - **What the existing check covers.** The console script versus native port check (`script_vs_port.js`) covers the advisor with the mode **off**. It must still pass unchanged, and that is all it can say.
-- **The mode needs its own check:** the port's LR-1 to LR-4 decisions against `sim.py`'s `faster_levels`, `push_up`, `push_frontier`, the twin guard and the `lr_age` / `moth_late` gates, on states from the long run. The simulator's states are on disk after `longrun_rules.py`.
+- **The mode needs its own check:** the port's LR-1 to LR-4 decisions against `sim.py`'s `faster_levels`, `push_up`, `push_frontier`, the twin guard and the `lr_age` / `moth_late` gates, on states from the long run. The reference cases for that check are in `advisor/modelcheck/longrun_cases/`: 28 exported states, each with the simulator's decisions and per-field comparison rules. See its README. The simulator's states are on disk after `longrun_rules.py`.
 - **Sizing differs.** The native advisor sizes purchases per rule 3 (time-scaled share and spare). The simulator's tuned policy uses per-visit shares and income carry. Under the human cadence both give the same endless days (`time_share`: 50 / 62 against 52 / 59). With single looks the native sizing is the worse one (A.10.1), so tell the player to stay a couple of minutes.
 
 #### A.10.7 Grades
@@ -845,6 +847,7 @@ python3 -I advisor/sim/achievements.py                          # ACHIEVEMENTS.m
 python3 -I advisor/sim/achievement_strategy.py                  # Part A tables, about 8 minutes (--quick: base policy only, ~2 min)
 python3 -I advisor/modelcheck/bignum_check.py                   # game vs sim past 1e308, and territory empower, about 3 s
 python3 -I advisor/sim/longrun_rules.py diag rules rounds glance final early empower --jobs 4   # A.10 tables, about 15 minutes with 4 cores
+python3 -I advisor/modelcheck/longrun_cases.py                  # A.10 reference cases for the port + round trip in the game, about 40 s
 python3 -I advisor/sim/cadence.py                               # the visit profiles
 node advisor/modelcheck/achievement_check.js                    # every achievement through the game's listener (JSON), about 4 s
 python3 -I advisor/sim/ascension_strategy.py                    # Part C tables, about 10 minutes (was 40 s before big numbers)

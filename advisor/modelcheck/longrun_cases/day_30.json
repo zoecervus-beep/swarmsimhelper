@@ -1,0 +1,759 @@
+{
+ "case": "day_30",
+ "exercises": "the long run on day 30 (a typical state)",
+ "save": "day_30.save.json",
+ "config": {
+  "age_multiple": 5,
+  "territory_share": 0.1,
+  "bank": 3,
+  "share": 0.5,
+  "gate_run_age_s": 172800,
+  "push_share": 0.5,
+  "push_frontier_share": 0.02,
+  "push_twin_guard_multiple": 1000000.0,
+  "push_cooldown_s": 60,
+  "moth_target": 4000,
+  "moth_target_late": [
+   259200,
+   30000
+  ],
+  "meat_share_for_push": 0.5
+ },
+ "state": {
+  "run_age_s": 2592000.0,
+  "gate_active": true,
+  "horizon_s": 12960000.0,
+  "frontier": 14,
+  "tiers": [
+   {
+    "tier": 1,
+    "name": "drone",
+    "count": "7.5005602768636838e+444",
+    "prod_level": 157,
+    "twin_level": 7,
+    "H_s": "0",
+    "passes_plain": true,
+    "since_last_hatch_s": 2588400.0,
+    "twin_guard": {
+     "pay_tier": "queen",
+     "price": "10000000.0",
+     "pay_held": "3.0066741137858498e+398",
+     "pushed_pay_tier": false,
+     "suppressed": false
+    }
+   },
+   {
+    "tier": 2,
+    "name": "queen",
+    "count": "3.0066741137858498e+398",
+    "prod_level": 141,
+    "twin_level": 6,
+    "H_s": "5.6051938572992683e-43",
+    "passes_plain": true,
+    "since_last_hatch_s": 2587800.0,
+    "twin_guard": {
+     "pay_tier": "nest",
+     "price": "1000000.0",
+     "pay_held": "2.3551920245049957e+356",
+     "pushed_pay_tier": false,
+     "suppressed": false
+    }
+   },
+   {
+    "tier": 3,
+    "name": "nest",
+    "count": "2.3551920245049957e+356",
+    "prod_level": 126,
+    "twin_level": 7,
+    "H_s": "9.1835496157991212e-38",
+    "passes_plain": true,
+    "since_last_hatch_s": 2586600.0,
+    "twin_guard": {
+     "pay_tier": "greaterqueen",
+     "price": "10000000.0",
+     "pay_held": "2.0539037917983437e+318",
+     "pushed_pay_tier": false,
+     "suppressed": false
+    }
+   },
+   {
+    "tier": 4,
+    "name": "greaterqueen",
+    "count": "2.0539037917983437e+318",
+    "prod_level": 112,
+    "twin_level": 8,
+    "H_s": "7.5231638452626401e-33",
+    "passes_plain": true,
+    "since_last_hatch_s": 2571300.0,
+    "twin_guard": {
+     "pay_tier": "hive",
+     "price": "100000000.0",
+     "pay_held": "5.5450762933708604e+283",
+     "pushed_pay_tier": false,
+     "suppressed": false
+    }
+   },
+   {
+    "tier": 5,
+    "name": "hive",
+    "count": "5.5450762933708604e+283",
+    "prod_level": 100,
+    "twin_level": 10,
+    "H_s": "7.7037197775489434e-29",
+    "passes_plain": true,
+    "since_last_hatch_s": 2418300.0,
+    "twin_guard": {
+     "pay_tier": "hivequeen",
+     "price": "10000000000.0",
+     "pay_held": "2.3985178055042761e+252",
+     "pushed_pay_tier": false,
+     "suppressed": false
+    }
+   },
+   {
+    "tier": 6,
+    "name": "hivequeen",
+    "count": "2.3985178055042761e+252",
+    "prod_level": 89,
+    "twin_level": 11,
+    "H_s": "7.8886090522101181e-25",
+    "passes_plain": true,
+    "since_last_hatch_s": 2339400.0,
+    "twin_guard": {
+     "pay_tier": "empress",
+     "price": "100000000000.0",
+     "pay_held": "8.4182283216639538e+223",
+     "pushed_pay_tier": false,
+     "suppressed": false
+    }
+   },
+   {
+    "tier": 7,
+    "name": "empress",
+    "count": "8.4182283216639538e+223",
+    "prod_level": 79,
+    "twin_level": 17,
+    "H_s": "1.2621774483536189e-22",
+    "passes_plain": true,
+    "since_last_hatch_s": 2013000.0,
+    "twin_guard": {
+     "pay_tier": "prophet",
+     "price": "1.0000000000000000e+17",
+     "pay_held": "1.2376676325588945e+198",
+     "pushed_pay_tier": false,
+     "suppressed": false
+    }
+   },
+   {
+    "tier": 8,
+    "name": "prophet",
+    "count": "1.2376676325588945e+198",
+    "prod_level": 70,
+    "twin_level": 33,
+    "H_s": "9.8607613152626476e-24",
+    "passes_plain": true,
+    "since_last_hatch_s": 1504500.0,
+    "twin_guard": {
+     "pay_tier": "goddess",
+     "price": "9.9999999999999995e+32",
+     "pay_held": "3.9183890814053310e+174",
+     "pushed_pay_tier": false,
+     "suppressed": false
+    }
+   },
+   {
+    "tier": 9,
+    "name": "goddess",
+    "count": "3.9183890814053310e+174",
+    "prod_level": 62,
+    "twin_level": 42,
+    "H_s": "4.9303806576313238e-23",
+    "passes_plain": true,
+    "since_last_hatch_s": 1173900.0,
+    "twin_guard": {
+     "pay_tier": "pantheon",
+     "price": "1.0000000000000000e+42",
+     "pay_held": "2.4567538753324716e+153",
+     "pushed_pay_tier": false,
+     "suppressed": false
+    }
+   },
+   {
+    "tier": 10,
+    "name": "pantheon",
+    "count": "2.4567538753324716e+153",
+    "prod_level": 54,
+    "twin_level": 36,
+    "H_s": "8.0779356694631609e-18",
+    "passes_plain": true,
+    "since_last_hatch_s": 1171200.0,
+    "twin_guard": {
+     "pay_tier": "pantheon2",
+     "price": "1.0000000000000000e+36",
+     "pay_held": "1.2198824158969768e+134",
+     "pushed_pay_tier": false,
+     "suppressed": false
+    }
+   },
+   {
+    "tier": 11,
+    "name": "pantheon2",
+    "count": "1.2198824158969768e+134",
+    "prod_level": 47,
+    "twin_level": 27,
+    "H_s": "5.2939559203393771e-11",
+    "passes_plain": true,
+    "since_last_hatch_s": 1114200.0,
+    "twin_guard": {
+     "pay_tier": "pantheon3",
+     "price": "1.0000000000000000e+27",
+     "pay_held": "3.1465037209961287e+116",
+     "pushed_pay_tier": false,
+     "suppressed": false
+    }
+   },
+   {
+    "tier": 12,
+    "name": "pantheon3",
+    "count": "3.1465037209961287e+116",
+    "prod_level": 41,
+    "twin_level": 33,
+    "H_s": "5.2939559203393771e-09",
+    "passes_plain": true,
+    "since_last_hatch_s": 468300.0,
+    "twin_guard": {
+     "pay_tier": "pantheon4",
+     "price": "9.9999999999999995e+32",
+     "pay_held": "4.3793060511462393e+100",
+     "pushed_pay_tier": false,
+     "suppressed": false
+    }
+   },
+   {
+    "tier": 13,
+    "name": "pantheon4",
+    "count": "4.3793060511462393e+100",
+    "prod_level": 35,
+    "twin_level": 45,
+    "H_s": "8.2718061255302767e-09",
+    "passes_plain": true,
+    "since_last_hatch_s": 254400.0,
+    "twin_guard": {
+     "pay_tier": "pantheon5",
+     "price": "9.9999999999999993e+44",
+     "pay_held": "1.7092795349061367e+86",
+     "pushed_pay_tier": false,
+     "suppressed": false
+    }
+   },
+   {
+    "tier": 14,
+    "name": "pantheon5",
+    "count": "1.7092795349061367e+86",
+    "prod_level": 30,
+    "twin_level": 48,
+    "H_s": "3.3087224502121107e-05",
+    "passes_plain": true,
+    "since_last_hatch_s": 300.0,
+    "twin_guard": {
+     "pay_tier": "overmind",
+     "price": "1.0000000000000000e+48",
+     "pay_held": "1.7065667395699299e+53",
+     "pushed_pay_tier": true,
+     "suppressed": true
+    }
+   },
+   {
+    "tier": 15,
+    "name": "overmind",
+    "count": "1.7065667395699299e+53",
+    "prod_level": 19,
+    "twin_level": 13,
+    "H_s": "2.3283064365386961e+13",
+    "passes_plain": false,
+    "since_last_hatch_s": 253200.0,
+    "twin_guard": {
+     "pay_tier": "overmind2",
+     "price": "106993205379072.0",
+     "pay_held": "3.6905925133259063e+19",
+     "pushed_pay_tier": true,
+     "suppressed": true
+    },
+    "faster_levels_pass_if_got_at_least": [
+     {
+      "L": 1,
+      "faster_price_total": "2.9211529014557858e+55",
+      "got_min": null
+     },
+     {
+      "L": 2,
+      "faster_price_total": "1.9484089852710089e+58",
+      "got_min": null
+     },
+     {
+      "L": 3,
+      "faster_price_total": "1.2976433053433934e+61",
+      "got_min": null
+     },
+     {
+      "L": 4,
+      "faster_price_total": "8.6423044427985295e+63",
+      "got_min": null
+     },
+     {
+      "L": 5,
+      "faster_price_total": "5.7557747589330318e+66",
+      "got_min": null
+     },
+     {
+      "L": 6,
+      "faster_price_total": "3.8333459894494292e+69",
+      "got_min": null
+     },
+     {
+      "L": 7,
+      "faster_price_total": "2.5530084289733194e+72",
+      "got_min": null
+     },
+     {
+      "L": 8,
+      "faster_price_total": "1.7003036136962309e+75",
+      "got_min": null
+     }
+    ]
+   },
+   {
+    "tier": 16,
+    "name": "overmind2",
+    "count": "3.6905925133259063e+19",
+    "prod_level": 7,
+    "twin_level": 0,
+    "H_s": "7.8124999999999997e+25",
+    "passes_plain": false,
+    "since_last_hatch_s": 253200.0,
+    "twin_guard": {
+     "pay_tier": "overmind3",
+     "price": "1.0",
+     "pay_held": "0",
+     "pushed_pay_tier": true,
+     "suppressed": true
+    },
+    "faster_levels_pass_if_got_at_least": [
+     {
+      "L": 1,
+      "faster_price_total": "3.8358669925082317e+21",
+      "got_min": null
+     },
+     {
+      "L": 2,
+      "faster_price_total": "2.5585232840029908e+24",
+      "got_min": null
+     },
+     {
+      "L": 3,
+      "faster_price_total": "1.7039803430129842e+27",
+      "got_min": null
+     },
+     {
+      "L": 4,
+      "faster_price_total": "1.1348509122825145e+30",
+      "got_min": null
+     },
+     {
+      "L": 5,
+      "faster_price_total": "7.5581070758399058e+32",
+      "got_min": null
+     },
+     {
+      "L": 6,
+      "faster_price_total": "5.0336993125094155e+35",
+      "got_min": null
+     },
+     {
+      "L": 7,
+      "faster_price_total": "3.3524437421312706e+38",
+      "got_min": null
+     },
+     {
+      "L": 8,
+      "faster_price_total": "2.2327275322594261e+41",
+      "got_min": null
+     }
+    ]
+   },
+   {
+    "tier": 17,
+    "name": "overmind3",
+    "count": "0",
+    "prod_level": 0,
+    "twin_level": 0,
+    "H_s": "9.9999999999999995e+33",
+    "passes_plain": false,
+    "since_last_hatch_s": null,
+    "twin_guard": {
+     "pay_tier": "overmind4",
+     "price": "1.0",
+     "pay_held": "0",
+     "pushed_pay_tier": true,
+     "suppressed": true
+    },
+    "faster_levels_pass_if_got_at_least": [
+     {
+      "L": 1,
+      "faster_price_total": "66.0",
+      "got_min": null
+     },
+     {
+      "L": 2,
+      "faster_price_total": "44022.0",
+      "got_min": null
+     },
+     {
+      "L": 3,
+      "faster_price_total": "29318718.0",
+      "got_min": null
+     },
+     {
+      "L": 4,
+      "faster_price_total": "19526266254.0",
+      "got_min": null
+     },
+     {
+      "L": 5,
+      "faster_price_total": "13004493325230.0",
+      "got_min": null
+     },
+     {
+      "L": 6,
+      "faster_price_total": "8660992554603246.0",
+      "got_min": null
+     },
+     {
+      "L": 7,
+      "faster_price_total": "5.7682210413657620e+18",
+      "got_min": null
+     },
+     {
+      "L": 8,
+      "faster_price_total": "3.8416352135495974e+21",
+      "got_min": null
+     }
+    ]
+   },
+   {
+    "tier": 18,
+    "name": "overmind4",
+    "count": "0",
+    "prod_level": 0,
+    "twin_level": 0,
+    "H_s": "1.0000000000000000e+41",
+    "passes_plain": false,
+    "since_last_hatch_s": null,
+    "twin_guard": {
+     "pay_tier": "overmind5",
+     "price": "1.0",
+     "pay_held": "0",
+     "pushed_pay_tier": true,
+     "suppressed": true
+    },
+    "faster_levels_pass_if_got_at_least": [
+     {
+      "L": 1,
+      "faster_price_total": "66.0",
+      "got_min": null
+     },
+     {
+      "L": 2,
+      "faster_price_total": "44022.0",
+      "got_min": null
+     },
+     {
+      "L": 3,
+      "faster_price_total": "29318718.0",
+      "got_min": null
+     },
+     {
+      "L": 4,
+      "faster_price_total": "19526266254.0",
+      "got_min": null
+     },
+     {
+      "L": 5,
+      "faster_price_total": "13004493325230.0",
+      "got_min": null
+     },
+     {
+      "L": 6,
+      "faster_price_total": "8660992554603246.0",
+      "got_min": null
+     },
+     {
+      "L": 7,
+      "faster_price_total": "5.7682210413657620e+18",
+      "got_min": null
+     },
+     {
+      "L": 8,
+      "faster_price_total": "3.8416352135495974e+21",
+      "got_min": null
+     }
+    ]
+   },
+   {
+    "tier": 19,
+    "name": "overmind5",
+    "count": "0",
+    "prod_level": 0,
+    "twin_level": 0,
+    "H_s": "9.9999999999999995e+48",
+    "passes_plain": false,
+    "since_last_hatch_s": null,
+    "twin_guard": {
+     "pay_tier": "overmind6",
+     "price": "1.0",
+     "pay_held": "0",
+     "pushed_pay_tier": true,
+     "suppressed": true
+    },
+    "faster_levels_pass_if_got_at_least": [
+     {
+      "L": 1,
+      "faster_price_total": "66.0",
+      "got_min": null
+     },
+     {
+      "L": 2,
+      "faster_price_total": "44022.0",
+      "got_min": null
+     },
+     {
+      "L": 3,
+      "faster_price_total": "29318718.0",
+      "got_min": null
+     },
+     {
+      "L": 4,
+      "faster_price_total": "19526266254.0",
+      "got_min": null
+     },
+     {
+      "L": 5,
+      "faster_price_total": "13004493325230.0",
+      "got_min": null
+     },
+     {
+      "L": 6,
+      "faster_price_total": "8660992554603246.0",
+      "got_min": null
+     },
+     {
+      "L": 7,
+      "faster_price_total": "5.7682210413657620e+18",
+      "got_min": null
+     },
+     {
+      "L": 8,
+      "faster_price_total": "3.8416352135495974e+21",
+      "got_min": null
+     }
+    ]
+   },
+   {
+    "tier": 20,
+    "name": "overmind6",
+    "count": "0",
+    "prod_level": 0,
+    "twin_level": null,
+    "H_s": "9.9999999999999994e+57",
+    "passes_plain": false,
+    "since_last_hatch_s": null,
+    "faster_levels_pass_if_got_at_least": [
+     {
+      "L": 1,
+      "faster_price_total": "66.0",
+      "got_min": null
+     },
+     {
+      "L": 2,
+      "faster_price_total": "44022.0",
+      "got_min": null
+     },
+     {
+      "L": 3,
+      "faster_price_total": "29318718.0",
+      "got_min": null
+     },
+     {
+      "L": 4,
+      "faster_price_total": "19526266254.0",
+      "got_min": null
+     },
+     {
+      "L": 5,
+      "faster_price_total": "13004493325230.0",
+      "got_min": null
+     },
+     {
+      "L": 6,
+      "faster_price_total": "8660992554603246.0",
+      "got_min": null
+     },
+     {
+      "L": 7,
+      "faster_price_total": "5.7682210413657620e+18",
+      "got_min": null
+     },
+     {
+      "L": 8,
+      "faster_price_total": "3.8416352135495974e+21",
+      "got_min": null
+     }
+    ]
+   }
+  ],
+  "top_owned": 16,
+  "larvae_held_back": {
+   "territory_purse": "0",
+   "nexus_saving": "0",
+   "clone_reserve": "0"
+  },
+  "moth_target": 30000,
+  "larvae": "1.0633885566523496e+70",
+  "larva_rate": "3.9384761357494428e+67",
+  "meat": "2.3885658415256431e+495",
+  "achievement_points": 1640
+ },
+ "decisions": {
+  "climb": [
+   {
+    "tier": 17,
+    "name": "overmind3",
+    "outcome": "fa_fails",
+    "n_sim": "0",
+    "faster_level_L": 0
+   },
+   {
+    "tier": 16,
+    "name": "overmind2",
+    "outcome": "fa_fails",
+    "n_sim": "8.5328336978496499e+24",
+    "faster_level_L": 0
+   },
+   {
+    "tier": 15,
+    "name": "overmind",
+    "outcome": "fa_fails",
+    "n_sim": "8.5463976745306842e+62",
+    "faster_level_L": 0
+   },
+   {
+    "tier": 14,
+    "name": "pantheon5",
+    "outcome": "buys",
+    "n_sim": "1.0633885566523496e+70",
+    "test": "plain"
+   },
+   {
+    "tier": 13,
+    "name": "pantheon4",
+    "outcome": "bank"
+   },
+   {
+    "tier": 12,
+    "name": "pantheon3",
+    "outcome": "bank"
+   },
+   {
+    "tier": 11,
+    "name": "pantheon2",
+    "outcome": "bank"
+   },
+   {
+    "tier": 10,
+    "name": "pantheon",
+    "outcome": "bank"
+   },
+   {
+    "tier": 9,
+    "name": "goddess",
+    "outcome": "bank"
+   },
+   {
+    "tier": 8,
+    "name": "prophet",
+    "outcome": "bank"
+   },
+   {
+    "tier": 7,
+    "name": "empress",
+    "outcome": "bank"
+   },
+   {
+    "tier": 6,
+    "name": "hivequeen",
+    "outcome": "bank"
+   },
+   {
+    "tier": 5,
+    "name": "hive",
+    "outcome": "bank"
+   },
+   {
+    "tier": 4,
+    "name": "greaterqueen",
+    "outcome": "bank"
+   },
+   {
+    "tier": 3,
+    "name": "nest",
+    "outcome": "bank"
+   },
+   {
+    "tier": 2,
+    "name": "queen",
+    "outcome": "bank"
+   },
+   {
+    "tier": 1,
+    "name": "drone",
+    "outcome": "bank"
+   }
+  ],
+  "faster_after_climb": [],
+  "push": [
+   {
+    "tier": 20,
+    "name": "overmind6",
+    "outcome": "nothing below"
+   },
+   {
+    "tier": 19,
+    "name": "overmind5",
+    "outcome": "nothing below"
+   },
+   {
+    "tier": 18,
+    "name": "overmind4",
+    "outcome": "nothing below"
+   },
+   {
+    "tier": 17,
+    "name": "overmind3",
+    "outcome": "no larvae"
+   },
+   {
+    "tier": 16,
+    "name": "overmind2",
+    "outcome": "no larvae"
+   },
+   {
+    "tier": 15,
+    "name": "overmind",
+    "outcome": "no larvae"
+   }
+  ],
+  "larvae_for_push": "0",
+  "frontier_at_push": 14,
+  "larvae_before_climb": "1.0633885566523496e+70"
+ }
+}

@@ -35,6 +35,9 @@ def earn_achievements(s):
 def log_ach(s,name):
     if not hasattr(s,'ach_log'): s.ach_log=[]
     s.ach_log.append((s.time,name))
+CAPTURE=None   # with TRACE: a list that receives a copy of the state as the climb starts
+TRACE=None   # a list to record the policy's decisions (longrun_cases.py); None: off, nothing recorded
+def tr(*a): TRACE.append(a)
 def buy_stat(s,name,twinnum): s.bought[name]=s.bought.get(name,0.0)+twinnum
 K=20  # meat tiers 1..K (drone=1 ... endless=overmind6=20)
 NAMES=['meat','drone','queen','nest','greaterqueen','hive','hivequeen','empress','prophet','goddess','pantheon','pantheon2','pantheon3',
@@ -275,6 +278,7 @@ def energy_policy(s,p,gained):
     if ascend_saving(s,p): return
     mt=p.get('moth_N5',p.get('moth_N',0)) if s.nexus>=5 else p.get('moth_N',0)
     if p.get('moth_late') and run_age(s,p)>=p['moth_late'][0]: mt=p['moth_late'][1]   # (run age, target): raise the target later in a run
+    if TRACE is not None: tr('moth_target',mt)
     if s.nexus>=4 and s.moth<mt:
         n=math.floor(min(mt-s.moth,max(0,s.energy-hold)/10,s.larva))
         if n>0: s.moth+=n; s.energy-=10*n; s.larva-=n
@@ -336,6 +340,7 @@ def allowed(s,p,k):
         if cap>p['sat']*lam(s): return True
     return False
 def policy(s,p,gained):
+    if TRACE is not None: tr('gate', not (p.get('lr_age') and run_age(s,p)<p['lr_age']), run_age(s,p))
     if p.get('lr_age') and run_age(s,p)<p['lr_age']:   # long-run rules switch on by themselves only from this run age
         p=dict(p,faster_aware=None,push=None)
     if p.get('theta_age'): p['theta']=p['theta_age']*(p.get('age0',4306)+s.time-s.run_off)   # run age (run_off moves at an ascension)
@@ -356,7 +361,9 @@ def policy(s,p,gained):
     for k in range(1,K+1):
         while True:
             cost=prod_cost(s,k)
-            if s.c[k]>=p['prod_mult']*cost: s.c[k]-=cost; s.prod[k]+=1
+            if s.c[k]>=p['prod_mult']*cost:
+                s.c[k]-=cost; s.prod[k]+=1
+                if TRACE is not None: tr('faster',k,s.prod[k])
             else: break
     # --- twin upgrades (twin of tier k costs tier k+1)
     twin_pass(s,p)
@@ -409,15 +416,26 @@ def policy(s,p,gained):
                 s.t[j]+=n*TWO**s.tt[j]; s.c[0]-=n*TCs[j]; s.larva-=n; s.purse-=n; s.spentT+=n; buy_stat(s,TN[j],n*TWO**s.tt[j])
     # --- climb, top down
     avail=(s.larva-s.purse if f>0 else s.larva)-s.reserve-s.nexres
+    if TRACE is not None:
+        tr('before_climb',avail,top)
+        if CAPTURE is not None: CAPTURE.append(copy.deepcopy(s))   # the state the climb and push rules see (longrun_cases.py)
+    _climb_and_push(s,p,avail,top,f)
+def _climb_and_push(s,p,avail,top,f):
+    """The climb (top down), twins after it, the push, achievements: the end of policy(), run on the state as the
+    climb starts (also called on its own by advisor/modelcheck/longrun_cases.py)."""
     first=True
     s.hprev=s.hatched; s.hatched=[0.0]*(K+2)
     for k in range(min(top+1,K),0,-1):
         fa=False   # tier passes only on the faster-aware test (see faster_aware below)
         if not allowed(s,p,k):
-            if not (p.get('faster_aware') and k>=p.get('fa_from',2)): continue
+            if not (p.get('faster_aware') and k>=p.get('fa_from',2)):
+                if TRACE is not None: tr('climb',k,'fails')
+                continue
             fa=True
         if k<=p.get('min_tier',1)-1: continue
-        if p.get('bank') and k<K and s.c[k+1]>0 and allowed(s,p,k+1) and s.c[k+1]*P(s,k+1) > p['bank']*lam(s)*(1-p['f'])*TWO**s.twin[k]/TWO**s.twin[k+1]: continue
+        if p.get('bank') and k<K and s.c[k+1]>0 and allowed(s,p,k+1) and s.c[k+1]*P(s,k+1) > p['bank']*lam(s)*(1-p['f'])*TWO**s.twin[k]/TWO**s.twin[k+1]:
+            if TRACE is not None: tr('climb',k,'bank')
+            continue
         n=avail
         sh=p.get('share',1.0)
         if first and p.get('share_top'): sh=p['share_top']
@@ -443,13 +461,18 @@ def policy(s,p,gained):
             n=min(n,s.carry[k])
             n=math.floor(n); s.carry[k]-=n; carried=n
         n=math.floor(n)
+        if TRACE is not None and fa: tr('fa',k,n,faster_levels(s,p,k,n) if p.get('faster_aware')=='multi' else None)
         if fa and not faster_aware_passes(s,p,k,n):
+            if TRACE is not None: tr('climb',k,'fa_fails',n)
             # nothing hatched. Default: the tier's earmark keeps growing while it waits (as the advisor's spare
             # does), so it starts with a slice of the stock. fa_accumulate=False: income only, as a normal start.
             if p.get('fa_accumulate',True): s.carry[k]+=carried
             else: s.carry[k]=carry0
             continue
-        if n<=0: continue
+        if n<=0:
+            if TRACE is not None: tr('climb',k,'passes_none',n,fa)
+            continue
+        if TRACE is not None: tr('climb',k,'buys',n,fa)
         first=False
         if k>=2: s.c[k-1]-=n*UNITC[k]
         s.c[0]-=n*MEATC[k]; s.c[k]+=n*TWO**s.twin[k]; s.larva-=n; avail-=n; s.spent[k]+=n; s.lastbuy[k]=s.time; s.hatched[k]+=n*TWO**s.twin[k]; buy_stat(s,NAMES[k],n*TWO**s.twin[k])
@@ -458,7 +481,9 @@ def policy(s,p,gained):
             s.fa_log.append((s.time,NAMES[k],s.prod[k],n))
             if p.get('fa_buy',True):
                 for _ in range(1 if p.get('faster_aware')!='multi' else 400):
-                    if s.c[k]>=prod_cost(s,k): s.c[k]-=prod_cost(s,k); s.prod[k]+=1   # the level(s) the start relied on
+                    if s.c[k]>=prod_cost(s,k):
+                        s.c[k]-=prod_cost(s,k); s.prod[k]+=1   # the level(s) the start relied on
+                        if TRACE is not None: tr('fa_faster',k,s.prod[k])
                     else: break
                     if p.get('faster_aware')!='multi' or H(s,k)<=p['theta']: break
     if p.get('twin_after'): twin_pass(s,p)   # twin_after: twins for the tiers just hatched, in the same visit (as the native advisor's tips)
@@ -483,11 +508,19 @@ def push_up(s,p):
     frontier=push_frontier(s,p)
     larva=s.larva-s.reserve-s.nexres-(s.purse if p['f']>0 else 0)
     order=range(frontier+1,G+1) if q.get('bottom_up') else range(G,frontier,-1)   # bottom_up: a visit can carry units several tiers up
+    if TRACE is not None: tr('frontier',frontier,larva)
     for k in order:
-        if s.c[k-1]<=0 or larva<1: continue
+        if q.get('cooldown') and s.time-s.lastbuy[k]<q['cooldown']:   # cooldown: no push of a unit hatched less than this many s ago
+            if TRACE is not None: tr('push',k,'cooldown')
+            continue
+        if s.c[k-1]<=0 or larva<1:
+            if TRACE is not None: tr('push',k,'nothing below' if s.c[k-1]<=0 else 'no larvae')
+            continue
         sh=q.get('share',0.5) if k>frontier+1 else q.get('base',0.02)
         if p.get('time_share'): sh=tshare(sh,p)
-        n=math.floor(min(sh*s.c[k-1]/UNITC[k], larva, s.c[0]*0.5/MEATC[k]))
+        caps=(sh*s.c[k-1]/UNITC[k], larva, s.c[0]*0.5/MEATC[k])
+        n=math.floor(min(caps))
+        if TRACE is not None: tr('push',k,'hatch' if n>=1 else 'under one',n,sh,s.c[k-1],larva,s.c[0],['share','larvae','meat'][caps.index(min(caps))])
         if n<1: continue
         hatch(s,k,n); larva-=n
 def tshare(sh,p):
@@ -505,8 +538,12 @@ def twin_pass(s,p):
                 inc=(s.c[k]*P(s,k)/UNITC[k]) if k>=2 else 1e99
                 R=TWO**s.twin[k]*min(lam(s)*(1-p['f']),inc)
                 if R < p['twin_flow']*cost*P(s,k+1): break
-            if p.get('push') and k+1>push_frontier(s,p) and s.c[k+1]<p['push'].get('twin_mult',1)*cost: break   # keep pushed units for climbing
-            if s.c[k+1]>=p['twin_mult']*cost and s.c[k+1]>=cost: s.c[k+1]-=cost; s.twin[k]+=1
+            if p.get('push') and k+1>push_frontier(s,p) and s.c[k+1]<p['push'].get('twin_mult',1)*cost:   # keep pushed units for climbing
+                if TRACE is not None: tr('twin',k,'guard',cost,s.c[k+1])
+                break
+            if s.c[k+1]>=p['twin_mult']*cost and s.c[k+1]>=cost:
+                if TRACE is not None: tr('twin',k,'buys',cost,s.c[k+1])
+                s.c[k+1]-=cost; s.twin[k]+=1
             else: break
 def faster_aware_passes(s,p,k,n):
     """Policy option `faster_aware` (default off). A tier that fails the run-age test may still be climbed

@@ -1,0 +1,287 @@
+{
+ "case": "save_20h",
+ "exercises": "the owner's 20.1 h save (run age 0.84 d): the mode must change nothing",
+ "save": "save_20h.save.json",
+ "config": {
+  "age_multiple": 5,
+  "territory_share": 0.1,
+  "bank": 3,
+  "share": 0.5,
+  "gate_run_age_s": 172800,
+  "push_share": 0.5,
+  "push_frontier_share": 0.02,
+  "push_twin_guard_multiple": 1000000.0,
+  "push_cooldown_s": 60,
+  "moth_target": 4000,
+  "moth_target_late": [
+   259200,
+   30000
+  ],
+  "meat_share_for_push": 0.5
+ },
+ "state": {
+  "run_age_s": 72406.0,
+  "gate_active": false,
+  "horizon_s": 362030.0,
+  "frontier": null,
+  "tiers": [
+   {
+    "tier": 1,
+    "name": "drone",
+    "count": "1.3833335091541131e+28",
+    "prod_level": 10,
+    "twin_level": 21,
+    "H_s": "0",
+    "passes_plain": true,
+    "since_last_hatch_s": null
+   },
+   {
+    "tier": 2,
+    "name": "queen",
+    "count": "1.2440056594184354e+22",
+    "prod_level": 8,
+    "twin_level": 16,
+    "H_s": "5.9604644775390625e-06",
+    "passes_plain": true,
+    "since_last_hatch_s": null
+   },
+   {
+    "tier": 3,
+    "name": "nest",
+    "count": "5.3471303072509744e+16",
+    "prod_level": 6,
+    "twin_level": 11,
+    "H_s": "7.6293945312500000e-03",
+    "passes_plain": true,
+    "since_last_hatch_s": null
+   },
+   {
+    "tier": 4,
+    "name": "greaterqueen",
+    "count": "5.2305881287706079e+11",
+    "prod_level": 4,
+    "twin_level": 6,
+    "H_s": "9.7656250000000000e+00",
+    "passes_plain": true,
+    "since_last_hatch_s": null
+   },
+   {
+    "tier": 5,
+    "name": "hive",
+    "count": "2.9582253551999998e+08",
+    "prod_level": 3,
+    "twin_level": 3,
+    "H_s": "1.5625000000000000e+03",
+    "passes_plain": true,
+    "since_last_hatch_s": null
+   },
+   {
+    "tier": 6,
+    "name": "hivequeen",
+    "count": "1.0",
+    "prod_level": 0,
+    "twin_level": 0,
+    "H_s": "1000000.0",
+    "passes_plain": false,
+    "since_last_hatch_s": null
+   },
+   {
+    "tier": 7,
+    "name": "empress",
+    "count": "0",
+    "prod_level": 0,
+    "twin_level": 0,
+    "H_s": "10000000.0",
+    "passes_plain": false,
+    "since_last_hatch_s": null
+   },
+   {
+    "tier": 8,
+    "name": "prophet",
+    "count": "0",
+    "prod_level": 0,
+    "twin_level": 0,
+    "H_s": "100000000.0",
+    "passes_plain": false,
+    "since_last_hatch_s": null
+   },
+   {
+    "tier": 9,
+    "name": "goddess",
+    "count": "0",
+    "prod_level": 0,
+    "twin_level": 0,
+    "H_s": "1000000000.0",
+    "passes_plain": false,
+    "since_last_hatch_s": null
+   },
+   {
+    "tier": 10,
+    "name": "pantheon",
+    "count": "0",
+    "prod_level": 0,
+    "twin_level": 0,
+    "H_s": "10000000000.0",
+    "passes_plain": false,
+    "since_last_hatch_s": null
+   },
+   {
+    "tier": 11,
+    "name": "pantheon2",
+    "count": "0",
+    "prod_level": 0,
+    "twin_level": 0,
+    "H_s": "1000000000000.0",
+    "passes_plain": false,
+    "since_last_hatch_s": null
+   },
+   {
+    "tier": 12,
+    "name": "pantheon3",
+    "count": "0",
+    "prod_level": 0,
+    "twin_level": 0,
+    "H_s": "100000000000000.0",
+    "passes_plain": false,
+    "since_last_hatch_s": null
+   },
+   {
+    "tier": 13,
+    "name": "pantheon4",
+    "count": "0",
+    "prod_level": 0,
+    "twin_level": 0,
+    "H_s": "1.0000000000000000e+16",
+    "passes_plain": false,
+    "since_last_hatch_s": null
+   },
+   {
+    "tier": 14,
+    "name": "pantheon5",
+    "count": "0",
+    "prod_level": 0,
+    "twin_level": 0,
+    "H_s": "1.0000000000000000e+19",
+    "passes_plain": false,
+    "since_last_hatch_s": null
+   },
+   {
+    "tier": 15,
+    "name": "overmind",
+    "count": "0",
+    "prod_level": 0,
+    "twin_level": 0,
+    "H_s": "9.9999999999999992e+22",
+    "passes_plain": false,
+    "since_last_hatch_s": null
+   },
+   {
+    "tier": 16,
+    "name": "overmind2",
+    "count": "0",
+    "prod_level": 0,
+    "twin_level": 0,
+    "H_s": "9.9999999999999996e+27",
+    "passes_plain": false,
+    "since_last_hatch_s": null
+   },
+   {
+    "tier": 17,
+    "name": "overmind3",
+    "count": "0",
+    "prod_level": 0,
+    "twin_level": 0,
+    "H_s": "9.9999999999999995e+33",
+    "passes_plain": false,
+    "since_last_hatch_s": null
+   },
+   {
+    "tier": 18,
+    "name": "overmind4",
+    "count": "0",
+    "prod_level": 0,
+    "twin_level": 0,
+    "H_s": "1.0000000000000000e+41",
+    "passes_plain": false,
+    "since_last_hatch_s": null
+   },
+   {
+    "tier": 19,
+    "name": "overmind5",
+    "count": "0",
+    "prod_level": 0,
+    "twin_level": 0,
+    "H_s": "9.9999999999999995e+48",
+    "passes_plain": false,
+    "since_last_hatch_s": null
+   },
+   {
+    "tier": 20,
+    "name": "overmind6",
+    "count": "0",
+    "prod_level": 0,
+    "twin_level": null,
+    "H_s": "9.9999999999999994e+57",
+    "passes_plain": false,
+    "since_last_hatch_s": null
+   }
+  ],
+  "top_owned": 6,
+  "larvae_held_back": {
+   "territory_purse": "0",
+   "nexus_saving": "2.7800288329390388e+09",
+   "clone_reserve": "0"
+  },
+  "moth_target": 4000,
+  "larvae": "2.7800288329390388e+09",
+  "larva_rate": "2.5076619533005406e+05",
+  "meat": "8.6409129084254832e+33",
+  "achievement_points": 730
+ },
+ "decisions": {
+  "climb": [
+   {
+    "tier": 7,
+    "name": "empress",
+    "outcome": "fails"
+   },
+   {
+    "tier": 6,
+    "name": "hivequeen",
+    "outcome": "fails"
+   },
+   {
+    "tier": 5,
+    "name": "hive",
+    "outcome": "passes_none",
+    "n_sim": "0",
+    "test": "plain"
+   },
+   {
+    "tier": 4,
+    "name": "greaterqueen",
+    "outcome": "bank"
+   },
+   {
+    "tier": 3,
+    "name": "nest",
+    "outcome": "bank"
+   },
+   {
+    "tier": 2,
+    "name": "queen",
+    "outcome": "bank"
+   },
+   {
+    "tier": 1,
+    "name": "drone",
+    "outcome": "bank"
+   }
+  ],
+  "faster_after_climb": [],
+  "push": [],
+  "larvae_for_push": null,
+  "frontier_at_push": null,
+  "larvae_before_climb": "0"
+ }
+}
