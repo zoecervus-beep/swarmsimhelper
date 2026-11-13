@@ -119,12 +119,15 @@ mismatches['prices'] = table('Upgrade prices at the save', rows)
 
 # 2. Idle dynamics ------------------------------------------------------------------------------
 WATCH = ['meat'] + CH[1:6] + ['larva', 'territory', 'energy']
+def G(snap, n):
+    """A game count; 'larva' is larvae plus cocoons, as the simulator holds them."""
+    return F(snap['larva']) + F(snap.get('cocoon', 0)) if n == 'larva' else F(snap[n])
 def simval(s, n):
     if n in CH: return s.c[CH.index(n)]
     return {'larva': s.larva, 'territory': s.terr, 'energy': s.energy}[n]
 for secs, snap in sorted(game['idle'].items(), key=lambda kv: int(kv[0])):
     s = sim.load(); sim.advance(s, int(secs))
-    mismatches['idle %ss' % secs] = table('No purchases, +%s s' % secs, [(n, F(snap[n]), simval(s, n)) for n in WATCH])
+    mismatches['idle %ss' % secs] = table('No purchases, +%s s' % secs, [(n, G(snap, n), simval(s, n)) for n in WATCH])
 
 # 3. Identical purchases --------------------------------------------------------------------------
 P = game['purchases']
@@ -151,20 +154,23 @@ def buy(kind, name, num):
     return price
 rows = []
 for st in P['steps']:
+    if st.get('skipped'):
+        out('(skipped on this save, not affordable in the game: %s %s x%d)' % (st['kind'], st['name'], st['num'])); continue
     price = buy(st['kind'], st['name'], st['num'])
     for unit, gv in st['price'].items():
         rows.append(('price of %s %s x%d, in %s' % (st['kind'], st['name'], st['num'], unit), F(gv), price.get(unit, 0.0)))
 mismatches['purchase prices'] = table('Prices paid for the same purchases at +2 h', rows)
-last = P['steps'][-1]['after']
+done = [st for st in P['steps'] if not st.get('skipped')]
+last = done[-1]['after'] if done else P['before']
 WATCH2 = WATCH + ['goon']
 def simval2(s, n): return s.t[sim.TN.index(n)] if n in sim.TN else simval(s, n)
-mismatches['after purchases'] = table('State right after the purchases', [(n, F(last[n]), simval2(s, n)) for n in WATCH2])
+mismatches['after purchases'] = table('State right after the purchases', [(n, G(last, n), simval2(s, n)) for n in WATCH2])
 ar = P['afterRates']
 mismatches['rates after purchases'] = table('Rates after the purchases', [
     ('larvae / s', F(ar['larva']), lam(s)), ('meat / s', F(ar['meat']), s.c[1] * sim.P(s, 1)),
     ('territory / s', F(ar['territory']), sim.trate(s))])
 sim.advance(s, 3600)
-mismatches['1h after purchases'] = table('One hour after the purchases', [(n, F(P['later'][n]), simval2(s, n)) for n in WATCH2])
+mismatches['1h after purchases'] = table('One hour after the purchases', [(n, G(P['later'], n), simval2(s, n)) for n in WATCH2])
 
 # 4. Spells --------------------------------------------------------------------------------------
 def spell_state(bats, larvae=None):
@@ -188,7 +194,7 @@ for bats in ('0', '1000'):
         after = {'larva': s.larva, 'meat': s.c[0], 'territory': s.terr}
         after.update({n: s.t[j] for j, n in enumerate(sim.TN)})
         if gname == 'clonearmy':
-            for n in ('swarmling', 'centipede', 'goon'):
+            for n in ('stinger', 'centipede', 'goon'):
                 rows.append(('House of Mirrors: %s after/before' % n, F(r['after'][n]) / F(r['before'][n]), after[n] / before[n]))
         elif gname == 'swarmwarp':
             for n in ('meat', 'larva', 'territory'):

@@ -221,6 +221,109 @@ Result on Nov 12, 2026:
 
 It never ascends. The port deliberately starts a fresh purchase memory after an ascension; the script keeps the last run's stock levels and purchase times.
 
+## Faster-aware climbing
+
+Nov 13, 2026. The owner asked whether the climb rule should count the "faster" upgrade when deciding to start a new tier. On their 20.1 h save, hive queens cost 10^6 hives and make 6 hives/s. So H = 6 × 46.3 h = 11.6 d against a horizon of 3 × 20.1 h = 2.5 d, and the advisor says "wait 3.0 d". "Faster hive queens" costs only 66 hive queens and would halve H.
+
+**Answer: it does not matter, as a rule of its own.** In every start and at every age multiple, the faster-aware rule behaves like the run-age rule with the age multiple doubled. Hive queens and empresses start within the same hour, the same numbers are held, and the scores differ by under 0.75 log10, with one exception noted below. Two reasons:
+- When a tier first passes the faster-aware test, one check-in's hatch is thousands to 10^18 units, so the 66-unit price is negligible and H_eff ≈ H/2.
+- Buying that faster level at its price instead of twice its price changed nothing measurable (≤0.07 log10): the policy holds twice the price within a check-in or two anyway.
+
+So the benefit, where there is one, is "start the tier earlier", which a larger age multiple does just as well. At the native default of 3, starting earlier helps or is neutral in every start; at 5 it trades up to 10× at +24 h for 10^15 at 14 days. **Recommendation: do not add the rule to the native advisor; raise the default age multiple instead** (5, as `policy.json` already uses, or 6 to reproduce "3 with faster" exactly). An optional display-only hint is sketched at the end.
+
+### The 20 h save loads correctly
+
+**Measured.** `compare.py --save advisor/sim/example_save_20h.json` matches the game on every row.
+
+Two things on this save were new, and the comparison showed them:
+- **Crystal-bought energy.** The save has 8,500 `mtxEnergy`, which raises the energy cap by 1 each (the game's `capFlat`). The game's cap is 48,500; the simulator said 40,000. Fixed in `sim.py` (`s.mtx`).
+- **Empowered swarmlings** (`swarmlingempower` 1). These change the swarmling's cost and production. The simulator does not model empower. The save holds 0 swarmlings and the policy only buys higher territory units, so nothing depends on it.
+
+Two corrections were also made to the checker:
+- It now skips purchases the save cannot afford.
+- It compares larvae plus cocoons, because the simulator holds cocoons as larvae.
+
+**At its first instant** (`faster_aware.py`, part 1), the native advisor, run as real game code, and the simulator agree on H for every tier:
+
+| Tier | H (advisor = sim) | Advisor | Simulator |
+| --- | --- | --- | --- |
+| queen, nest, greater queen | 6e-6 s, 0.0076 s, 9.8 s | bank | pass the run-age test, bank |
+| hive | 1562.5 s | BUY 1.00e6 (×8 twins) | passes, does not bank |
+| hive queen | 1e6 s = 11.6 d | wait 3.0 d | fails; wait 3.02 d |
+
+On the first step the simulator hatches no hives, because its tuned policy holds all 2.78e9 larvae (larvae plus cocoons) for nexus 5 (`nexus_secs`). The advisor's meat rules do not hold larvae for a nexus. With that hold switched off, the simulator hatches 2.09e7 hives on its first step. The count differs from the advisor's 8e6 because the simulator's quantity rule (income share) is not the advisor's share/spare rule. That is a policy difference, not a game-mechanics one.
+
+### The rule as simulated (`faster_aware`, default off)
+
+A tier k that fails the run-age test (H > ageMultiple × age) may still be climbed when this holds:
+
+- n = purchases the policy would make this check-in under its usual limits: free larvae after higher tiers, `share` of the tier below, meat share, and the income earmark (`inc_share` / `stock_rel`).
+- F = the next faster level's price, 66 × 666^level units of tier k.
+- got = units held + n × twin.
+- N = got − F, the units kept after paying for the upgrade.
+- H_eff = k × (N + F) × costEach / (N × 2 × prodEach) = H × (N + F) / (2N).
+- Test: N ≥ 1 and H_eff ≤ horizon.
+
+This is honest accounting: the sunk F counts as cost, and only the N kept units count, at double rate. When the tier is started on this basis, the policy hatches n and buys that faster level at once, at its price rather than twice its price.
+
+While the test fails, the tier's income earmark keeps growing, as the advisor's spare does. So the start converts a slice of the stock. A variant `fa_accumulate=False` keeps it to income only.
+
+**When it can fire again.** Prices only fall in H (faster and twin levels only go up) and the horizon only grows. So once a tier passes either test it passes for good, and the rule fires at most once per tier. In every run here it fired once for hive queens and once for empresses, both at faster level 0.
+
+A later level (43,956 units at level 1, then ×666) only comes into play for a tier already held at level ≥1 that still fails the plain test, for example one bought up through twin plans. Then the honest N + F accounting matters, and it correctly refuses until one check-in's hatch is large next to F. That is sensible.
+
+**Twin seeking.** It treats a tier as "not climbed" when the plain test fails, so it may still hatch a few hive queens to pay for a hive twin, consuming them, in the same check-in where the faster-aware rule starts the tier. On these saves that never made a difference. The owner's 1 hive queen from a twin plan counts toward `got`.
+
+### Results
+
+Run `python3 -I advisor/modelcheck/faster_aware.py` (about 1.5 minutes; `--quick` takes about 20 s). Full tables are written to stdout and to `advisor/modelcheck/out/faster_aware.json`.
+
+The real starts are the 20.1 h and 14.5 h saves. The other three are states of the simulator's own tuned run (age multiple 5), so they are **not independent**. Scores are log10 meat earned, rule on minus rule off at the same age multiple.
+
+| Start | × | +24 h | +48 h | +4 d | +7 d | +14 d | Hive queens first hatched, off → on (h ahead) | Empresses, off → on |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 20.1 h save | 3 | 0 | **+5.6** | +1.7 | 0 | 0 | 72.5 → 26.2 | – → – |
+| | 5 | −0.7 | **+5.3** | +0.1 | 0 | **+15.5** | 35.5 → 7.7 | – → 258 |
+| | 10 | −2.8 | −0.3 | 0 | **+12.3** | +0.1 | 7.7 → 0.7 | 258 → 119 |
+| 14.5 h save | 3 | 0 | −0.2 | **+2.3** | 0 | 0 | 78.1 → 31.8 | – → – |
+| | 5 | −0.5 | −2.1 | +0.1 | 0 | **+15.3** | 41.1 → 13.3 | – → 263 |
+| | 10 | −8.2 | −2.5 | −0.1 | **+11.8** | +0.1 | 13.3 → 8.1 | 263 → 124 |
+| 14.5 h + 12 h (sim) | 3 | 0 | **+7.6** | +1.0 | 0 | 0 | 66.1 → 19.8 | – → – |
+| | 5 | −1.0 | +1.8 | +0.1 | 0 | **+15.6** | 29.1 → 1.3 | – → 251 |
+| 14.5 h + 48 h (sim, 4e8 hive queens held) | 3 | 0 | 0 | 0 | 0 | 0 | already climbing | – → – |
+| | 5 | 0 | 0 | 0 | 0 | **+16.1** | already climbing | – → 215 |
+| 20.1 h + 24 h (sim) | 3 | **+5.3** | **+9.8** | +0.3 | 0 | 0 | 48.5 → 2.2 | – → – |
+| | 5 | **+4.0** | +0.2 | 0 | 0 | **+15.8** | 11.4 → 0.0 | – → 234 |
+
+At +8 h every difference is within ±0.2 except −3.0 (20.1 h save, ×10). With the rule on at ×5, the three starts that had not begun hive queens hold 5.7e6 to 3.3e7 of them at +24 h, against 0 with it off. By +4 d both arms hold the same order of hive queens (1.5e17 to 6.7e16, for example), because larvae are no longer scarce.
+
+**Ablations** (largest gap from the faster-aware row over all marks):
+
+| Ablation | Gap |
+| --- | --- |
+| Upgrade bought at 2× price, as today | ≤0.07 log10 everywhere |
+| Naive H/2 (upgrade counted, its price not) | ≤0.04, except 7.1 at one mark (14.5 h save, ×10, +48 h) |
+| Income-only start (`fa_accumulate=False`) | ≤0.41, except that same cell |
+| Rule off at twice the age multiple | ≤0.74 at ×3 and ×5; that same cell at ×10 (7.2) |
+
+The ×10 cells are where both arms start hive queens within an hour or two of the save, and timing at a single mark swings by up to 10^8. Hive queen and empress start times match the doubled-multiple arm to within 2 hours in every case.
+
+**Interpretation.**
+- At ×3 (the native default), starting at about half the age helps from three of the five starts by 10^5 to 10^10 at +24 to +48 h. It never hurts by more than 0.2 log10 (noise). It is neutral from 7 days on, because neither arm reaches empresses in 14 days at ×3.
+- On the 20.1 h save the rule starts hive queens at a run age of 46.3 h = 1.9 d, as the owner estimated.
+- At ×5, the earlier start costs 3 to 9× at +24 h in three starts (−0.5 to −1.0, around the noise level) and gains 10^4 in a fourth. At +48 h it is mixed (+5.3, −2.1, +1.8, 0, +0.2). It wins 10^15 to 10^16 at 14 days in every start, because empresses get started at about 10 days instead of never.
+- This is the same trade the earlier sensitivity sweep found for larger age multiples. The handoff's "starting hive queens as soon as possible costs 10^10 at 24 hours" (from the 11.9 h save) is a much earlier start than these, and was not re-run.
+
+**How sure.** The equivalence to "double the age multiple" is measured in all 15 start × multiple cells, and it has a simple mechanical reason (N ≫ F at the moment of starting), so I am confident in it. That earlier starts help at ×3 is measured from two real saves and three dependent states. It agrees in direction everywhere, with magnitudes that depend on the mark.
+
+### If the owner still wants it in the advisor
+
+As a display hint only. It changes no buy decision, because it is equivalent to a larger age multiple, which is the better lever. Shown on a tier that fails rule 1:
+
+- Quantities: F = the tier's faster price (66 × 666^level of the tier itself); n = the purchase count rule 3 would suggest if the tier passed; got = count + n × twin; N = got − F.
+- If N ≥ 1 and H × (N + F)/(2N) ≤ horizon, show the plan "hatch n hive queens > buy faster hive queens (66)". After the hatch, show the faster tip at 1× its price for that level, not 2×.
+- If N < 1, keep "wait …" and add "(with faster: wait X)", where X = (H/2)/ageMultiple − age. Leave it out when X ≥ the plain wait.
+
 ## What remains unverified
 
 - **The browser build and Karma.** Everything here ran the game's services in Node with a stand-in injector. The Angular wiring, the UI and the statistics service, which the advisor uses to detect purchases, were not exercised.

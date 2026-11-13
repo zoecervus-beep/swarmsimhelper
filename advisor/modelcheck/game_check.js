@@ -82,6 +82,11 @@ out.idle = {};
     ['unit', 'goon', 10], ['upgrade', 'expansion', 1], ['upgrade', 'hatchery', 1]];
   out.purchases = {before: snapshot(g), beforeRates: rates(g), steps: []};
   steps.forEach(function (st) {
+    var item = st[0] === 'unit' ? g.unit(st[1]) : g.upgrade(st[1]);
+    if (!item.isCostMet() || (st[0] === 'unit' && item.maxCostMet().lessThan(st[2]))) {
+      out.purchases.steps.push({kind: st[0], name: st[1], num: st[2], skipped: true}); // not affordable on this save
+      return;
+    }
     var price = st[0] === 'unit' ? (function () {
       var r = {}; g.unit(st[1]).eachCost().forEach(function (c) { r[c.unit.name] = S(c.val.times(st[2])); }); return r;
     })() : upCost(g, st[1]).cost;

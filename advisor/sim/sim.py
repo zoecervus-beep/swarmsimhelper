@@ -58,8 +58,8 @@ def load():
         s.prod[k]=int(g.get(NAMES[k]+'prod',0)); s.twin[k]=int(g.get(NAMES[k]+'twin',0))
     s.t=[float(u[n]) for n in TN]; s.tt=[int(g.get(n+'twin',0)) for n in TN]
     s.hatch=int(g['hatchery']); s.exp=int(g['expansion']); s.ach=int(g['achievementbonus'])
-    s.energy=float(u.get('energy',0)); s.nexus=int(float(u.get('nexus',0))); s.moth=float(u.get('moth',0)); s.bat=float(u.get('bat',0)); s.nightbug=float(u.get('nightbug',0)); s.hatched=[0.0]*(K+2); s.hprev=[0.0]*(K+2); s.carry=[0.0]*(K+2); s.reserve=0.0; s.nexres=0.0; s.casts={}; s.earned=0.0
-    s.lastbuy=[-1e18]*(K+2); s.purse=0.0; s.time=0.0; s.spent=[0.0]*(K+1); s.spentT=0.0
+    s.energy=float(u.get('energy',0)); s.nexus=int(float(u.get('nexus',0))); s.moth=float(u.get('moth',0)); s.bat=float(u.get('bat',0)); s.nightbug=float(u.get('nightbug',0)); s.mtx=float(u.get('mtxEnergy',0)); s.hatched=[0.0]*(K+2); s.hprev=[0.0]*(K+2); s.carry=[0.0]*(K+2); s.reserve=0.0; s.nexres=0.0; s.casts={}; s.earned=0.0
+    s.lastbuy=[-1e18]*(K+2); s.firstclimb={}; s.fa_log=[]; s.purse=0.0; s.time=0.0; s.spent=[0.0]*(K+1); s.spentT=0.0
     return s
 def lam(s): return LMULT*(1+s.hatch)*1.1**s.exp*(1+0.001*s.achpts)**s.ach
 def P(s,k): return BASEP[k]*2.0**s.prod[k]*(MMULT if k==1 else 1)
@@ -73,7 +73,8 @@ def twin_cost(s,k): return 10.0**s.twin[k]                       # twin tier k: 
 def tt_cost(s,j): return 100*500.0**s.tt[j], 50.0**s.tt[j]       # territory twin: meat, larvae
 def epow(s): return 1+0.6*(1-1/(1+0.001*s.bat))
 def erate(s): return 0.1*s.nexus*(1+(1-1/(1+0.001*s.moth)))
-def ecap(s): return 10000.0*s.nexus*(1+5*(1-1/(1+0.001*getattr(s,'nightbug',0.0))))   # nightbugs: cap toward 6x (none bought by the policy)
+# nightbugs: cap toward 6x (none bought by the policy); mtxEnergy (energy bought with crystals) adds 1 each (capFlat)
+def ecap(s): return 10000.0*s.nexus*(1+5*(1-1/(1+0.001*getattr(s,'nightbug',0.0))))+getattr(s,'mtx',0.0)
 NEX={1:(3.33333e15,625,0,4000),2:(3.33333e18,2500,3333333,6000),3:(3.33333e21,10000,33333330,8000),4:(3.33333e24,36000,3333333000,10000)}
 SPELL={'warp':(2000,1),'larvarush':(1600,1),'meatrush':(1600,2),'terrrush':(1600,3),'clone':(12000,4),'mirror':(2500,5)}
 def energy_policy(s,p,gained):
@@ -223,7 +224,10 @@ def policy(s,p,gained):
     first=True
     s.hprev=s.hatched; s.hatched=[0.0]*(K+2)
     for k in range(min(top+1,K),0,-1):
-        if not allowed(s,p,k): continue
+        fa=False   # tier passes only on the faster-aware test (see faster_aware below)
+        if not allowed(s,p,k):
+            if not (p.get('faster_aware') and k>=2): continue
+            fa=True
         if k<=p.get('min_tier',1)-1: continue
         if p.get('bank') and k<K and s.c[k+1]>0 and allowed(s,p,k+1) and s.c[k+1]*P(s,k+1) > p['bank']*lam(s)*(1-p['f'])*2.0**s.twin[k]/2.0**s.twin[k+1]: continue
         n=avail
@@ -240,7 +244,7 @@ def policy(s,p,gained):
             if p.get('res_larva_only'): inflow=s.hprev[k-1]/p['ci']
             keep=inflow*(p['res_min']*60 if p.get('res_min') is not None else p['res_beta']*H(s,k)/k)
             n=min(n,max(0.0,(s.c[k-1]-keep))*p.get('res_share',1.0)/UNITC[k])
-        phi=p.get('inc_share')
+        phi=p.get('inc_share'); carried=0; carry0=s.carry[k]
         if phi is not None and k>=p.get('inc_min_tier',3) and (not p.get('inc_top_only') or first):
             if p.get('inc_gamma'):
                 phi=min(1.0,phi*(p['theta']/H(s,k)/p.get('theta_age',1))**p['inc_gamma'])
@@ -248,13 +252,35 @@ def policy(s,p,gained):
             rel=p.get('stock_rel',0)*p['ci']/(H(s,k)/k)
             s.carry[k]=min(s.carry[k]+(phi*inflow+min(1.0,rel)*s.c[k-1])/UNITC[k], s.c[k-1]/UNITC[k])
             n=min(n,s.carry[k])
-            n=math.floor(n); s.carry[k]-=n
+            n=math.floor(n); s.carry[k]-=n; carried=n
         n=math.floor(n)
+        if fa and not faster_aware_passes(s,p,k,n):
+            # nothing hatched. Default: the tier's earmark keeps growing while it waits (as the advisor's spare
+            # does), so it starts with a slice of the stock. fa_accumulate=False: income only, as a normal start.
+            if p.get('fa_accumulate',True): s.carry[k]+=carried
+            else: s.carry[k]=carry0
+            continue
         if n<=0: continue
         first=False
         if k>=2: s.c[k-1]-=n*UNITC[k]
         s.c[0]-=n*MEATC[k]; s.c[k]+=n*2.0**s.twin[k]; s.larva-=n; avail-=n; s.spent[k]+=n; s.lastbuy[k]=s.time; s.hatched[k]+=n*2.0**s.twin[k]; buy_stat(s,NAMES[k],n*2.0**s.twin[k])
+        s.firstclimb.setdefault(NAMES[k],s.time)
+        if fa:
+            s.fa_log.append((s.time,NAMES[k],s.prod[k],n))
+            if p.get('fa_buy',True) and s.c[k]>=prod_cost(s,k): s.c[k]-=prod_cost(s,k); s.prod[k]+=1   # the level the start relied on
     earn_achievements(s)
+def faster_aware_passes(s,p,k,n):
+    """Policy option `faster_aware` (default off). A tier that fails the run-age test may still be climbed
+    when its break-even clock, counted as if the next faster level were bought out of this purchase, is
+    under the horizon. N = units held after the purchase and after paying the upgrade's price F (66 x 666^level
+    units of the tier itself); the sunk F counts as cost, production counts N at double rate:
+        H_eff = k x (N + F) x cost_each / (N x 2 x prodEach) = H x (N + F) / (2 N)
+    n is what the policy could hatch at this check-in under its usual share/carry/meat/larva limits. With
+    `fa_naive`, H_eff = H / 2 (the upgrade counted, its price not). Never passes unless N >= 1 after paying F."""
+    F=prod_cost(s,k); got=s.c[k]+n*2.0**s.twin[k]; N=got-F
+    if n<=0 or N<1: return False
+    Heff=H(s,k)/2 if p.get('fa_naive') else H(s,k)*(N+F)/(2*N)
+    return Heff<=p['theta']
 def run(p,hours,ci,marks,s0=None):
     p=dict(p,ci=ci); s=copy.deepcopy(s0) if s0 is not None else load()
     if s0 is not None: s.time=0.0; s.earned=0.0; s.lastbuy=[t-s0.time for t in s.lastbuy]
