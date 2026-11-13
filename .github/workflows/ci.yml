@@ -1,4 +1,4 @@
-# This doesn't deploy anything. Netlify deploys all changes made to the `master` and `production` branches
+# This doesn't deploy anything. GitHub Pages deploys from .github/workflows/pages.yml.
 
 name: continuous integration
 
@@ -11,9 +11,13 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # PhantomJS 2.1.1 (Karma's browser) aborts on reading a modern openssl.cnf
+      # ("Auto configuration failed ... libproviders.so"); the Dockerfile does the same.
+      OPENSSL_CONF: /dev/null
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
+    - uses: actions/checkout@v6
+    - uses: actions/setup-node@v7
       with:
         node-version: "16.x"
     - uses: ruby/setup-ruby@v1

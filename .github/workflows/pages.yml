@@ -1,0 +1,56 @@
+# Builds the game for GitHub Pages and publishes it, e.g. at
+# https://<owner>.github.io/<repo>/ (the build uses relative URLs, so a subpath works).
+# Uses the `pages` build flavour (swarmsim-coffee/Gruntfile.js): upstream's production
+# build minus upstream's Google Analytics property, with "fork <sha>" after the version.
+# Tests run in ci.yml; this workflow only builds, and deploys only after a successful build.
+# Needs, once, in the repository: Settings -> Pages -> Source: "GitHub Actions".
+
+name: GitHub Pages
+
+on:
+  push:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time; let an in-progress deployment finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+    - uses: actions/setup-node@v7
+      with:
+        node-version: "16.x"
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.1
+    - run: gem install compass
+    - run: yarn --frozen-lockfile
+    - name: Build (same steps as `yarn build`, with the pages flavour)
+      run: |
+        (cd tables && yarn build)
+        (cd swarmsim-ts && yarn build)
+        (cd swarmsim-coffee && yarn grunt build:pages && yarn _build:ts)
+    - uses: actions/configure-pages@v5
+    - uses: actions/upload-pages-artifact@v4
+      with:
+        path: swarmsim-coffee/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+    - id: deployment
+      uses: actions/deploy-pages@v4
