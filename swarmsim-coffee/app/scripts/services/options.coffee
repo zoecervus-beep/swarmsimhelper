@@ -212,6 +212,9 @@ angular.module('swarmApp').factory 'Options', ($log, util, env, game, $location,
   # and hand-edited saves load cleanly.
   _advisorParse: (key, val) ->
     limit = ADVISOR_SETTINGS.limits[key]
+    # a choice: one of the listed strings, nothing else
+    if limit.choices?
+      return if val in limit.choices then val else undefined
     if _.isNumber val
       num = val
     else if _.isString(val) and val.trim() != ''

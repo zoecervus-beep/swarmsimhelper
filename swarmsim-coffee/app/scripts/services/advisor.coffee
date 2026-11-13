@@ -10,6 +10,7 @@ angular.module('swarmApp').constant 'ADVISOR_SETTINGS',
     bank: 3           # stop hatching a unit once the tier above makes this many x what larvae could
     territory: 0.10   # fraction of larvae held back for territory units
     moths: 4000       # lepidoptera target
+    spareEnergy: 'larvarush' # below nexus 5, spare energy: 'larvarush' casts it, 'save' holds it for the next nexus
   limits:
     ageMultiple: {min: 0.01, max: 1000}
     share: {min: 0.01, max: 1}
@@ -17,6 +18,7 @@ angular.module('swarmApp').constant 'ADVISOR_SETTINGS',
     bank: {min: 0, max: 1e6}
     territory: {min: 0, max: 0.95}
     moths: {min: 0, max: 1e12, integer: true}
+    spareEnergy: {choices: ['larvarush', 'save']} # a choice, not a number
 
 ###*
  # @ngdoc service
@@ -130,7 +132,9 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
           name: up.name
           level: nexus + 1
           costs: ({unit: c.unit.name, val: D(c.val), have: D(c.unit.count())} for c in up.totalCost())
+      cap = g.unit('energy').capValue()
       energy =
+        cap: if cap? then D(cap) else null # as the game computes it: nexus, nightbugs, crystal energy
         nexus: nexus
         energy: D g.unit('energy').count()
         moths: D g.unit('moth').count()
@@ -429,6 +433,18 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
       return saving or {type: 'mothTarget', moths: moths, target: cfg.moths}
     if saving
       return saving
+    # Setting spareEnergy 'save': below nexus 5, hold spare energy for the next nexus (and, from
+    # nexus 4, the lepidoptera) instead of casting larva rush. The one exception is energy at its cap,
+    # where further income is wasted: one larva rush brings it back under.
+    if nexus < 5 and cfg.spareEnergy == 'save'
+      if e.cap? and energy.greaterThanOrEqualTo(e.cap)
+        return {type: 'energyFull', energy: energy, cap: e.cap, spell: SPELLS.larvarush.spell, label: SPELLS.larvarush.label, cost: SPELLS.larvarush.cost}
+      hold = {type: 'hold', level: nexus + 1, energy: energy, price: null, ready: false, missing: [], mothsNext: nexus == 3}
+      if next
+        hold.price = need.energy ? null
+        hold.ready = not hold.price? or energy.greaterThanOrEqualTo(hold.price)
+        hold.missing = ({unit: c.unit, have: c.have, need: c.val} for c in missing when c.unit != 'energy')
+      return hold
     spell = if nexus >= 5 then SPELLS.clonearmy else SPELLS.larvarush
     casts = spare.dividedBy(spell.cost).floor()
     if casts.greaterThanOrEqualTo 1
@@ -465,6 +481,19 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
   renderSaving = (rec) ->
     'save for nexus ' + rec.level + ': ' + ((formatNumber(m.have) + '/' + formatNumber(m.need) + ' ' + m.unit) for m in rec.missing).join(', ')
 
+  # "saving energy for nexus 2: 2,000/625 energy (ready); still need 3.33e15 meat (have 8.95e11)"
+  renderHold = (rec) ->
+    text = 'saving energy for nexus ' + rec.level
+    if rec.price?
+      text += ': ' + formatNumber(rec.energy) + '/' + formatNumber(rec.price) + ' energy' + (if rec.ready then ' (ready)' else '')
+    else
+      text += ': ' + formatNumber(rec.energy) + ' energy'
+    if rec.missing.length
+      text += '; still need ' + ((formatNumber(m.need) + ' ' + m.unit + ' (have ' + formatNumber(m.have) + ')') for m in rec.missing).join(', ')
+    if rec.mothsNext
+      text += '; then lepidoptera'
+    return text
+
   # Without the "energy: " prefix the panel puts in front. Null for null.
   renderEnergy = (rec) ->
     if not rec?
@@ -478,6 +507,9 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
       when 'mothTarget' then 'all energy into lepidoptera ' + formatNumber(rec.moths) + '/' + formatNumber(rec.target)
       when 'cast' then 'cast ' + rec.label + ' x' + formatNumber(rec.casts)
       when 'nextCast' then 'next ' + rec.label + ' at ' + formatNumber(rec.cost) + ' energy (have ' + formatNumber(rec.energy) + ')'
+      when 'hold' then renderHold rec
+      when 'energyFull'
+        'energy is full (' + formatNumber(rec.energy) + '/' + formatNumber(rec.cap) + '): cast ' + rec.label + ' x1 so the income is not wasted'
       else ''
 
   renderHeader = (r) ->

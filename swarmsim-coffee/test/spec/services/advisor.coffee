@@ -457,6 +457,73 @@ describe 'Service: advisor', ->
         expect(say mk 5, 6000, 4000, 1, null).toBe 'cast House of Mirrors x2'
         expect(say mk 5, 100, 4000, 1, null).toBe 'next House of Mirrors at 2,500 energy (have 100)'
 
+    describe 'with spare energy saved instead of rushed', ->
+      SAVE = {spareEnergy: 'save'}
+      withCap = (snap, cap) ->
+        snap.energy.cap = D cap
+        return snap
+      nexus2 = (energy, meat) -> [['meat', 3.33e15, meat], ['energy', 625, energy]]
+
+      it 'holds energy for the next nexus while its meat is missing (the owner at nexus 1)', ->
+        snap = withCap mk(1, 2000, 0, 50, nexus2(2000, 8.95e11)), 10000
+        rec = advisor.energyAdvice snap, SAVE
+        expect(rec.type).toBe 'hold'
+        expect(rec.level).toBe 2
+        expect(rec.ready).toBe true
+        expect(rec.price.toNumber()).toBe 625
+        expect(_.map rec.missing, 'unit').toEqual ['meat']
+        expect(say snap, SAVE).toBe 'saving energy for nexus 2: 2,000/625 energy (ready); still need 3.33e15 meat (have 8.95e11)'
+        # the default still rushes
+        expect(say snap).toBe 'cast larva rush x1'
+
+      it 'holds energy short of the price, and says lepidoptera follow at nexus 3', ->
+        snap = withCap mk(3, 2000, 0, 1000, [['meat', 3.33333e21, 1e20], ['energy', 10000, 2000], ['larva', 33333330, 1e6]]), 30000
+        rec = advisor.energyAdvice snap, SAVE
+        expect(rec.ready).toBe false
+        expect(rec.mothsNext).toBe true
+        expect(say snap, SAVE).toBe 'saving energy for nexus 4: 2,000/10,000 energy; still need 3.33e21 meat (have 1.00e20), 3.33e7 larva (have 1.00e6); then lepidoptera'
+
+      it 'leaves the other energy rules alone', ->
+        # all costs met: buy the nexus
+        snap = withCap mk(2, 3000, 0, 1, [['meat', 3.33333e18, 1e19], ['energy', 2500, 3000], ['larva', 3333333, 4e6]]), 20000
+        expect(say snap, SAVE).toBe 'buy nexus 3'
+        # the existing saving rule, with its own text
+        snap = withCap mk(3, 2000, 0, 2000, [['meat', 3.33333e21, 1e22], ['energy', 10000, 2000], ['larva', 33333330, 1e6]]), 30000
+        expect(say snap, SAVE).toBe 'save for nexus 4: 2,000/10,000 energy, 1.00e6/3.33e7 larva'
+        # lepidoptera first at nexus 4
+        snap = withCap mk(4, 6000, 2416, 1, [['meat', 3.33333e24, 1e25], ['energy', 36000, 6000], ['larva', 3333333000, 1]]), 40000
+        expect(say snap, SAVE).toBe 'buy 600 lepidoptera (lepidoptera 2,416/4,000)'
+        expect(say snap, SAVE).toBe say(snap)
+        # nexus 5: House of Mirrors, setting or not
+        snap = withCap mk(5, 6000, 4000, 1, null), 50000
+        expect(say snap, SAVE).toBe 'cast House of Mirrors x2'
+        expect(say snap, SAVE).toBe say(snap)
+
+      it 'holds for nexus 5 once the lepidoptera are done at nexus 4', ->
+        snap = withCap mk(4, 6000, 4000, 1, [['meat', 3.33333e24, 1e25], ['energy', 36000, 6000], ['larva', 3333333000, 1]]), 40000
+        expect(say snap).toBe 'cast larva rush x3'
+        rec = advisor.energyAdvice snap, SAVE
+        expect(rec.type).toBe 'hold'
+        expect(rec.mothsNext).toBe false
+        expect(say snap, SAVE).toBe 'saving energy for nexus 5: 6,000/36,000 energy; still need 3.33e9 larva (have 1)'
+
+      it 'suggests one larva rush when energy is full, so income is not wasted', ->
+        snap = withCap mk(1, 10000, 0, 50, nexus2(10000, 8.95e11)), 10000
+        rec = advisor.energyAdvice snap, SAVE
+        expect(rec.type).toBe 'energyFull'
+        expect(say snap, SAVE).toBe 'energy is full (10,000/10,000): cast larva rush x1 so the income is not wasted'
+        # just under the cap: keep holding
+        snap.energy.energy = D 9999
+        expect(advisor.energyAdvice(snap, SAVE).type).toBe 'hold'
+        # without a known cap it never claims "full"
+        delete snap.energy.cap
+        snap.energy.energy = D 1e6
+        expect(advisor.energyAdvice(snap, SAVE).type).toBe 'hold'
+
+      it 'reads the energy cap from the game', inject (game) ->
+        snap = advisor.snapshot()
+        expect(snap.energy.cap?.toString()).toBe game.unit('energy').capValue()?.toString()
+
     it 'is part of the full advice', ->
       snap = mk 5, 6000, 4000, 1, null
       expect(advisor.advise(snap, null, {}).energy.type).toBe 'cast'
