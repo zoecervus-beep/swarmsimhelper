@@ -17,7 +17,11 @@
    259200,
    30000
   ],
-  "meat_share_for_push": 0.5
+  "meat_share_for_push": 0.5,
+  "push_reserve_share": 0.01,
+  "climb_sizing": "rule 3 (advisor_sizing)",
+  "cooldown_s": 60,
+  "faster_level_rule": false
  },
  "state": {
   "run_age_s": 43500.0,
@@ -28,52 +32,57 @@
    {
     "tier": 1,
     "name": "drone",
-    "count": "1.3662881141323171e+29",
+    "count": "8.9179392997736427e+28",
     "prod_level": 10,
     "twin_level": 1,
     "H_s": "0",
     "passes_plain": true,
-    "since_last_hatch_s": 41400.0
+    "since_last_hatch_s": 41700.0,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 2,
     "name": "queen",
-    "count": "7.4217512516914589e+22",
+    "count": "4.1570442396936633e+22",
     "prod_level": 8,
-    "twin_level": 3,
-    "H_s": "4.8828125000000000e-02",
+    "twin_level": 2,
+    "H_s": "9.7656250000000000e-02",
     "passes_plain": true,
-    "since_last_hatch_s": 38400.0
+    "since_last_hatch_s": 39300.0,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 3,
     "name": "nest",
-    "count": "6.4086484423910624e+16",
+    "count": "4.3750170494651920e+16",
     "prod_level": 6,
     "twin_level": 5,
     "H_s": "4.8828125000000000e-01",
     "passes_plain": true,
-    "since_last_hatch_s": 30300.0
+    "since_last_hatch_s": 30300.0,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 4,
     "name": "greaterqueen",
-    "count": "94640903376.0",
+    "count": "147488614858.0",
     "prod_level": 4,
-    "twin_level": 6,
-    "H_s": "9.7656250000000000e+00",
+    "twin_level": 7,
+    "H_s": "4.8828125000000000e+00",
     "passes_plain": true,
-    "since_last_hatch_s": 4200.0
+    "since_last_hatch_s": 300.0,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 5,
     "name": "hive",
-    "count": "8663271.0",
+    "count": "257029.0",
     "prod_level": 2,
-    "twin_level": 1,
-    "H_s": "12500.0",
+    "twin_level": 0,
+    "H_s": "25000.0",
     "passes_plain": true,
-    "since_last_hatch_s": 300.0
+    "since_last_hatch_s": 300.0,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 6,
@@ -83,7 +92,8 @@
     "twin_level": 0,
     "H_s": "1000000.0",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 7,
@@ -93,7 +103,8 @@
     "twin_level": 0,
     "H_s": "10000000.0",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 8,
@@ -103,7 +114,8 @@
     "twin_level": 0,
     "H_s": "100000000.0",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 9,
@@ -113,7 +125,8 @@
     "twin_level": 0,
     "H_s": "1000000000.0",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 10,
@@ -123,7 +136,8 @@
     "twin_level": 0,
     "H_s": "10000000000.0",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 11,
@@ -133,7 +147,8 @@
     "twin_level": 0,
     "H_s": "1000000000000.0",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 12,
@@ -143,7 +158,8 @@
     "twin_level": 0,
     "H_s": "100000000000000.0",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 13,
@@ -153,7 +169,8 @@
     "twin_level": 0,
     "H_s": "1.0000000000000000e+16",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 14,
@@ -163,7 +180,8 @@
     "twin_level": 0,
     "H_s": "1.0000000000000000e+19",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 15,
@@ -173,7 +191,8 @@
     "twin_level": 0,
     "H_s": "9.9999999999999992e+22",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 16,
@@ -183,7 +202,8 @@
     "twin_level": 0,
     "H_s": "9.9999999999999996e+27",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 17,
@@ -193,7 +213,8 @@
     "twin_level": 0,
     "H_s": "9.9999999999999995e+33",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 18,
@@ -203,7 +224,8 @@
     "twin_level": 0,
     "H_s": "1.0000000000000000e+41",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 19,
@@ -213,7 +235,8 @@
     "twin_level": 0,
     "H_s": "9.9999999999999995e+48",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 20,
@@ -223,19 +246,21 @@
     "twin_level": null,
     "H_s": "9.9999999999999994e+57",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    }
   ],
+  "run_start_s_ago": 43500.0,
   "top_owned": 5,
   "larvae_held_back": {
-   "territory_purse": "1.2742649689316750e+00",
+   "territory_purse": "5.0855262391269207e-01",
    "nexus_saving": "3333333000.0",
    "clone_reserve": "0"
   },
   "moth_target": 4000,
-  "larvae": "5.0018301664205132e+09",
+  "larvae": "3.4754541563944135e+09",
   "larva_rate": "5.2637465061352716e+05",
-  "meat": "4.4315416745674227e+33",
+  "meat": "2.9146759105280845e+33",
   "achievement_points": 920
  },
  "decisions": {
@@ -249,13 +274,15 @@
     "tier": 5,
     "name": "hive",
     "outcome": "buys",
-    "n_sim": "473204.0",
+    "n_sim": "88493.0",
     "test": "plain"
    },
    {
     "tier": 4,
     "name": "greaterqueen",
-    "outcome": "bank"
+    "outcome": "buys",
+    "n_sim": "142032662.0",
+    "test": "plain"
    },
    {
     "tier": 3,
@@ -277,6 +304,9 @@
   "push": [],
   "larvae_for_push": null,
   "frontier_at_push": null,
-  "larvae_before_climb": "1.6684971651462479e+09"
+  "larvae_before_climb": "1.4212115588586092e+08",
+  "push_reserve": null,
+  "larvae_for_climb": null,
+  "climb_left": "8.8586091995239258e-01"
  }
 }

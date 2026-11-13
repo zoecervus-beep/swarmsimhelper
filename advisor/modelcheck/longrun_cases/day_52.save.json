@@ -1,50 +1,50 @@
 {
 "unittypes": {
 "invisiblehatchery": "1",
-"meat": "1.3973850739381652e+1025",
-"larva": "2.6220999999116803e+118",
+"meat": "1.9270014703901449e+1028",
+"larva": "4.7867325707198115e+118",
 "cocoon": "0",
-"territory": "1.4010097440340827e+1041",
-"energy": "2.3298410719408121e+03",
+"territory": "2.4066976705694030e+1043",
+"energy": "2.1902383796230342e+03",
 "respecEnergy": "0",
 "mtxEnergy": "8500.0",
 "nexus": "5",
 "crystal": "0",
 "mutagen": "6.0388900641879782e+07",
-"premutagen": "3.3846977123322041e+132",
+"premutagen": "6.6803701073881904e+132",
 "ascension": "1",
 "freeRespec": "4",
-"drone": "2.5788626582561097e+923",
-"queen": "1.5733865440573535e+831",
-"nest": "3.9343477269439082e+747",
-"greaterqueen": "1.2069183174320207e+672",
-"hive": "4.4024251373732273e+603",
-"hivequeen": "6.2625616163647580e+541",
-"empress": "5.3069850182029845e+485",
-"prophet": "7.4896668662822019e+434",
-"goddess": "5.4685921405041710e+388",
-"pantheon": "1.5736967661533087e+347",
-"pantheon2": "3.0947137833543092e+309",
-"pantheon3": "1.7790722305972545e+275",
-"pantheon4": "1.6939987494718222e+244",
-"pantheon5": "1.3691906417462516e+216",
-"overmind": "4.9132888595130291e+190",
-"overmind2": "4.1248794658552310e+167",
-"overmind3": "4.0317508497518487e+146",
-"overmind4": "7.2111780475147630e+111",
-"overmind5": "9.1907340677382436e+59",
-"overmind6": "0",
-"swarmling": "9.6919996156893745e+1020",
-"stinger": "1.0095549759823478e+1020",
-"spider": "5.7745162396738677e+1018",
-"mosquito": "1.9948670805419114e+1019",
-"locust": "9.9625125562101455e+1018",
-"roach": "4.6007699868626831e+1019",
-"giantspider": "3.5015100533394117e+1019",
-"centipede": "1.4636201567719420e+1020",
-"wasp": "1.1703300709918612e+1021",
-"devourer": "7.4103175190137124e+1021",
-"goon": "4.8139772258074073e+1022",
+"drone": "1.4810070885950770e+926",
+"queen": "3.6727782725853057e+833",
+"nest": "5.6785087487084775e+749",
+"greaterqueen": "8.2806432944475794e+673",
+"hive": "1.4945684077745161e+605",
+"hivequeen": "8.5629379698493595e+542",
+"empress": "4.0824532892488494e+486",
+"prophet": "4.2657478273402111e+435",
+"goddess": "2.4172580238526735e+389",
+"pantheon": "3.3244383401596059e+347",
+"pantheon2": "4.8931459769407563e+309",
+"pantheon3": "2.3004174628792558e+275",
+"pantheon4": "1.8527085701849586e+244",
+"pantheon5": "1.3189269198320567e+216",
+"overmind": "4.4044091645825599e+190",
+"overmind2": "3.6778726969956097e+167",
+"overmind3": "3.6604462832535330e+146",
+"overmind4": "4.0081847152136632e+120",
+"overmind5": "1.9500549831580330e+74",
+"overmind6": "4.2210911014980518e+17",
+"swarmling": "2.0403026705285890e+1023",
+"stinger": "2.3589151608516209e+1022",
+"spider": "1.0778275467167412e+1021",
+"mosquito": "4.8586816377203004e+1021",
+"locust": "6.5388485077238478e+1021",
+"roach": "5.6555357367517046e+1021",
+"giantspider": "4.6236779931373463e+1021",
+"centipede": "3.4240389884880334e+1022",
+"wasp": "2.8134390259593750e+1023",
+"devourer": "2.0321573522183661e+1024",
+"goon": "9.5855231320107416e+1024",
 "nightbug": "0",
 "moth": "30000.0",
 "bat": "0",
@@ -71,26 +71,26 @@
 "showAdvancedUnitData": true
 },
 "upgrades": {
-"hatchery": "1023",
-"droneprod": "327",
-"dronetwin": "7",
+"hatchery": "1026",
+"droneprod": "328",
+"dronetwin": "5",
 "swarmlingtwin": "5",
-"expansion": "2673",
+"expansion": "2679",
 "stingertwin": "4",
-"queenprod": "294",
+"queenprod": "295",
 "achievementbonus": "5",
-"queentwin": "6",
+"queentwin": "7",
 "spidertwin": "1",
 "mosquitotwin": "2",
 "nestprod": "265",
-"locusttwin": "2",
+"locusttwin": "3",
 "nexus1": "1",
 "nesttwin": "7",
-"roachtwin": "3",
+"roachtwin": "2",
 "nexus2": "1",
 "greaterqueenprod": "238",
-"giantspidertwin": "3",
-"centipedetwin": "6",
+"giantspidertwin": "2",
+"centipedetwin": "5",
 "nexus3": "1",
 "greaterqueentwin": "8",
 "nexus4": "1",
@@ -104,32 +104,32 @@
 "hivequeenprod": "192",
 "hivequeentwin": "11",
 "empressprod": "172",
-"empresstwin": "17",
+"empresstwin": "19",
 "prophetprod": "154",
-"prophettwin": "33",
+"prophettwin": "22",
 "goddessprod": "138",
-"goddesstwin": "42",
+"goddesstwin": "25",
 "pantheonprod": "123",
-"pantheontwin": "36",
+"pantheontwin": "30",
 "pantheon2prod": "109",
 "pantheon2twin": "27",
 "pantheon3prod": "97",
 "pantheon3twin": "33",
 "pantheon4prod": "86",
-"pantheon4twin": "45",
+"pantheon4twin": "39",
 "pantheon5prod": "76",
-"pantheon5twin": "57",
+"pantheon5twin": "53",
 "overmindprod": "67",
-"overmindtwin": "78",
+"overmindtwin": "60",
 "overmind2prod": "59",
-"overmind2twin": "87",
+"overmind2twin": "72",
 "overmind3prod": "52",
 "overmind3twin": "88",
-"overmind4prod": "39",
-"overmind4twin": "43",
-"overmind5prod": "21",
-"overmind5twin": "0",
-"overmind6prod": "0",
+"overmind4prod": "43",
+"overmind4twin": "55",
+"overmind5prod": "26",
+"overmind5twin": "9",
+"overmind6prod": "6",
 "stingerempower": "0",
 "spiderempower": "0",
 "mosquitoempower": "0",
@@ -141,8 +141,8 @@
 "devourerempower": "0",
 "goonempower": "0",
 "nexus5": "1",
-"larvarush": "5",
-"clonearmy": "3356",
+"larvarush": "1",
+"clonearmy": "3364",
 "mutatehatchery": "0",
 "mutatebat": "0",
 "mutateclone": "0",
@@ -159,74 +159,74 @@
 "byUnit": {
 "drone": {
 "clicks": 15,
-"num": "75125735137.0",
-"twinnum": "75125735137.0",
+"num": "74278989650.0",
+"twinnum": "74278989650.0",
 "elapsedFirst": 38488
 },
 "queen": {
 "clicks": 42,
-"num": "233437659335.0",
-"twinnum": "233437659335.0",
+"num": "1041890098188.0",
+"twinnum": "1041890098188.0",
 "elapsedFirst": 143018
 },
 "swarmling": {
 "clicks": 7,
-"num": "53673019904.0",
-"twinnum": "53673019904.0",
+"num": "44136615184.0",
+"twinnum": "44136615184.0",
 "elapsedFirst": 208577
 },
 "nest": {
 "clicks": 78,
-"num": "2636640532373.0",
-"twinnum": "2636640532373.0",
+"num": "174594198726.0",
+"twinnum": "174594198726.0",
 "elapsedFirst": 539295
 },
 "stinger": {
 "clicks": 4,
-"num": "5591678604.0",
-"twinnum": "5591678604.0",
+"num": "5103780756.0",
+"twinnum": "5103780756.0",
 "elapsedFirst": 587324
 },
 "spider": {
 "clicks": 6,
-"num": "320779169.0",
-"twinnum": "320779169.0",
+"num": "234154542.0",
+"twinnum": "234154542.0",
 "elapsedFirst": 1477426
 },
 "mosquito": {
 "clicks": 5,
-"num": "1105710585.0",
-"twinnum": "1105710585.0",
+"num": "1052024959.0",
+"twinnum": "1052024959.0",
 "elapsedFirst": 2717246
 },
 "greaterqueen": {
 "clicks": 199,
-"num": "17885599026385.0",
-"twinnum": "17885599026385.0",
+"num": "18154439769508.0",
+"twinnum": "18154439769508.0",
 "elapsedFirst": 3706629
 },
 "locust": {
 "clicks": 3,
-"num": "552700571.0",
-"twinnum": "552700571.0",
+"num": "1415476909.0",
+"twinnum": "1415476909.0",
 "elapsedFirst": 4063306
 },
 "roach": {
 "clicks": 12,
-"num": "2550148202.0",
-"twinnum": "2550148202.0",
+"num": "1225749337.0",
+"twinnum": "1225749337.0",
 "elapsedFirst": 5561407
 },
 "giantspider": {
 "clicks": 5,
-"num": "1940054114.0",
-"twinnum": "1940054114.0",
+"num": "1001189215.0",
+"twinnum": "1001189215.0",
 "elapsedFirst": 11419408
 },
 "hive": {
 "clicks": 202,
-"num": "5852818215449548.0",
-"twinnum": "5852818215449548.0",
+"num": "1.1205846060045744e+16",
+"twinnum": "1.1205846060045744e+16",
 "elapsedFirst": 13300146
 },
 "moth": {
@@ -237,26 +237,26 @@
 },
 "centipede": {
 "clicks": 1,
-"num": "8153790533.0",
-"twinnum": "8153790533.0",
+"num": "7455451035.0",
+"twinnum": "7455451035.0",
 "elapsedFirst": 42007111
 },
 "wasp": {
 "clicks": 5,
-"num": "64833723018.0",
-"twinnum": "64833723018.0",
+"num": "60883609973.0",
+"twinnum": "60883609973.0",
 "elapsedFirst": 44780918
 },
 "devourer": {
 "clicks": 11,
-"num": "412818777113.0",
-"twinnum": "412818777113.0",
+"num": "442046944286.0",
+"twinnum": "442046944286.0",
 "elapsedFirst": 50393018
 },
 "goon": {
 "clicks": 7,
-"num": "1.7136437375063617e+140",
-"twinnum": "1.7136437375063617e+140",
+"num": "3.3313720510312873e+140",
+"twinnum": "3.3313720510312873e+140",
 "elapsedFirst": 51796277
 },
 "energy": {
@@ -267,8 +267,8 @@
 },
 "hivequeen": {
 "clicks": 13,
-"num": "1.0370440953768859e+18",
-"twinnum": "1.0370440953768859e+18",
+"num": "1.0842896701781992e+18",
+"twinnum": "1.0842896701781992e+18",
 "elapsedFirst": 60453973
 },
 "cocoon": {
@@ -280,80 +280,86 @@
 "empress": {
 "clicks": 0,
 "elapsedFirst": 0,
-"num": "5.6789797585654914e+24",
-"twinnum": "5.6789797585654914e+24"
+"num": "5.1762485734174684e+26",
+"twinnum": "5.1762485734174684e+26"
 },
 "prophet": {
 "clicks": 0,
 "elapsedFirst": 0,
-"num": "7.1614368758439403e+41",
-"twinnum": "7.1614368758439403e+41"
+"num": "3.5426488313382304e+30",
+"twinnum": "3.5426488313382304e+30"
 },
 "goddess": {
 "clicks": 0,
 "elapsedFirst": 0,
-"num": "7.1023043926274492e+51",
-"twinnum": "7.1023043926274492e+51"
+"num": "3.3247504381700339e+34",
+"twinnum": "3.3247504381700339e+34"
 },
 "pantheon": {
 "clicks": 0,
 "elapsedFirst": 0,
-"num": "9.5698352935788418e+50",
-"twinnum": "9.5698352935788418e+50"
+"num": "1.2706009460258723e+43",
+"twinnum": "1.2706009460258723e+43"
 },
 "pantheon2": {
 "clicks": 0,
 "elapsedFirst": 0,
-"num": "1.9866753504961036e+51",
-"twinnum": "1.9866753504961036e+51"
+"num": "1.0478849245858333e+50",
+"twinnum": "1.0478849245858333e+50"
 },
 "pantheon3": {
 "clicks": 0,
 "elapsedFirst": 0,
-"num": "4.6774822038191937e+69",
-"twinnum": "4.6774822038191937e+69"
+"num": "2.9967961447502894e+57",
+"twinnum": "2.9967961447502894e+57"
 },
 "pantheon4": {
 "clicks": 0,
 "elapsedFirst": 0,
-"num": "7.9276275054969735e+77",
-"twinnum": "7.9276275054969735e+77"
+"num": "1.8982987167797026e+72",
+"twinnum": "1.8982987167797026e+72"
 },
 "pantheon5": {
 "clicks": 0,
 "elapsedFirst": 0,
-"num": "2.9581349808749602e+91",
-"twinnum": "2.9581349808749602e+91"
+"num": "1.2246700191504305e+86",
+"twinnum": "1.2246700191504305e+86"
 },
 "overmind": {
 "clicks": 0,
 "elapsedFirst": 0,
-"num": "1.0908140421957837e+118",
-"twinnum": "1.0908140421957837e+118"
+"num": "4.3695168106454008e+109",
+"twinnum": "4.3695168106454008e+109"
 },
 "overmind2": {
 "clicks": 0,
 "elapsedFirst": 0,
-"num": "1.1449705342453256e+135",
-"twinnum": "1.1449705342453256e+135"
+"num": "4.1180574352619569e+136",
+"twinnum": "4.1180574352619569e+136"
 },
 "overmind3": {
 "clicks": 0,
 "elapsedFirst": 0,
-"num": "4.6884805190964190e+146",
-"twinnum": "4.6884805190964190e+146"
+"num": "8.4040011265585440e+146",
+"twinnum": "8.4040011265585440e+146"
 },
 "overmind4": {
 "clicks": 0,
 "elapsedFirst": 0,
-"num": "7.2335126684934402e+111",
-"twinnum": "7.2335126684934402e+111"
+"num": "1.0238504755441915e+122",
+"twinnum": "1.0238504755441915e+122"
 },
 "overmind5": {
 "clicks": 0,
 "elapsedFirst": 0,
-"num": "9.3855759630671708e+59",
-"twinnum": "9.3855759630671708e+59"
+"num": "4.5052598677594477e+75",
+"twinnum": "4.5052598677594477e+75"
+},
+"overmind6": {
+"clicks": 0,
+"elapsedFirst": 0,
+"num": "4.3077012965177690e+17",
+"twinnum": "4.3077012965177690e+17"
 }
 },
 "byUpgrade": {
@@ -577,6 +583,7 @@
 "overmind5_1": 1,
 "overmind5_2": 1,
 "overmind5_3": 1,
+"overmind6_1": 1,
 "pantheon1": 1,
 "pantheon2": 1,
 "pantheon21": 1,

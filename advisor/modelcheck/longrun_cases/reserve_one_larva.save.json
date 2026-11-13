@@ -1,0 +1,536 @@
+{
+"unittypes": {
+"invisiblehatchery": "1",
+"meat": "1.2991528135337954e+54",
+"larva": "1.0058496856689453e+02",
+"cocoon": "0",
+"territory": "3.5632378607575058e+54",
+"energy": "2.0358565056966918e+03",
+"respecEnergy": "0",
+"mtxEnergy": "8500.0",
+"nexus": "5",
+"crystal": "0",
+"mutagen": "6.0388900641879782e+07",
+"premutagen": "5.8327957423275143e+07",
+"ascension": "1",
+"freeRespec": "4",
+"drone": "2.0499193950923834e+45",
+"queen": "9.0365414309808877e+36",
+"nest": "2.0409901765162745e+29",
+"greaterqueen": "1.6644670808514946e+22",
+"hive": "9347119396550438.0",
+"hivequeen": "0",
+"empress": "0",
+"prophet": "0",
+"goddess": "0",
+"pantheon": "0",
+"pantheon2": "0",
+"pantheon3": "0",
+"pantheon4": "0",
+"pantheon5": "0",
+"overmind": "0",
+"overmind2": "0",
+"overmind3": "0",
+"overmind4": "0",
+"overmind5": "0",
+"overmind6": "0",
+"swarmling": "2.6678342380256536e+34",
+"stinger": "3.0844416966269736e+33",
+"spider": "1.4093326805640846e+32",
+"mosquito": "6.3530560499725351e+32",
+"locust": "8.5499882826939612e+32",
+"roach": "7.3949968751327093e+32",
+"giantspider": "6.0457728325679378e+32",
+"centipede": "4.4771634021615641e+33",
+"wasp": "3.6787625034610247e+34",
+"devourer": "2.6571836814285776e+35",
+"goon": "1.2533722163065133e+36",
+"nightbug": "0",
+"moth": "4000.0",
+"bat": "0",
+"mutanthatchery": "0",
+"mutantbat": "0",
+"mutantclone": "0",
+"mutantswarmwarp": "0",
+"mutantrush": "0",
+"mutanteach": "0",
+"mutantfreq": "1000001.0",
+"mutantnexus": "1000001.0",
+"mutantarmy": "0",
+"mutantmeat": "0"
+},
+"date": {
+"started": "2026-11-10T22:18:19.823Z",
+"restarted": "2026-11-10T22:18:19.823Z",
+"saved": "2026-11-12T22:18:19.823Z",
+"reified": "2026-11-12T22:18:19.823Z",
+"closed": "2026-11-10T22:18:19.823Z",
+"addUnitTimed-crystal": "2026-11-12T22:14:49.034Z"
+},
+"options": {
+"showAdvancedUnitData": true
+},
+"upgrades": {
+"hatchery": "52",
+"droneprod": "16",
+"dronetwin": "5",
+"swarmlingtwin": "5",
+"expansion": "138",
+"stingertwin": "4",
+"queenprod": "13",
+"achievementbonus": "5",
+"queentwin": "7",
+"spidertwin": "1",
+"mosquitotwin": "2",
+"nestprod": "10",
+"locusttwin": "3",
+"nexus1": "1",
+"nesttwin": "7",
+"roachtwin": "2",
+"nexus2": "1",
+"greaterqueenprod": "8",
+"giantspidertwin": "2",
+"centipedetwin": "5",
+"nexus3": "1",
+"greaterqueentwin": "8",
+"nexus4": "1",
+"cocooning": "1",
+"hiveprod": "5",
+"wasptwin": "6",
+"devourertwin": "6",
+"goontwin": "7",
+"hivetwin": "10",
+"swarmlingempower": "0",
+"hivequeenprod": "0",
+"hivequeentwin": "0",
+"empressprod": "0",
+"empresstwin": "0",
+"prophetprod": "0",
+"prophettwin": "0",
+"goddessprod": "0",
+"goddesstwin": "0",
+"pantheonprod": "0",
+"pantheontwin": "0",
+"pantheon2prod": "0",
+"pantheon2twin": "0",
+"pantheon3prod": "0",
+"pantheon3twin": "0",
+"pantheon4prod": "0",
+"pantheon4twin": "0",
+"pantheon5prod": "0",
+"pantheon5twin": "0",
+"overmindprod": "0",
+"overmindtwin": "0",
+"overmind2prod": "0",
+"overmind2twin": "0",
+"overmind3prod": "0",
+"overmind3twin": "0",
+"overmind4prod": "0",
+"overmind4twin": "0",
+"overmind5prod": "0",
+"overmind5twin": "0",
+"overmind6prod": "0",
+"stingerempower": "0",
+"spiderempower": "0",
+"mosquitoempower": "0",
+"locustempower": "0",
+"roachempower": "0",
+"giantspiderempower": "0",
+"centipedeempower": "0",
+"waspempower": "0",
+"devourerempower": "0",
+"goonempower": "0",
+"nexus5": "1",
+"larvarush": "1",
+"clonearmy": "79",
+"mutatehatchery": "0",
+"mutatebat": "0",
+"mutateclone": "0",
+"mutateswarmwarp": "0",
+"mutaterush": "0",
+"mutateeach": "0",
+"mutatefreq": "1",
+"mutatenexus": "1",
+"mutatearmy": "0",
+"mutatemeat": "0",
+"mutatehidden": "2"
+},
+"statistics": {
+"byUnit": {
+"drone": {
+"clicks": 15,
+"num": "74278989650.0",
+"twinnum": "74278989650.0",
+"elapsedFirst": 38488
+},
+"queen": {
+"clicks": 42,
+"num": "1041890098188.0",
+"twinnum": "1041890098188.0",
+"elapsedFirst": 143018
+},
+"swarmling": {
+"clicks": 7,
+"num": "44136615184.0",
+"twinnum": "44136615184.0",
+"elapsedFirst": 208577
+},
+"nest": {
+"clicks": 78,
+"num": "174594198726.0",
+"twinnum": "174594198726.0",
+"elapsedFirst": 539295
+},
+"stinger": {
+"clicks": 4,
+"num": "5103780756.0",
+"twinnum": "5103780756.0",
+"elapsedFirst": 587324
+},
+"spider": {
+"clicks": 6,
+"num": "234154542.0",
+"twinnum": "234154542.0",
+"elapsedFirst": 1477426
+},
+"mosquito": {
+"clicks": 5,
+"num": "1052024959.0",
+"twinnum": "1052024959.0",
+"elapsedFirst": 2717246
+},
+"greaterqueen": {
+"clicks": 199,
+"num": "18154439769508.0",
+"twinnum": "18154439769508.0",
+"elapsedFirst": 3706629
+},
+"locust": {
+"clicks": 3,
+"num": "1415476909.0",
+"twinnum": "1415476909.0",
+"elapsedFirst": 4063306
+},
+"roach": {
+"clicks": 12,
+"num": "1225749337.0",
+"twinnum": "1225749337.0",
+"elapsedFirst": 5561407
+},
+"giantspider": {
+"clicks": 5,
+"num": "1001189215.0",
+"twinnum": "1001189215.0",
+"elapsedFirst": 11419408
+},
+"hive": {
+"clicks": 202,
+"num": "1.0612632583488944e+16",
+"twinnum": "1.0612632583488944e+16",
+"elapsedFirst": 13300146
+},
+"moth": {
+"clicks": 36,
+"num": "3665.0",
+"twinnum": "3665.0",
+"elapsedFirst": 41969140
+},
+"centipede": {
+"clicks": 1,
+"num": "7455451035.0",
+"twinnum": "7455451035.0",
+"elapsedFirst": 42007111
+},
+"wasp": {
+"clicks": 5,
+"num": "60883609973.0",
+"twinnum": "60883609973.0",
+"elapsedFirst": 44780918
+},
+"devourer": {
+"clicks": 11,
+"num": "442046944286.0",
+"twinnum": "442046944286.0",
+"elapsedFirst": 50393018
+},
+"goon": {
+"clicks": 7,
+"num": "2682155975616508.0",
+"twinnum": "2682155975616508.0",
+"elapsedFirst": 51796277
+},
+"energy": {
+"clicks": 7,
+"num": "8500.0",
+"twinnum": "8500.0",
+"elapsedFirst": 52690936
+},
+"hivequeen": {
+"clicks": 13,
+"num": "1.5092829774394781e+17",
+"twinnum": "1.5092829774394781e+17",
+"elapsedFirst": 60453973
+},
+"cocoon": {
+"clicks": 1,
+"num": "2000000000.0",
+"twinnum": "2000000000.0",
+"elapsedFirst": 70691943
+},
+"empress": {
+"clicks": 0,
+"elapsedFirst": 0,
+"num": "1111111111.0",
+"twinnum": "1111111111.0"
+}
+},
+"byUpgrade": {
+"hatchery": {
+"clicks": 25,
+"num": "32",
+"elapsedFirst": 90028
+},
+"droneprod": {
+"clicks": 10,
+"num": "10",
+"elapsedFirst": 116188
+},
+"dronetwin": {
+"clicks": 17,
+"num": "21",
+"elapsedFirst": 156338
+},
+"swarmlingtwin": {
+"clicks": 5,
+"num": "5",
+"elapsedFirst": 207737
+},
+"expansion": {
+"clicks": 56,
+"num": "65",
+"elapsedFirst": 223707
+},
+"stingertwin": {
+"clicks": 5,
+"num": "5",
+"elapsedFirst": 399825
+},
+"queenprod": {
+"clicks": 8,
+"num": "8",
+"elapsedFirst": 417296
+},
+"achievementbonus": {
+"clicks": 5,
+"num": "5",
+"elapsedFirst": 522604
+},
+"queentwin": {
+"clicks": 6,
+"num": "16",
+"elapsedFirst": 543364
+},
+"spidertwin": {
+"clicks": 5,
+"num": "5",
+"elapsedFirst": 680153
+},
+"mosquitotwin": {
+"clicks": 4,
+"num": "5",
+"elapsedFirst": 1474896
+},
+"nestprod": {
+"clicks": 6,
+"num": "6",
+"elapsedFirst": 1671374
+},
+"locusttwin": {
+"clicks": 2,
+"num": "5",
+"elapsedFirst": 3256422
+},
+"nexus1": {
+"clicks": 1,
+"num": "1",
+"elapsedFirst": 3256422
+},
+"nesttwin": {
+"clicks": 6,
+"num": "11",
+"elapsedFirst": 3710209
+},
+"roachtwin": {
+"clicks": 5,
+"num": "5",
+"elapsedFirst": 4504093
+},
+"nexus2": {
+"clicks": 1,
+"num": "1",
+"elapsedFirst": 4506553
+},
+"greaterqueenprod": {
+"clicks": 4,
+"num": "4",
+"elapsedFirst": 5482197
+},
+"giantspidertwin": {
+"clicks": 3,
+"num": "5",
+"elapsedFirst": 6078894
+},
+"centipedetwin": {
+"clicks": 2,
+"num": "5",
+"elapsedFirst": 10937621
+},
+"nexus3": {
+"clicks": 1,
+"num": "1",
+"elapsedFirst": 12135024
+},
+"greaterqueentwin": {
+"clicks": 6,
+"num": "6",
+"elapsedFirst": 13307026
+},
+"nexus4": {
+"clicks": 1,
+"num": "1",
+"elapsedFirst": 41957571
+},
+"cocooning": {
+"clicks": 1,
+"num": "1",
+"elapsedFirst": 41996871
+},
+"hiveprod": {
+"clicks": 3,
+"num": "3",
+"elapsedFirst": 42386882
+},
+"wasptwin": {
+"clicks": 2,
+"num": "5",
+"elapsedFirst": 42641769
+},
+"devourertwin": {
+"clicks": 2,
+"num": "5",
+"elapsedFirst": 42646258
+},
+"goontwin": {
+"clicks": 5,
+"num": "5",
+"elapsedFirst": 45528940
+},
+"hivetwin": {
+"clicks": 3,
+"num": "3",
+"elapsedFirst": 60462103
+},
+"swarmlingempower": {
+"clicks": 1,
+"num": "1",
+"elapsedFirst": 68203231
+}
+},
+"clicks": 863
+},
+"achievements": {
+"ascension1": 1,
+"centipede1": 1,
+"centipede2": 1,
+"changelog": 1,
+"clickme": 1,
+"debug": 1,
+"devourer1": 1,
+"devourer2": 1,
+"drone1": 1,
+"drone2": 1,
+"drone3": 1,
+"empress1": 1,
+"empress2": 1,
+"expansion1": 1,
+"expansion2": 1,
+"expansion3": 1,
+"expansion4": 1,
+"giantspider1": 1,
+"giantspider2": 1,
+"goon1": 1,
+"goon2": 1,
+"goon3": 1,
+"greaterqueen1": 1,
+"greaterqueen2": 1,
+"greaterqueen3": 1,
+"hive1": 1,
+"hive2": 1,
+"hive3": 1,
+"hivequeen1": 1,
+"hivequeen2": 1,
+"hivequeen3": 1,
+"import": 1,
+"konami": 1,
+"locust1": 1,
+"locust2": 1,
+"mosquito1": 1,
+"mosquito2": 1,
+"mutation1": 1,
+"nest1": 1,
+"nest2": 1,
+"nest3": 1,
+"nexus1": 1,
+"nexus2": 1,
+"queen1": 1,
+"queen2": 1,
+"queen3": 1,
+"roach1": 1,
+"roach2": 1,
+"spider1": 1,
+"spider2": 1,
+"stinger1": 1,
+"stinger2": 1,
+"swarmling1": 1,
+"swarmling2": 1,
+"therightquestion": 1,
+"tutorial": 1,
+"wasp1": 1,
+"wasp2": 1
+},
+"watched": {
+"droneprod": 2,
+"dronetwin": 0,
+"swarmlingtwin": 4,
+"queenprod": 2,
+"stingertwin": 4,
+"spidertwin": 4,
+"mosquitotwin": 4,
+"nestprod": 2,
+"queentwin": 0,
+"greaterqueenprod": 2,
+"locusttwin": 4,
+"roachtwin": 4,
+"giantspidertwin": 4,
+"nesttwin": 0,
+"centipedetwin": 4,
+"hiveprod": 2,
+"wasptwin": 4,
+"devourertwin": 4,
+"goontwin": 4,
+"swarmlingempower": 4,
+"greaterqueentwin": 0
+},
+"skippedMillis": 0,
+"version": {
+"started": "1.1.17",
+"saved": "1.1.17"
+},
+"achievementsShown": {
+"earned": false,
+"unearned": true,
+"masked": true,
+"order": "percentComplete",
+"reverse": true
+}
+}

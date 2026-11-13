@@ -17,7 +17,11 @@
    259200,
    30000
   ],
-  "meat_share_for_push": 0.5
+  "meat_share_for_push": 0.5,
+  "push_reserve_share": 0.01,
+  "climb_sizing": "rule 3 (advisor_sizing)",
+  "cooldown_s": 60,
+  "faster_level_rule": false
  },
  "state": {
   "run_age_s": 72406.0,
@@ -33,7 +37,8 @@
     "twin_level": 21,
     "H_s": "0",
     "passes_plain": true,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 2,
@@ -43,7 +48,8 @@
     "twin_level": 16,
     "H_s": "5.9604644775390625e-06",
     "passes_plain": true,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 3,
@@ -53,7 +59,8 @@
     "twin_level": 11,
     "H_s": "7.6293945312500000e-03",
     "passes_plain": true,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 4,
@@ -63,7 +70,8 @@
     "twin_level": 6,
     "H_s": "9.7656250000000000e+00",
     "passes_plain": true,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 5,
@@ -73,7 +81,8 @@
     "twin_level": 3,
     "H_s": "1.5625000000000000e+03",
     "passes_plain": true,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 6,
@@ -83,7 +92,8 @@
     "twin_level": 0,
     "H_s": "1000000.0",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 7,
@@ -93,7 +103,8 @@
     "twin_level": 0,
     "H_s": "10000000.0",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 8,
@@ -103,7 +114,8 @@
     "twin_level": 0,
     "H_s": "100000000.0",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 9,
@@ -113,7 +125,8 @@
     "twin_level": 0,
     "H_s": "1000000000.0",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 10,
@@ -123,7 +136,8 @@
     "twin_level": 0,
     "H_s": "10000000000.0",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 11,
@@ -133,7 +147,8 @@
     "twin_level": 0,
     "H_s": "1000000000000.0",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 12,
@@ -143,7 +158,8 @@
     "twin_level": 0,
     "H_s": "100000000000000.0",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 13,
@@ -153,7 +169,8 @@
     "twin_level": 0,
     "H_s": "1.0000000000000000e+16",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 14,
@@ -163,7 +180,8 @@
     "twin_level": 0,
     "H_s": "1.0000000000000000e+19",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 15,
@@ -173,7 +191,8 @@
     "twin_level": 0,
     "H_s": "9.9999999999999992e+22",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 16,
@@ -183,7 +202,8 @@
     "twin_level": 0,
     "H_s": "9.9999999999999996e+27",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 17,
@@ -193,7 +213,8 @@
     "twin_level": 0,
     "H_s": "9.9999999999999995e+33",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 18,
@@ -203,7 +224,8 @@
     "twin_level": 0,
     "H_s": "1.0000000000000000e+41",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 19,
@@ -213,7 +235,8 @@
     "twin_level": 0,
     "H_s": "9.9999999999999995e+48",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    },
    {
     "tier": 20,
@@ -223,9 +246,11 @@
     "twin_level": null,
     "H_s": "9.9999999999999994e+57",
     "passes_plain": false,
-    "since_last_hatch_s": null
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null
    }
   ],
+  "run_start_s_ago": 72406.0,
   "top_owned": 6,
   "larvae_held_back": {
    "territory_purse": "0",
@@ -282,6 +307,9 @@
   "push": [],
   "larvae_for_push": null,
   "frontier_at_push": null,
-  "larvae_before_climb": "0"
+  "larvae_before_climb": "0",
+  "push_reserve": null,
+  "larvae_for_climb": null,
+  "climb_left": "0"
  }
 }

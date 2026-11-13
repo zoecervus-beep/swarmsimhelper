@@ -1,6 +1,6 @@
 {
  "case": "push_binds_meat",
- "exercises": "meat set to 2 x (what share and larvae allow) x the meat price of empress, so the push line hatches but half the meat binds",
+ "exercises": "meat set to 2 x (what share and larvae allow) x the meat price of hivequeen, so the push line hatches but half the meat binds",
  "save": "push_binds_meat.save.json",
  "config": {
   "age_multiple": 5,
@@ -17,27 +17,32 @@
    259200,
    30000
   ],
-  "meat_share_for_push": 0.5
+  "meat_share_for_push": 0.5,
+  "push_reserve_share": 0.01,
+  "climb_sizing": "rule 3 (advisor_sizing)",
+  "cooldown_s": 60,
+  "faster_level_rule": false
  },
  "state": {
-  "run_age_s": 174000.0,
+  "run_age_s": 172800.0,
   "gate_active": true,
-  "horizon_s": 870000.0,
-  "frontier": 6,
+  "horizon_s": 864000.0,
+  "frontier": 5,
   "tiers": [
    {
     "tier": 1,
     "name": "drone",
-    "count": "1.5871688911213710e+45",
+    "count": "2.0499193950923834e+45",
     "prod_level": 16,
-    "twin_level": 7,
+    "twin_level": 5,
     "H_s": "0",
     "passes_plain": true,
-    "since_last_hatch_s": 170400.0,
+    "since_last_hatch_s": 169500.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "queen",
-     "price": "10000000.0",
-     "pay_held": "6.3496556012950987e+36",
+     "price": "100000.0",
+     "pay_held": "9.0365414309808877e+36",
      "pushed_pay_tier": false,
      "suppressed": false
     }
@@ -45,16 +50,17 @@
    {
     "tier": 2,
     "name": "queen",
-    "count": "6.3496556012950987e+36",
+    "count": "9.0365414309808877e+36",
     "prod_level": 13,
-    "twin_level": 6,
-    "H_s": "1.9073486328125000e-04",
+    "twin_level": 7,
+    "H_s": "9.5367431640625000e-05",
     "passes_plain": true,
-    "since_last_hatch_s": 169800.0,
+    "since_last_hatch_s": 168900.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "nest",
-     "price": "1000000.0",
-     "pay_held": "1.1382571774891532e+29",
+     "price": "10000000.0",
+     "pay_held": "2.0409901765162745e+29",
      "pushed_pay_tier": false,
      "suppressed": false
     }
@@ -62,16 +68,17 @@
    {
     "tier": 3,
     "name": "nest",
-    "count": "1.1382571774891532e+29",
+    "count": "2.0409901765162745e+29",
     "prod_level": 10,
     "twin_level": 7,
     "H_s": "7.6293945312500000e-03",
     "passes_plain": true,
-    "since_last_hatch_s": 168600.0,
+    "since_last_hatch_s": 167700.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "greaterqueen",
      "price": "10000000.0",
-     "pay_held": "7.0755306493009419e+21",
+     "pay_held": "1.6644670808514946e+22",
      "pushed_pay_tier": false,
      "suppressed": false
     }
@@ -79,16 +86,17 @@
    {
     "tier": 4,
     "name": "greaterqueen",
-    "count": "7.0755306493009419e+21",
+    "count": "1.6644670808514946e+22",
     "prod_level": 8,
     "twin_level": 8,
     "H_s": "1.5258789062500000e-01",
     "passes_plain": true,
-    "since_last_hatch_s": 153300.0,
+    "since_last_hatch_s": 152700.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "hive",
      "price": "100000000.0",
-     "pay_held": "3599190747608641.0",
+     "pay_held": "9347119396550438.0",
      "pushed_pay_tier": false,
      "suppressed": false
     }
@@ -96,32 +104,34 @@
    {
     "tier": 5,
     "name": "hive",
-    "count": "3599190747608641.0",
+    "count": "9347119396550438.0",
     "prod_level": 5,
     "twin_level": 10,
     "H_s": "3.0517578125000000e+00",
     "passes_plain": true,
     "since_last_hatch_s": 300.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "hivequeen",
      "price": "10000000000.0",
-     "pay_held": "2318076256.0",
-     "pushed_pay_tier": false,
-     "suppressed": false
+     "pay_held": "0",
+     "pushed_pay_tier": true,
+     "suppressed": true
     }
    },
    {
     "tier": 6,
     "name": "hivequeen",
-    "count": "2318076256.0",
-    "prod_level": 3,
-    "twin_level": 3,
-    "H_s": "15625.0",
-    "passes_plain": true,
-    "since_last_hatch_s": 300.0,
+    "count": "0",
+    "prod_level": 0,
+    "twin_level": 0,
+    "H_s": "1000000.0",
+    "passes_plain": false,
+    "since_last_hatch_s": null,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "empress",
-     "price": "1000.0",
+     "price": "1.0",
      "pay_held": "0",
      "pushed_pay_tier": true,
      "suppressed": true
@@ -136,55 +146,14 @@
     "H_s": "10000000.0",
     "passes_plain": false,
     "since_last_hatch_s": null,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "prophet",
      "price": "1.0",
      "pay_held": "0",
      "pushed_pay_tier": true,
      "suppressed": true
-    },
-    "faster_levels_pass_if_got_at_least": [
-     {
-      "L": 1,
-      "faster_price_total": "66.0",
-      "got_min": null
-     },
-     {
-      "L": 2,
-      "faster_price_total": "44022.0",
-      "got_min": null
-     },
-     {
-      "L": 3,
-      "faster_price_total": "29318718.0",
-      "got_min": null
-     },
-     {
-      "L": 4,
-      "faster_price_total": "19526266254.0",
-      "got_min": "6.9338169963183670e+10"
-     },
-     {
-      "L": 5,
-      "faster_price_total": "13004493325230.0",
-      "got_min": "2.0294007520986727e+13"
-     },
-     {
-      "L": 6,
-      "faster_price_total": "8660992554603246.0",
-      "got_min": "1.0557006686521644e+16"
-     },
-     {
-      "L": 7,
-      "faster_price_total": "5.7682210413657620e+18",
-      "got_min": "6.3373036224002693e+18"
-     },
-     {
-      "L": 8,
-      "faster_price_total": "3.8416352135495974e+21",
-      "got_min": "4.0222310772929971e+21"
-     }
-    ]
+    }
    },
    {
     "tier": 8,
@@ -195,55 +164,14 @@
     "H_s": "100000000.0",
     "passes_plain": false,
     "since_last_hatch_s": null,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "goddess",
      "price": "1.0",
      "pay_held": "0",
      "pushed_pay_tier": true,
      "suppressed": true
-    },
-    "faster_levels_pass_if_got_at_least": [
-     {
-      "L": 1,
-      "faster_price_total": "66.0",
-      "got_min": null
-     },
-     {
-      "L": 2,
-      "faster_price_total": "44022.0",
-      "got_min": null
-     },
-     {
-      "L": 3,
-      "faster_price_total": "29318718.0",
-      "got_min": null
-     },
-     {
-      "L": 4,
-      "faster_price_total": "19526266254.0",
-      "got_min": null
-     },
-     {
-      "L": 5,
-      "faster_price_total": "13004493325230.0",
-      "got_min": null
-     },
-     {
-      "L": 6,
-      "faster_price_total": "8660992554603246.0",
-      "got_min": null
-     },
-     {
-      "L": 7,
-      "faster_price_total": "5.7682210413657620e+18",
-      "got_min": "5.6544814715360141e+19"
-     },
-     {
-      "L": 8,
-      "faster_price_total": "3.8416352135495974e+21",
-      "got_min": "6.9720420042516810e+21"
-     }
-    ]
+    }
    },
    {
     "tier": 9,
@@ -254,55 +182,14 @@
     "H_s": "1000000000.0",
     "passes_plain": false,
     "since_last_hatch_s": null,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "pantheon",
      "price": "1.0",
      "pay_held": "0",
      "pushed_pay_tier": true,
      "suppressed": true
-    },
-    "faster_levels_pass_if_got_at_least": [
-     {
-      "L": 1,
-      "faster_price_total": "66.0",
-      "got_min": null
-     },
-     {
-      "L": 2,
-      "faster_price_total": "44022.0",
-      "got_min": null
-     },
-     {
-      "L": 3,
-      "faster_price_total": "29318718.0",
-      "got_min": null
-     },
-     {
-      "L": 4,
-      "faster_price_total": "19526266254.0",
-      "got_min": null
-     },
-     {
-      "L": 5,
-      "faster_price_total": "13004493325230.0",
-      "got_min": null
-     },
-     {
-      "L": 6,
-      "faster_price_total": "8660992554603246.0",
-      "got_min": null
-     },
-     {
-      "L": 7,
-      "faster_price_total": "5.7682210413657620e+18",
-      "got_min": null
-     },
-     {
-      "L": 8,
-      "faster_price_total": "3.8416352135495974e+21",
-      "got_min": null
-     }
-    ]
+    }
    },
    {
     "tier": 10,
@@ -313,55 +200,14 @@
     "H_s": "10000000000.0",
     "passes_plain": false,
     "since_last_hatch_s": null,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "pantheon2",
      "price": "1.0",
      "pay_held": "0",
      "pushed_pay_tier": true,
      "suppressed": true
-    },
-    "faster_levels_pass_if_got_at_least": [
-     {
-      "L": 1,
-      "faster_price_total": "66.0",
-      "got_min": null
-     },
-     {
-      "L": 2,
-      "faster_price_total": "44022.0",
-      "got_min": null
-     },
-     {
-      "L": 3,
-      "faster_price_total": "29318718.0",
-      "got_min": null
-     },
-     {
-      "L": 4,
-      "faster_price_total": "19526266254.0",
-      "got_min": null
-     },
-     {
-      "L": 5,
-      "faster_price_total": "13004493325230.0",
-      "got_min": null
-     },
-     {
-      "L": 6,
-      "faster_price_total": "8660992554603246.0",
-      "got_min": null
-     },
-     {
-      "L": 7,
-      "faster_price_total": "5.7682210413657620e+18",
-      "got_min": null
-     },
-     {
-      "L": 8,
-      "faster_price_total": "3.8416352135495974e+21",
-      "got_min": null
-     }
-    ]
+    }
    },
    {
     "tier": 11,
@@ -372,55 +218,14 @@
     "H_s": "1000000000000.0",
     "passes_plain": false,
     "since_last_hatch_s": null,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "pantheon3",
      "price": "1.0",
      "pay_held": "0",
      "pushed_pay_tier": true,
      "suppressed": true
-    },
-    "faster_levels_pass_if_got_at_least": [
-     {
-      "L": 1,
-      "faster_price_total": "66.0",
-      "got_min": null
-     },
-     {
-      "L": 2,
-      "faster_price_total": "44022.0",
-      "got_min": null
-     },
-     {
-      "L": 3,
-      "faster_price_total": "29318718.0",
-      "got_min": null
-     },
-     {
-      "L": 4,
-      "faster_price_total": "19526266254.0",
-      "got_min": null
-     },
-     {
-      "L": 5,
-      "faster_price_total": "13004493325230.0",
-      "got_min": null
-     },
-     {
-      "L": 6,
-      "faster_price_total": "8660992554603246.0",
-      "got_min": null
-     },
-     {
-      "L": 7,
-      "faster_price_total": "5.7682210413657620e+18",
-      "got_min": null
-     },
-     {
-      "L": 8,
-      "faster_price_total": "3.8416352135495974e+21",
-      "got_min": null
-     }
-    ]
+    }
    },
    {
     "tier": 12,
@@ -431,55 +236,14 @@
     "H_s": "100000000000000.0",
     "passes_plain": false,
     "since_last_hatch_s": null,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "pantheon4",
      "price": "1.0",
      "pay_held": "0",
      "pushed_pay_tier": true,
      "suppressed": true
-    },
-    "faster_levels_pass_if_got_at_least": [
-     {
-      "L": 1,
-      "faster_price_total": "66.0",
-      "got_min": null
-     },
-     {
-      "L": 2,
-      "faster_price_total": "44022.0",
-      "got_min": null
-     },
-     {
-      "L": 3,
-      "faster_price_total": "29318718.0",
-      "got_min": null
-     },
-     {
-      "L": 4,
-      "faster_price_total": "19526266254.0",
-      "got_min": null
-     },
-     {
-      "L": 5,
-      "faster_price_total": "13004493325230.0",
-      "got_min": null
-     },
-     {
-      "L": 6,
-      "faster_price_total": "8660992554603246.0",
-      "got_min": null
-     },
-     {
-      "L": 7,
-      "faster_price_total": "5.7682210413657620e+18",
-      "got_min": null
-     },
-     {
-      "L": 8,
-      "faster_price_total": "3.8416352135495974e+21",
-      "got_min": null
-     }
-    ]
+    }
    },
    {
     "tier": 13,
@@ -490,55 +254,14 @@
     "H_s": "1.0000000000000000e+16",
     "passes_plain": false,
     "since_last_hatch_s": null,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "pantheon5",
      "price": "1.0",
      "pay_held": "0",
      "pushed_pay_tier": true,
      "suppressed": true
-    },
-    "faster_levels_pass_if_got_at_least": [
-     {
-      "L": 1,
-      "faster_price_total": "66.0",
-      "got_min": null
-     },
-     {
-      "L": 2,
-      "faster_price_total": "44022.0",
-      "got_min": null
-     },
-     {
-      "L": 3,
-      "faster_price_total": "29318718.0",
-      "got_min": null
-     },
-     {
-      "L": 4,
-      "faster_price_total": "19526266254.0",
-      "got_min": null
-     },
-     {
-      "L": 5,
-      "faster_price_total": "13004493325230.0",
-      "got_min": null
-     },
-     {
-      "L": 6,
-      "faster_price_total": "8660992554603246.0",
-      "got_min": null
-     },
-     {
-      "L": 7,
-      "faster_price_total": "5.7682210413657620e+18",
-      "got_min": null
-     },
-     {
-      "L": 8,
-      "faster_price_total": "3.8416352135495974e+21",
-      "got_min": null
-     }
-    ]
+    }
    },
    {
     "tier": 14,
@@ -549,55 +272,14 @@
     "H_s": "1.0000000000000000e+19",
     "passes_plain": false,
     "since_last_hatch_s": null,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "overmind",
      "price": "1.0",
      "pay_held": "0",
      "pushed_pay_tier": true,
      "suppressed": true
-    },
-    "faster_levels_pass_if_got_at_least": [
-     {
-      "L": 1,
-      "faster_price_total": "66.0",
-      "got_min": null
-     },
-     {
-      "L": 2,
-      "faster_price_total": "44022.0",
-      "got_min": null
-     },
-     {
-      "L": 3,
-      "faster_price_total": "29318718.0",
-      "got_min": null
-     },
-     {
-      "L": 4,
-      "faster_price_total": "19526266254.0",
-      "got_min": null
-     },
-     {
-      "L": 5,
-      "faster_price_total": "13004493325230.0",
-      "got_min": null
-     },
-     {
-      "L": 6,
-      "faster_price_total": "8660992554603246.0",
-      "got_min": null
-     },
-     {
-      "L": 7,
-      "faster_price_total": "5.7682210413657620e+18",
-      "got_min": null
-     },
-     {
-      "L": 8,
-      "faster_price_total": "3.8416352135495974e+21",
-      "got_min": null
-     }
-    ]
+    }
    },
    {
     "tier": 15,
@@ -608,55 +290,14 @@
     "H_s": "9.9999999999999992e+22",
     "passes_plain": false,
     "since_last_hatch_s": null,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "overmind2",
      "price": "1.0",
      "pay_held": "0",
      "pushed_pay_tier": true,
      "suppressed": true
-    },
-    "faster_levels_pass_if_got_at_least": [
-     {
-      "L": 1,
-      "faster_price_total": "66.0",
-      "got_min": null
-     },
-     {
-      "L": 2,
-      "faster_price_total": "44022.0",
-      "got_min": null
-     },
-     {
-      "L": 3,
-      "faster_price_total": "29318718.0",
-      "got_min": null
-     },
-     {
-      "L": 4,
-      "faster_price_total": "19526266254.0",
-      "got_min": null
-     },
-     {
-      "L": 5,
-      "faster_price_total": "13004493325230.0",
-      "got_min": null
-     },
-     {
-      "L": 6,
-      "faster_price_total": "8660992554603246.0",
-      "got_min": null
-     },
-     {
-      "L": 7,
-      "faster_price_total": "5.7682210413657620e+18",
-      "got_min": null
-     },
-     {
-      "L": 8,
-      "faster_price_total": "3.8416352135495974e+21",
-      "got_min": null
-     }
-    ]
+    }
    },
    {
     "tier": 16,
@@ -667,55 +308,14 @@
     "H_s": "9.9999999999999996e+27",
     "passes_plain": false,
     "since_last_hatch_s": null,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "overmind3",
      "price": "1.0",
      "pay_held": "0",
      "pushed_pay_tier": true,
      "suppressed": true
-    },
-    "faster_levels_pass_if_got_at_least": [
-     {
-      "L": 1,
-      "faster_price_total": "66.0",
-      "got_min": null
-     },
-     {
-      "L": 2,
-      "faster_price_total": "44022.0",
-      "got_min": null
-     },
-     {
-      "L": 3,
-      "faster_price_total": "29318718.0",
-      "got_min": null
-     },
-     {
-      "L": 4,
-      "faster_price_total": "19526266254.0",
-      "got_min": null
-     },
-     {
-      "L": 5,
-      "faster_price_total": "13004493325230.0",
-      "got_min": null
-     },
-     {
-      "L": 6,
-      "faster_price_total": "8660992554603246.0",
-      "got_min": null
-     },
-     {
-      "L": 7,
-      "faster_price_total": "5.7682210413657620e+18",
-      "got_min": null
-     },
-     {
-      "L": 8,
-      "faster_price_total": "3.8416352135495974e+21",
-      "got_min": null
-     }
-    ]
+    }
    },
    {
     "tier": 17,
@@ -726,55 +326,14 @@
     "H_s": "9.9999999999999995e+33",
     "passes_plain": false,
     "since_last_hatch_s": null,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "overmind4",
      "price": "1.0",
      "pay_held": "0",
      "pushed_pay_tier": true,
      "suppressed": true
-    },
-    "faster_levels_pass_if_got_at_least": [
-     {
-      "L": 1,
-      "faster_price_total": "66.0",
-      "got_min": null
-     },
-     {
-      "L": 2,
-      "faster_price_total": "44022.0",
-      "got_min": null
-     },
-     {
-      "L": 3,
-      "faster_price_total": "29318718.0",
-      "got_min": null
-     },
-     {
-      "L": 4,
-      "faster_price_total": "19526266254.0",
-      "got_min": null
-     },
-     {
-      "L": 5,
-      "faster_price_total": "13004493325230.0",
-      "got_min": null
-     },
-     {
-      "L": 6,
-      "faster_price_total": "8660992554603246.0",
-      "got_min": null
-     },
-     {
-      "L": 7,
-      "faster_price_total": "5.7682210413657620e+18",
-      "got_min": null
-     },
-     {
-      "L": 8,
-      "faster_price_total": "3.8416352135495974e+21",
-      "got_min": null
-     }
-    ]
+    }
    },
    {
     "tier": 18,
@@ -785,55 +344,14 @@
     "H_s": "1.0000000000000000e+41",
     "passes_plain": false,
     "since_last_hatch_s": null,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "overmind5",
      "price": "1.0",
      "pay_held": "0",
      "pushed_pay_tier": true,
      "suppressed": true
-    },
-    "faster_levels_pass_if_got_at_least": [
-     {
-      "L": 1,
-      "faster_price_total": "66.0",
-      "got_min": null
-     },
-     {
-      "L": 2,
-      "faster_price_total": "44022.0",
-      "got_min": null
-     },
-     {
-      "L": 3,
-      "faster_price_total": "29318718.0",
-      "got_min": null
-     },
-     {
-      "L": 4,
-      "faster_price_total": "19526266254.0",
-      "got_min": null
-     },
-     {
-      "L": 5,
-      "faster_price_total": "13004493325230.0",
-      "got_min": null
-     },
-     {
-      "L": 6,
-      "faster_price_total": "8660992554603246.0",
-      "got_min": null
-     },
-     {
-      "L": 7,
-      "faster_price_total": "5.7682210413657620e+18",
-      "got_min": null
-     },
-     {
-      "L": 8,
-      "faster_price_total": "3.8416352135495974e+21",
-      "got_min": null
-     }
-    ]
+    }
    },
    {
     "tier": 19,
@@ -844,55 +362,14 @@
     "H_s": "9.9999999999999995e+48",
     "passes_plain": false,
     "since_last_hatch_s": null,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "overmind6",
      "price": "1.0",
      "pay_held": "0",
      "pushed_pay_tier": true,
      "suppressed": true
-    },
-    "faster_levels_pass_if_got_at_least": [
-     {
-      "L": 1,
-      "faster_price_total": "66.0",
-      "got_min": null
-     },
-     {
-      "L": 2,
-      "faster_price_total": "44022.0",
-      "got_min": null
-     },
-     {
-      "L": 3,
-      "faster_price_total": "29318718.0",
-      "got_min": null
-     },
-     {
-      "L": 4,
-      "faster_price_total": "19526266254.0",
-      "got_min": null
-     },
-     {
-      "L": 5,
-      "faster_price_total": "13004493325230.0",
-      "got_min": null
-     },
-     {
-      "L": 6,
-      "faster_price_total": "8660992554603246.0",
-      "got_min": null
-     },
-     {
-      "L": 7,
-      "faster_price_total": "5.7682210413657620e+18",
-      "got_min": null
-     },
-     {
-      "L": 8,
-      "faster_price_total": "3.8416352135495974e+21",
-      "got_min": null
-     }
-    ]
+    }
    },
    {
     "tier": 20,
@@ -903,83 +380,34 @@
     "H_s": "9.9999999999999994e+57",
     "passes_plain": false,
     "since_last_hatch_s": null,
-    "faster_levels_pass_if_got_at_least": [
-     {
-      "L": 1,
-      "faster_price_total": "66.0",
-      "got_min": null
-     },
-     {
-      "L": 2,
-      "faster_price_total": "44022.0",
-      "got_min": null
-     },
-     {
-      "L": 3,
-      "faster_price_total": "29318718.0",
-      "got_min": null
-     },
-     {
-      "L": 4,
-      "faster_price_total": "19526266254.0",
-      "got_min": null
-     },
-     {
-      "L": 5,
-      "faster_price_total": "13004493325230.0",
-      "got_min": null
-     },
-     {
-      "L": 6,
-      "faster_price_total": "8660992554603246.0",
-      "got_min": null
-     },
-     {
-      "L": 7,
-      "faster_price_total": "5.7682210413657620e+18",
-      "got_min": null
-     },
-     {
-      "L": 8,
-      "faster_price_total": "3.8416352135495974e+21",
-      "got_min": null
-     }
-    ]
+    "stock_below_at_last_look": null
    }
   ],
-  "top_owned": 6,
+  "run_start_s_ago": 172800.0,
+  "top_owned": 5,
   "larvae_held_back": {
-   "territory_purse": "5.4362297058105469e-01",
+   "territory_purse": "5.8496856689453125e-01",
    "nexus_saving": "0",
    "clone_reserve": "0"
   },
   "moth_target": 4000,
-  "larvae": "1.2113187548095363e+11",
-  "larva_rate": "4.4863657622142124e+08",
-  "meat": "1.3184585274842814e+14",
+  "larvae": "1.9408866019280933e+11",
+  "larva_rate": "7.1884688959727407e+08",
+  "meat": "2.0288033796343259e+19",
   "achievement_points": 920
  },
  "decisions": {
   "climb": [
    {
-    "tier": 7,
-    "name": "empress",
-    "outcome": "fa_fails",
-    "n_sim": "13.0",
-    "faster_level_L": 0
-   },
-   {
     "tier": 6,
     "name": "hivequeen",
-    "outcome": "buys",
-    "n_sim": "1240.0",
-    "test": "plain"
+    "outcome": "fails"
    },
    {
     "tier": 5,
     "name": "hive",
     "outcome": "buys",
-    "n_sim": "55841.0",
+    "n_sim": "17178981690.0",
     "test": "plain"
    },
    {
@@ -1073,17 +501,25 @@
    {
     "tier": 7,
     "name": "empress",
+    "outcome": "nothing below"
+   },
+   {
+    "tier": 6,
+    "name": "hivequeen",
     "outcome": "hatch",
-    "n": "3.0",
+    "n": "95438787.0",
     "share": 0.02,
-    "below_held": "2318086176.0",
-    "larvae_left": "1.2113181839941000e+11",
-    "meat": "3.2973616658428141e+13",
+    "below_held": "9364710673800998.0",
+    "larvae_left": "1.7690967850222437e+11",
+    "meat": "1.0144016898215160e+19",
     "binding": "meat"
    }
   ],
-  "larvae_for_push": "1.2113181839941000e+11",
-  "frontier_at_push": 6,
-  "larvae_before_climb": "1.2113187548041000e+11"
+  "larvae_for_push": "1.7690967850222437e+11",
+  "frontier_at_push": 5,
+  "larvae_before_climb": "1.9408866019222437e+11",
+  "push_reserve": "1940886601.0",
+  "larvae_for_climb": "1.9214777359122437e+11",
+  "climb_left": "1.7496879190122437e+11"
  }
 }

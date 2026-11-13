@@ -17,27 +17,32 @@
    259200,
    30000
   ],
-  "meat_share_for_push": 0.5
+  "meat_share_for_push": 0.5,
+  "push_reserve_share": 0.01,
+  "climb_sizing": "rule 3 (advisor_sizing)",
+  "cooldown_s": 60,
+  "faster_level_rule": false
  },
  "state": {
-  "run_age_s": 4537800.0,
+  "run_age_s": 4283100.0,
   "gate_active": true,
-  "horizon_s": 22689000.0,
+  "horizon_s": 21415500.0,
   "frontier": 17,
   "tiers": [
    {
     "tier": 1,
     "name": "drone",
-    "count": "2.1242404948128552e+931",
-    "prod_level": 330,
-    "twin_level": 7,
+    "count": "2.7005235237452497e+812",
+    "prod_level": 287,
+    "twin_level": 5,
     "H_s": "0",
     "passes_plain": true,
-    "since_last_hatch_s": 4534200.0,
+    "since_last_hatch_s": 4279800.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "queen",
-     "price": "10000000.0",
-     "pay_held": "2.4048838474412142e+838",
+     "price": "100000.0",
+     "pay_held": "1.6619426035511801e+733",
      "pushed_pay_tier": false,
      "suppressed": false
     }
@@ -45,16 +50,17 @@
    {
     "tier": 2,
     "name": "queen",
-    "count": "2.4048838474412142e+838",
-    "prod_level": 297,
-    "twin_level": 6,
-    "H_s": "6.1363668316221582e-90",
+    "count": "1.6619426035511801e+733",
+    "prod_level": 259,
+    "twin_level": 7,
+    "H_s": "8.4337583545844186e-79",
     "passes_plain": true,
-    "since_last_hatch_s": 4533600.0,
+    "since_last_hatch_s": 4279200.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "nest",
-     "price": "1000000.0",
-     "pay_held": "1.3226178738702275e+754",
+     "price": "10000000.0",
+     "pay_held": "2.0611377787459264e+661",
      "pushed_pay_tier": false,
      "suppressed": false
     }
@@ -62,16 +68,17 @@
    {
     "tier": 3,
     "name": "nest",
-    "count": "1.3226178738702275e+754",
-    "prod_level": 267,
+    "count": "2.0611377787459264e+661",
+    "prod_level": 234,
     "twin_level": 7,
-    "H_s": "3.2944368572595385e-80",
+    "H_s": "2.8298997121333476e-70",
     "passes_plain": true,
-    "since_last_hatch_s": 4532400.0,
+    "since_last_hatch_s": 4278000.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "greaterqueen",
      "price": "10000000.0",
-     "pay_held": "5.3487621088792329e+677",
+     "pay_held": "1.4871853046336525e+596",
      "pushed_pay_tier": false,
      "suppressed": false
     }
@@ -79,16 +86,17 @@
    {
     "tier": 4,
     "name": "greaterqueen",
-    "count": "5.3487621088792329e+677",
-    "prod_level": 240,
+    "count": "1.4871853046336525e+596",
+    "prod_level": 211,
     "twin_level": 8,
-    "H_s": "2.2108591501041778e-71",
+    "H_s": "1.1869459682199748e-62",
     "passes_plain": true,
-    "since_last_hatch_s": 4517100.0,
+    "since_last_hatch_s": 4263000.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "hive",
      "price": "100000000.0",
-     "pay_held": "4.6663816322120838e+608",
+     "pay_held": "1.6971788097844757e+537",
      "pushed_pay_tier": false,
      "suppressed": false
     }
@@ -96,16 +104,17 @@
    {
     "tier": 5,
     "name": "hive",
-    "count": "4.6663816322120838e+608",
-    "prod_level": 215,
+    "count": "1.6971788097844757e+537",
+    "prod_level": 190,
     "twin_level": 10,
-    "H_s": "1.8546030753437107e-63",
+    "H_s": "6.2230152778611417e-56",
     "passes_plain": true,
-    "since_last_hatch_s": 4364100.0,
+    "since_last_hatch_s": 4109700.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "hivequeen",
      "price": "10000000000.0",
-     "pay_held": "1.1915662318557567e+546",
+     "pay_held": "3.7453676415069678e+483",
      "pushed_pay_tier": false,
      "suppressed": false
     }
@@ -113,16 +122,17 @@
    {
     "tier": 6,
     "name": "hivequeen",
-    "count": "1.1915662318557567e+546",
-    "prod_level": 193,
+    "count": "3.7453676415069678e+483",
+    "prod_level": 171,
     "twin_level": 11,
-    "H_s": "3.8893845486632136e-56",
+    "H_s": "1.6313261169996311e-49",
     "passes_plain": true,
-    "since_last_hatch_s": 4285200.0,
+    "since_last_hatch_s": 4038900.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "empress",
      "price": "100000000000.0",
-     "pay_held": "2.4760703624765019e+489",
+     "pay_held": "7.7989206918710204e+434",
      "pushed_pay_tier": false,
      "suppressed": false
     }
@@ -130,16 +140,17 @@
    {
     "tier": 7,
     "name": "empress",
-    "count": "2.4760703624765019e+489",
-    "prod_level": 173,
-    "twin_level": 17,
-    "H_s": "6.3723676445298091e-51",
+    "count": "7.7989206918710204e+434",
+    "prod_level": 154,
+    "twin_level": 19,
+    "H_s": "8.3523897190381114e-46",
     "passes_plain": true,
-    "since_last_hatch_s": 3958800.0,
+    "since_last_hatch_s": 3659400.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "prophet",
-     "price": "1.0000000000000000e+17",
-     "pay_held": "1.1030501462848420e+438",
+     "price": "1.0000000000000000e+19",
+     "pay_held": "9.4192480250980846e+390",
      "pushed_pay_tier": false,
      "suppressed": false
     }
@@ -147,16 +158,17 @@
    {
     "tier": 8,
     "name": "prophet",
-    "count": "1.1030501462848420e+438",
-    "prod_level": 155,
-    "twin_level": 33,
-    "H_s": "2.5489470578119236e-49",
+    "count": "9.4192480250980846e+390",
+    "prod_level": 138,
+    "twin_level": 22,
+    "H_s": "6.8422776578360209e-41",
     "passes_plain": true,
-    "since_last_hatch_s": 3450300.0,
+    "since_last_hatch_s": 3541500.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "goddess",
-     "price": "9.9999999999999995e+32",
-     "pay_held": "2.9642282154817241e+391",
+     "price": "1.0000000000000000e+22",
+     "pay_held": "1.3254370650441016e+351",
      "pushed_pay_tier": false,
      "suppressed": false
     }
@@ -164,16 +176,17 @@
    {
     "tier": 9,
     "name": "goddess",
-    "count": "2.9642282154817241e+391",
-    "prod_level": 139,
-    "twin_level": 42,
-    "H_s": "3.2626522339992623e-46",
+    "count": "1.3254370650441016e+351",
+    "prod_level": 124,
+    "twin_level": 25,
+    "H_s": "1.4012984643248171e-36",
     "passes_plain": true,
-    "since_last_hatch_s": 3119700.0,
+    "since_last_hatch_s": 3425700.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "pantheon",
-     "price": "1.0000000000000000e+42",
-     "pay_held": "4.9969867810794900e+349",
+     "price": "1.0000000000000001e+25",
+     "pay_held": "5.9475006328479781e+314",
      "pushed_pay_tier": false,
      "suppressed": false
     }
@@ -181,16 +194,17 @@
    {
     "tier": 10,
     "name": "pantheon",
-    "count": "4.9969867810794900e+349",
-    "prod_level": 124,
-    "twin_level": 36,
-    "H_s": "6.8422776578360209e-39",
+    "count": "5.9475006328479781e+314",
+    "prod_level": 111,
+    "twin_level": 30,
+    "H_s": "3.5873240686715317e-33",
     "passes_plain": true,
-    "since_last_hatch_s": 3117000.0,
+    "since_last_hatch_s": 3171600.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "pantheon2",
-     "price": "1.0000000000000000e+36",
-     "pay_held": "6.0846775313574758e+311",
+     "price": "1.0000000000000000e+30",
+     "pay_held": "6.0863700361638685e+281",
      "pushed_pay_tier": false,
      "suppressed": false
     }
@@ -198,16 +212,17 @@
    {
     "tier": 11,
     "name": "pantheon2",
-    "count": "6.0846775313574758e+311",
-    "prod_level": 110,
+    "count": "6.0863700361638685e+281",
+    "prod_level": 100,
     "twin_level": 27,
-    "H_s": "5.7397185098744507e-30",
+    "H_s": "5.8774717541114375e-27",
     "passes_plain": true,
-    "since_last_hatch_s": 3060000.0,
+    "since_last_hatch_s": 2867400.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "pantheon3",
      "price": "1.0000000000000000e+27",
-     "pay_held": "2.0837824834228874e+277",
+     "pay_held": "9.1416460076472576e+251",
      "pushed_pay_tier": false,
      "suppressed": false
     }
@@ -215,16 +230,17 @@
    {
     "tier": 12,
     "name": "pantheon3",
-    "count": "2.0837824834228874e+277",
-    "prod_level": 98,
+    "count": "9.1416460076472576e+251",
+    "prod_level": 89,
     "twin_level": 33,
-    "H_s": "3.6734198463196485e-26",
+    "H_s": "1.8807909613156600e-23",
     "passes_plain": true,
-    "since_last_hatch_s": 2414100.0,
+    "since_last_hatch_s": 2648700.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "pantheon4",
      "price": "9.9999999999999995e+32",
-     "pay_held": "1.2074030919766999e+246",
+     "pay_held": "8.1253472768954607e+224",
      "pushed_pay_tier": false,
      "suppressed": false
     }
@@ -232,16 +248,17 @@
    {
     "tier": 13,
     "name": "pantheon4",
-    "count": "1.2074030919766999e+246",
-    "prod_level": 87,
-    "twin_level": 45,
-    "H_s": "1.8367099231598242e-24",
+    "count": "8.1253472768954607e+224",
+    "prod_level": 79,
+    "twin_level": 39,
+    "H_s": "3.0092655381050560e-20",
     "passes_plain": true,
-    "since_last_hatch_s": 2200200.0,
+    "since_last_hatch_s": 2142600.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "pantheon5",
-     "price": "9.9999999999999993e+44",
-     "pay_held": "5.7826160985948955e+217",
+     "price": "9.9999999999999994e+38",
+     "pay_held": "2.6432277897662841e+200",
      "pushed_pay_tier": false,
      "suppressed": false
     }
@@ -249,16 +266,17 @@
    {
     "tier": 14,
     "name": "pantheon5",
-    "count": "5.7826160985948955e+217",
-    "prod_level": 77,
-    "twin_level": 57,
-    "H_s": "4.5917748078995606e-22",
+    "count": "2.6432277897662841e+200",
+    "prod_level": 71,
+    "twin_level": 53,
+    "H_s": "4.7019774032891500e-19",
     "passes_plain": true,
-    "since_last_hatch_s": 1842000.0,
+    "since_last_hatch_s": 1767600.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "overmind",
-     "price": "1.0000000000000000e+57",
-     "pay_held": "1.1718259968926368e+192",
+     "price": "9.9999999999999999e+52",
+     "pay_held": "1.0324763826422115e+178",
      "pushed_pay_tier": false,
      "suppressed": false
     }
@@ -266,16 +284,17 @@
    {
     "tier": 15,
     "name": "overmind",
-    "count": "1.1718259968926368e+192",
-    "prod_level": 68,
-    "twin_level": 78,
-    "H_s": "1.1210387714598536e-21",
+    "count": "1.0324763826422115e+178",
+    "prod_level": 63,
+    "twin_level": 60,
+    "H_s": "9.4039548065782993e-15",
     "passes_plain": true,
-    "since_last_hatch_s": 932400.0,
+    "since_last_hatch_s": 922500.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "overmind2",
-     "price": "1.5001586541738241e+84",
-     "pay_held": "5.5766389381359440e+168",
+     "price": "5.6347514353166785e+64",
+     "pay_held": "4.9986028722487240e+157",
      "pushed_pay_tier": false,
      "suppressed": false
     }
@@ -283,16 +302,17 @@
    {
     "tier": 16,
     "name": "overmind2",
-    "count": "5.5766389381359440e+168",
-    "prod_level": 60,
-    "twin_level": 87,
-    "H_s": "5.6051938572992681e-17",
+    "count": "4.9986028722487240e+157",
+    "prod_level": 56,
+    "twin_level": 72,
+    "H_s": "2.9387358770557186e-11",
     "passes_plain": true,
-    "since_last_hatch_s": 466800.0,
+    "since_last_hatch_s": 3600.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "overmind3",
-     "price": "5.1658180331451019e+99",
-     "pay_held": "6.3806656802280947e+147",
+     "price": "3.3206153322262536e+82",
+     "pay_held": "1.3345042291268716e+139",
      "pushed_pay_tier": false,
      "suppressed": false
     }
@@ -300,16 +320,17 @@
    {
     "tier": 17,
     "name": "overmind3",
-    "count": "6.3806656802280947e+147",
-    "prod_level": 52,
-    "twin_level": 88,
-    "H_s": "7.1746481373430630e-09",
+    "count": "1.3345042291268716e+139",
+    "prod_level": 49,
+    "twin_level": 86,
+    "H_s": "2.2958874039497802e-07",
     "passes_plain": true,
     "since_last_hatch_s": 300.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "overmind4",
-     "price": "9.1739944639602860e+105",
-     "pay_held": "7.2111780475147630e+111",
+     "price": "3.5835915874844867e+103",
+     "pay_held": "6.6514224294817152e+108",
      "pushed_pay_tier": true,
      "suppressed": true
     }
@@ -317,120 +338,38 @@
    {
     "tier": 18,
     "name": "overmind4",
-    "count": "7.2111780475147630e+111",
-    "prod_level": 39,
-    "twin_level": 43,
-    "H_s": "2.0679515313825692e+16",
+    "count": "6.6514224294817152e+108",
+    "prod_level": 38,
+    "twin_level": 42,
+    "H_s": "8.2718061255302768e+16",
     "passes_plain": false,
-    "since_last_hatch_s": 133500.0,
+    "since_last_hatch_s": 300.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "overmind5",
-     "price": "9.4780221530051801e+53",
-     "pay_held": "9.1907340677382436e+59",
+     "price": "5.2655678627806563e+52",
+     "pay_held": "4.8526537905774392e+58",
      "pushed_pay_tier": true,
      "suppressed": true
-    },
-    "faster_levels_pass_if_got_at_least": [
-     {
-      "L": 1,
-      "faster_price_total": "8.6107082216261328e+111",
-      "got_min": null
-     },
-     {
-      "L": 2,
-      "faster_price_total": "5.7433423838246299e+114",
-      "got_min": null
-     },
-     {
-      "L": 3,
-      "faster_price_total": "3.8250746383354257e+117",
-      "got_min": null
-     },
-     {
-      "L": 4,
-      "faster_price_total": "2.5474997177421021e+120",
-      "got_min": null
-     },
-     {
-      "L": 5,
-      "faster_price_total": "1.6966348120248502e+123",
-      "got_min": null
-     },
-     {
-      "L": 6,
-      "faster_price_total": "1.1299587848085592e+126",
-      "got_min": null
-     },
-     {
-      "L": 7,
-      "faster_price_total": "7.5255255068250030e+128",
-      "got_min": null
-     },
-     {
-      "L": 8,
-      "faster_price_total": "5.0119999875454522e+131",
-      "got_min": null
-     }
-    ]
+    }
    },
    {
     "tier": 19,
     "name": "overmind5",
-    "count": "9.1907340677382436e+59",
+    "count": "4.8526537905774392e+58",
     "prod_level": 21,
     "twin_level": 0,
     "H_s": "4.7683715820312497e+42",
     "passes_plain": false,
-    "since_last_hatch_s": 133500.0,
+    "since_last_hatch_s": 300.0,
+    "stock_below_at_last_look": null,
     "twin_guard": {
      "pay_tier": "overmind6",
      "price": "1.0",
      "pay_held": "0",
      "pushed_pay_tier": true,
      "suppressed": true
-    },
-    "faster_levels_pass_if_got_at_least": [
-     {
-      "L": 1,
-      "faster_price_total": "1.2956948963581224e+61",
-      "got_min": null
-     },
-     {
-      "L": 2,
-      "faster_price_total": "8.6422849587086757e+63",
-      "got_min": null
-     },
-     {
-      "L": 3,
-      "faster_price_total": "5.7557747394489426e+66",
-      "got_min": null
-     },
-     {
-      "L": 4,
-      "faster_price_total": "3.8333459894299450e+69",
-      "got_min": null
-     },
-     {
-      "L": 5,
-      "faster_price_total": "2.5530084289733002e+72",
-      "got_min": null
-     },
-     {
-      "L": 6,
-      "faster_price_total": "1.7003036136962309e+75",
-      "got_min": null
-     },
-     {
-      "L": 7,
-      "faster_price_total": "1.1324022067216898e+78",
-      "got_min": null
-     },
-     {
-      "L": 8,
-      "faster_price_total": "7.5417986967664534e+80",
-      "got_min": null
-     }
-    ]
+    }
    },
    {
     "tier": 20,
@@ -441,60 +380,20 @@
     "H_s": "9.9999999999999994e+57",
     "passes_plain": false,
     "since_last_hatch_s": null,
-    "faster_levels_pass_if_got_at_least": [
-     {
-      "L": 1,
-      "faster_price_total": "66.0",
-      "got_min": null
-     },
-     {
-      "L": 2,
-      "faster_price_total": "44022.0",
-      "got_min": null
-     },
-     {
-      "L": 3,
-      "faster_price_total": "29318718.0",
-      "got_min": null
-     },
-     {
-      "L": 4,
-      "faster_price_total": "19526266254.0",
-      "got_min": null
-     },
-     {
-      "L": 5,
-      "faster_price_total": "13004493325230.0",
-      "got_min": null
-     },
-     {
-      "L": 6,
-      "faster_price_total": "8660992554603246.0",
-      "got_min": null
-     },
-     {
-      "L": 7,
-      "faster_price_total": "5.7682210413657620e+18",
-      "got_min": null
-     },
-     {
-      "L": 8,
-      "faster_price_total": "3.8416352135495974e+21",
-      "got_min": null
-     }
-    ]
+    "stock_below_at_last_look": null
    }
   ],
+  "run_start_s_ago": 4283100.0,
   "top_owned": 19,
   "larvae_held_back": {
-   "territory_purse": "8.0914974193070857e+118",
+   "territory_purse": "0",
    "nexus_saving": "0",
    "clone_reserve": "0"
   },
   "moth_target": 30000,
-  "larvae": "4.6237128110326211e+119",
-  "larva_rate": "1.4128011367044120e+117",
-  "meat": "4.7517958573603878e+1033",
+  "larvae": "2.2498197349680946e+113",
+  "larva_rate": "8.3511630345585440e+110",
+  "meat": "2.3898630819160608e+899",
   "achievement_points": 1930
  },
  "decisions": {
@@ -502,29 +401,23 @@
    {
     "tier": 20,
     "name": "overmind6",
-    "outcome": "fa_fails",
-    "n_sim": "45.0",
-    "faster_level_L": 0
+    "outcome": "fails"
    },
    {
     "tier": 19,
     "name": "overmind5",
-    "outcome": "fa_fails",
-    "n_sim": "3.6055890237573816e+62",
-    "faster_level_L": 0
+    "outcome": "fails"
    },
    {
     "tier": 18,
     "name": "overmind4",
-    "outcome": "fa_fails",
-    "n_sim": "3.1903328401140472e+106",
-    "faster_level_L": 0
+    "outcome": "fails"
    },
    {
     "tier": 17,
     "name": "overmind3",
     "outcome": "buys",
-    "n_sim": "3.8145630691019122e+119",
+    "n_sim": "2.2273215376184136e+113",
     "test": "plain"
    },
    {
@@ -614,38 +507,41 @@
     "tier": 20,
     "name": "overmind6",
     "outcome": "hatch",
-    "n": "45.0",
+    "n": "2.0",
     "share": 0.5,
-    "below_held": "9.1907340677382436e+59",
-    "larvae_left": "3.5835915874844867e+103",
-    "meat": "4.7517958573603878e+1033",
+    "below_held": "4.8526537905774392e+58",
+    "larvae_left": "2.2498197349680947e+111",
+    "meat": "2.3898630819160608e+899",
     "binding": "share"
    },
    {
     "tier": 19,
     "name": "overmind5",
     "outcome": "hatch",
-    "n": "3.6055890237573816e+62",
+    "n": "3.3257112147408576e+59",
     "share": 0.5,
-    "below_held": "7.2111780475147630e+111",
-    "larvae_left": "3.5835915874844867e+103",
-    "meat": "4.7517958573603878e+1033",
+    "below_held": "6.6514224294817152e+108",
+    "larvae_left": "2.2498197349680947e+111",
+    "meat": "2.3898630819160608e+899",
     "binding": "share"
    },
    {
     "tier": 18,
     "name": "overmind4",
     "outcome": "hatch",
-    "n": "3.5835915874844867e+103",
+    "n": "6.1156215979793842e+96",
     "share": 0.02,
-    "below_held": "6.4987206891186098e+147",
-    "larvae_left": "3.5835915874844867e+103",
-    "meat": "4.7517958573603878e+1033",
-    "binding": "larvae"
+    "below_held": "3.0578107989896920e+139",
+    "larvae_left": "2.2498197349680947e+111",
+    "meat": "2.3898630819160608e+899",
+    "binding": "share"
    }
   ],
-  "larvae_for_push": "3.5835915874844867e+103",
+  "larvae_for_push": "2.2498197349680947e+111",
   "frontier_at_push": 17,
-  "larvae_before_climb": "3.8145630691019122e+119"
+  "larvae_before_climb": "2.2498197349680946e+113",
+  "push_reserve": "2.2498197349680947e+111",
+  "larvae_for_climb": "2.2273215376184136e+113",
+  "climb_left": "0"
  }
 }

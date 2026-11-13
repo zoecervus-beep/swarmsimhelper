@@ -13,7 +13,10 @@ What it does:
   4. Loads every exported save in the real game (longrun_roundtrip.js) and compares what the rules read.
 
 Usage (from the repo root; node on PATH):
-    python3 -I advisor/modelcheck/longrun_cases.py        # about 4 minutes; writes advisor/modelcheck/longrun_cases/
+    python3 -I advisor/modelcheck/longrun_cases.py        # about 40 s; writes advisor/modelcheck/longrun_cases/
+
+Pass 4: the rules are longrun_rules.SPEC4 (1% push reserve, honest larva arithmetic, the advisor's rule-3 sizing for
+the climbing tiers, no faster-level rule) plus the 60 s push cooldown.
 """
 import copy, json, math, os, pickle, subprocess, sys, time
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -23,7 +26,7 @@ os.environ['SAVE'] = os.path.join(REPO, 'advisor', 'sim', 'example_save_20h.json
 import sim, bignum as bn, export, longrun_rules as LR
 
 OUTDIR = os.path.join(HERE, 'longrun_cases'); os.makedirs(OUTDIR, exist_ok=True)
-CONFIG = dict(LR.SPEC, push=dict(LR.SPEC['push'], cooldown=60))   # the spec as written: 60 s push cooldown
+CONFIG = dict(LR.SPEC4, push=dict(LR.SPEC4['push'], cooldown=60))   # the pass-4 spec as written: 1% reserve, rule-3 sizing, 60 s push cooldown
 GAP = 300.0
 D = bn.dec
 T0 = time.time()
@@ -40,11 +43,14 @@ def categories(ev, s, p):
     """Situations met at one visit, from its trace."""
     out = set()
     age = sim.run_age(s, p) / 86400
+    after = [e for e in ev if e[0] == 'after_climb']
     for e in ev:
-        if e[0] == 'fa':
-            L = e[3]
-            if e[2] > 0 and age > 2.05: out.add('fa_L1' if L == 1 else 'fa_Lmulti' if L and L > 1 else 'fa_fails')   # after the gate case
-        if e[0] == 'push' and e[2] == 'hatch': out.add('push_binds_' + e[8])
+        if e[0] == 'climb' and e[2] == 'cooldown': out.add('climb_cooldown_earmark')
+        if e[0] == 'climb' and e[2] == 'bank' and age > 2.05: out.add('bank_with_mode')
+        if e[0] == 'push' and e[2] == 'hatch':
+            out.add('push_binds_' + e[8])
+            if after and after[0][1] < 1: out.add('push_fed_by_reserve_only')
+            elif after: out.add('push_fed_by_reserve_and_leftover')
         if e[0] == 'push' and e[2] == 'under one': out.add('push_under_one')
         if e[0] == 'twin' and e[2] == 'guard': out.add('twin_guard')
         if e[0] == 'frontier':
@@ -130,13 +136,14 @@ def pure(cs, p):
         since = s.time - s.lastbuy[k]
         t = {'tier': k, 'name': sim.NAMES[k], 'count': D(s.c[k]), 'prod_level': s.prod[k], 'twin_level': s.twin[k] if k < sim.K else None,
              'H_s': D(sim.H(s, k)), 'passes_plain': bool(sim.allowed(s, q, k)),
-             'since_last_hatch_s': since if since < 1e15 else None}
+             'since_last_hatch_s': since if since < 1e15 else None,
+             'stock_below_at_last_look': D(s.stock_at[k]) if getattr(s, 'stock_at', None) and s.stock_at[k] is not None else None}
         if k < sim.K and q.get('push'):
             cost = sim.twin_cost(s, k)
             guarded = (k + 1 > fr) and (s.c[k + 1] < q['push'].get('twin_mult', 1) * cost)
             t['twin_guard'] = {'pay_tier': sim.NAMES[k + 1], 'price': D(cost), 'pay_held': D(s.c[k + 1]),
                                'pushed_pay_tier': bool(k + 1 > fr), 'suppressed': bool(guarded)}
-        if q.get('faster_aware') == 'multi' and not t['passes_plain'] and k >= 2:
+        if False and q.get('faster_aware') == 'multi' and not t['passes_plain'] and k >= 2:   # LR-1 dropped in pass 4
             # smallest number of units held after the purchase ("got") for which L faster levels pass
             h = sim.H(s, k); th = q['theta']; Fl = 0.0; mins = []
             for L in range(1, 9):
@@ -146,20 +153,25 @@ def pure(cs, p):
             t['faster_levels_pass_if_got_at_least'] = mins
         tiers.append(t)
     out['tiers'] = tiers
+    out['run_start_s_ago'] = age
     out['top_owned'] = max([k for k in range(1, sim.K + 1) if s.c[k] > 0] or [1])
     out['larvae_held_back'] = {'territory_purse': D(s.purse), 'nexus_saving': D(s.nexres), 'clone_reserve': D(s.reserve)}
     out['moth_target'] = (q['moth_late'][1] if q.get('moth_late') and age >= q['moth_late'][0] else q.get('moth_N', 0))
     return out
 
 def events_to_decisions(ev):
-    d = {'climb': [], 'faster_after_climb': [], 'push': [], 'larvae_for_push': None, 'frontier_at_push': None, 'larvae_before_climb': None}
+    d = {'climb': [], 'faster_after_climb': [], 'push': [], 'larvae_for_push': None, 'frontier_at_push': None, 'larvae_before_climb': None,
+         'push_reserve': None, 'larvae_for_climb': None, 'climb_left': None}
     fa = {}
     for e in ev:
         if e[0] == 'before_climb': d['larvae_before_climb'] = D(e[1])
+        if e[0] == 'reserve': d['push_reserve'] = D(e[1]); d['larvae_for_climb'] = D(e[2] - e[1])
+        if e[0] == 'after_climb': d['climb_left'] = D(e[1])
         if e[0] == 'fa': fa[e[1]] = {'n': D(e[2]), 'L': e[3]}
         if e[0] == 'climb':
             rec = {'tier': e[1], 'name': sim.NAMES[e[1]], 'outcome': e[2]}
             if e[2] in ('buys', 'passes_none', 'fa_fails'): rec['n_sim'] = D(e[3])
+            if e[2] == 'cooldown': rec['earmarked'] = D(e[3])
             if e[2] in ('buys', 'passes_none'): rec['test'] = 'faster-level' if e[4] else 'plain'
             if e[1] in fa: rec['faster_level_L'] = fa[e[1]]['L']
             d['climb'].append(rec)
@@ -187,16 +199,18 @@ def write_case(name, what, cs, p, extra=None):
 CONFIG_OUT = {'age_multiple': CONFIG['theta_age'], 'territory_share': CONFIG['f'], 'bank': CONFIG['bank'], 'share': CONFIG['share'],
               'gate_run_age_s': CONFIG['lr_age'], 'push_share': CONFIG['push']['share'], 'push_frontier_share': CONFIG['push']['base'],
               'push_twin_guard_multiple': CONFIG['push']['twin_mult'], 'push_cooldown_s': CONFIG['push']['cooldown'],
-              'moth_target': CONFIG['moth_N'], 'moth_target_late': list(CONFIG['moth_late']), 'meat_share_for_push': 0.5}
+              'moth_target': CONFIG['moth_N'], 'moth_target_late': list(CONFIG['moth_late']), 'meat_share_for_push': 0.5,
+              'push_reserve_share': CONFIG['push']['reserve'], 'climb_sizing': 'rule 3 (advisor_sizing)', 'cooldown_s': 60, 'faster_level_rule': False}
 
 WHAT = {
-    'gate_before': 'run age just under 2 days: the mode must change nothing (no faster-level passes, no push lines)',
+    'gate_before': 'run age just under 2 days: the mode must change nothing (no reserve, no push lines, no guard)',
     'gate_after': 'run age just over 2 days: the mode acts',
     'moth_before': 'run age just under 3 days: lepidoptera target 4,000',
     'moth_after': 'run age just over 3 days: lepidoptera target 30,000',
-    'fa_L1': 'a tier that passes only through the faster-level rule, with L = 1',
-    'fa_Lmulti': 'a tier that passes only through the faster-level rule, with L > 1',
-    'fa_fails': 'a tier that fails the plain test and the faster-level test (with the purchase it would make)',
+    'push_fed_by_reserve_only': 'the climb takes every larva it is offered: push lines run on the 1% reserve alone',
+    'push_fed_by_reserve_and_leftover': 'push lines run on the reserve plus larvae the climb left (its own caps bound)',
+    'climb_cooldown_earmark': 'a climbing tier inside its 60 s cooldown earmarks larvae (rule 3); the reserve was taken before',
+    'bank_with_mode': 'a tier skipped by banking (rule 4) with the mode on',
     'push_binds_share': 'push lines limited by the share of the tier below (larvae and meat plentiful)',
     'push_binds_larvae': 'a push line limited by the larvae left after climbing and territory',
     'push_binds_meat': 'a push line limited by half the meat',
@@ -205,7 +219,7 @@ WHAT = {
     'frontier_empress': 'frontier at hive empress (tier 7)',
     'frontier_pantheon': 'frontier in the neural cluster tiers (10-12)',
     'frontier_overmind': 'frontier at overmind / ascended / cosmic network (15-17)',
-    'cortex_owned_no_endless': 'universal cortex owned, endless empty: push feeds endless from cortex',
+    'cortex_owned_no_endless': 'the visit that makes the first universal cortex (push lines on cortex, galactic cluster, cosmic network); endless still empty',
     'endless_owned': 'endless already owned',
 }
 for d_ in (5, 10, 20, 30, 40, 52): WHAT['day_%d' % d_] = 'the long run on day %d (a typical state)' % d_
@@ -245,6 +259,16 @@ def main():
         hit = [x for x in ev if x[0] == 'push' and x[1] == kc and x[2] == 'hatch' and x[8] == 'meat']
         if hit: break
     cases.append(write_case('push_binds_meat', 'meat set to %g x (what share and larvae allow) x the meat price of %s, so the push line hatches but half the meat binds' % (frac, sim.NAMES[kc]), cs, p))
+    # a climbing tier inside its 60 s cooldown: rule 3 earmarks larvae for it; the reserve is taken before
+    climbers = [e[1] for e in pev if e[0] == 'climb' and e[2] == 'buys']
+    if climbers:
+        kt = climbers[0]; cs = copy.deepcopy(ps); cs.lastbuy[kt] = cs.time - 30
+        cases.append(write_case('climb_cooldown_earmark', '%s hatched 30 s ago: inside its climb cooldown, larvae earmarked for it (rule 3); the 1%% reserve is still taken first' % sim.NAMES[kt], cs, p))
+    # the reserve's floor either side of one larva: larvae offered to climb + push = 100 (reserve 1) and 99 (reserve 0)
+    for tag, A in (('reserve_one_larva', 100.0), ('reserve_zero_larvae', 99.0)):
+        cs = copy.deepcopy(ps)
+        cs.larva = bn.F(cs.purse + cs.reserve + cs.nexres + A)
+        cases.append(write_case(tag, 'larvae offered to the climb and push = %d: the 1%% reserve floors to %d' % (A, math.floor(A * 0.01)), cs, p))
     # no-change states: the 20.1 h save as loaded, and a fresh run (after an ascension, no mutagen) at 12 h
     s = sim.load(); clear_logs(s)
     sim.TRACE = []; sim.CAPTURE = []; sim.policy(s, dict(CONFIG, ci=GAP), 0); cs = sim.CAPTURE[0]; sim.TRACE = None; sim.CAPTURE = None

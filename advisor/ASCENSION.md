@@ -17,7 +17,7 @@ Two achievements set the length of the project, and both are paid for in energy,
 - **"prestigious": 20 ascensions.** Each ascension after the first needs 0.56 to 0.80 million energy spent and held within its run. That is about 75 days of energy for ascensions 2 to 20, plus each run's start-up. The simulator measured 3.6 to 3.9 days per ascension.
 
 Everything else falls inside those two:
-- every meat-tier achievement up to 1e62 endless bought, by day 60 of the long run
+- every meat-tier achievement up to 1e62 endless bought, by about day 63 of the long run (pass 4, A.10; pass 2 said day 60)
 - the territory, mutation and nexus achievements, which only need a deliberate purchase
 
 The route (simulator days at perfect play, 5-minute check-ins):
@@ -47,7 +47,7 @@ The route (simulator days at perfect play, 5-minute check-ins):
 | 2 | **Expansion 5,000 needs ~6,400 mirror casts in one run: ~96 days at the 2.0 energy/s maximum** (5 nexus × 0.1 × lepidoptera ≤2 × lepidoptera mutation ≤2). Each cast doubles territory, worth 0.774 expansions (measured 0.78). Nothing else lifts that rate: bats do not affect mirrors, crystals are excluded, territory rush only gives a one-off offset. | Mechanics **solid**. 96 days **likely** (simulator; a person loses days to late casts) |
 | 3 | **20 ascensions need ~13 million energy for ascensions 2–20: ~75 days at maximum energy, ~3.6–4.6 days per ascension.** It follows from the cost formula: hold C = min(cap, 50,000 × N / ln 2), spend 50,000 × N × log2(cost/C). Huge mutagen does not shorten a run, because energy is the limit (measured: 3.6–3.8 days with 6e7 or with 1e335 mutagen). | **solid** (formula), **likely** (days) |
 | 4 | **Ascend once, now (about 4 days from the save), to buy the lepidoptera mutation before the long run.** Without it the long run is about twice as slow: first endless at day 103 instead of 52, expansion 2,000 at day 77 instead of 39, and 5,000 out of reach for ~190 days. | **likely** |
-| 5 | **Endless are reachable, and "a bunch" follow quickly.** With the achievement policy the long run buys the first endless on about day 52, passes 1e31 on about day 59 and 1e62 on about day 60. By day 130 it holds ~1e270. The binding constraint on the way up is larvae for the top tiers (endless cannot be twinned, and universal cortex twins cost endless), and larvae come from expansions (1.1^level), i.e. again from mirrors. | **likely** for "about 2 months into the long run". Exact days **guess** (one policy, one start, perfect play) |
+| 5 | **Endless are reachable, and "a bunch" follow quickly.** *(Pass 4 correction: with the rules as now specified in A.10.2 — a 1% push reserve, the advisor's own sizing — first endless about day 50 and 1e62 about day 63 under a person's cadence; the pass-2 days below rested partly on a floating-point artefact, see A.10.)* With the achievement policy the long run buys the first endless on about day 52, passes 1e31 on about day 59 and 1e62 on about day 60. By day 130 it holds ~1e270. The binding constraint on the way up is larvae for the top tiers (endless cannot be twinned, and universal cortex twins cost endless), and larvae come from expansions (1.1^level), i.e. again from mirrors. | **likely** for "about 2 months into the long run". Exact days **guess** (one policy, one start, perfect play) |
 | 6 | **Policy matters for the climb.** The tuned climbing rule (H ≤ multiple × run age) stalls at empresses on long runs, as MODEL-CHECK found. Two changes fix it: counting as many faster levels as one purchase pays for ("faster-aware, multi"), and feeding every tier above the frontier toward endless ("push"). The rest of the policy hardly matters: age multiple 5 or 20 makes no difference, and the second mutation does not move it. | **likely** |
 | 7 | **Attention matters for the climb only if each visit is a single look** (revised in A.10). With sessions where the panel is open (a few looks minutes apart), a person's cadence (7 to 80 visits a day, gaps up to 14 h) reaches endless within ~5 days of once-a-minute play. Evenly spaced single visits (every 30 min or 2 h) or one glance per session take ~109–111 days. Expansions and ascensions are unchanged: energy is banked up to the cap (15.5 h), and no energy was lost to it in any run. | **likely** |
 | 8 | **Mutations for this goal:** lepidoptera ("nexus") first, then any; all 10 once the long run's mutagen pays for them. Unspent mutagen makes 0.1 larva/s each and helps the early part of each run; meat, hatchery and frequency mutations did not change the day the first endless fell (52 either way). | **likely** |
@@ -135,8 +135,8 @@ Every meat-tier "_3" threshold up to universal cortex 1e56 falls by day 51.
 - **House of Mirrors versus swarmwarp or clone larvae.** Mirrors drive expansions, and expansions drive larvae, so mirrors stay right for this goal too. Swarmwarp gives no energy and no expansions. Clone larvae is capped at 1e5 seconds of larva income, a one-off.
 
 **Time estimates:**
-- **First endless: day ~52 of the long run** (sensitivity: 52–66 with perfect play; ~108 at 30-minute check-ins), i.e. about 8 weeks after the first ascension.
-- **The top endless achievement (1e62 bought): ~day 60** (60–68; beyond 130 days at slow check-ins in this policy).
+- **First endless: day ~50 of the long run** (pass 4, A.10.3: 50–53 across cadences with sessions; 96 with single looks), i.e. about 7 weeks after the first ascension. Pass 2 said ~52.
+- **The top endless achievement (1e62 bought): ~day 63** (pass 4: 62–66 with sessions; 113–115 with single looks). Pass 2 said ~60.
 - **All achievements: ~6 months of real time at simulator pace, 7–9 months for a person.** Weeks for the first endless; months for everything.
 
 ### A.5 Ascensions: how many, when, and what each run is for
@@ -221,7 +221,20 @@ The push and multi-faster rules should be ported from `sim.py` and checked with 
 
 ### A.10 Long-run climb rules (spec for the advisor's opt-in long-run mode)
 
-Third pass. This section turns the two rules that got the simulator to endless into a spec for the native advisor. Everything here comes from the simulator. The long run starts at the first ascension from the 20.1 h save (lepidoptera and frequency mutations, no crystals) and lasts 130 days.
+**Pass 4 correction.** The pass-3 evidence in this section ran on a floating-point artefact, and A.10.2 now carries the fix.
+
+- **The artefact.** Whenever the climb took every larva it was offered, the push recomputed its larvae as `larvae − purse − reserves`. That left a rounding remainder of about one float ULP, which at 1e100 larvae is ~1e84 larvae. In exact arithmetic, as in the game, the remainder is 0.
+- **What the push actually ran on.** Pass 4 traced the long run visit by visit. Push lines are rare, a few per day. Early in the run (to about day 6) they were fed by larvae the climb genuinely left. From about day 9 on, most were fed by the remainder, including the first universal cortex and the endless lines.
+- **With honest arithmetic and no other change** the mode stalls exactly where the old rules stall: overmind on day 65, and no universal cortex or endless within 130 days.
+- **The fix** is a deliberate rule doing what the artefact did by accident: **keep 1% of the larvae for the push** (LR-2).
+- **What pass 4 also simulated.** It simulated the advisor's own purchase sizing (rule 3) for the climbing tiers, which pass 3 never did. It dropped the faster-level rule (LR-1), which carries no weight with the advisor's sizing.
+- **Corrected headline** (rule-3 sizing, 1% reserve, human cadence): **first endless day 50, 1e62 endless day 63, 5,000 expansions day 96.** It is day 50 / 62 / 96 at once every 5 minutes, and 52–53 / 64–66 / 98 for the busy, twice-a-day and glance+ cadences.
+  - Previously stated: 52 / 60 / 96. So 1e62 endless comes 3–5 days later; everything else is the same or earlier.
+  - Single looks per session are still slow: first endless day 96, 1e62 day 113–115.
+- **Which tables are pass 3.** A.10.1 and the pass-3 tables in A.10.3 and A.10.4 were made with the artefact; they are kept as they were, marked "pass 3". So is A.4, which was made with the pass-2 rules.
+- **What survives.** The cadence findings: sessions are as good as every-5-minute play, single looks are slow, the energy cap never binds. So do the twin-guard and banking findings. **What does not:** "the faster-level rule is cheap insurance", and the exact pass-3 days.
+
+Third pass, revised in pass 4. This section turns the rules that got the simulator to endless into a spec for the native advisor. Everything here comes from the simulator. The long run starts at the first ascension from the 20.1 h save (lepidoptera and frequency mutations, no crystals) and lasts 130 days.
 
 Time is modelled the way a person plays (`advisor/sim/cadence.py`):
 - **Sessions with the panel open.** During a session the player acts every 2 minutes on everything the advisor shows.
@@ -279,7 +292,22 @@ The mode is opt-in. With it off, the advisor is exactly what it is now. With it 
 
 **LR-0. When the mode acts.** From a run age of 2 days (run age ≥ 172,800 s; the gate is open at exactly 2 days). Before that the mode changes nothing (measured: identical advice on days 1–2 from a fresh run, from the save and after an ascension). This also makes a mode left on after an ascension harmless for the first two days.
 
-**LR-1. Climbing with several faster levels (extends rule 1).** Consider each tier the climb table considers: up to one above the highest owned tier. LR-1 applies to a tier k ≥ 2 that fails the climb test (H > horizon), is affordable, and is not banked (rule 4 still applies first):
+**LR-1. Dropped in pass 4.** With the advisor's own sizing (rule 3), a slow tier's first-look purchase is small, so this rule almost never fires. The port found L = 0 in all five reference cases where the simulator's sizing passed it.
+
+Measured with rule-3 sizing and the 1% reserve, first endless / 1e62 endless:
+
+| Cadence | LR-1 off | LR-1 on rule 3's count | LR-1 on the affordable count |
+| --- | --- | --- | --- |
+| every5 | 50 / 62 | 50 / 62 | 50 / 62 |
+| human | 50 / 63 | 50 / 63 | 50 / 63 |
+| busy | 52 / 65 | 52 / 65 | 52 / 65 |
+| glance+ | 52 / 64 | 52 / 64 | 52 / 64 |
+| glance (single looks) | 96 / 115 | 96 / 115 | 96 / 115 |
+| every120 | 96 / 113 | 96 / 113 | 96 / 113 |
+
+It carries no weight, so the port should remove it. The pass-3 text follows for reference only.
+
+*(Pass 3, no longer part of the spec.) Climbing with several faster levels (extends rule 1).* Consider each tier the climb table considers: up to one above the highest owned tier. LR-1 applies to a tier k ≥ 2 that fails the climb test (H > horizon), is affordable, and is not banked (rule 4 still applies first):
 
 | Quantity | Definition |
 | --- | --- |
@@ -299,8 +327,17 @@ The mode is opt-in. With it off, the advisor is exactly what it is now. With it 
 - For each tier k from endless down to frontier + 1, with any of the tier below held: hatch n = floor(share × below.count / cost), where:
   - share = **0.5** for k ≥ frontier + 2;
   - share = **0.02** for k = frontier + 1, because that price comes out of the top growing tier.
+- **Reserve (pass 4).**
+  1. Before the climb works out its suggestions, set aside **R = floor(0.01 × A)** larvae for the push. A = the larvae the climb could otherwise use: larvae × (1 − territory share), floored, minus the larvae held for the next nexus.
+  2. The climb works with A − R: rule 3's "larvae left", its cooldown earmarks and banking all come out of A − R.
+  3. The push starts with **R + whatever the climb leaves**, with exact arithmetic. If the climb takes everything offered, the push has exactly R.
 - Skip the tier when none of the tier below is held, or when fewer than 1 larva is left.
-- Cap n by the larvae left (larvae − what the climbing tiers take − the territory share − larvae held for the next nexus) and by half the meat (meat / 2 / the tier's meat price), and take the floor. No line when n < 1.
+- Cap n by the larvae the push has left (R + the climb's leftover − earlier push lines) and by half the meat (meat / 2 / the tier's meat price), and take the floor. No line when n < 1.
+- **Why the reserve, and why 1%.** Without it the climb's top tier takes every larva on almost every visit (rule 3's limits on a top tier rarely bind), and the push gets nothing.
+  - Swept from 1e-12 to 0.5, any reserve gives the same days: first endless 48–50, 1e62 59–63, 5,000 expansions 96, under both sizings and both cadences. The counts are astronomically large, so even 1e-12 of them is plenty late in the run.
+  - 1% is chosen to be **independent of the numbers' size**. It gives the push 1 larva from 100 offered, 1e7 from 1e9 on day 2, and so on. Its cost to the climb is not measurable: meat/s on days 20 and 40 is the same from 1e-6 to 10%. At 50% it costs about 10^39 meat/s on day 20.
+  - A visible, round share is also easier to explain in the panel than 1e-12.
+- **Do cooldown earmarks and banking need their own protection?** No. The reserve is taken before them; with rule-3 sizing, earmarks included, the results match the simulator's sizing (table below).
 - Top-down, once per visit. Each line takes its larvae and meat before the next one is worked out.
 - No line for a tier hatched less than 60 s ago, by the climb or by a push line (cooldown, as for climbing).
 - **The player is told:** `feed upward: hatch 3.2e15 universal cortex (half your galactic clusters)`.
@@ -330,7 +367,34 @@ The mode is opt-in. With it off, the advisor is exactly what it is now. With it 
 
 #### A.10.3 Evidence: the specified mode under each cadence
 
-Days of the long run; "spec" = LR-0 to LR-4 with age multiple 5.
+**Pass 4.** The spec as now written: LR-0, LR-2 with the 1% reserve, LR-3, LR-4; no LR-1; the advisor's rule-3 sizing for the climbing tiers; honest larva arithmetic; age multiple 5. Days of the long run, plus log10 meat/s on days 20 and 40.
+
+| Cadence | arch-mind | overmind | universal cortex | endless 1 | endless 1e62 | exp 5,000 | meat/s day 20 / 40 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| every5 | 15 | 18 | 39 | **50** | **62** | **96** | 340 / 756 |
+| **human** | 15 | 18 | 40 | **50** | **63** | **96** | 297 / 703 |
+| human, seeds 2 and 3 | 15 | 18 | 40 | 50 | 63 | 96 | 296–304 / 715–738 |
+| busy | 17 | 19 | 41 | **52** | **65** | **98** | 290 / 646 |
+| busy, seeds 2 and 3 | 17 | 20 | 42 | 52 | 64–65 | 98 | 288–291 / 646–648 |
+| twice | 18 | 20 | 45 | 53 | 66 | 98 | 285 / 651 |
+| glance+ | 16 | 20 | 41 | 52 | 64 | 97 | 293 / 648 |
+| glance (single looks) | 30 | 38 | 81 | 96 | 115 | 98 | 144 / 357 |
+| every120 | 28 | 36 | 80 | 96 | 113 | 97 | 155 / 364 |
+
+What carries it:
+
+| Variant | every5 endless 1 / 1e62 | human endless 1 / 1e62 |
+| --- | --- | --- |
+| honest larvae, **no reserve** (rule-3 sizing) | – / – (stalls: overmind day 65) | – / – |
+| honest larvae, no reserve (simulator sizing) | – / – | – / – |
+| reserve 1e-12 … 0.5 (simulator sizing) | 48 / 59–60 | 49 / 62 |
+| reserve 1e-6, 1%, 10% (rule-3 sizing) | 50 / 62 | 50 / 63 |
+| current rules, rule-3 sizing (no mode) | – / – (stalls at hive queens; meat/s 148 on day 20) | – / – |
+| the pass-3 spec, with the artefact | 53 / 62 | 53 / 63 |
+
+Tables: `longrun_rules.py honest`, `advisor`, `final4`.
+
+**Pass 3 (made with the artefact; kept for the record).** Days of the long run; "spec" = LR-0 to LR-4 with age multiple 5.
 
 | Variant | Cadence | arch-mind | overmind | universal cortex | endless 1 | endless 1e31 | endless 1e62 | exp 5,000 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -349,7 +413,26 @@ Other random schedules (seeds 2 and 3, pass-2 rules) give first endless at 52–
 
 #### A.10.4 No harm early
 
-log10 meat per second (top tier) on days 1, 2, 4 and 7 of a run:
+**Pass 4** (rule-3 sizing for both). log10 meat per second (top tier) on days 1, 2, 4 and 7:
+
+| Start | Cadence | Rules | Day 1 | Day 2 | Day 4 | Day 7 |
+| --- | --- | --- | --- | --- | --- | --- |
+| fresh run | every5 | current | 42.2 (hive) | 47.0 (hive) | 60.6 (hive queen) | 69.5 (hive queen) |
+| fresh run | every5 | spec | 42.2 (hive) | 47.0 (hive) | 60.0 (empress) | 65.6 (empress) |
+| fresh run | human | current | 26.8 | 34.9 | 49.1 | 67.3 |
+| fresh run | human | spec | 26.8 | 34.9 | 48.6 | 62.3 |
+| after the first ascension | every5 | current | 46.8 | 49.9 | 69.0 (hive queen) | 85.1 (hive queen) |
+| after the first ascension | every5 | spec | 46.8 | 49.9 | 78.4 (hive neuron) | 90.1 (hive neuron) |
+| after the first ascension | human | current | 42.7 | 48.2 | 66.6 | 83.0 |
+| after the first ascension | human | spec | 42.7 | 48.2 | 65.9 | 88.1 |
+| the 20.1 h save | every5 | current | 45.1 | 48.3 | 64.2 | 72.6 (hive queen) |
+| the 20.1 h save | every5 | spec | 45.1 | 48.3 | 62.9 | 66.9 (neuroprophet) |
+| the 20.1 h save | human | current | 43.9 | 47.2 | 60.7 | 70.9 |
+| the 20.1 h save | human | spec | 43.9 | 47.1 | 58.9 | 65.4 |
+
+Days 1–2 are identical. Days 4–7 are between 10^6 below and 10^5 above, the same picture as pass 3: the raised lepidoptera target costs meat early.
+
+**Pass 3** (the simulator's sizing, with the artefact). log10 meat per second (top tier) on days 1, 2, 4 and 7 of a run:
 
 | Start | Cadence | Rules | Day 1 | Day 2 | Day 4 | Day 7 |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -398,15 +481,16 @@ The policy option `empower` follows the native advisor's `empowerAdvice` rule: e
 | Behaviour | Now | In the mode (run age ≥ 2 d) |
 | --- | --- | --- |
 | Tiers listed | up to top + 2 | up to endless while LR-2 feeds them |
-| Rule 1 climb test | H ≤ horizon | also passes on LR-1; the faster tip then shows at 1× price for L levels |
-| New action | – | LR-2 "feed upward" lines, after the climbing tiers have taken their larvae |
+| Rule 1 climb test | H ≤ horizon | unchanged (LR-1 dropped in pass 4) |
+| Larvae for the climb | larvae × (1 − territory) | minus the larvae held for the next nexus, minus the 1% push reserve R (pass 4) |
+| New action | – | LR-2 "feed upward" lines, run on R plus what the climbing tiers leave |
 | Rule 6 twin tips | as now | suppressed for twins paid in a pushed tier unless it holds 10^6× the price (LR-3) |
 | Lepidoptera target | setting (4,000) | 30,000 from run age 3 d (LR-4) |
 | Everything else | – | unchanged: rule 3 sizing, cooldown, banking, twin plans, energy, territory, empower |
 
 - **What the existing check covers.** The console script versus native port check (`script_vs_port.js`) covers the advisor with the mode **off**. It must still pass unchanged, and that is all it can say.
-- **The mode needs its own check:** the port's LR-1 to LR-4 decisions against `sim.py`'s `faster_levels`, `push_up`, `push_frontier`, the twin guard and the `lr_age` / `moth_late` gates, on states from the long run. The reference cases for that check are in `advisor/modelcheck/longrun_cases/`: 28 exported states, each with the simulator's decisions and per-field comparison rules. See its README. The simulator's states are on disk after `longrun_rules.py`.
-- **Sizing differs.** The native advisor sizes purchases per rule 3 (time-scaled share and spare). The simulator's tuned policy uses per-visit shares and income carry. Under the human cadence both give the same endless days (`time_share`: 50 / 62 against 52 / 59). With single looks the native sizing is the worse one (A.10.1), so tell the player to stay a couple of minutes.
+- **The mode needs its own check:** the port's LR-1 to LR-4 decisions against `sim.py`'s `faster_levels`, `push_up`, `push_frontier`, the twin guard and the `lr_age` / `moth_late` gates, on states from the long run. The reference cases for that check are in `advisor/modelcheck/longrun_cases/`: 30 exported states (pass 4: the reserve on both sides of its one-larva floor, and a climb cooldown earmark), each with the simulator's decisions and per-field comparison rules. See its README. The simulator's states are on disk after `longrun_rules.py`.
+- **Sizing.** Pass 4 simulates the native advisor's rule 3 itself (option `advisor_sizing`: time since last hatch, spare, cooldown earmarks). With the 1% reserve it gives 50 / 63 against 49 / 62 for the simulator's own sizing under the human cadence. The reference cases are made with rule-3 sizing, so the climb purchase counts are comparable given the memory seeds in each case (README).
 
 #### A.10.7 Grades
 
@@ -415,15 +499,18 @@ The policy option `empower` follows the native advisor's `empowerAdvice` rule: e
 | Energy capping is not binding (0 days lost, gaps up to 14 h) | **solid** (cap arithmetic plus simulation) |
 | With sessions (panel open, a few minutes per visit), slow overall cadence costs ≤ 5 days on endless and ≤ 2 on expansions | **likely** |
 | Single looks per session cost ~2 months on endless; a second look a minute or two later fixes most of it | **likely** that it matters; the exact mechanism is **guess** |
-| Push (LR-2) is what reaches endless; twin protection (LR-3) and banking matter; share values and age multiple do not | **likely** |
-| LR-1 matters only at slow cadences | **guess** |
+| Push (LR-2) is what reaches endless; twin protection (LR-3) and banking matter; share values and age multiple do not | **likely**. Pass 4: the push only works with larvae of its own (the reserve). The pass-3 evidence for it came from the artefact. |
+| The 1% push reserve: any share from 1e-12 to 0.5 gives the same days; 1% costs the climb nothing measurable | **likely** (pass 4, both sizings, two cadences) |
+| With the advisor's own sizing (rule 3) the mode reaches first endless ~day 50, 1e62 endless ~day 63 (human), 5,000 expansions day 96 | **likely**; days are simulator-only |
+| LR-1 carries no weight | **likely** (pass 4: identical results with it off, at every cadence tried) |
 | LR-0 gate makes days 1–2 identical; LR-4 trades meat on days 4–7 for endless ~9 days sooner | **likely** |
 | Empower is a wash in the long run | **likely** |
 | Endless days | all simulator-only, one start, one save, perfect execution of what the rules say at each visit |
 
 #### A.10.8 What I would still want tested
 
-- **The port itself**, against the simulator's rule functions on long-run states: LR-1 levels, LR-2 counts, the LR-3 guard. Then the console-script check with the mode off.
+- **The port itself**, against the simulator's rule functions on long-run states: the LR-2 reserve and counts, the LR-3 guard. Then the console-script check with the mode off.
+- **Pass 4 open points:** the reserve is taken from larvae held back from the nexus in the simulator; check the port's order gives the same R. The 30-minute-cadence advisor memory (spare) after a page reload starts afresh; not simulated.
 - **Rule 3 sizing with the mode on**, in the simulator, i.e. `time_share` plus a spare cap, at human and busy cadences over a full long run. Only the per-visit-share version was tuned.
 - **More starts:** a long run from a fresh game, and from a later or earlier first ascension. Every run here starts from one state.
 - **Raising lepidoptera at day 7 instead of day 3**, and nightbugs for players away longer than 15 hours.
@@ -846,7 +933,8 @@ python3 -I advisor/modelcheck/ascension_compare.py              # game vs sim, a
 python3 -I advisor/sim/achievements.py                          # ACHIEVEMENTS.md, with the code check, about 5 s
 python3 -I advisor/sim/achievement_strategy.py                  # Part A tables, about 8 minutes (--quick: base policy only, ~2 min)
 python3 -I advisor/modelcheck/bignum_check.py                   # game vs sim past 1e308, and territory empower, about 3 s
-python3 -I advisor/sim/longrun_rules.py diag rules rounds glance final early empower --jobs 4   # A.10 tables, about 15 minutes with 4 cores
+python3 -I advisor/sim/longrun_rules.py --jobs 4                # A.10 pass-4 tables (honest, advisor, final4, early4), about 8 minutes with 4 cores
+python3 -I advisor/sim/longrun_rules.py diag rules rounds glance final early empower --jobs 4   # the pass-3 tables (artefact), about 15 minutes
 python3 -I advisor/modelcheck/longrun_cases.py                  # A.10 reference cases for the port + round trip in the game, about 40 s
 python3 -I advisor/sim/cadence.py                               # the visit profiles
 node advisor/modelcheck/achievement_check.js                    # every achievement through the game's listener (JSON), about 4 s

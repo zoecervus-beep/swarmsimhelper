@@ -1,27 +1,27 @@
 {
 "unittypes": {
 "invisiblehatchery": "1",
-"meat": "4.1141821271525724e+66",
-"larva": "8.4004117765795406e+13",
+"meat": "2.5238542303890843e+67",
+"larva": "5.3785103357356256e+14",
 "cocoon": "0",
-"territory": "9.7985949161142066e+69",
-"energy": "2.4764833103015826e+03",
+"territory": "1.5877554372771034e+72",
+"energy": "2.3481919824077918e+03",
 "respecEnergy": "0",
 "mtxEnergy": "8500.0",
 "nexus": "5",
 "crystal": "0",
 "mutagen": "6.0388900641879782e+07",
-"premutagen": "5.3893150179513683e+09",
+"premutagen": "1.0625957222935080e+10",
 "ascension": "1",
 "freeRespec": "4",
-"drone": "1.5220220776309113e+57",
-"queen": "1.1016521242627033e+48",
-"nest": "3.4078929215055761e+39",
-"greaterqueen": "4.6084027076405929e+31",
-"hive": "2.5576664258765516e+24",
-"hivequeen": "1.4899724192773376e+16",
-"empress": "224521006594.0",
-"prophet": "212.0",
+"drone": "5.0452466073863889e+57",
+"queen": "3.0160707960454515e+48",
+"nest": "7.7518738666150739e+39",
+"greaterqueen": "9.1573894490763039e+31",
+"hive": "4.8770648122020871e+24",
+"hivequeen": "5.1459321289815475e+17",
+"empress": "1054205161332.0",
+"prophet": "4694.0",
 "goddess": "0",
 "pantheon": "0",
 "pantheon2": "0",
@@ -34,17 +34,17 @@
 "overmind4": "0",
 "overmind5": "0",
 "overmind6": "0",
-"swarmling": "7.3054567881443362e+49",
-"stinger": "7.6096373759199185e+48",
-"spider": "4.3526083918828742e+47",
-"mosquito": "1.5036541305056583e+48",
-"locust": "7.5093590452605305e+47",
-"roach": "3.4678835806811004e+48",
-"giantspider": "2.6393036939988130e+48",
-"centipede": "1.1032206184001101e+49",
-"wasp": "8.8214982465089621e+49",
-"devourer": "5.5856125225127799e+50",
-"goon": "3.6285910025539663e+51",
+"swarmling": "1.5379017318730989e+52",
+"stinger": "1.7780595808736331e+51",
+"spider": "8.1242497728377264e+49",
+"mosquito": "3.6622874699929836e+50",
+"locust": "4.9287326776272167e+50",
+"roach": "4.2629254619204675e+50",
+"giantspider": "3.4851507553177130e+50",
+"centipede": "2.5809089829954102e+51",
+"wasp": "2.1206622002907678e+52",
+"devourer": "1.5317621040046982e+53",
+"goon": "7.2251989072826188e+53",
 "nightbug": "0",
 "moth": "4000.0",
 "bat": "0",
@@ -73,24 +73,24 @@
 "upgrades": {
 "hatchery": "65",
 "droneprod": "20",
-"dronetwin": "7",
+"dronetwin": "5",
 "swarmlingtwin": "5",
-"expansion": "178",
+"expansion": "184",
 "stingertwin": "4",
 "queenprod": "17",
 "achievementbonus": "5",
-"queentwin": "6",
+"queentwin": "7",
 "spidertwin": "1",
 "mosquitotwin": "2",
 "nestprod": "14",
-"locusttwin": "2",
+"locusttwin": "3",
 "nexus1": "1",
 "nesttwin": "7",
-"roachtwin": "3",
+"roachtwin": "2",
 "nexus2": "1",
 "greaterqueenprod": "11",
-"giantspidertwin": "3",
-"centipedetwin": "6",
+"giantspidertwin": "2",
+"centipedetwin": "5",
 "nexus3": "1",
 "greaterqueentwin": "8",
 "nexus4": "1",
@@ -141,8 +141,8 @@
 "devourerempower": "0",
 "goonempower": "0",
 "nexus5": "1",
-"larvarush": "5",
-"clonearmy": "130",
+"larvarush": "1",
+"clonearmy": "138",
 "mutatehatchery": "0",
 "mutatebat": "0",
 "mutateclone": "0",
@@ -159,74 +159,74 @@
 "byUnit": {
 "drone": {
 "clicks": 15,
-"num": "75125735137.0",
-"twinnum": "75125735137.0",
+"num": "74278989650.0",
+"twinnum": "74278989650.0",
 "elapsedFirst": 38488
 },
 "queen": {
 "clicks": 42,
-"num": "233437659335.0",
-"twinnum": "233437659335.0",
+"num": "1041890098188.0",
+"twinnum": "1041890098188.0",
 "elapsedFirst": 143018
 },
 "swarmling": {
 "clicks": 7,
-"num": "53673019904.0",
-"twinnum": "53673019904.0",
+"num": "44136615184.0",
+"twinnum": "44136615184.0",
 "elapsedFirst": 208577
 },
 "nest": {
 "clicks": 78,
-"num": "2636640532373.0",
-"twinnum": "2636640532373.0",
+"num": "174594198726.0",
+"twinnum": "174594198726.0",
 "elapsedFirst": 539295
 },
 "stinger": {
 "clicks": 4,
-"num": "5591678604.0",
-"twinnum": "5591678604.0",
+"num": "5103780756.0",
+"twinnum": "5103780756.0",
 "elapsedFirst": 587324
 },
 "spider": {
 "clicks": 6,
-"num": "320779169.0",
-"twinnum": "320779169.0",
+"num": "234154542.0",
+"twinnum": "234154542.0",
 "elapsedFirst": 1477426
 },
 "mosquito": {
 "clicks": 5,
-"num": "1105710585.0",
-"twinnum": "1105710585.0",
+"num": "1052024959.0",
+"twinnum": "1052024959.0",
 "elapsedFirst": 2717246
 },
 "greaterqueen": {
 "clicks": 199,
-"num": "17885599026385.0",
-"twinnum": "17885599026385.0",
+"num": "18154439769508.0",
+"twinnum": "18154439769508.0",
 "elapsedFirst": 3706629
 },
 "locust": {
 "clicks": 3,
-"num": "552700571.0",
-"twinnum": "552700571.0",
+"num": "1415476909.0",
+"twinnum": "1415476909.0",
 "elapsedFirst": 4063306
 },
 "roach": {
 "clicks": 12,
-"num": "2550148202.0",
-"twinnum": "2550148202.0",
+"num": "1225749337.0",
+"twinnum": "1225749337.0",
 "elapsedFirst": 5561407
 },
 "giantspider": {
 "clicks": 5,
-"num": "1940054114.0",
-"twinnum": "1940054114.0",
+"num": "1001189215.0",
+"twinnum": "1001189215.0",
 "elapsedFirst": 11419408
 },
 "hive": {
 "clicks": 202,
-"num": "5852818215449548.0",
-"twinnum": "5852818215449548.0",
+"num": "1.1205846060045744e+16",
+"twinnum": "1.1205846060045744e+16",
 "elapsedFirst": 13300146
 },
 "moth": {
@@ -237,26 +237,26 @@
 },
 "centipede": {
 "clicks": 1,
-"num": "8153790533.0",
-"twinnum": "8153790533.0",
+"num": "7455451035.0",
+"twinnum": "7455451035.0",
 "elapsedFirst": 42007111
 },
 "wasp": {
 "clicks": 5,
-"num": "64833723018.0",
-"twinnum": "64833723018.0",
+"num": "60883609973.0",
+"twinnum": "60883609973.0",
 "elapsedFirst": 44780918
 },
 "devourer": {
 "clicks": 11,
-"num": "412818777113.0",
-"twinnum": "412818777113.0",
+"num": "442046944286.0",
+"twinnum": "442046944286.0",
 "elapsedFirst": 50393018
 },
 "goon": {
 "clicks": 7,
-"num": "1.8324807968745672e+16",
-"twinnum": "1.8324807968745672e+16",
+"num": "3.3520671834480764e+16",
+"twinnum": "3.3520671834480764e+16",
 "elapsedFirst": 51796277
 },
 "energy": {
@@ -267,8 +267,8 @@
 },
 "hivequeen": {
 "clicks": 13,
-"num": "1.0370440953768859e+18",
-"twinnum": "1.0370440953768859e+18",
+"num": "1.0842896701781992e+18",
+"twinnum": "1.0842896701781992e+18",
 "elapsedFirst": 60453973
 },
 "cocoon": {
@@ -280,14 +280,14 @@
 "empress": {
 "clicks": 0,
 "elapsedFirst": 0,
-"num": "395166243070.0",
-"twinnum": "395166243070.0"
+"num": "1672728742608.0",
+"twinnum": "1672728742608.0"
 },
 "prophet": {
 "clicks": 0,
 "elapsedFirst": 0,
-"num": "1389.0",
-"twinnum": "1389.0"
+"num": "5871.0",
+"twinnum": "5871.0"
 }
 },
 "byUpgrade": {

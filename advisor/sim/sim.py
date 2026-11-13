@@ -425,6 +425,12 @@ def _climb_and_push(s,p,avail,top,f):
     climb starts (also called on its own by advisor/modelcheck/longrun_cases.py)."""
     first=True
     s.hprev=s.hatched; s.hatched=[0.0]*(K+2)
+    q=p.get('push') or {}
+    held=0.0
+    if q.get('reserve') and avail>0:           # push reserve: this share of the larvae is kept from the climb for the push
+        held=math.floor(avail*q['reserve'])
+        if TRACE is not None: tr('reserve',held,avail)
+        avail=avail-held
     for k in range(min(top+1,K),0,-1):
         fa=False   # tier passes only on the faster-aware test (see faster_aware below)
         if not allowed(s,p,k):
@@ -436,31 +442,43 @@ def _climb_and_push(s,p,avail,top,f):
         if p.get('bank') and k<K and s.c[k+1]>0 and allowed(s,p,k+1) and s.c[k+1]*P(s,k+1) > p['bank']*lam(s)*(1-p['f'])*TWO**s.twin[k]/TWO**s.twin[k+1]:
             if TRACE is not None: tr('climb',k,'bank')
             continue
-        n=avail
-        sh=p.get('share',1.0)
-        if first and p.get('share_top'): sh=p['share_top']
-        if p.get('time_share'): sh=tshare(sh,p)
-        if k>=2 and p.get('alpha'): sh=1-math.exp(-p['alpha']*p['ci']/(H(s,k)/k))
-        if k>=2 and p.get('prod_reserve'):
-            pc=2*prod_cost(s,k-1)
-            if p['prod_reserve']*pc<=s.c[k-1]<pc: continue
-        if k>=2: n=min(n,(s.c[k-1]*sh)/UNITC[k])
-        n=min(n,s.c[0]*p.get('meatshare',0.5)/MEATC[k])
-        if (p.get('res_min') is not None or p.get('res_beta') is not None) and k>=p.get('inc_min_tier',3):
-            inflow=(s.c[k]*P(s,k)*p['ci']+s.hprev[k-1])/p['ci']
-            if p.get('res_larva_only'): inflow=s.hprev[k-1]/p['ci']
-            keep=inflow*(p['res_min']*60 if p.get('res_min') is not None else p['res_beta']*H(s,k)/k)
-            n=min(n,max(0.0,(s.c[k-1]-keep))*p.get('res_share',1.0)/UNITC[k])
-        phi=p.get('inc_share'); carried=0; carry0=s.carry[k]
-        if phi is not None and k>=p.get('inc_min_tier',3) and (not p.get('inc_top_only') or first):
-            if p.get('inc_gamma'):
-                phi=min(1.0,phi*(p['theta']/H(s,k)/p.get('theta_age',1))**p['inc_gamma'])
-            inflow=s.c[k]*P(s,k)*p['ci']+s.hprev[k-1]
-            rel=p.get('stock_rel',0)*p['ci']/(H(s,k)/k)
-            s.carry[k]=min(s.carry[k]+(phi*inflow+min(1.0,rel)*s.c[k-1])/UNITC[k], s.c[k-1]/UNITC[k])
-            n=min(n,s.carry[k])
-            n=math.floor(n); s.carry[k]-=n; carried=n
-        n=math.floor(n)
+        carried=0; carry0=s.carry[k]
+        if p.get('advisor_sizing') and k>=2:
+            # the native advisor's rule 3 (advisor_size); drones keep the simulator's rule, the advisor never hatches them
+            n=advisor_size(s,p,k,avail)
+            if n is None:                          # inside the 60 s cooldown: larvae earmarked for this tier
+                em=math.floor(min(avail,s.c[k-1]/UNITC[k]*p.get('share',0.5)))
+                avail=avail-em
+                if TRACE is not None: tr('climb',k,'cooldown',em)
+                continue
+            if fa and p.get('fa_n')=='afford': n=min(avail,s.c[k-1]/UNITC[k])   # LR-1 tested on what the tier could afford
+            n=math.floor(min(n,s.c[0]*p.get('meatshare',0.5)/MEATC[k]))
+        else:
+            n=avail
+            sh=p.get('share',1.0)
+            if first and p.get('share_top'): sh=p['share_top']
+            if p.get('time_share'): sh=tshare(sh,p)
+            if k>=2 and p.get('alpha'): sh=1-math.exp(-p['alpha']*p['ci']/(H(s,k)/k))
+            if k>=2 and p.get('prod_reserve'):
+                pc=2*prod_cost(s,k-1)
+                if p['prod_reserve']*pc<=s.c[k-1]<pc: continue
+            if k>=2: n=min(n,(s.c[k-1]*sh)/UNITC[k])
+            n=min(n,s.c[0]*p.get('meatshare',0.5)/MEATC[k])
+            if (p.get('res_min') is not None or p.get('res_beta') is not None) and k>=p.get('inc_min_tier',3):
+                inflow=(s.c[k]*P(s,k)*p['ci']+s.hprev[k-1])/p['ci']
+                if p.get('res_larva_only'): inflow=s.hprev[k-1]/p['ci']
+                keep=inflow*(p['res_min']*60 if p.get('res_min') is not None else p['res_beta']*H(s,k)/k)
+                n=min(n,max(0.0,(s.c[k-1]-keep))*p.get('res_share',1.0)/UNITC[k])
+            phi=p.get('inc_share'); carried=0; carry0=s.carry[k]
+            if phi is not None and k>=p.get('inc_min_tier',3) and (not p.get('inc_top_only') or first):
+                if p.get('inc_gamma'):
+                    phi=min(1.0,phi*(p['theta']/H(s,k)/p.get('theta_age',1))**p['inc_gamma'])
+                inflow=s.c[k]*P(s,k)*p['ci']+s.hprev[k-1]
+                rel=p.get('stock_rel',0)*p['ci']/(H(s,k)/k)
+                s.carry[k]=min(s.carry[k]+(phi*inflow+min(1.0,rel)*s.c[k-1])/UNITC[k], s.c[k-1]/UNITC[k])
+                n=min(n,s.carry[k])
+                n=math.floor(n); s.carry[k]-=n; carried=n
+            n=math.floor(n)
         if TRACE is not None and fa: tr('fa',k,n,faster_levels(s,p,k,n) if p.get('faster_aware')=='multi' else None)
         if fa and not faster_aware_passes(s,p,k,n):
             if TRACE is not None: tr('climb',k,'fa_fails',n)
@@ -477,6 +495,7 @@ def _climb_and_push(s,p,avail,top,f):
         if k>=2: s.c[k-1]-=n*UNITC[k]
         s.c[0]-=n*MEATC[k]; s.c[k]+=n*TWO**s.twin[k]; s.larva-=n; avail-=n; s.spent[k]+=n; s.lastbuy[k]=s.time; s.hatched[k]+=n*TWO**s.twin[k]; buy_stat(s,NAMES[k],n*TWO**s.twin[k])
         s.firstclimb.setdefault(NAMES[k],s.time)
+        if hasattr(s,'stock_at'): s.stock_at[k]=None   # advisor sizing: re-measure the lower tier's stock after a purchase
         if fa:
             s.fa_log.append((s.time,NAMES[k],s.prod[k],n))
             if p.get('fa_buy',True):
@@ -486,17 +505,41 @@ def _climb_and_push(s,p,avail,top,f):
                         if TRACE is not None: tr('fa_faster',k,s.prod[k])
                     else: break
                     if p.get('faster_aware')!='multi' or H(s,k)<=p['theta']: break
+    if TRACE is not None: tr('after_climb',avail,held)
     if p.get('twin_after'): twin_pass(s,p)   # twin_after: twins for the tiers just hatched, in the same visit (as the native advisor's tips)
     if p.get('push'):
-        for _ in range(p['push'].get('rounds',1)): push_up(s,p)   # rounds: the player follows the push suggestions several times in one visit
+        for _ in range(p['push'].get('rounds',1)):
+            avail=push_up(s,p,(avail+held) if q.get('honest') else None); held=0.0   # rounds: the player follows the push suggestions several times in one visit
     earn_achievements(s)
+def advisor_size(s,p,k,avail):
+    """Policy option `advisor_sizing` (default off): the native advisor's rule 3 for a climbing tier. since = time
+    since this tier was last hatched (the advisor's memory starts with the run, as if hatched 60 s before it);
+    inside the 60 s cooldown it returns None (the caller earmarks larvae); otherwise
+        min(larvae left, affordable x (1 - (1 - share)^(minutes since)), spare)
+    with spare = (what the tier below gained since the last hatch + the stock it held then x min(1, since /
+    payback)) / cost, the stock being measured at the first look after a hatch (s.stock_at)."""
+    if not hasattr(s,'stock_at') or len(s.stock_at)<K+2: s.stock_at=[None]*(K+2)
+    run_start=s.time-run_age(s,p)
+    last=s.lastbuy[k] if s.lastbuy[k]>=run_start else run_start-60.0
+    since=s.time-last
+    if since<p.get('cooldown_s',60): return None
+    if s.stock_at[k] is None: s.stock_at[k]=s.c[k-1]
+    base=s.stock_at[k]
+    gained=max(s.c[k-1]-base,0.0)
+    payback=UNITC[k]/(TWO**s.twin[k]*P(s,k))
+    release=base*min(1.0,since/payback) if payback>0 else base
+    spare=(gained+release)/UNITC[k]
+    afford=s.c[k-1]/UNITC[k]
+    frac=1-(1-p.get('share',0.5))**(since/60.0)
+    return min(avail,afford*frac,spare)
 def hatch(s,k,n):
     """Buy n of meat tier k (n hatch events, n x 2^twin units), with the same bookkeeping as the climb."""
     if k>=2: s.c[k-1]-=n*UNITC[k]
     s.c[0]-=n*MEATC[k]; s.c[k]+=n*TWO**s.twin[k]; s.larva-=n; s.spent[k]+=n; s.lastbuy[k]=s.time
     s.hatched[k]+=n*TWO**s.twin[k]; buy_stat(s,NAMES[k],n*TWO**s.twin[k]); s.firstclimb.setdefault(NAMES[k],s.time)
+    if hasattr(s,'stock_at'): s.stock_at[k]=None
 def push_frontier(s,p): return max([k for k in range(1,K+1) if s.c[k]>0 and allowed(s,p,k)] + [p['push'].get('from',2)-1])   # push only tiers >= push['from']
-def push_up(s,p):
+def push_up(s,p,left=None):
     """Policy option `push` (default off), for the achievement objective: {'goal': tier, 'share': f, 'base': f0}.
     Tiers above the climb frontier (the highest tier whose break-even H passes the horizon) never pay back
     their price, so the climb rules never buy them; but the goal is to own and to have bought them. Every
@@ -506,7 +549,9 @@ def push_up(s,p):
     half the meat."""
     q=p['push']; G=min(q.get('goal',K),K)
     frontier=push_frontier(s,p)
-    larva=s.larva-s.reserve-s.nexres-(s.purse if p['f']>0 else 0)
+    # left: the climb's own count of larvae it did not take (push 'honest'); None: recomputed from the larva
+    # count, which after a climb that took everything leaves a float rounding remainder (the pass-3 artefact)
+    larva=left if left is not None else s.larva-s.reserve-s.nexres-(s.purse if p['f']>0 else 0)
     order=range(frontier+1,G+1) if q.get('bottom_up') else range(G,frontier,-1)   # bottom_up: a visit can carry units several tiers up
     if TRACE is not None: tr('frontier',frontier,larva)
     for k in order:
@@ -523,6 +568,7 @@ def push_up(s,p):
         if TRACE is not None: tr('push',k,'hatch' if n>=1 else 'under one',n,sh,s.c[k-1],larva,s.c[0],['share','larvae','meat'][caps.index(min(caps))])
         if n<1: continue
         hatch(s,k,n); larva-=n
+    return larva
 def tshare(sh,p):
     """`time_share` (default off): a share stated per minute, applied over the time since the last visit, as the
     native advisor sizes purchases: 1 - (1 - share)^(minutes since). At one-minute visits it is the share itself."""

@@ -11,9 +11,14 @@ Sections:
   final     the specified rules (SPEC) under four cadences                                       (~2 min)
   early     no harm early: the mode against the current rules, fresh run / after an ascension / the save, 1-7 days (~2 min)
   empower   territory empower (sim.EMPOWER_MODEL, option `empower`), long run with and without     (~2 min)
+  -- pass 4 (the push's larvae made honest; ASCENSION.md A.10 opening lines) --
+  honest    the pass-3 spec against honest larvae, and a push reserve swept 1e-12 .. 0.5               (~3 min)
+  advisor   the advisor's own rule-3 sizing, LR-1 variants, reserves                                (~3 min)
+  final4    the pass-4 spec (SPEC4) under seven cadences and two more seeds; LR-1 at slow cadences    (~1 min)
+  early4    no harm early, pass 4                                                                  (~1 min)
 Usage (from the repo root):
     python3 -I advisor/sim/longrun_rules.py [sections] [--days N] [--jobs N]
-Each long run takes 0.3-2 minutes; variants run in parallel (--jobs, default 4). All sections: about 15 minutes.
+Each long run takes 0.3-2 minutes; variants run in parallel (--jobs, default 4). Pass-4 sections (the default): about 8 minutes; the pass-3 sections: about 15.
 Results also go to advisor/modelcheck/out/longrun_rules_<section>.json.
 """
 import copy, json, math, os, pickle, sys, time
@@ -59,7 +64,8 @@ def long_run(args):
     s2, rows, _ = sim.run_cycles(dict(p, ascend=None), gap, s.time / 3600 + 24 * days, s0=s, every=24 * 3600)
     when = {n: (t - s0.time) / 86400 for t, n in s2.ach_log}
     first = {n: (s2.firstclimb[n] - s0.time) / 86400 for n in TIERS if n in s2.firstclimb}
-    return {'name': name, 'cadence': prof, 'seed': seed, 'when': when, 'first': first, 'exp': s2.exp,
+    lmeat = {round(r['age'] / 24): r['lmeat'] for r in rows}
+    return {'name': name, 'cadence': prof, 'seed': seed, 'when': when, 'first': first, 'exp': s2.exp, 'lmeat': {d: lmeat.get(d) for d in (10, 20, 30, 40)},
             'endless': lg(s2.bought.get('overmind6', 0)) if s2.bought.get('overmind6', 0) else None,
             'ewaste_days': s2.ewaste / (sim.erate(s2) * 86400) if sim.erate(s2) else 0, 'secs': time.time() - t0,
             'visits': len([v for v in gap.visits if v <= s2.time])}
@@ -231,12 +237,89 @@ def section_final(days, jobs):
     table(res, 'The specified rules under each cadence (days of the long run)')
     return res
 
+# Pass 4: the push fed by the climb's honest leftover (push 'honest'), and an explicit reserve for it.
+SPEC_H = dict(SPEC, push=dict(SPEC['push'], honest=True))
+
+def table2(res, title):
+    print('\n### %s\n' % title)
+    print('| variant | cadence | arch-mind | overmind | universal cortex | endless 1 | endless 1e62 | exp 5,000 | log10 meat/s day 20 / 40 |')
+    print('|' + ' --- |' * 9)
+    for r in res:
+        f = r['first']; w = r['when']; d = lambda x: '%.0f' % x if x is not None else '-'
+        lm = r.get('lmeat', {})
+        print('| %s | %s | %s | %s | %s | %s | %s | %s | %s / %s |' % (r['name'], r['cadence'], d(f.get('pantheon5')), d(f.get('overmind')),
+              d(f.get('overmind5')), d(w.get('overmind6_1')), d(w.get('overmind6_3')), d(w.get('expansion9')),
+              '%.0f' % lm[20] if lm.get(20) else '-', '%.0f' % lm[40] if lm.get(40) else '-'))
+
+def section_honest(days, jobs):
+    """The artefact: the spec as published (push fed by the float remainder) against honest larvae, and a reserve sweep."""
+    var = [('spec as published (artefact)', SPEC), ('honest larvae, no reserve', SPEC_H)]
+    for r in (1e-12, 1e-9, 1e-6, 1e-3, 1e-2, 0.1, 0.5):
+        var.append(('honest + reserve %g' % r, dict(SPEC_H, push=dict(SPEC_H['push'], reserve=r))))
+    specs = [(n, p, c, days, 1) for c in ('every5', 'human') for n, p in var]
+    res = run_all(jobs, specs)
+    json.dump(res, open(os.path.join(OUTD, 'longrun_rules_honest.json'), 'w'))
+    table2(res, 'Honest larvae for the push, and a reserve for it (days of the long run)')
+    return res
+
+SPEC_R = dict(SPEC_H, push=dict(SPEC_H['push'], reserve=0.01))      # pass 4: honest larvae + a 1% reserve for the push
+
+def section_advisor(days, jobs):
+    """The advisor's own sizing (rule 3) for the climbing tiers, with and without LR-1, and the reserve."""
+    A = dict(SPEC_R, advisor_sizing=True)
+    var = [('reserve 1%, simulator sizing', SPEC_R),
+           ('reserve 1%, advisor sizing (rule 3), LR-1 on its count', A),
+           ('advisor sizing, LR-1 off', dict(A, faster_aware=None)),
+           ('advisor sizing, LR-1 tested on what the tier could afford', dict(A, fa_n='afford')),
+           ('advisor sizing, no reserve (honest)', dict(SPEC_H, advisor_sizing=True)),
+           ('advisor sizing, reserve 1e-6', dict(A, push=dict(A['push'], reserve=1e-6))),
+           ('advisor sizing, reserve 10%', dict(A, push=dict(A['push'], reserve=0.1))),
+           ('current rules, advisor sizing (no mode)', dict(BASE, moth_N=30000, advisor_sizing=True))]
+    specs = [(n, p, c, days, 1) for c in ('every5', 'human', 'busy', 'glance+') for n, p in var]
+    res = run_all(jobs, specs)
+    json.dump(res, open(os.path.join(OUTD, 'longrun_rules_advisor.json'), 'w'))
+    table2(res, "The advisor's own purchase sizing (days of the long run)")
+    return res
+
+# Pass 4's specification: honest larvae, a 1% push reserve, the advisor's own sizing, no LR-1.
+SPEC4 = dict(SPEC_R, advisor_sizing=True, faster_aware=None)
+
+def section_final4(days, jobs):
+    """The pass-4 spec under every cadence, and LR-1 at the cadences where it once mattered."""
+    var = [('pass-4 spec (reserve 1%, advisor sizing, no LR-1)', SPEC4)]
+    specs = [(n, p, c, days, 1) for c in ('every5', 'human', 'busy', 'twice', 'glance', 'glance+', 'every120') for n, p in var]
+    specs += [('pass-4 spec, seed %d' % sd, SPEC4, c, days, sd) for c in ('human', 'busy') for sd in (2, 3)]
+    specs += [('pass-4 spec + LR-1 (on rule-3 count)', dict(SPEC4, faster_aware='multi'), c, days, 1) for c in ('glance', 'every120')]
+    specs += [('pass-4 spec + LR-1 (on affordable count)', dict(SPEC4, faster_aware='multi', fa_n='afford'), c, days, 1) for c in ('glance', 'every120')]
+    res = run_all(jobs, specs)
+    json.dump(res, open(os.path.join(OUTD, 'longrun_rules_final4.json'), 'w'))
+    table2(res, 'The pass-4 specification under each cadence (days of the long run)')
+    return res
+
+def section_early4(days, jobs):
+    """No harm early, pass 4: the spec against the current rules, both with the advisor's sizing."""
+    CUR = dict(BASE, advisor_sizing=True)
+    var = [('current rules (advisor sizing)', CUR), ('pass-4 spec', SPEC4)]
+    specs = [(n, p, c, st, 7) for st in ('fresh', 'asc1', 'save') for c in ('every5', 'human') for n, p in var]
+    res = run_all(jobs, specs, early_run)
+    json.dump(res, open(os.path.join(OUTD, 'longrun_rules_early4.json'), 'w'))
+    print('\n### No harm early (pass 4): log10 meat per second (top tier) after 1, 2, 4, 7 days\n')
+    print('| start | cadence | rules | day 1 | day 2 | day 4 | day 7 |'); print('|' + ' --- |' * 7)
+    lab = {'fresh': 'fresh run (no mutagen)', 'asc1': 'after the first ascension', 'save': 'the 20.1 h save'}
+    for r in res:
+        cells = []
+        for d in (1, 2, 4, 7):
+            o = r['out'].get(d)
+            cells.append('%.1f (%s)' % (o['earned'], sim.LABEL.get(o['top'], o['top'])) if o else '-')
+        print('| %s | %s | %s | %s |' % (lab[r['start']], r['cadence'], r['name'], ' | '.join(cells)))
+    return res
+
 if __name__ == '__main__':
     args = [a for a in sys.argv[1:] if not a.startswith('--')]
     days = 130; jobs = 4
     if '--days' in sys.argv: days = int(sys.argv[sys.argv.index('--days') + 1]); args.remove(str(days))
     if '--jobs' in sys.argv: jobs = int(sys.argv[sys.argv.index('--jobs') + 1]); args.remove(str(jobs))
-    want = args or ['diag', 'rules', 'rounds', 'glance', 'final', 'early', 'empower']
+    want = args or ['honest', 'advisor', 'final4', 'early4']   # pass 4; the pass-3 sections by name
     start_state()
     T = time.time()
     for w in want:

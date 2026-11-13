@@ -1,5 +1,7 @@
 # Long-run mode reference cases
 
+**Pass 4.** Regenerated with the corrected rules (ASCENSION.md A.10): honest larva arithmetic, a **1% push reserve**, the advisor's own **rule-3 sizing** for the climbing tiers, and **no faster-level rule (LR-1)**. The pass-3 cases (28) ran the push on a float rounding remainder in three of them, and their LR-1 fields are gone.
+
 Fixtures for checking the native advisor's long-run mode (`advisor/ASCENSION.md` A.10) against the simulator's rule functions. Each case is a simulator state exported as a save the real game loads, plus the simulator's decisions at that instant.
 
 ## Generating them
@@ -8,7 +10,7 @@ Fixtures for checking the native advisor's long-run mode (`advisor/ASCENSION.md`
 python3 -I advisor/modelcheck/longrun_cases.py      # about 40 s; needs node on PATH and `npm install` in advisor/modelcheck
 ```
 
-- **The long run.** The generator plays the long run from the first ascension under the specified rules. The start state is cached by `advisor/sim/longrun_rules.py` in `advisor/modelcheck/out/lr_start.pkl`; it is the 20.1 h save run on to the earliest ascension, with the lepidoptera and frequency mutations. The rules are `longrun_rules.SPEC` plus the spec's 60 s push cooldown, and there is one visit every 5 minutes.
+- **The long run.** The generator plays the long run from the first ascension under the specified rules (`longrun_rules.SPEC4` plus the 60 s push cooldown). The start state is cached by `advisor/sim/longrun_rules.py` in `advisor/modelcheck/out/lr_start.pkl`; it is the 20.1 h save run on to the earliest ascension, with the lepidoptera and frequency mutations. The rules are `longrun_rules.SPEC` plus the spec's 60 s push cooldown, and there is one visit every 5 minutes.
 - **Survey.** It records the first visit at which each situation below occurs.
 - **Capture.** It replays the run and, at those visits, captures the state **as the climb starts**: after the visit's energy, upgrade, twin and territory purchases.
 - **Edited and no-change cases.** It adds edited cases (twin guard either side of the line, push cooldown, meat binding) and two states where the mode must change nothing.
@@ -25,7 +27,7 @@ Everything is deterministic: rerunning gives the same files.
 
 ## Round trip
 
-28 cases, 165 numbers each. Compared for each of the 20 meat tiers:
+30 cases, 165 numbers each. Compared for each of the 20 meat tiers:
 - count, cost in the tier below and in meat;
 - units per hatch, production per unit;
 - faster and twin prices, units bought.
@@ -36,38 +38,40 @@ Also compared: larvae, larvae/s, meat, energy, energy/s, lepidoptera, territory,
 
 ## The cases
 
-"Frontier" is shown before / after the visit's climb purchases. "FL" means a pass through the faster-level rule (LR-1); L = 0 means the tier fails both tests.
+"Frontier" is shown before / after the visit's climb purchases. Several situations first occur on the same visit (run age 2.00 d); those cases share a state.
 
 | Case | Run age (d) | Gate | Frontier | Lepidoptera target | What it exercises |
 | --- | --- | --- | --- | --- | --- |
-| `gate_before` | 1.95 | off | – | 4,000 | just under 2 days: the mode changes nothing (no FL, no push, no guard) |
-| `gate_after` | 2.00 | on | 5 / 6 | 4,000 | first visit with the mode on; hive queen passes by FL with L = 1 |
-| `twin_guard` | 2.00 | on | 5 / 6 | 4,000 | the guard suppressing twins paid in pushed tiers (same visit as `gate_after`) |
-| `push_binds_share` | 2.01 | on | 6 / 6 | 4,000 | a push line on the frontier tier (2% share), limited by the share |
-| `push_under_one` | 2.02 | on | 6 / 6 | 4,000 | a 50% push line that rounds to 0 (neuroprophet), and a 2% one that hatches (empress) |
-| `fa_fails` | 2.05 | on | 6 / 6 | 4,000 | tiers failing the plain test and FL with a purchase of n > 0 |
-| `fa_L1` | 2.90 | on | 6 / 7 | 4,000 | empress passes by FL with L = 1 |
-| `frontier_empress` | 2.90 | on | 6 / 7 | 4,000 | frontier at hive empress at push time |
-| `moth_before` | 2.95 | on | 7 / 7 | 4,000 | lepidoptera target before day 3 |
-| `moth_after` | 3.00 | on | 7 / 7 | 30,000 | lepidoptera target from day 3 |
-| `day_5` | 5.00 | on | 7 / 7 | 30,000 | typical state |
-| `fa_Lmulti` | 6.69 | on | 7 / 8 | 30,000 | neuroprophet passes by FL with L = 3 |
-| `push_binds_larvae` | 8.01 | on | 8 / 8 | 30,000 | three push lines: one under one, one limited by share (50%), one by larvae left (2%) |
-| `day_10` | 10.00 | on | 8 / 8 | 30,000 | typical: the climb takes all larvae, every push line has none left |
-| `frontier_pantheon` | 12.74 | on | 9 / 10 | 30,000 | frontier at neural cluster at push time; neural cluster by FL with L = 2 |
-| `day_20` | 20.00 | on | 12 / 12 | 30,000 | typical, frontier at lesser hive mind |
-| `day_30` | 30.00 | on | 14 / 14 | 30,000 | typical, frontier at arch-mind |
-| `frontier_overmind` | 31.20 | on | 14 / 15 | 30,000 | frontier at overmind; overmind by FL with L = 5; push lines on ascended |
-| `day_40` | 40.00 | on | 15 / 15 | 30,000 | typical, frontier at overmind |
-| `cortex_owned_no_endless` | 45.55 | on | 16 / 16 | 30,000 | the visit that makes the first universal cortex (push hatches 4 from galactic clusters); endless still empty, so the endless line is `nothing below` |
-| `day_52` | 52.00 | on | 17 / 17 | 30,000 | typical state on day 52, just before the first endless |
-| `endless_owned` | 52.52 | on | 17 / 17 | 30,000 | endless owned; push lines on endless, universal cortex (share) and galactic cluster (larvae) |
-| `twin_guard_just_above` | 20.00 | on | 12 / 12 | 30,000 | arch-mind held at 1.000001 × 1e6 × hive mind's twin price: that twin is **allowed** |
-| `twin_guard_just_below` | 20.00 | on | 12 / 12 | 30,000 | arch-mind held at 0.999999 × 1e6 × that price: **suppressed** |
-| `push_cooldown` | 2.01 | on | 6 / 6 | 4,000 | `push_binds_share` with empress hatched 30 s ago: no push line for it (`outcome: cooldown`) |
-| `push_binds_meat` | 2.01 | on | 6 / 6 | 4,000 | `push_binds_share` with meat cut so the empress push line hatches 3, limited by half the meat |
-| `save_20h` | 0.84 | off | – | 4,000 | the owner's 20.1 h save: the mode changes nothing |
-| `fresh_run_12h` | 0.50 | off | – | 4,000 | a fresh run (after an ascension, no mutagen) at 12 h: the mode changes nothing |
+| `gate_before` | 1.95 | off | – / – | 4,000 | run age just under 2 days: the mode must change nothing (no reserve, no push lines, no guard) |
+| `push_binds_share` | 2.00 | on | 5 / 5 | 4,000 | push lines limited by the share of the tier below (larvae and meat plentiful) |
+| `push_fed_by_reserve_only` | 2.00 | on | 5 / 5 | 4,000 | the climb takes every larva it is offered: push lines run on the 1% reserve alone |
+| `twin_guard` | 2.00 | on | 5 / 5 | 4,000 | a twin paid in a pushed tier, suppressed by the 1e6x guard |
+| `gate_after` | 2.00 | on | 5 / 5 | 4,000 | run age just over 2 days: the mode acts |
+| `push_fed_by_reserve_and_leftover` | 2.01 | on | 6 / 6 | 4,000 | push lines run on the reserve plus larvae the climb left (its own caps bound) |
+| `push_under_one` | 2.01 | on | 6 / 6 | 4,000 | a push line that rounds down to zero (below one hatch) |
+| `bank_with_mode` | 2.05 | on | 6 / 6 | 4,000 | a tier skipped by banking (rule 4) with the mode on |
+| `frontier_empress` | 2.24 | on | 7 / 7 | 4,000 | frontier at hive empress (tier 7) |
+| `moth_before` | 2.95 | on | 7 / 7 | 4,000 | run age just under 3 days: lepidoptera target 4,000 |
+| `moth_after` | 3.00 | on | 7 / 7 | 30,000 | run age just over 3 days: lepidoptera target 30,000 |
+| `day_5` | 5.00 | on | 7 / 7 | 30,000 | the long run on day 5 (a typical state) |
+| `frontier_pantheon` | 9.72 | on | 10 / 10 | 30,000 | frontier in the neural cluster tiers (10-12) |
+| `day_10` | 10.00 | on | 10 / 10 | 30,000 | the long run on day 10 (a typical state) |
+| `day_20` | 20.00 | on | 13 / 13 | 30,000 | the long run on day 20 (a typical state) |
+| `frontier_overmind` | 26.93 | on | 15 / 15 | 30,000 | frontier at overmind / ascended / cosmic network (15-17) |
+| `day_30` | 30.00 | on | 15 / 15 | 30,000 | the long run on day 30 (a typical state) |
+| `cortex_owned_no_endless` | 39.24 | on | 16 / 16 | 30,000 | the visit that makes the first universal cortex (push lines on cortex, galactic cluster, cosmic network); endless still empty |
+| `day_40` | 40.00 | on | 16 / 16 | 30,000 | the long run on day 40 (a typical state) |
+| `endless_owned` | 49.57 | on | 17 / 17 | 30,000 | endless already owned |
+| `day_52` | 52.00 | on | 17 / 17 | 30,000 | the long run on day 52 (a typical state) |
+| `twin_guard_just_above` | 20.00 | on | 13 / 13 | 30,000 | pay tier overmind held at 1.000001 x 1e6 x the twin price of pantheon5: the guard allows it |
+| `twin_guard_just_below` | 20.00 | on | 13 / 13 | 30,000 | pay tier overmind held at 0.999999 x 1e6 x the twin price of pantheon5: the guard suppresses it |
+| `push_cooldown` | 2.00 | on | 5 / 5 | 4,000 | hivequeen hatched 30 s ago: inside the 60 s push cooldown, no push line for it (others unchanged) |
+| `push_binds_meat` | 2.00 | on | 5 / 5 | 4,000 | meat set to 2 x (what share and larvae allow) x the meat price of hivequeen, so the push line hatches but half the meat binds |
+| `climb_cooldown_earmark` | 2.00 | on | 5 / 5 | 4,000 | hive hatched 30 s ago: inside its climb cooldown, larvae earmarked for it (rule 3); the 1% reserve is still taken first |
+| `reserve_one_larva` | 2.00 | on | 5 / 5 | 4,000 | larvae offered to the climb and push = 100: the 1% reserve floors to 1 |
+| `reserve_zero_larvae` | 2.00 | on | 5 / 5 | 4,000 | larvae offered to the climb and push = 99: the 1% reserve floors to 0 |
+| `save_20h` | 0.84 | off | – / – | 4,000 | the owner's 20.1 h save (run age 0.84 d): the mode must change nothing |
+| `fresh_run_12h` | 0.50 | off | – / – | 4,000 | a fresh run (no mutagen) at run age 12 h: the mode must change nothing |
 
 ## Fields of `<case>.json`
 
@@ -87,6 +91,10 @@ Also compared: larvae, larvae/s, meat, energy, energy/s, lepidoptera, territory,
 | `moth_target` | 4,000 |
 | `moth_target_late` | [259,200 s, 30,000] |
 | `meat_share_for_push` | 0.5 |
+| `push_reserve_share` | 0.01: R = floor(0.01 × larvae the climb could use) |
+| `climb_sizing` | rule 3 |
+| `cooldown_s` | 60 |
+| `faster_level_rule` | false: LR-1 is dropped |
 
 **`state`** holds quantities computed directly on the captured state, which is the exported save:
 
@@ -109,18 +117,20 @@ Fields of each `tiers[]` entry:
 | `H_s` | cost / 2^(prod + twin) in seconds; the simulator's H, see the differences below |
 | `passes_plain` | H ≤ horizon |
 | `since_last_hatch_s` | seconds since the simulator last hatched this tier; `null` = never in this run |
+| `stock_below_at_last_look` | rule 3's memory: the tier below's stock as measured at the first look after this tier's last hatch; `null` = not measured yet, so the next look measures it |
 | `twin_guard` | for the twin of this tier: `pay_tier`, `price`, `pay_held`; `pushed_pay_tier` = the pay tier is above `frontier`; `suppressed` = pushed pay tier and pay_held < 1e6 × price |
-| `faster_levels_pass_if_got_at_least` | for tiers failing the plain test (gate on). For L = 1..8: `faster_price_total` (the next L levels' price in units of this tier) and `got_min`, the smallest "units held after the purchase" for which L levels pass, from H × (N + F_L)/(N × 2^L) ≤ horizon with N = got − F_L. `null` = L levels cannot pass at any size. The smallest L whose `got_min` ≤ got is the L LR-1 uses. |
 
 **`decisions`** are from the simulator's own climb and push code run on the state, the end of `sim.policy`, via `sim._climb_and_push`:
 
 | Field | Meaning |
 | --- | --- |
-| `larvae_before_climb` | larvae available to the climb: larvae − territory purse − reserves |
-| `climb[]` | each tier the climb looked at, top down (up to one above `top_owned`). `outcome`: `fails` (plain test and no FL considered), `bank` (rule 4), `fa_fails` (failed the plain test and FL with the purchase it would make), `passes_none` (passes but would buy 0), `buys`. `test`: `plain` / `faster-level`. `faster_level_L` (0 = fails). `n_sim` = the simulator's purchase count. |
-| `faster_after_climb[]` | faster levels bought straight after an FL hatch, one at a time at 1× price, until the tier passes the plain test or the next level is unaffordable |
+| `larvae_before_climb` | the larvae the climb could use, A: larvae − territory purse − nexus saving − clone reserve |
+| `push_reserve` | R = floor(0.01 × A), set aside for the push before the climb; `null` while the gate is off |
+| `larvae_for_climb` | A − R |
+| `climb_left` | what the climb left of A − R. Honest arithmetic: 0 when it took everything. |
+| `climb[]` | each tier the climb looked at, top down (up to one above `top_owned`). `outcome`: `fails` (plain test), `bank` (rule 4), `cooldown` (rule 3: hatched < 60 s ago; `earmarked` larvae held for it), `passes_none` (passes but would buy 0), `buys`. `n_sim` = the simulator's purchase count under rule 3. |
 | `frontier_at_push` | the frontier after the climb purchases, which is what the push used |
-| `larvae_for_push` | larvae left after the climb, minus territory purse and reserves |
+| `larvae_for_push` | what the push starts with: R + `climb_left` |
 | `push[]` | from endless down to `frontier_at_push` + 1; fields below |
 
 `outcome` of each `push[]` line:
@@ -143,11 +153,13 @@ Push lines are worked out top down. Each hatch takes its larvae, meat and units 
 
 ## Comparing the port with these cases: what must match
 
-The simulator and the advisor legitimately differ in how they size ordinary purchases:
-- the simulator uses its income-share and carry rule;
-- the advisor uses rule 3: time-since-last-hatch share and spare, with a purchase memory, floors, a 60 s cooldown and Decimal arithmetic.
+Pass 4 simulates the advisor's own rule 3 for the climbing tiers, so the climb counts are now comparable given the purchase memory (seeded from each case). What still legitimately differs:
+- **Meat cap.** The simulator caps a purchase at half the meat; the advisor does not.
+- **Territory larvae.** The simulator holds its territory larvae as a purse; the advisor holds back the territory share.
+- **Drones.** The simulator hatches drones by its own rule; the advisor never suggests drones.
+- **Arithmetic.** Float against Decimal.
 
-So the climb purchase count, and everything downstream of it, cannot be compared directly. Per field:
+Per field:
 
 | Field | Compare | How |
 | --- | --- | --- |
@@ -156,19 +168,21 @@ So the climb purchase count, and everything downstream of it, cannot be compared
 | `state.tiers[].passes_plain` | **exact** | with `H_s` within 1e-12 relative (Decimal vs float) |
 | `state.tiers[].twin_guard.suppressed` | **exact** | the `twin_guard_just_*` cases sit 1e-6 either side of the line, far above float error. This decides whether the port's rule-6 twin tip may show; whether rule 6 would show it at all is the existing rule, not tested here. |
 | `climb[].outcome` = `fails` / `bank` | **exact** | rule 1 and rule 4 on the loaded state (rule 4 uses larvae/s and the territory share, as now) |
-| `climb[].faster_level_L` | **exact given the port's own purchase count** | compute got = count + n_port × twin, and L = the smallest L with `got_min` ≤ got (boundary tolerance 1e-9 relative). With the simulator's n (`n_sim`), L equals `faster_level_L`; with the port's n it may legitimately differ. |
-| `climb[].n_sim`, `faster_after_climb[]` | **not comparable** | sizing. The port should check its own count against rule 3 as now. |
+| `decisions.push_reserve`, `larvae_for_climb` | **exact** | R = floor(0.01 × A), with A = larvae × (1 − territory share), floored, minus the larvae held for the next nexus. The simulator's A uses its territory purse rather than the territory share, so compare R given A. With the port's own A, A and R differ by the territory share's bookkeeping. |
+| `climb[].outcome` = `cooldown`, `earmarked` | **exact given the memory** | seed the port's memory from `since_last_hatch_s` |
+| `climb[].n_sim` | **exact given the memory, unless meat binds** | rule 3 is now simulated: seed the port's memory with boughtAt = now − `since_last_hatch_s` (never hatched: the run start − 60 s) and stockAt = `stock_below_at_last_look`, give it `larvae_for_climb`, and n must match (floor; 1e-12 relative above 2^53). The simulator also caps n at half the meat / meat price, which the advisor does not; where that cap binds, n differs. |
+| `climb_left` | **exact given the climb's counts** | `larvae_for_climb` minus the hatched counts and earmarks; 0 when everything was taken |
 | `decisions.frontier_at_push` | **exact if** the port evaluates the push after applying its climb suggestions, and its climb buys the same tiers | it differs from `state.frontier` only when a climb purchase makes a tier owned or buys faster levels |
 | `push[].outcome` = `nothing below` | **exact** | |
-| `push[].outcome` = `cooldown` | **exact given the memory** | the save cannot carry the advisor's purchase memory. Seed the port's memory from `state.tiers[].since_last_hatch_s`; `push_cooldown` needs empress hatched 30 s ago. |
+| `push[].outcome` = `cooldown` | **exact given the memory** | the save cannot carry the advisor's purchase memory. Seed the port's memory from `state.tiers[].since_last_hatch_s`; `push_cooldown` needs hive queen hatched 30 s ago; `climb_cooldown_earmark` needs hive hatched 30 s ago. |
 | `push[].outcome` = `no larvae` / `under one` / `hatch` and `n` | **exact given the inputs** | with `below_held`, `larvae_left` and `meat` from the line, the port's formula must give the same n (exact while n < 2^53, else 1e-12 relative) and the same `binding`. With its own inputs (its own larvae left after its own climb), n is not comparable. |
-| Larvae left for the push | **not comparable** | depends on the climb sizing. The port computes it as larvae − what its climb lines take − territory share − nexus saving. |
+| `larvae_for_push` | **exact given the climb** | R + `climb_left` |
 
 ## Where the simulator and the advisor differ, and how to handle it
 
 | Difference | What to do |
 | --- | --- |
-| **Sizing.** As above. | Compare decisions given inputs, not counts. |
+| **Sizing.** Both use rule 3 now, but the simulator's memory differs: it is seeded from the run start, and its territory larvae are a purse. | Seed the port's memory from the case. |
 | **H.** The simulator's H is cost / 2^(prod + twin), which leaves out production multipliers other than faster levels. The advisor's H is tier × cost / (twin × prodEach), which includes the meat mutation (`mutantmeat`). | Equal in every case here: no case has meat mutants, and the round trip shows prodEach equal. A save with meat mutants would make them differ, and the advisor's is the right one. |
 | **Purchase memory.** The advisor's cooldown and spare rely on its memory, which starts fresh on a loaded save. | Use `since_last_hatch_s`. |
 | **Larvae held back.** The simulator's territory purse and nexus saving are policy memory. | The port has its own territory share. |
