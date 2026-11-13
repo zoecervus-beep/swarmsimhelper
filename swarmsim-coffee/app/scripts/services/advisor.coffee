@@ -12,6 +12,7 @@ angular.module('swarmApp').constant 'ADVISOR_SETTINGS',
     moths: 4000       # lepidoptera target
     spareEnergy: 'larvarush' # below nexus 5, spare energy: 'larvarush' casts it, 'save' holds it for the next nexus
     ascension: 'off'  # ascension advice (advisorascension.coffee): 'off', or 'achievements' for ASCENSION.md's route
+    longRun: 'off'    # long-run climb mode (ASCENSION.md A.10): 'on' adds rules LR-1 to LR-4 from a run age of 2 days
   limits:
     ageMultiple: {min: 0.01, max: 1000}
     share: {min: 0.01, max: 1}
@@ -21,6 +22,7 @@ angular.module('swarmApp').constant 'ADVISOR_SETTINGS',
     moths: {min: 0, max: 1e12, integer: true}
     spareEnergy: {choices: ['larvarush', 'save']} # a choice, not a number
     ascension: {choices: ['off', 'achievements']}
+    longRun: {choices: ['off', 'on']}
 
 ###*
  # @ngdoc service
@@ -47,6 +49,16 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
   DEFAULTS = ADVISOR_SETTINGS.defaults
   NEXUS_LARVA_SECS = 20000 # save for the next nexus once its larva price is under this many seconds of larvae
   MOTH_ENERGY = 10
+  # Long-run climb mode (ASCENSION.md A.10.2), all of it gated on the setting and the run age.
+  LR =
+    age: 2 * 86400        # LR-0: the mode acts from this run age (s)
+    mothAge: 3 * 86400    # LR-4: the raised lepidoptera target from this run age (s)
+    moths: 30000          # LR-4: the raised target (the setting, if higher, stays)
+    maxLevels: 400        # LR-1: most faster levels tried, as sim.py's faster_levels
+    share: 0.5            # LR-2: share of the tier below, tiers frontier + 2 and up
+    frontierShare: 0.02   # LR-2: share of the tier below for the tier just above the frontier
+    meatShare: 0.5        # LR-2: at most this share of the meat left
+    twinGuard: 1e6        # LR-3: a twin paid in a pushed tier needs this many times its price held
   SPELLS =
     larvarush: {spell: 'larvarush', label: 'larva rush', cost: 1600}
     clonearmy: {spell: 'clonearmy', label: 'House of Mirrors', cost: 2500}
@@ -121,6 +133,9 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
       twinCost: if tcost then D(tcost.val) else null # twin upgrade price, in units of the tier above
       twinFactor: if tcost then D(twinUp.cost[0].factor) else ONE
       prodCost: if prodUp then D(prodUp.totalCost()[0].val) else null # faster upgrade price, in this unit
+      prodLevel: if prodUp then prodUp.count().toNumber() else 0 # faster levels bought
+      prodFactor: if prodUp then D(prodUp.totalCost()[0].factor) else null # price growth per faster level
+      meatCost: if unit.costByName.meat? then D(unit.costByName.meat.val) else null # meat per purchase
       purchases: String(if stats[name] then stats[name].num else 0)
 
     # Energy is read separately, as the script did, so a failure there only loses the energy line.
@@ -149,6 +164,7 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
       restartedAt: new Date(dates.restarted or dates.started).getTime()
       larvae: D larva.count()
       larvaRate: D larva.velocity()
+      meat: D g.unit('meat').count()
       units: units
       energy: energy
       energyError: energyError
@@ -171,11 +187,20 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
   copyMemory = (memory, now, restartedAt) ->
     if not memory? or (memory.restartedAt? and restartedAt? and memory.restartedAt != restartedAt)
       return createMemory now, restartedAt
-    startedAt: if memory.startedAt? then memory.startedAt else now
-    restartedAt: if memory.restartedAt? then memory.restartedAt else restartedAt
-    seen: copyMap memory.seen
-    boughtAt: copyMap memory.boughtAt
-    stockAt: copyMap memory.stockAt
+    ret =
+      startedAt: if memory.startedAt? then memory.startedAt else now
+      restartedAt: if memory.restartedAt? then memory.restartedAt else restartedAt
+      seen: copyMap memory.seen
+      boughtAt: copyMap memory.boughtAt
+      stockAt: copyMap memory.stockAt
+    # long-run mode only (absent otherwise): push purchase memory and faster levels promised by LR-1
+    if memory.push?
+      ret.push = {seen: copyMap(memory.push.seen), boughtAt: copyMap(memory.push.boughtAt)}
+    if memory.lrFaster?
+      ret.lrFaster = {}
+      for own key, val of memory.lrFaster
+        ret.lrFaster[key] = copyMap val
+    return ret
 
   # Detect purchases from the game's own "total hatched" statistic. Mutates `mem`.
   lastBuyTime = (mem, name, total, now, cooldown) ->
@@ -252,6 +277,17 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
     horizon = age * cfg.ageMultiple
     larvae = snap.larvae
     larvaRate = snap.larvaRate
+    # Long-run climb mode (ASCENSION.md A.10.2): on by the setting, acting from a run age of 2 days (LR-0).
+    # Everything it adds is behind `lrActive`; with it false, this function is exactly the console port.
+    lrOn = cfg.longRun == 'on'
+    lrActive = lrOn and age >= LR.age
+    if lrActive
+      mem.push ?= {seen: {}, boughtAt: {}}
+      mem.lrFaster ?= {}
+      seeFasterPromises mem, snap
+    else
+      delete mem.push
+      delete mem.lrFaster
 
     top = 0
     for u, i in snap.units
@@ -307,7 +343,9 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
     for j in [tiers.length - 1..0] by -1
       x = tiers[j]
       x.buys = ZERO
-      if not x.passes
+      # LR-1: a tier that fails the climb test but is affordable may still pass with faster levels.
+      lrTry = lrActive and not x.passes and x.affordable.greaterThanOrEqualTo(1)
+      if not x.passes and not lrTry
         x.kind = 'wait'
         x.reason = 'tooSlow'
         x.waitSeconds = x.waitFor.toNumber()
@@ -318,6 +356,9 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
         x.kind = 'skip'
         x.reason = 'bank'
         x.bankFor = all[j + 1].name
+      else if lrTry
+        climbWithFaster x, snap.units[j + 1], mem, now, cfg, horizon, left
+        left = left.minus(x.buys).minus(x.earmarked ? ZERO)
       else
         x.hatching = true # being climbed, even while it waits between purchases
         since = (now - lastBuyTime(mem, x.name, snap.units[j + 1].purchases, now, cfg.cooldown)) / 1000
@@ -345,6 +386,13 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
           x.kind = 'wait'
           x.reason = 'buildUp'
 
+    # LR-2: feed the tiers above the frontier, with the larvae the climbing tiers left.
+    lr = null
+    if lrActive
+      lr = pushUp snap, all, tiers, mem, now, cfg, left
+      left = lr.left
+      fasterTips snap, mem, tips
+
     # Twin upgrades only matter for a unit being hatched with larvae.
     # all[k] is that unit; all[k + 1] is the unit its twin upgrade is paid in.
     for k in [0...tiers.length]
@@ -359,7 +407,11 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
         aboveMakes = payIn.count.times payIn.prodEach
         larvaeMake = spendable.times(u.twin).dividedBy(payIn.twin)
         if uRate.greaterThanOrEqualTo(sacrificed) and not (payIn.passes and aboveMakes.greaterThan(larvaeMake))
-          tips.push {type: 'twin', unit: u.name, payIn: payIn.name, cost: tc}
+          # LR-3: units of a pushed tier (above the frontier) are kept for climbing, unless plentiful
+          if lr? and k + 2 > lr.frontierIndex and payIn.count.lessThan(tc.times LR.twinGuard)
+            lr.suppressed.push {type: 'twin', unit: u.name, payIn: payIn.name, cost: tc, need: tc.times(LR.twinGuard), have: payIn.count}
+          else
+            tips.push {type: 'twin', unit: u.name, payIn: payIn.name, cost: tc}
       else if not payIn.passes and payIn.count.lessThan(tc)
         st = ({name: o.name, have: o.count, twin: o.twin, cost: o.cost, twinCost: o.twinCost, twinFactor: o.twinFactor} for o in all)
         steps = []
@@ -375,12 +427,20 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
 
     energy = null
     energyError = snap.energyError ? null
+    # LR-4: from a run age of 3 days the mode raises the lepidoptera target to 30,000 (never lowers it)
+    raiseMoths = lrOn and age >= LR.mothAge and cfg.moths < LR.moths
     if not energyError?
       try
-        energy = energyAdvice snap, cfg
+        if raiseMoths
+          energy = energyAdvice snap, _.extend({}, cfg, moths: LR.moths)
+          if energy?.type in ['buyMoths', 'mothTarget']
+            energy.longRun = true
+            energy.setting = cfg.moths
+        else
+          energy = energyAdvice snap, cfg
       catch e
         energyError = e
-    return {
+    ret = {
       now: now
       age: age
       horizon: horizon
@@ -395,6 +455,178 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
       config: cfg
       memory: mem
     }
+    # Only with the setting on, so the result is unchanged with it off.
+    if lrOn
+      ret.longRun =
+        active: lrActive
+        startsIn: if lrActive then 0 else LR.age - age # seconds until the mode acts
+        mothsRaised: raiseMoths
+        frontier: if lr? then CHAIN[lr.frontierIndex] else null
+        pushes: if lr? then lr.pushes else []
+        suppressed: if lr? then lr.suppressed else []
+        # tiers above the listed ones, up to endless: nothing can be fed there (LR-2 needs the tier below)
+        above: if lrActive then CHAIN.slice(shown + 1) else []
+    return ret
+
+  # ---------------------------------------------------------------------------
+  # Long-run climb mode helpers (ASCENSION.md A.10.2). Each mutates `mem` and the tier records passed.
+
+  # LR-1 bookkeeping. `mem.lrFaster[name]` is a promise made by LR-1: {level, levels, purchases, bought,
+  # fresh}. Once the purchase it advised is seen (the unit's purchase statistic changed), it is
+  # `bought`, and the faster tip shows those levels at 1x their price until they are bought. A promise
+  # not bought is dropped as soon as LR-1 stops advising it.
+  seeFasterPromises = (mem, snap) ->
+    for u in snap.units when mem.lrFaster[u.name]?
+      p = mem.lrFaster[u.name]
+      p.fresh = false
+      if not p.bought and p.purchases isnt u.purchases
+        p.bought = true
+      if p.bought and u.prodLevel >= p.level + p.levels
+        delete mem.lrFaster[u.name]
+    return
+
+  # The smallest L >= 1 for which hatching n (giving n x twin units) and buying L faster levels out of
+  # the units held brings the break-even under the horizon, counting the levels' price as cost:
+  #   got = count + n x twin, F_L = price of the next L levels, N_L = got - F_L >= 1,
+  #   H x (N_L + F_L) / (N_L x 2^L) <= horizon.
+  # Returns {levels, price} or null.
+  fasterLevels = (x, s, n, horizon) ->
+    if not s.prodCost? or not s.prodFactor? or not n.greaterThanOrEqualTo(1)
+      return null
+    got = x.count.plus n.times(x.twin)
+    F = ZERO
+    price = s.prodCost
+    for L in [1..LR.maxLevels]
+      F = F.plus price
+      price = price.times s.prodFactor
+      N = got.minus F
+      if N.lessThan 1
+        return null
+      if x.H.times(N.plus F).dividedBy(N.times Decimal.pow(2, L)).lessThanOrEqualTo horizon
+        return {levels: L, price: F}
+    return null
+
+  # LR-1 for a tier that fails the climb test: size the purchase as rule 3 would if it passed, then test.
+  # Sets the tier's kind/reason/buys (and earmark while it cools down after an LR-1 purchase).
+  climbWithFaster = (x, s, mem, now, cfg, horizon, left) ->
+    promise = mem.lrFaster[x.name]
+    since = (now - lastBuyTime(mem, x.name, s.purchases, now, cfg.cooldown)) / 1000
+    x.since = since
+    if since < cfg.cooldown and promise?.bought
+      # just bought on LR-1's advice: it cools down like a climbing tier, larvae earmarked
+      x.hatching = true
+      x.lrPass = true
+      x.fasterLevels = promise.levels
+      x.kind = 'wait'
+      x.reason = 'cooldown'
+      x.waitSeconds = cfg.cooldown - since
+      x.earmarked = Decimal.min(left, x.affordable.times(cfg.share)).floor()
+      return
+    frac = 1 - Math.pow(1 - cfg.share, since / 60)
+    spare = spareBuys mem, x, since
+    x.spare = spare
+    n = Decimal.min(left, x.affordable.times(frac), spare).floor()
+    fit = if since >= cfg.cooldown then fasterLevels(x, s, n, horizon) else null
+    if fit?
+      x.hatching = true
+      x.lrPass = true
+      x.kind = 'buy'
+      x.reason = 'buyFaster'
+      x.buys = n
+      x.fasterLevels = fit.levels
+      x.fasterPrice = fit.price
+      mem.lrFaster[x.name] = {level: s.prodLevel, levels: fit.levels, purchases: s.purchases, bought: false, fresh: true}
+    else
+      x.kind = 'wait'
+      x.reason = 'tooSlow'
+      x.waitSeconds = x.waitFor.toNumber()
+    return
+
+  # The faster tip for a tier bought on LR-1's advice: the promised levels still to buy, at 1x their
+  # price (the purchase was sized to pay for them), in place of the usual 2x tip. Mutates `tips`.
+  fasterTips = (snap, mem, tips) ->
+    for own name, p of mem.lrFaster
+      if not p.bought and not p.fresh
+        delete mem.lrFaster[name]
+        continue
+      if not p.bought
+        continue
+      u = _.find snap.units, name: name
+      remaining = p.level + p.levels - u.prodLevel
+      if remaining < 1 or not u.prodCost?
+        continue
+      price = ZERO
+      each = u.prodCost
+      for i in [0...remaining]
+        price = price.plus each
+        each = each.times u.prodFactor
+      _.remove tips, (t) -> t.type == 'faster' and t.unit == name
+      if u.count.greaterThanOrEqualTo price
+        tips.unshift {type: 'faster', unit: name, cost: price, levels: remaining, longRun: true}
+    return
+
+  # When a pushed unit was last bought, from its purchase statistic, as `lastBuyTime` does for climbing
+  # (first sighting: available at once). Kept apart from the climbing memory. Mutates `mem.push`.
+  pushBuyTime = (mem, name, total, now, cooldown) ->
+    m = mem.push
+    if m.seen[name] is undefined
+      m.seen[name] = total
+      m.boughtAt[name] = now - cooldown * 1000
+    else if m.seen[name] isnt total
+      m.seen[name] = total
+      m.boughtAt[name] = now
+    return m.boughtAt[name]
+
+  # LR-2 "feed upward". The frontier is the highest tier that passes the climb test (rule 1 or LR-1)
+  # and is owned or bought this visit. From endless down to frontier + 1, with any of the tier below
+  # held: hatch floor(share x below / cost), share 0.5 (0.02 for frontier + 1), capped by the larvae
+  # left and by half the meat left. Top-down; a pushed unit cools down for `cooldown` seconds after a
+  # purchase is seen (no earmark meanwhile). Returns {frontierIndex, pushes, suppressed, left}.
+  pushUp = (snap, all, tiers, mem, now, cfg, left) ->
+    frontier = 0 # drone
+    meatLeft = snap.meat
+    for x, j in tiers
+      if (x.passes or x.lrPass) and (x.count.greaterThan(0) or x.kind == 'buy')
+        frontier = j + 1
+      if x.kind == 'buy' and snap.units[j + 1].meatCost?
+        meatLeft = meatLeft.minus x.buys.times(snap.units[j + 1].meatCost)
+    meatLeft = Decimal.max meatLeft, 0
+    pushes = []
+    for k in [CHAIN.length - 1...frontier] by -1
+      u = snap.units[k]
+      b = snap.units[k - 1]
+      if not b.count.greaterThan(0) or left.lessThan(1)
+        continue
+      share = if k >= frontier + 2 then LR.share else LR.frontierShare
+      byShare = b.count.times(share).dividedBy u.cost
+      byMeat = if u.meatCost? then meatLeft.times(LR.meatShare).dividedBy(u.meatCost) else null
+      n = Decimal.min byShare, left
+      limitedBy = if byShare.lessThanOrEqualTo(left) then 'share' else 'larvae'
+      if byMeat? and byMeat.lessThan n
+        n = byMeat
+        limitedBy = 'meat'
+      n = n.floor()
+      if n.lessThan 1
+        continue
+      x = all[k - 1]
+      since = (now - pushBuyTime(mem, u.name, u.purchases, now, cfg.cooldown)) / 1000
+      x.pushed = true
+      if since < cfg.cooldown
+        x.kind = 'wait'
+        x.reason = 'cooldown'
+        x.waitSeconds = cfg.cooldown - since
+        x.buys = ZERO
+        continue
+      rec = {type: 'push', unit: u.name, below: b.name, buys: n, twin: u.twin, units: n.times(u.twin), share: share, limitedBy: limitedBy, belowCount: b.count}
+      pushes.push rec
+      x.kind = 'push'
+      x.reason = 'push'
+      x.buys = n
+      x.push = rec
+      left = left.minus n
+      if u.meatCost?
+        meatLeft = meatLeft.minus n.times(u.meatCost)
+    return {frontierIndex: frontier, pushes: pushes, suppressed: [], left: left}
 
   # ---------------------------------------------------------------------------
   # Energy: nexus first, lepidoptera up to the target, then every point into House of Mirrors.
@@ -465,7 +697,19 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
       when 'buy' then 'BUY ' + formatNumber(t.buys) + (if t.twin.greaterThan(1) then ' (x' + formatNumber(t.twin) + ' twins)' else '')
       when 'larvaeUsedAbove' then 'skip: larvae used above'
       when 'buildUp' then 'let ' + t.below + 's build up'
+      # long-run mode
+      when 'buyFaster'
+        'BUY ' + formatNumber(t.buys) + (if t.twin.greaterThan(1) then ' (x' + formatNumber(t.twin) + ' twins)' else '') + ', then ' + t.fasterLevels + 'x faster ' + t.name + 's'
+      when 'push' then 'feed upward: ' + renderPush(t.push)
       else ''
+
+  # "hatch 3.20e15 overmind5s (half your overmind4s)"
+  renderPush = (rec) ->
+    why = switch rec.limitedBy
+      when 'larvae' then 'all larvae left'
+      when 'meat' then 'half your meat'
+      else (if rec.share == 0.5 then 'half' else (rec.share * 100) + '% of') + ' your ' + rec.below + 's'
+    'hatch ' + formatNumber(rec.buys) + ' ' + rec.unit + (if rec.buys.equals(1) then '' else 's') + (if rec.twin.greaterThan(1) then ' (x' + formatNumber(rec.twin) + ' twins)' else '') + ' (' + why + ')'
 
   renderStep = (step) ->
     if step.type == 'twin'
@@ -474,7 +718,7 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
 
   renderTip = (tip) ->
     switch tip.type
-      when 'faster' then 'faster ' + tip.unit + 's (' + formatNumber(tip.cost) + ')'
+      when 'faster' then 'faster ' + tip.unit + 's' + (if tip.levels? then ' x' + tip.levels else '') + ' (' + formatNumber(tip.cost) + ')'
       when 'twin' then 'twin ' + tip.unit + 's (' + formatNumber(tip.cost) + ' ' + tip.payIn + 's)'
       when 'twinPlan'
         (renderStep(s) for s in tip.steps).join(' > ') + ' > twin ' + tip.unit + 's (pays back in ' + formatTime(tip.payback) + ')'
@@ -504,9 +748,9 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
       when 'buyNexus' then 'buy nexus ' + rec.level
       when 'save' then renderSaving rec
       when 'buyMoths'
-        want = 'lepidoptera ' + formatNumber(rec.moths) + '/' + formatNumber(rec.target)
+        want = 'lepidoptera ' + formatNumber(rec.moths) + '/' + formatNumber(rec.target) + (if rec.longRun then ', long-run target' else '')
         'buy ' + formatNumber(rec.count) + ' lepidoptera (' + want + ')' + (if rec.then then '; then ' + renderSaving(rec.then) else '')
-      when 'mothTarget' then 'all energy into lepidoptera ' + formatNumber(rec.moths) + '/' + formatNumber(rec.target)
+      when 'mothTarget' then 'all energy into lepidoptera ' + formatNumber(rec.moths) + '/' + formatNumber(rec.target) + (if rec.longRun then ' (long-run target)' else '')
       when 'cast' then 'cast ' + rec.label + ' x' + formatNumber(rec.casts)
       when 'nextCast' then 'next ' + rec.label + ' at ' + formatNumber(rec.cost) + ' energy (have ' + formatNumber(rec.energy) + ')'
       when 'hold' then renderHold rec
@@ -548,6 +792,8 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
     renderStep: renderStep
     renderEnergy: renderEnergy
     renderHeader: renderHeader
+    renderPush: renderPush
+    LR: LR
     # live
     config: -> options.advisorConfig()
     enabled: -> options.advisorEnabled()
