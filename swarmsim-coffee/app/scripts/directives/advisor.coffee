@@ -108,6 +108,22 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
         text = 'cast ' + rec.label + ' \u00d7' + bignum(rec.casts)
       when 'nextCast'
         text = 'next ' + rec.label + ' at ' + bignum(rec.cost) + ' energy (have ' + bignum(rec.energy) + ')'
+      when 'hold'
+        # spare energy kept for the next nexus (setting spareEnergy 'save')
+        text = 'saving for nexus ' + rec.level + ': '
+        if not rec.price?
+          text += bignum(rec.energy) + ' energy'
+        else if rec.ready
+          text += 'energy ready (' + bignum(rec.energy) + '/' + bignum(rec.price) + ')'
+        else
+          text += bignum(rec.energy) + '/' + count(rec.price, 'energy')
+        if rec.missing.length
+          text += (if rec.ready then '; waiting for ' else '; also needs ') + ((count(m.need, m.unit) + ' (have ' + bignum(m.have) + ')') for m in rec.missing).join(', ')
+        if rec.mothsNext
+          text += '; lepidoptera after that'
+        link = 'nexus'
+      when 'energyFull'
+        text = 'energy is full (' + bignum(rec.energy) + '/' + bignum(rec.cap) + '): cast ' + rec.label + ' \u00d71 so the income isn\'t wasted'
       else
         text = advisor.renderEnergy rec
     return {type: rec.type, text: text, href: href(link)}
@@ -506,6 +522,13 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
       <p class="help-block" ng-if="errors[field.key]">{{errors[field.key]}}</p>
       <p class="help-block" ng-if="!errors[field.key] && notes[field.key]">{{notes[field.key]}}</p>
     </div>
+    <div class="form-group" ng-class="{'has-error': !!errors.spareEnergy}">
+      <label class="control-label">Spare energy before House of Mirrors</label>
+      <div class="radio"><label><input type="radio" name="advisor-spareEnergy" value="larvarush" ng-model="form.values.spareEnergy" ng-change="setChoice('spareEnergy')"> Cast larva rush</label></div>
+      <div class="radio"><label><input type="radio" name="advisor-spareEnergy" value="save" ng-model="form.values.spareEnergy" ng-change="setChoice('spareEnergy')"> Save it for the next nexus and lepidoptera</label></div>
+      <p class="help-block">Larva rush suits runs of a day or two. Saving reaches nexus 4 and lepidoptera hours sooner, and came out ahead from about day 4 in the simulator. At nexus 5 spare energy always goes to House of Mirrors. Default: cast larva rush.</p>
+      <p class="help-block" ng-if="errors.spareEnergy">{{errors.spareEnergy}}</p>
+    </div>
     <button type="button" class="btn btn-default btn-sm" ng-click="reset()">Reset advisor settings to defaults</button>
   </div>
 </div>
@@ -532,6 +555,18 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
       scope.errors = {}
       scope.notes = {}
     syncAll()
+
+    # A two-way choice, saved as soon as it is picked (as the game's own radio options are).
+    scope.setChoice = (key) ->
+      delete scope.errors[key]
+      try
+        options.advisorSetting key, scope.form.values[key]
+        advisor.invalidate()
+      catch e
+        $log.debug 'advisor setting rejected', key, e
+        scope.errors[key] = 'Not a valid choice. Still using ' + options.advisorSetting(key) + '.'
+        scope.form.values[key] = options.advisorSetting key
+      return
 
     scope.setEnabled = (enabled) ->
       options.advisorEnabled !!enabled

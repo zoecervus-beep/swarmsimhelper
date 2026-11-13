@@ -266,6 +266,25 @@ describe 'Directive: advisorPanel', ->
     el = render()
     expect(el.querySelector('.advisor-territory a').getAttribute 'href').toBe '#/tab/larva/unit/larva'
 
+  it 'says what spare energy is being saved for', ->
+    D = (x) -> new Decimal x
+    hold = {type: 'hold', level: 2, energy: D(2000), price: D(625), ready: true, missing: [{unit: 'meat', have: D(8.95e11), need: D(3.33e15)}], mothsNext: false}
+    spyOn(advisor, 'update').and.returnValue fakeAdvice {energy: hold}
+    el = render()
+    expect(text el.querySelector '.advisor-energy').toBe 'Energy: saving for nexus 2: energy ready (' + bignum(D 2000) + '/625); waiting for ' + bignum(D 3.33e15) + ' meat (have ' + bignum(D 8.95e11) + ')'
+    hold = {type: 'hold', level: 4, energy: D(2000), price: D(10000), ready: false, missing: [], mothsNext: true}
+    advisor.update.and.returnValue fakeAdvice {energy: hold}
+    advisor.invalidate()
+    $rootScope.$emit 'tick'
+    $rootScope.$digest()
+    expect(text el.querySelector '.advisor-energy').toBe 'Energy: saving for nexus 4: ' + bignum(D 2000) + '/' + bignum(D 10000) + ' energy; lepidoptera after that'
+    full = {type: 'energyFull', energy: D(10000), cap: D(10000), spell: 'larvarush', label: 'larva rush', cost: 1600}
+    advisor.update.and.returnValue fakeAdvice {energy: full}
+    advisor.invalidate()
+    $rootScope.$emit 'tick'
+    $rootScope.$digest()
+    expect(text el.querySelector '.advisor-energy').toBe 'Energy: energy is full (' + bignum(D 10000) + '/' + bignum(D 10000) + '): cast larva rush ×1 so the income isn\'t wasted'
+
   it 'collapses to a one-line summary and remembers that with the save', ->
     spyOn(advisor, 'update').and.returnValue fakeAdvice()
     el = render()
@@ -555,6 +574,24 @@ describe 'Directive: advisorOptions', ->
     angular.element(input).triggerHandler {type: 'keydown', keyCode: 13}
     expect(input.blur).toHaveBeenCalled()
 
+  it 'offers the spare-energy choice as two options, saved when picked', ->
+    spyOn(options, 'advisorSetting').and.callThrough()
+    el = render()
+    radios = el.querySelectorAll 'input[name=advisor-spareEnergy]'
+    expect(radios.length).toBe 2
+    expect(radios[0].checked).toBe true
+    expect(text el).toContain 'Larva rush suits runs of a day or two'
+    radios[1].checked = true
+    angular.element(radios[1]).triggerHandler 'click'
+    $rootScope.$digest()
+    expect(options.advisorSetting).toHaveBeenCalledWith 'spareEnergy', 'save'
+    expect(options.advisorConfig().spareEnergy).toBe 'save'
+    # reset brings the default back, in the control too
+    angular.element(el.querySelector '.advisor-options > .well > button').triggerHandler 'click'
+    $rootScope.$digest()
+    expect(options.advisorConfig().spareEnergy).toBe 'larvarush'
+    expect(el.querySelectorAll('input[name=advisor-spareEnergy]')[0].checked).toBe true
+
   it 'turns the advisor on and off', ->
     el = render()
     box = el.querySelector 'input[type=checkbox]'
@@ -570,5 +607,5 @@ describe 'Directive: advisorOptions', ->
     el = render()
     angular.element(el.querySelector '.advisor-options button').triggerHandler 'click'
     $rootScope.$digest()
-    expect(options.advisorConfig()).toEqual {ageMultiple: 3, share: 0.5, cooldown: 60, bank: 3, territory: 0.1, moths: 4000}
+    expect(options.advisorConfig()).toEqual {ageMultiple: 3, share: 0.5, cooldown: 60, bank: 3, territory: 0.1, moths: 4000, spareEnergy: 'larvarush'}
     expect(el.querySelector('#advisor-moths').value).toBe '4000'
