@@ -14,7 +14,8 @@ var SAVES = {s14: path.join(__dirname, '..', 'sim', 'example_save_14h.json'),
 var SPEC = process.argv[2] ? JSON.parse(fs.readFileSync(process.argv[2], 'utf8')) : {replays: []};
 var S = function (d) { return d === undefined || d === null ? null : String(d); };
 var CHAIN = ['drone', 'queen', 'nest', 'greaterqueen', 'hive', 'hivequeen', 'empress', 'prophet', 'goddess',
-  'pantheon', 'pantheon2', 'pantheon3'];
+  'pantheon', 'pantheon2', 'pantheon3', 'pantheon4', 'pantheon5', 'overmind', 'overmind2', 'overmind3', 'overmind4', 'overmind5',
+  'overmind6'];
 var TERR = ['swarmling', 'stinger', 'spider', 'mosquito', 'locust', 'roach', 'giantspider', 'centipede', 'wasp',
   'devourer', 'goon'];
 var MUTANTS = ['mutanthatchery', 'mutantbat', 'mutantclone', 'mutantswarmwarp', 'mutantrush', 'mutanteach',

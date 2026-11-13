@@ -1,0 +1,13 @@
+{
+ "units": {"meat": "1e600", "larva": "1e450", "territory": "1e600", "drone": "3e420", "queen": "2e390", "nest": "1e370",
+           "greaterqueen": "1e330", "hive": "5e320", "hivequeen": "1e300", "empress": "1e280", "prophet": "1e260",
+           "goddess": "1e240", "pantheon": "1e220", "pantheon2": "1e200", "pantheon3": "1e180", "pantheon4": "1e160",
+           "pantheon5": "1e140", "overmind": "1e120", "overmind2": "1e100", "overmind3": "1e90", "overmind4": "1e80",
+           "overmind5": "1e75", "overmind6": "1e70", "goon": "1e400", "devourer": "1e380", "nexus": "5", "moth": "20000",
+           "mutagen": "1e350", "mutanthatchery": "1e300", "mutantmeat": "1e320", "mutantarmy": "1e330", "mutanteach": "1e310",
+           "mutantfreq": "1e6", "mutantnexus": "1e9"},
+ "upgrades": {"expansion": "1500", "hatchery": "600", "achievementbonus": "5", "nexus5": "1", "droneprod": "200", "dronetwin": "1100",
+              "queenprod": "150", "queentwin": "900", "hivetwin": "400", "pantheon5twin": "60", "overmindtwin": "40",
+              "overmind5twin": "7", "overmind6prod": "3", "overmind5prod": "90", "goontwin": "300", "devourertwin": "200",
+              "mutatehatchery": "1", "mutatemeat": "1", "mutatearmy": "1", "mutateeach": "1", "mutatefreq": "1", "mutatenexus": "1"}
+}
