@@ -349,3 +349,13 @@ body {
 .advisor-panel .advisor-summary {
   text-transform: none;
 }
+// On a unit page, the panel marks that unit's row with a bar in the text colour and a marker icon,
+// so it reads in every theme and doesn't compete with the green "buy" rows.
+.advisor-panel .advisor-table tr.advisor-current > td:first-child,
+.advisor-panel .list-group-item.advisor-current {
+  box-shadow: inset 4px 0 0 currentColor;
+  font-weight: bold;
+}
+.advisor-panel .advisor-here {
+  margin-right: 0.25em;
+}

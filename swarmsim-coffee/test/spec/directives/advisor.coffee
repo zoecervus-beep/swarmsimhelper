@@ -182,6 +182,59 @@ describe 'Directive: advisorPanel', ->
     expect(text el.querySelector '.advisor-error').toBe 'Advisor error: no hive data'
     expect(el.querySelectorAll('.advisor-territory').length).toBe 2
 
+  it 'marks the unit of the page it is on, separately from the buy emphasis', ->
+    spyOn(advisor, 'update').and.returnValue fakeAdvice()
+    spyOn(advisorTerritory, 'update').and.returnValue fakeTerritory()
+    el = $compile('<advisor-panel current-unit="nest"></advisor-panel>') scope
+    $rootScope.$digest()
+    el = el[0]
+    marked = el.querySelectorAll 'tr.advisor-current'
+    expect(marked.length).toBe 1
+    expect(text marked[0].querySelector 'td').toBe '(this page) nest'
+    expect(marked[0].querySelector '.advisor-here').not.toBe null
+    # a row can be both the current unit and a buy
+    expect(marked[0].className).toContain 'success'
+    expect(el.querySelectorAll('.advisor-territory.advisor-current').length).toBe 0
+
+  it 'marks a territory line for the unit of the page', ->
+    spyOn(advisor, 'update').and.returnValue fakeAdvice()
+    spyOn(advisorTerritory, 'update').and.returnValue fakeTerritory()
+    scope.unitName = 'devourer'
+    el = $compile('<advisor-panel current-unit="{{unitName}}"></advisor-panel>') scope
+    $rootScope.$digest()
+    el = el[0]
+    marked = el.querySelectorAll '.advisor-territory.advisor-current'
+    expect(marked.length).toBe 1
+    expect(text marked[0]).toContain 'devourers'
+    expect(el.querySelectorAll('tr.advisor-current').length).toBe 0
+    # follows the page's unit
+    scope.unitName = 'queen'
+    $rootScope.$digest()
+    expect(text el.querySelector 'tr.advisor-current td').toBe '(this page) queen'
+
+  it 'marks nothing on the list pages', ->
+    spyOn(advisor, 'update').and.returnValue fakeAdvice()
+    spyOn(advisorTerritory, 'update').and.returnValue fakeTerritory()
+    el = render()
+    expect(el.querySelectorAll('.advisor-current').length).toBe 0
+    expect(el.querySelectorAll('.advisor-here').length).toBe 0
+
+  it 'says when the territory larvae are refilling', ->
+    spyOn(advisor, 'update').and.returnValue fakeAdvice()
+    status = {type: 'idle', reason: 'refilling', since: 10, rate: 5, seconds: 30}
+    spyOn(advisorTerritory, 'update').and.returnValue fakeTerritory {records: [status], hatch: [], status: status}
+    el = render()
+    expect(text el.querySelector '.advisor-territory').toBe 'Territory: territory larvae spent for now, more in 30 s'
+
+  it 'links territory upgrades shown on the larva page there', ->
+    D = (x) -> new Decimal x
+    spyOn(advisor, 'update').and.returnValue fakeAdvice()
+    spyOn(game.unit('larva'), 'isVisible').and.returnValue true
+    rec = {type: 'upgrade', name: 'hatchery', label: 'hatchery', levels: 1, from: 1, costs: [{unit: 'meat', val: D(3000)}]}
+    spyOn(advisorTerritory, 'update').and.returnValue fakeTerritory {records: [rec], hatch: []}
+    el = render()
+    expect(el.querySelector('.advisor-territory a').getAttribute 'href').toBe '#/tab/larva/unit/larva'
+
   it 'collapses to a one-line summary and remembers that with the save', ->
     spyOn(advisor, 'update').and.returnValue fakeAdvice()
     el = render()

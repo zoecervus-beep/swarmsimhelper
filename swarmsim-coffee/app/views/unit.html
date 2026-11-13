@@ -6,6 +6,10 @@
          table plus pull-right makes most of the page unclickable for some reason, so 
          individual pull/push offsets for each screen size are needed. -->
     <div class="col-lg-9 col-md-8 col-sm-7 col-lg-push-3 col-md-push-4 col-sm-push-5">
+      <!-- The climbing advisor sits beside the unit's content on wide screens (lg) and below it on
+           narrower ones, never above it, so its changing height can't move the buy box or buttons. -->
+      <div class="row">
+      <div class="col-xs-12" ng-class="{'col-lg-6': options.advisorEnabled()}">
       <ul class="nav nav-pills nav-justified text-nowrap visible-xs">
         <li><a ng-href="#/unit/{{cur.unit.prev.unittype.slug}}" ng-if="cur.unit.prev && cur.unit.prev.isVisible()">
           <span class="glyphicon glyphicon-chevron-left"></span>
@@ -23,6 +27,11 @@
         <span class="label-label">{{cur.unit.unittype.label}}</span><span class="label-suffix"> {{cur.unit.suffix}}</span>
       </a></h3>
       <unit cur="cur.unit"></unit>
+      </div>
+      <div class="col-xs-12 col-lg-6 advisor-unit-col" ng-if="options.advisorEnabled()">
+        <advisor-panel current-unit="{{cur.unit.name}}"></advisor-panel>
+      </div>
+      </div>
     </div>
 
     <div class="col-lg-3 col-md-4 col-sm-5 col-lg-pull-9 col-md-pull-8 col-sm-pull-7">

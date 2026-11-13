@@ -29,10 +29,11 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
     if u?.tab? and u.isVisible()
       return '#' + u.url()
     return null
-  # An upgrade's page is its unit's page (hatchery and expansion are on the larva page).
+  # An upgrade's page is its unit's page. Hatchery, expansion and accomplished ancestry belong to
+  # the hidden 'invisiblehatchery' unit and are shown on the larva page.
   upgradeHref = (name) ->
     try
-      return href game.upgrade(name).unit.name
+      return href(game.upgrade(name).unit.name) ? href('larva')
     catch e
       return null
   upgradeLabel = (name, fallback) ->
@@ -158,7 +159,7 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
   # One territory record as a panel line: text from the record's fields with the game's labels and
   # number format, a link where the game has a page for it, and `buy` for what to hatch.
   territoryLine = (rec) ->
-    line = {type: rec.type, href: null, buy: false}
+    line = {type: rec.type, unit: rec.unit ? null, href: null, buy: false}
     switch rec.type
       when 'setShare'
         line.text = 'set the territory share to ' + rec.to + ' in Options (now ' + rec.share + ')'
@@ -251,7 +252,9 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
 ###
 angular.module('swarmApp').directive 'advisorPanel', ($rootScope, $log, advisor, advisorTerritory, advisorView, options, ADVISOR_REFRESH_MILLIS) ->
   restrict: 'E'
-  scope: {}
+  # current-unit: on a unit page, the unit shown there; its row (or territory line) is marked.
+  scope:
+    currentUnit: '@'
   template: """
 <div class="panel panel-default advisor-panel" ng-if="enabled()">
   <div class="panel-heading">
@@ -281,8 +284,8 @@ angular.module('swarmApp').directive 'advisorPanel', ($rootScope, $log, advisor,
         <th>Now</th>
       </tr></thead>
       <tbody>
-        <tr ng-repeat="row in view.rows track by row.name" ng-class="{success: row.kind == 'buy'}" class="advisor-row advisor-{{row.kind}}">
-          <td class="titlecase text-nowrap"><a ng-if="row.href" ng-href="{{row.href}}">{{row.label}}</a><span ng-if="!row.href">{{row.label}}</span></td>
+        <tr ng-repeat="row in view.rows track by row.name" ng-class="{success: row.kind == 'buy', 'advisor-current': row.name == currentUnit}" class="advisor-row advisor-{{row.kind}}">
+          <td class="titlecase text-nowrap"><span ng-if="row.name == currentUnit" class="glyphicon glyphicon-map-marker advisor-here" title="The unit on this page"></span><span ng-if="row.name == currentUnit" class="sr-only">(this page) </span><a ng-if="row.href" ng-href="{{row.href}}">{{row.label}}</a><span ng-if="!row.href">{{row.label}}</span></td>
           <td class="text-right text-nowrap">{{row.count|bignum:0}}</td>
           <td class="text-right text-nowrap">{{row.H}}</td>
           <td class="advisor-action" ng-class="{'text-muted': row.kind != 'buy'}"><strong ng-if="row.kind == 'buy'">{{row.action}}</strong><span ng-if="row.kind != 'buy'">{{row.action}}</span></td>
@@ -303,8 +306,9 @@ angular.module('swarmApp').directive 'advisorPanel', ($rootScope, $log, advisor,
       <span class="glyphicon glyphicon-flag" aria-hidden="true"></span> Territory: {{terr.error}}
     </li>
     <!-- hatch lines are bold, not tinted: a tinted item hides its link on some dark themes (darkly) -->
-    <li class="list-group-item advisor-territory" ng-repeat="line in terr.lines">
+    <li class="list-group-item advisor-territory" ng-repeat="line in terr.lines" ng-class="{'advisor-current': line.unit && line.unit == currentUnit}">
       <span class="glyphicon glyphicon-flag" aria-hidden="true"></span> <span ng-if="$first">Territory:</span>
+      <span ng-if="line.unit && line.unit == currentUnit" class="glyphicon glyphicon-map-marker advisor-here" title="The unit on this page"></span><span ng-if="line.unit && line.unit == currentUnit" class="sr-only">(this page) </span>
       <a ng-if="line.href" ng-href="{{line.href}}"><strong ng-if="line.buy">{{line.text}}</strong><span ng-if="!line.buy">{{line.text}}</span></a><span ng-if="!line.href">{{line.text}}</span>
     </li>
   </ul>
