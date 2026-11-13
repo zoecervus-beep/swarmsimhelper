@@ -14,15 +14,16 @@
  # (`createMemory()`, returned updated by `advise()`) and the settings.
  #
  # Translations from the simulator, which acts once a minute with a remembered territory "purse":
- # - The purse (f x larvae gained since the last check-in, kept until spent) becomes the share of the
+ # - The purse (f x larvae gained since the last check-in, kept until spent) starts as the share of the
  #   larvae on hand that the meat advice leaves unspent, floor(larvae) - floor(larvae x (1 - share)),
- #   until a territory purchase is seen; after that, the share of the larva income since that
- #   purchase, capped by the share of the larvae on hand (see `purseBudget`).
+ #   then refills with the share of the larva income and goes down by what is spent on territory,
+ #   never holding more than that share of the larvae on hand (see `updatePurse`).
  # - Fractional purchases are floored, as the simulator floors them before buying.
  # - Only units and upgrades the game shows (isVisible) are considered; the simulator has all 11.
 ###
 angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScope) ->
   ZERO = new Decimal 0
+  ONE = new Decimal 1
   D = (x) -> new Decimal(if x? then x else 0)
 
   UNITS = ['swarmling', 'stinger', 'spider', 'mosquito', 'locust', 'roach', 'giantspider',
@@ -58,8 +59,10 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
       for c in unit.eachCost()
         cost[c.unit.name] = D c.val
       tcost = {}
+      tfactor = {}
       for c in twinUp.totalCost()
         tcost[c.unit.name] = D c.val
+        tfactor[c.unit.name] = D c.factor
       name: name
       label: unit.unittype.plural # as the game shows it, e.g. 'arachnomorphs' for spider
       label1: unit.unittype.label # singular
@@ -78,6 +81,8 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
         level: twinUp.count().toNumber()
         visible: twinUp.isVisible()
         larvae: tcost.larva
+        larvaFactor: tfactor.larva # price growth per level
+        meatFactor: tfactor.meat
         meat: tcost.meat
     upgrades = for name in LARVA_UPGRADES
       up = g.upgrade name
@@ -103,61 +108,93 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
     }
 
   # ---------------------------------------------------------------------------
-  # Remembered state: the territory purchase statistics and twin levels last seen, and when the last
-  # territory purchase (a unit hatched or a territory twin bought) was seen. One memory per run.
+  # Remembered state, one per run: the territory purchase statistics and twin levels (with the twin
+  # prices) last seen, when the advice was last worked out, the territory purse in larvae, and the
+  # meat spent on territory since the purse was last empty.
 
   createMemory = (now, restartedAt) ->
     restartedAt: restartedAt
     seen: {}
-    boughtAt: null
+    prices: {}
+    at: null
+    purse: null # null until the first advice: the purse then starts as the share of the larvae on hand
+    meatSpent: ZERO
 
   copyMemory = (memory, now, restartedAt) ->
     if not memory? or (memory.restartedAt? and restartedAt? and memory.restartedAt != restartedAt)
       return createMemory now, restartedAt
-    seen = {}
+    ret = createMemory now, (if memory.restartedAt? then memory.restartedAt else restartedAt)
     for own key, val of memory.seen
-      seen[key] = val
-    return {restartedAt: (if memory.restartedAt? then memory.restartedAt else restartedAt), seen: seen, boughtAt: memory.boughtAt}
+      ret.seen[key] = val
+    for own key, val of memory.prices ? {}
+      ret.prices[key] = val
+    ret.at = memory.at ? null
+    ret.purse = memory.purse ? null
+    ret.meatSpent = memory.meatSpent ? ZERO
+    return ret
 
-  # Notes in `mem` the time of any territory purchase since the last call. Purchases are read from the
-  # units' purchase statistics and the twin upgrades' levels, never from unit counts, which House of
-  # Mirrors doubles. The first sighting of a value is not a purchase. Mutates `mem`.
+  # What was spent on territory since the last call, from the units' purchase statistics (larvae
+  # spent, before twins) and the twin upgrades' levels, never from unit counts, which House of Mirrors
+  # doubles. The first sighting of a value is not a purchase. Mutates `mem`; returns {larvae, meat}.
   seePurchases = (mem, snap) ->
+    larvae = ZERO
+    meat = ZERO
     for u in snap.units
-      for [key, val] in [[u.name, u.purchases], [u.twinUpgrade.name, String u.twinUpgrade.level]]
-        if mem.seen[key] is undefined
-          mem.seen[key] = val
-        else if mem.seen[key] isnt val
-          mem.seen[key] = val
-          mem.boughtAt = snap.now
-    return mem
+      prev = mem.seen[u.name]
+      if prev? and prev isnt u.purchases
+        n = Decimal.max 0, D(u.purchases).minus(prev)
+        larvae = larvae.plus n
+        meat = meat.plus n.times(u.meat)
+      mem.seen[u.name] = u.purchases
+      t = u.twinUpgrade
+      prev = mem.seen[t.name]
+      price = mem.prices[t.name]
+      if prev? and price? and t.level > prev
+        # the price of each level bought, from the price last seen
+        for i in [0...t.level - prev]
+          larvae = larvae.plus price.larvae.times(Decimal.pow t.larvaFactor, i)
+          meat = meat.plus price.meat.times(Decimal.pow t.meatFactor, i)
+      mem.seen[t.name] = t.level
+      mem.prices[t.name] = {larvae: t.larvae, meat: t.meat}
+    return {larvae: larvae, meat: meat}
 
   # Live translation of sim.py's territory purse. The simulator adds f x the larvae gained since the
-  # last check-in and keeps them until spent. Live, with no purchase seen yet (page load, new run,
-  # import), the purse is the share of the larvae on hand, as before. Once a territory purchase has
-  # been seen at t0, it is the share of the larva income since then, share x larva rate x (now - t0),
-  # never more than the share of the larvae on hand, and it starts again from zero at the next
-  # purchase. Without this, every hatch would at once be followed by another share of what is left,
-  # and a few clicks would spend far more than the share. Unspent purse is not carried over a
-  # purchase. A territory twin counts as a purchase too, so buying one restarts the purse rather than
-  # leaving units the full share of the larvae on hand.
-  purseBudget = (snap, mem, share) ->
-    onHand = snap.larvae.floor().minus snap.larvae.times(1 - share).floor()
-    if not mem.boughtAt?
-      return {budget: onHand, refill: null}
-    since = Math.max 0, (snap.now - mem.boughtAt) / 1000
+  # last check-in, takes out what it spends on territory, and keeps the rest. Live, the purse starts
+  # as the share of the larvae on hand (page load, new run, import), refills at share x larva income,
+  # goes down by the larvae actually spent on territory units and twins, never below zero, and never
+  # holds more than the share of the larvae on hand. So after one line of a two-line suggestion is
+  # bought, the other is still there; after both, it is empty and refills; and repeated hatching
+  # cannot spend more than the share. Mutates `mem`.
+  #
+  # Meat is kept consistent with it: the meat budget is MEAT_SHARE x (meat + meat spent on territory
+  # this cycle) - meat spent this cycle, never below zero. A cycle ends whenever the purse holds less
+  # than one larva (the suggestion was used up, larvae were spent elsewhere, or a twin took it all),
+  # or the memory starts afresh. Within a cycle, buying one line of the plan leaves exactly the rest
+  # of it, and territory takes at most MEAT_SHARE of the meat there would be without it.
+  updatePurse = (mem, snap, share, spent) ->
+    cap = snap.larvae.floor().minus snap.larvae.times(1 - share).floor()
     rate = snap.larvaRate.times share
-    purse = rate.times(since).floor()
-    if purse.greaterThanOrEqualTo onHand
-      return {budget: onHand, refill: null}
-    refill =
-      type: 'idle'
-      reason: 'refilling'
-      since: since
-      rate: rate # territory larvae per second
-      # seconds until the purse holds one larva (null with no larva income)
-      seconds: if rate.greaterThan(0) then Math.max(0, purse.plus(1).dividedBy(rate).toNumber() - since) else null
-    return {budget: purse, refill: refill}
+    if not mem.purse?
+      mem.purse = cap
+      mem.meatSpent = ZERO
+    else
+      dt = Math.max 0, (snap.now - mem.at) / 1000
+      mem.purse = Decimal.min cap, Decimal.max(0, mem.purse.plus(rate.times dt).minus(spent.larvae))
+      mem.meatSpent = mem.meatSpent.plus spent.meat
+    mem.at = snap.now
+    if mem.purse.lessThan 1
+      mem.meatSpent = ZERO
+    budget = mem.purse.floor()
+    refill = null
+    if budget.lessThan(1) and cap.greaterThanOrEqualTo(1)
+      refill =
+        type: 'idle'
+        reason: 'refilling'
+        purse: mem.purse
+        rate: rate # territory larvae per second
+        # seconds until the purse holds one larva (null with no larva income)
+        seconds: if rate.greaterThan(0) then ONE.minus(mem.purse).dividedBy(rate).toNumber() else null
+    return {budget: budget, refill: refill}
 
   # ---------------------------------------------------------------------------
   # Rules.
@@ -297,12 +334,12 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
     cfg = withDefaults cfg
     share = cfg.territory
     mirrors = snap.mirrorCasts > 0
-    mem = seePurchases copyMemory(memory, snap.now, snap.restartedAt), snap
-    purse = purseBudget snap, mem, share
+    mem = copyMemory memory, snap.now, snap.restartedAt
+    purse = updatePurse mem, snap, share, seePurchases(mem, snap)
     budget = purse.budget
 
     up = larvaUpgrades snap
-    meatBudget = up.meat.times MEAT_SHARE
+    meatBudget = Decimal.max 0, up.meat.plus(mem.meatSpent).times(MEAT_SHARE).minus(mem.meatSpent)
 
     status = null
     setting = null

@@ -37,6 +37,8 @@ describe 'Service: advisorTerritory', ->
         visible: u.twinVisible ? visible
         larvae: D(u.twinLarvae ? 1e30)
         meat: D(u.twinMeat ? 100)
+        larvaFactor: D(50)
+        meatFactor: D(500)
     upgrades = for name in territory.LARVA_UPGRADES
       up = opts.upgrades?[name] ? {}
       name: name
@@ -232,69 +234,155 @@ describe 'Service: advisorTerritory', ->
       r = territory.advise mksnap(meat: 5e6 + 3300 + 1, territory: 560, upgrades: up), null, {}
       expect(([u.name, u.levels] for u in r.upgrades)).toEqual [['achievementbonus', 1], ['expansion', 2], ['hatchery', 2]]
 
-  describe 'the territory purse after a purchase', ->
-    # Larva income 100/s, share 0.1: the purse refills at 10 territory larvae a second.
-    # Meat 1e9 => spiders take everything (shown: swarmling, stinger, spider).
-    at = (secs, larvae, spiders, extra={}) ->
-      mksnap _.extend {now: 1000e3 + secs * 1000, larvae: larvae, larvaRate: 100, meat: 1e9, units: {spider: _.extend({purchases: spiders}, extra)}}, extra.snap
-    first = -> territory.advise at(0, 30000, 5000), null, {}
+  describe 'the territory purse', ->
+    # The property tested: whichever line of a suggestion is bought first, with the suggested count or
+    # fewer, what is advised next (with no time passed) is the rest of the same plan; once it is all
+    # bought the purse is empty and refills at share x larva income; and it never offers more than the
+    # share of the larvae on hand.
+    #
+    # The plan, as in 'fills the biggest unit...': larvae 1000, share 0.1 => purse 100; meat 50000 =>
+    # budget 45000; y = (45000 - 100 x 100) / 900 = 38.9 spiders, x = 61.1 stingers: 61 + 38, and one
+    # larva left over by the flooring. Larva income 100/s refills the purse at 10/s (no territory twin
+    # is cheap enough to be advised). Purchase statistics start at 5000 stingers and 7000 spiders.
+    at = (o={}) ->
+      mksnap
+        now: 1000e3 + (o.secs ? 0) * 1000
+        larvae: o.larvae ? 1000
+        larvaRate: 100
+        meat: o.meat ? 50000
+        restartedAt: o.restartedAt ? 0
+        units:
+          stinger: _.extend {purchases: 5000 + (o.stingers ? 0)}, o.stinger
+          spider: _.extend {purchases: 7000 + (o.spiders ? 0)}, o.spider
+    first = -> territory.advise at(), null, {}
+    # The advice after buying `stingers` stingers and `spiders` spiders since `first()`, at the same
+    # moment unless `secs` says otherwise, with larvae and meat lowered by exactly what they cost.
+    after = (o, mem=first().memory) ->
+      o = _.extend {stingers: 0, spiders: 0}, o
+      larvae = (o.larvae ? 1000) - o.stingers - o.spiders
+      meat = (o.meat ? 50000) - o.stingers * 100 - o.spiders * 1000
+      territory.advise at(_.extend({}, o, larvae: larvae, meat: meat)), mem, {}
 
-    it 'offers the share of the larvae on hand while no purchase has been seen', ->
+    it 'starts as the share of the larvae on hand', ->
       r = first()
-      # 30000 - floor(27000) = 3000; the statistic's first sighting is not a purchase
-      expect(counts r).toEqual [['spider', 3000]]
-      expect(r.memory.boughtAt).toBe null
-      expect(r.memory.seen.spider).toBe '5000'
+      expect(counts r).toEqual [['stinger', 61], ['spider', 38]]
+      expect(r.memory.purse.toNumber()).toBe 100
+      expect(r.memory.meatSpent.toNumber()).toBe 0
+      expect(r.memory.seen.stinger).toBe '5000'
 
-    it 'does not offer another share right after the suggestion was bought', ->
-      # One second later: 3000 spiders hatched (statistic 5000 -> 8000), 30000 - 3000 + 100 larvae.
-      # The share of those would be 27100 - floor(24390) = 2710, but the purse restarts at the purchase.
-      r = territory.advise at(1, 27100, 8000), first().memory, {}
-      expect(r.memory.boughtAt).toBe 1001e3
-      expect(r.larvae.toNumber()).toBe 0
+    it 'leaves the spare line when the main line is bought', ->
+      # purse 100 - 61 = 39; meat spent 6100, meat 43900: budget 0.9 x (43900 + 6100) - 6100 = 38900.
+      # 39 spiders cost 39000 > 38900, so stingers again with spare to spiders:
+      # y = (38900 - 3900) / 900 = 38.9 => 38 spiders, x = 0.1 => no stingers
+      r = after stingers: 61
+      expect(r.memory.purse.toNumber()).toBe 39
+      expect(r.memory.meatSpent.toNumber()).toBe 6100
+      expect(r.meatBudget.toNumber()).toBe 38900
+      expect(counts r).toEqual [['spider', 38]]
+
+    it 'leaves the main line when the spare line is bought', ->
+      # purse 62; meat spent 38000: budget 0.9 x 50000 - 38000 = 7000; 62 stingers cost 6200 and
+      # y = (7000 - 6200) / 900 = 0.9 => no spiders, 61.1 => 61 stingers
+      r = after spiders: 38
+      expect(r.memory.purse.toNumber()).toBe 62
+      expect(r.meatBudget.toNumber()).toBe 7000
+      expect(counts r).toEqual [['stinger', 61]]
+
+    it 'is used up once both lines are bought, then refills', ->
+      m = after(spiders: 38).memory
+      r = after {spiders: 38, stingers: 61}, m
+      # the larva the flooring left over is all that remains: 900 of meat budget buys 1 stinger
+      expect(r.memory.purse.toNumber()).toBe 1
+      expect(counts r).toEqual [['stinger', 1]]
+      r = after {spiders: 38, stingers: 62}, r.memory
+      expect(r.memory.purse.toNumber()).toBe 0
+      expect(r.memory.meatSpent.toNumber()).toBe 0 # the cycle ended
       expect(r.hatch).toEqual []
       expect(r.status.reason).toBe 'refilling'
-      # one larva at 10 a second
-      expect(r.status.seconds).toBeCloseTo 0.1, 9
+      expect(r.status.seconds).toBeCloseTo 0.1, 9 # one larva at 10 a second
       expect(texts r).toEqual ['territory larvae spent for now, more in 1 s']
+      # 2 s later: 20 larvae of purse and a fresh meat budget, 0.9 x the 5800 meat on hand = 5220:
+      # spiders 20 x 1000 > 5220, stingers 2000 fit; y = (5220 - 2000) / 900 = 3.6 => 3 spiders,
+      # x = 16.4 => 16 stingers
+      r = after {spiders: 38, stingers: 62, secs: 2, larvae: 1200}, r.memory
+      expect(r.memory.purse.toNumber()).toBe 20
+      expect(r.meatBudget.toNumber()).toBe 5220
+      expect(counts r).toEqual [['stinger', 16], ['spider', 3]]
 
-    it 'refills with the share of larva income since the purchase', ->
-      m = territory.advise(at(1, 27100, 8000), first().memory, {}).memory
-      # 2.5 s after the purchase: floor(10 x 2.5) = 25
-      r = territory.advise at(3.5, 27350, 8000), m, {}
-      expect(counts r).toEqual [['spider', 25]]
-      # a minute after: 600
-      r = territory.advise at(61, 33100, 8000), m, {}
-      expect(counts r).toEqual [['spider', 600]]
-      # buying those restarts it again
-      r = territory.advise at(62, 32600, 8600), territory.advise(at(61, 33100, 8000), m, {}).memory, {}
-      expect(r.memory.boughtAt).toBe 1062e3
-      expect(r.hatch).toEqual []
+    it 'keeps the rest of the plan when fewer than suggested are bought', ->
+      # 50 of 61 stingers: purse 50, meat spent 5000, budget 45000 - 5000 = 40000;
+      # y = (40000 - 5000) / 900 = 38.9 => 38 spiders; x = 11.1 => 11 stingers
+      r = after stingers: 50
+      expect(counts r).toEqual [['stinger', 11], ['spider', 38]]
 
-    it 'never offers more than the share of the larvae on hand', ->
-      m = territory.advise(at(1, 27100, 8000), first().memory, {}).memory
-      # 1000 s later the purse holds 10000, but only 5000 larvae are on hand: 5000 - 4500 = 500
-      r = territory.advise at(1001, 5000, 8000), m, {}
-      expect(counts r).toEqual [['spider', 500]]
-      expect(r.status).toBe null
-
-    it 'counts a territory twin bought as a purchase, and unit counts not at all', ->
-      m = first().memory
-      # House of Mirrors doubles counts without a purchase: still the full share
-      r = territory.advise at(1, 30000, 5000, {count: 1e6}), m, {}
-      expect(r.memory.boughtAt).toBe null
-      expect(counts r).toEqual [['spider', 3000]]
-      # the spider twin went from level 0 to 1
-      r = territory.advise at(1, 30000, 5000, {twinLevel: 1}), m, {}
-      expect(r.memory.boughtAt).toBe 1001e3
+    it 'is emptied by buying more than the purse holds (buy-max)', ->
+      # 500 stingers: purse max(0, 100 - 500) = 0, cycle over
+      r = after stingers: 500
+      expect(r.memory.purse.toNumber()).toBe 0
+      expect(r.memory.meatSpent.toNumber()).toBe 0
       expect(r.status.reason).toBe 'refilling'
+
+    it 'refills between purchases, keeping the unbought line', ->
+      # main line bought, seen 1 s later with 100 more larvae and 1000 more meat:
+      # purse 100 + 10 - 61 = 49; budget 0.9 x (44900 + 6100) - 6100 = 39800;
+      # y = (39800 - 4900) / 900 = 38.8 => 38 spiders, x = 10.2 => 10 stingers
+      r = after stingers: 61, secs: 1, larvae: 1100, meat: 51000
+      expect(r.memory.purse.toNumber()).toBe 49
+      expect(counts r).toEqual [['stinger', 10], ['spider', 38]]
+
+    it 'stays affordable when meat is spent elsewhere in between', ->
+      # main line bought, then 10000 meat on meat units: meat 33900;
+      # budget 0.9 x (33900 + 6100) - 6100 = 29900 <= 0.9 x 33900;
+      # y = (29900 - 3900) / 900 = 28.9 => 28 spiders, x = 10.1 => 10 stingers: 29000 meat
+      r = after stingers: 61, meat: 40000
+      expect(r.meatBudget.toNumber()).toBe 29900
+      expect(counts r).toEqual [['stinger', 10], ['spider', 28]]
+      # with almost no meat left the budget is 0, not negative
+      r = after stingers: 61, meat: 6100
+      expect(r.meatBudget.toNumber()).toBe 0
+      expect(r.status.reason).toBe 'noMeat'
+
+    it 'never holds more than the share of the larvae on hand', ->
+      # main line bought, 1000 s later, but larvae spent elsewhere down to 500: purse 39 + 10000,
+      # capped at 500 - 450 = 50
+      r = after stingers: 61, secs: 1000, larvae: 561
+      expect(r.memory.purse.toNumber()).toBe 50
+
+    it 'takes a twin bought after the units out of the purse, never reopening it', ->
+      m = after(spiders: 38, stingers: 61).memory # purse 1
+      # the stinger twin goes from level 0 to 1; its price when last seen (1e30 larvae) is taken out
+      r = after {spiders: 38, stingers: 61, stinger: {twinLevel: 1}}, m
+      expect(r.memory.purse.toNumber()).toBe 0
+      expect(r.status.reason).toBe 'refilling'
+
+    it 'takes the twin and its meat out of the plan when the twin is bought first', ->
+      # As in 'buys the twin first...': 3000 territory larvae, twin 2500 larvae + 2.5e7 meat, then
+      # 500 spiders x2. After buying the twin: purse 500, meat spent 2.5e7,
+      # budget 0.9 x 1e9 - 2.5e7 = 8.75e8 => the same 500 spiders.
+      snap = (level, larvae, meat) ->
+        mksnap larvae: larvae, larvaRate: 100, meat: meat, units: {spider: {twinLevel: level, twin: Math.pow(2, level), twinLarvae: 2500 * Math.pow(50, level), twinMeat: 2.5e7 * Math.pow(500, level)}}
+      r = territory.advise snap(0, 30000, 1e9), null, {}
+      expect(r.twin.type).toBe 'twin'
+      expect(counts r).toEqual [['spider', 500]]
+      r = territory.advise snap(1, 27500, 1e9 - 2.5e7), r.memory, {}
+      expect(r.twin).toBe null
+      expect(r.memory.purse.toNumber()).toBe 500
+      expect(r.meatBudget.toNumber()).toBe 8.75e8
+      expect(counts r).toEqual [['spider', 500]]
+      expect(r.hatch[0].twin.toNumber()).toBe 2
+
+    it 'ignores unit counts, which House of Mirrors doubles', ->
+      r = territory.advise at(stinger: {count: 1e6}), first().memory, {}
+      expect(r.memory.purse.toNumber()).toBe 100
+      expect(counts r).toEqual [['stinger', 61], ['spider', 38]]
 
     it 'starts afresh in a new run', ->
-      m = territory.advise(at(1, 27100, 8000), first().memory, {}).memory
-      r = territory.advise at(2, 27100, 0, {snap: {restartedAt: 1500e3}}), m, {}
-      expect(r.memory.boughtAt).toBe null
+      m = after(stingers: 61).memory
+      r = territory.advise at(restartedAt: 1500e3, larvae: 939, meat: 43900), m, {}
       expect(r.memory.restartedAt).toBe 1500e3
-      expect(counts r).toEqual [['spider', 2710]]
+      # 939 - floor(845.1) = 94; budget 0.9 x 43900 = 39510
+      expect(r.memory.purse.toNumber()).toBe 94
+      expect(r.memory.meatSpent.toNumber()).toBe 0
 
   describe 'once House of Mirrors has been cast', ->
     it 'advises no territory units and a territory share of 0', ->
@@ -359,22 +447,40 @@ describe 'Service: advisorTerritory', ->
       game.ascend true
       expect(territory.snapshot(game).mirrorCasts).toBe 0
 
-    it 'remembers a purchase made through the game between live updates', inject (game, commands, statistics) ->
+    # The owner's run at 27 minutes (the reported bug): two lines, stingers and arachnomorphs.
+    ownerGame = (game) ->
       game.reset true
-      game.unit('queen')._setCount 5
-      game.unit('meat')._setCount 1e4
-      game.unit('larva')._setCount 1000
-      game.upgrade('swarmlingtwin')._setCount 10 # twin too dear to be advised
-      game.upgrade('hatchery')._setCount 20 # hatchery too dear to be advised
+      for name, val of {larva: 2787, meat: 1.596e10, territory: 15527238, queen: 29081, swarmling: 861, stinger: 3908, spider: 1136}
+        game.unit(name)._setCount val
+      for name, val of {hatchery: 8, expansion: 16, achievementbonus: 1, swarmlingtwin: 2, stingertwin: 3, spidertwin: 3}
+        game.upgrade(name)._setCount val
+      return game
+    # 2787 - floor(2508.3) = 279 territory larvae; meat budget 0.9 x 1.596e10 = 1.4364e10 (hatchery 3e10,
+    # expansion 1.66e7 territory and ancestry 5e10 meat are out of reach; twins cost 125000 larvae,
+    # over 600 s x 41.4 larvae/s x 0.1). 279 arachnomorphs cost 4.24e10, 279 stingers 9.42e7:
+    # y = (1.4364e10 - 9.416e7) / (151875000 - 337500) = 94.2 arachnomorphs, x = 184.8 stingers.
+    it 'keeps the second line after the first is bought through the game (owner save)', inject (game, commands, statistics) ->
+      ownerGame game
       r = territory.update()
-      # 1000 - 900 = 100 territory larvae; meat budget 9000: 750 x 100 > 9000, so swarmlings capped at 12
-      expect(counts r).toEqual [['swarmling', 12]]
-      commands.buyUnit {unit: game.unit('swarmling'), num: r.hatch[0].buys}
-      expect(game.unit('swarmling').statistics().num.toString()).toBe '12'
+      expect(counts r).toEqual [['stinger', 184], ['spider', 94]]
+      commands.buyUnit {unit: game.unit('stinger'), num: r.hatch[0].buys}
+      expect(game.unit('stinger').statistics().num.toString()).toBe '184'
       r = territory.update()
-      expect(r.hatch).toEqual []
-      expect(r.status.reason).toBe 'refilling'
+      # purse 279 - 184 = 95; budget 1.4364e10 - 184 x 337500 = 1.43019e10 < 95 arachnomorphs:
+      # y = (1.43019e10 - 95 x 337500) / 151537500 = 94.2, x = 0.8
+      expect(r.memory.purse.toNumber()).toBe 95
+      expect(counts r).toEqual [['spider', 94]]
       expect(territory.memory()).toBe r.memory
+
+    it 'keeps the first line after the second is bought through the game (owner save)', inject (game, commands, statistics) ->
+      ownerGame game
+      territory.update()
+      commands.buyUnit {unit: game.unit('spider'), num: 94}
+      r = territory.update()
+      # purse 185; budget 1.4364e10 - 94 x 151875000 = 8.775e7, less than one arachnomorph, so all 185
+      # go to stingers (6.24e7 of meat): the 184 of the plan plus the larva its flooring left over
+      expect(r.memory.purse.toNumber()).toBe 185
+      expect(counts r).toEqual [['stinger', 185]]
 
     it 'forgets the purchase memory on import and reset', inject ($rootScope) ->
       territory.update()
