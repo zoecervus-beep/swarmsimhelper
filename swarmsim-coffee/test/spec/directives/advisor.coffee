@@ -305,11 +305,10 @@ describe 'Directive: advisorPanel', ->
       advice = fakeAdvice over
       push = {type: 'push', unit: 'greaterqueen', below: 'nest', buys: D(50), twin: D(2), units: D(100), share: 0.5, limitedBy: 'share', belowCount: D(1e4)}
       advice.tiers[2] = _.extend advice.tiers[2], {kind: 'push', reason: 'push', buys: D(50), twin: D(2), push: push}
-      advice.tiers[1] = _.extend advice.tiers[1], {reason: 'buyFaster', fasterLevels: 3}
       advice.longRun = {active: true, startsIn: 0, mothsRaised: false, frontier: 'nest', pushes: [push], suppressed: [], above: ['hive', 'hivequeen', 'overmind6']}
       return advice
 
-    it 'shows push rows, faster-level climbs and the empty tiers above on one row', ->
+    it 'shows push rows and the empty tiers above on one row', ->
       spyOn(advisor, 'update').and.returnValue lrAdvice()
       el = render()
       rows = el.querySelectorAll 'tbody tr'
@@ -317,8 +316,8 @@ describe 'Directive: advisorPanel', ->
       expect(text rows[0]).toBe 'hive to endless: nothing to feed until you own the tier below'
       expect(rows[1].className).toContain 'info'
       expect(text rows[1].querySelector 'strong').toBe 'feed upward: hatch 50 (×2 twins) (half your nests)'
-      expect(text rows[2].querySelector 'strong').toBe 'buy 12 (×2 twins), then faster nests'
-      expect(text el.querySelector '.advisor-header').toContain '· long-run climb'
+      expect(text rows[2].querySelector 'strong').toBe 'buy 12 (×2 twins)'
+      expect(text el.querySelector '.advisor-header').toContain '· long-run climb: 1% of larvae kept for feeding upward'
       # the summary when collapsed counts a push as something to do
       options.advisorCollapsed true
       $rootScope.$digest()
@@ -487,11 +486,10 @@ describe 'Directive: advisorSuggest', ->
     expect(scope.form.buyCount).toBe '12'
     expect(parseNumber(scope.form.buyCount, scope.unit).equals 12).toBe true
 
-  it 'fills the box for a push and for the purchase half of a faster-level climb', ->
+  it 'fills the box for a push', ->
     advice = fakeAdvice()
     push = {type: 'push', unit: 'greaterqueen', below: 'nest', buys: new Decimal(50), twin: new Decimal(2), share: 0.5, limitedBy: 'share'}
     advice.tiers[2] = _.extend advice.tiers[2], {kind: 'push', reason: 'push', buys: new Decimal(50), twin: new Decimal(2), push: push}
-    advice.tiers[1] = _.extend advice.tiers[1], {reason: 'buyFaster', fasterLevels: 3}
     spyOn(advisor, 'update').and.returnValue advice
     el = render 'greaterqueen'
     button = el.querySelector 'button'
@@ -787,6 +785,7 @@ describe 'Directive: advisorOptions', ->
     expect(radios[0].checked).toBe true
     expect(text el).toContain 'It does nothing before a run is 2 days old'
     expect(text el).toContain 'It trades meat income for progress up the chain'
+    expect(text el).toContain 'keeping 1% of the larvae for that'
     radios[1].checked = true
     angular.element(radios[1]).triggerHandler 'click'
     $rootScope.$digest()

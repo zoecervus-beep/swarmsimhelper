@@ -63,11 +63,6 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
       when 'larvaeUsedAbove' then 'skip: larvae used above'
       when 'buildUp' then 'let ' + plural(t.below) + ' build up'
       # long-run mode
-      when 'buyFaster'
-        ret = 'buy ' + bignum(t.buys)
-        if t.twin.greaterThan 1
-          ret += ' (×' + bignum(t.twin) + ' twins)'
-        ret + ', then ' + upgradeLabel(t.name + 'prod', 'faster ' + plural(t.name))
       when 'push' then 'feed upward: ' + pushText(t.push)
       else advisor.renderAction t
 
@@ -87,8 +82,7 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
   tip = (t) ->
     text = switch t.type
       when 'faster'
-        # long-run mode: after a faster-level climb, one level at a time at 1x its price
-        'buy ' + upgradeLabel(t.unit + 'prod', 'faster ' + plural(t.unit)) + ' (' + count(t.cost, t.unit) + ')' + (if t.longRun then ', then again until they climb' else '')
+        'buy ' + upgradeLabel(t.unit + 'prod', 'faster ' + plural(t.unit)) + ' (' + count(t.cost, t.unit) + ')'
       when 'twin'
         'buy ' + upgradeLabel(t.unit + 'twin', 'twin ' + plural(t.unit)) + ' (' + count(t.cost, t.payIn) + ')'
       when 'twinPlan'
@@ -207,7 +201,7 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
       if lr?
         longRun =
           active: lr.active
-          text: if lr.active then 'long-run climb' else 'long-run climb from run age 2 d (in ' + time(lr.startsIn) + ')'
+          text: if lr.active then 'long-run climb: 1% of larvae kept for feeding upward' else 'long-run climb from run age 2 d (in ' + time(lr.startsIn) + ')'
         # the empty tiers above the table, up to endless, on one row
         if lr.above.length
           longRun.above = label(lr.above[0]) + (if lr.above.length > 1 then ' to ' + label(_.last lr.above) else '') + ': nothing to feed until you own the tier below'
@@ -682,7 +676,7 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
       <label class="control-label">Long-run climb</label>
       <div class="radio"><label><input type="radio" name="advisor-longRun" value="off" ng-model="form.values.longRun" ng-change="setChoice('longRun')"> Off</label></div>
       <div class="radio"><label><input type="radio" name="advisor-longRun" value="on" ng-model="form.values.longRun" ng-change="setChoice('longRun')"> On</label></div>
-      <p class="help-block">For climbing all the way to endless on runs of many days (the achievements goal). It does nothing before a run is 2 days old. From then it also climbs tiers whose faster upgrades pay for themselves, feeds the tiers above your climb upward ("feed upward"), keeps those units from twin upgrades, and from day 3 raises the lepidoptera target to 30,000. It trades meat income for progress up the chain, so leave it off for short runs. Stay a couple of minutes per visit: the next steps show once the last ones are bought. Default: off.</p>
+      <p class="help-block">For climbing all the way to endless on runs of many days (the achievements goal). It does nothing before a run is 2 days old. From then it feeds the tiers above your climb upward ("feed upward"), keeping 1% of the larvae for that, so climbing uses slightly fewer; it keeps those units from twin upgrades, and from day 3 it raises the lepidoptera target to 30,000. It trades meat income for progress up the chain, so leave it off for short runs. Stay a couple of minutes per visit: the next steps show once the last ones are bought. Default: off.</p>
       <p class="help-block" ng-if="errors.longRun">{{errors.longRun}}</p>
     </div>
     <div class="form-group" ng-class="{'has-error': !!errors.ascension}">
