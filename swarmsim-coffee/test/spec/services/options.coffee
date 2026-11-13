@@ -30,7 +30,7 @@ describe 'Service: options', ->
       expect(options.getVelocityUnit(unit:'energy').mult+'').toBe '1'
 
   it 'defaults the advisor settings', ->
-    expect(options.advisorConfig()).toEqual {ageMultiple: 3, share: 0.5, cooldown: 60, bank: 3, territory: 0.1, moths: 4000, spareEnergy: 'larvarush'}
+    expect(options.advisorConfig()).toEqual {ageMultiple: 3, share: 0.5, cooldown: 60, bank: 3, territory: 0.1, moths: 4000, spareEnergy: 'larvarush', ascension: 'off'}
     expect(options.advisorEnabled()).toBe true
 
   it 'sets, clamps and validates advisor settings', ->
@@ -49,7 +49,7 @@ describe 'Service: options', ->
     expect(-> options.advisorConfig {bank: 4, share: 'x'}).toThrow()
     expect(options.advisorSetting 'bank').toBe 3
     expect(options.advisorConfig({bank: 4, moths: 2000}).bank).toBe 4
-    expect(options.advisorConfig()).toEqual {ageMultiple: 5, share: 0.25, cooldown: 0, bank: 4, territory: 0.95, moths: 2000, spareEnergy: 'larvarush'}
+    expect(options.advisorConfig()).toEqual {ageMultiple: 5, share: 0.25, cooldown: 0, bank: 4, territory: 0.95, moths: 2000, spareEnergy: 'larvarush', ascension: 'off'}
     options.advisorEnabled false
     expect(options.advisorEnabled()).toBe false
     options.advisorEnabled true
@@ -59,7 +59,7 @@ describe 'Service: options', ->
 
   it 'reads missing or corrupt stored advisor settings as defaults', ->
     options.session.state.options.advisor = {share: 'garbage', bank: null, cooldown: 1e9, moths: '1000'}
-    expect(options.advisorConfig()).toEqual {ageMultiple: 3, share: 0.5, cooldown: 86400, bank: 3, territory: 0.1, moths: 1000, spareEnergy: 'larvarush'}
+    expect(options.advisorConfig()).toEqual {ageMultiple: 3, share: 0.5, cooldown: 86400, bank: 3, territory: 0.1, moths: 1000, spareEnergy: 'larvarush', ascension: 'off'}
     options.session.state.options.advisor = 'not an object'
     expect(options.advisorConfig().share).toBe 0.5
     delete options.session.state.options.advisor
@@ -97,3 +97,19 @@ describe 'Service: options', ->
     options.advisorSetting 'spareEnergy', 'save'
     options.resetAdvisorConfig()
     expect(options.advisorSetting 'spareEnergy').toBe 'larvarush'
+
+  it 'stores the ascension advice choice, off for old saves, after a reset and when corrupt', ->
+    delete options.session.state.options.advisor
+    expect(options.advisorSetting 'ascension').toBe 'off'
+    expect(options.advisorSetting 'ascension', 'achievements').toBe 'achievements'
+    expect(options.session.state.options.advisor).toEqual {ascension: 'achievements'}
+    loaded = options.session._loads options.session._saves()
+    expect(loaded.options.advisor.ascension).toBe 'achievements'
+    expect(-> options.advisorSetting 'ascension', 'on').toThrow()
+    expect(-> options.advisorSetting 'ascension', true).toThrow()
+    expect(options.advisorSetting 'ascension').toBe 'achievements'
+    options.session.state.options.advisor.ascension = 'bogus'
+    expect(options.advisorSetting 'ascension').toBe 'off'
+    options.advisorSetting 'ascension', 'achievements'
+    options.resetAdvisorConfig()
+    expect(options.advisorSetting 'ascension').toBe 'off'

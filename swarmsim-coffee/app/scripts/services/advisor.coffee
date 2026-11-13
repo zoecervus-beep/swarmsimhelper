@@ -11,6 +11,7 @@ angular.module('swarmApp').constant 'ADVISOR_SETTINGS',
     territory: 0.10   # fraction of larvae held back for territory units
     moths: 4000       # lepidoptera target
     spareEnergy: 'larvarush' # below nexus 5, spare energy: 'larvarush' casts it, 'save' holds it for the next nexus
+    ascension: 'off'  # ascension advice (advisorascension.coffee): 'off', or 'achievements' for ASCENSION.md's route
   limits:
     ageMultiple: {min: 0.01, max: 1000}
     share: {min: 0.01, max: 1}
@@ -19,6 +20,7 @@ angular.module('swarmApp').constant 'ADVISOR_SETTINGS',
     territory: {min: 0, max: 0.95}
     moths: {min: 0, max: 1e12, integer: true}
     spareEnergy: {choices: ['larvarush', 'save']} # a choice, not a number
+    ascension: {choices: ['off', 'achievements']}
 
 ###*
  # @ngdoc service
@@ -590,6 +592,8 @@ angular.module('swarmApp').run ($rootScope, $injector, $log, ADVISOR_REFRESH_MIL
       if $injector.get('options').advisorEnabled()
         $injector.get('advisor').current ADVISOR_REFRESH_MILLIS
         $injector.get('advisorTerritory').current ADVISOR_REFRESH_MILLIS
+        # does no work while the ascension setting is off
+        $injector.get('advisorAscension').current ADVISOR_REFRESH_MILLIS
     catch e
       $log.warn 'advisor tick', e
     return
