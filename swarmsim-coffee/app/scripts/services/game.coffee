@@ -60,6 +60,9 @@ angular.module('swarmApp').factory 'Game', (unittypes, upgradetypes, achievement
         new Unit this, unittype
     @_units.byName = _.keyBy @_units.list, 'name'
     @_units.bySlug = _.keyBy @_units.list, (u) -> u.unittype.slug
+    for unit in @_units.list
+      for slug in unit.unittype.legacySlugs ? []
+        @_units.bySlug[slug] ?= unit
 
     @_upgrades =
       list: _.map upgradetypes.list, (upgradetype) =>

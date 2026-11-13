@@ -194,3 +194,13 @@ describe 'Service: game achievements', ->
     expect(game.unit('energy').count().toNumber()).toBe 0
     expect(game.session.state.date.restarted.getTime()).toBe 1
 
+
+  it 'finds renamed units by their current and old slugs', ->
+    game = mkgame {}
+    expect(game.unit('overmind2').unittype.slug).toBe 'ascended'
+    expect(game.unitBySlug('ascended').name).toBe 'overmind2'
+    expect(game.unitBySlug('overmind II').name).toBe 'overmind2'
+    expect(game.unitBySlug('overmind VI').name).toBe 'overmind6'
+    expect(game.unitBySlug('endless').name).toBe 'overmind6'
+    expect(game.unitBySlug('overmind').name).toBe 'overmind'
+    expect(game.unitBySlug('drone').name).toBe 'drone'

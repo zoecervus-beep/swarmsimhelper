@@ -544,6 +544,14 @@ angular.module('swarmApp').factory 'UnitTypes', (spreadsheetUtil, UnitType, util
     for nextgen in producer.producedBy
       @_buildProducerPath unittype, nextgen, path
 
+  # Old labels of renamed units, by internal name. These were their unit-page slugs.
+  @LEGACY_SLUGS:
+    overmind2: ['overmind II']
+    overmind3: ['overmind III']
+    overmind4: ['overmind IV']
+    overmind5: ['overmind V']
+    overmind6: ['overmind VI']
+
   @parseSpreadsheet: (effecttypes, data) ->
     rows = spreadsheetUtil.parseRows {name:['cost','prod','warnfirst','requires','cap','effect']}, data.data.unittypes.elements
     ret = new UnitTypes (new UnitType(row) for row in rows)
@@ -566,6 +574,9 @@ angular.module('swarmApp').factory 'UnitTypes', (spreadsheetUtil, UnitType, util
       # oops - we haven't parsed upgradetypes yet! done in upgradetype.coffee.
       #spreadsheetUtil.resolveList unittype.require, 'upgradetype', ret.byName
       unittype.slug = unittype.label
+      # Unit-page urls are built from the label. A renamed unit keeps answering to its old slugs,
+      # so existing links and bookmarks still open it; MainCtrl redirects them to the new url.
+      unittype.legacySlugs = @LEGACY_SLUGS[unittype.name] ? []
       for prod in unittype.prod
         prod.unittype.producedBy.push unittype
         util.assert prod.val > 0, "unittype prod.val must be positive", prod

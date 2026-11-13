@@ -23,8 +23,12 @@ angular.module('swarmApp').controller 'MainCtrl', ($scope, $log, game, $routePar
   # if it's a bogus tab name, or the tab's not visible (ex. energy before first nexus)
   if ($routeParams.tab != $scope.cur.tab.name and $routeParams.tab?) or not $scope.cur.tab.isVisible()
     $location.url '/'
+  # an old slug of a renamed unit (an old link or bookmark): same page, under the unit's current url
+  if $scope.cur.unit? and $routeParams.unit in $scope.cur.unit.unittype.legacySlugs
+    $location.replace()
+    $location.path (if $routeParams.tab? then "/tab/#{$routeParams.tab}" else '') + "/unit/#{$scope.cur.unit.unittype.slug}"
   # if they asked for a unit but that unit has issues, redirect to no-unit
-  if $routeParams.unit? and (
+  else if $routeParams.unit? and (
     not $scope.cur.unit? or
     # they gave a bogus unit as a url parameter
     $scope.cur.unit.unittype.slug != $routeParams.unit or

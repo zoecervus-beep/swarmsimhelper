@@ -17,3 +17,12 @@ describe 'Controller: MainCtrl', ->
 
   it 'should attach a game to the scope', ->
     expect(!!scope.game).toBe true
+
+  it 'sends old urls of renamed units to their current urls', inject ($controller, $rootScope, $location) ->
+    for [params, path] in [
+        [{tab:'meat', unit:'overmind II'}, '/tab/meat/unit/ascended']
+        [{unit:'overmind VI'}, '/unit/endless']
+      ]
+      $location.path '/somewhere-else'
+      $controller 'MainCtrl', {$scope: $rootScope.$new(), $routeParams: params}
+      expect($location.path()).toBe path
