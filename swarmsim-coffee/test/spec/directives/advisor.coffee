@@ -317,7 +317,7 @@ describe 'Directive: advisorPanel', ->
       expect(text rows[0]).toBe 'hive to endless: nothing to feed until you own the tier below'
       expect(rows[1].className).toContain 'info'
       expect(text rows[1].querySelector 'strong').toBe 'feed upward: hatch 50 (×2 twins) (half your nests)'
-      expect(text rows[2].querySelector 'strong').toBe 'buy 12 (×2 twins), then 3× faster nests'
+      expect(text rows[2].querySelector 'strong').toBe 'buy 12 (×2 twins), then faster nests'
       expect(text el.querySelector '.advisor-header').toContain '· long-run climb'
       # the summary when collapsed counts a push as something to do
       options.advisorCollapsed true

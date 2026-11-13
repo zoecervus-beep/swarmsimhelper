@@ -67,7 +67,7 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
         ret = 'buy ' + bignum(t.buys)
         if t.twin.greaterThan 1
           ret += ' (×' + bignum(t.twin) + ' twins)'
-        ret + ', then ' + t.fasterLevels + '× ' + upgradeLabel(t.name + 'prod', 'faster ' + plural(t.name))
+        ret + ', then ' + upgradeLabel(t.name + 'prod', 'faster ' + plural(t.name))
       when 'push' then 'feed upward: ' + pushText(t.push)
       else advisor.renderAction t
 
@@ -87,8 +87,8 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
   tip = (t) ->
     text = switch t.type
       when 'faster'
-        # long-run mode: the levels promised with a purchase, at 1x their price
-        'buy ' + (if t.levels? then t.levels + '× ' else '') + upgradeLabel(t.unit + 'prod', 'faster ' + plural(t.unit)) + ' (' + count(t.cost, t.unit) + ')'
+        # long-run mode: after a faster-level climb, one level at a time at 1x its price
+        'buy ' + upgradeLabel(t.unit + 'prod', 'faster ' + plural(t.unit)) + ' (' + count(t.cost, t.unit) + ')' + (if t.longRun then ', then again until they climb' else '')
       when 'twin'
         'buy ' + upgradeLabel(t.unit + 'twin', 'twin ' + plural(t.unit)) + ' (' + count(t.cost, t.payIn) + ')'
       when 'twinPlan'

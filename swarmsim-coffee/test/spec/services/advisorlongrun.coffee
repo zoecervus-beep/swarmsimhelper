@@ -96,8 +96,12 @@ describe 'Service: advisor, long-run climb mode', ->
       nest = tier r, 'nest'
       expect([nest.kind, nest.reason, nest.buys.toNumber(), nest.fasterLevels]).toEqual ['buy', 'buyFaster', 60000, 1]
       expect(nest.fasterPrice.toNumber()).toBe 15000
-      expect(advisor.renderAction nest).toBe 'BUY 60,000, then 1x faster nests'
+      expect(advisor.renderAction nest).toBe 'BUY 60,000, then faster nests'
+      # its faster level (15,000 of the 60,000 got) halves H to 1.5e6 <= 2e6: it passes the plain test
+      # once bought, so it is the frontier after this visit's climb
+      expect(nest.passesAfter).toBe true
       expect(r.longRun.frontier).toBe 'nest'
+      expect(r.longRun.frontierBefore).toBe 'queen'
 
     it 'just fails one unit of price above that', ->
       # L = 1: N = 44,999 => 2,000,044 > 2e6; L = 2: F = 15,001 + 150,010 > 60,000 => N < 1, stop
@@ -121,10 +125,10 @@ describe 'Service: advisor, long-run climb mode', ->
       early = mksnap age: 2 * DAY - 1, units: {queen: {count: 1e12}, nest: {cost: 1000, prodEach: 1e-3, prodCost: 1, prodFactor: 10}}
       expect(tier(advisor.advise(early, null, ON), 'nest').reason).toBe 'tooSlow'
 
-    it 'then shows the promised levels at 1x their price, and cools down like a climb', ->
+    it 'then advises faster levels one at a time at 1x, until the tier passes the plain test', ->
       cfg = _.extend {ageMultiple: 10}, ON
       r = advisor.advise lrSnap(15000, 10), null, cfg
-      # bought 10 s later: the statistic moved; 20,000 nests held, under 2 x 15,000
+      # bought 10 s later: the statistic moved; 20,000 nests held, under rule 5's 2 x 15,000
       snap = lrSnap 15000, 10, nest: {count: 20000, cost: 1000, prodEach: 1e-3, prodCost: 15000, prodFactor: 10, purchases: 60000}
       snap.now += 10000
       r = advisor.advise snap, r.memory, cfg
@@ -134,24 +138,38 @@ describe 'Service: advisor, long-run climb mode', ->
       # earmark is min(larvae left, 1e9 x 0.5) = 900,000 - 110
       expect(tier(r, 'greaterqueen').buys.toNumber()).toBe 110
       expect(nest.earmarked.toNumber()).toBe 899890
+      # cooling down, its faster level not yet bought, it does not pass the plain test: not the frontier
+      # (the greaterqueens bought this visit pass plainly and are)
+      expect(tier(r, 'nest').passes).toBe false
+      expect(r.longRun.frontier).toBe 'greaterqueen'
       tip = _.find r.tips, unit: 'nest'
-      expect([tip.levels, tip.cost.toNumber()]).toEqual [1, 15000]
-      expect(advisor.renderTip tip).toBe 'faster nests x1 (15,000)'
+      expect([tip.longRun, tip.cost.toNumber()]).toEqual [true, 15000]
+      expect(advisor.renderTip tip).toBe 'faster nests (15,000) at 1x, until they climb'
       # with the mode off the usual rule asks for twice the price, so no tip
       expect(_.find advisor.advise(snap, r.memory, {ageMultiple: 10}).tips, unit: 'nest').toBeUndefined()
-      # once the level is bought the promise is kept: no more tip
+      # level 1 bought but (say) production only x1.2 here, so H = 2.5e6 > horizon still: the next level
+      # (150,000) is advised at 1x once held, not before
       snap.units[2].prodLevel = 1
       snap.units[2].prodCost = D 150000
+      snap.units[2].prodEach = D 1.2e-3
       snap.now += 1000
       r = advisor.advise snap, r.memory, cfg
-      expect(r.memory.lrFaster.nest).toBeUndefined()
+      expect(r.memory.lrFaster.nest.bought).toBe true
       expect(_.find r.tips, unit: 'nest').toBeUndefined()
+      snap.units[2].count = D 150000
+      r = advisor.advise snap, r.memory, cfg
+      expect(_.find(r.tips, unit: 'nest').cost.toNumber()).toBe 150000
+      # production doubled (H 1.5e6 <= 2e6): the tier passes the plain test, the advice ends
+      snap.units[2].prodEach = D 2e-3
+      r = advisor.advise snap, r.memory, cfg
+      expect(r.memory.lrFaster.nest).toBeUndefined()
+      expect(_.find r.tips, (t) -> t.unit == 'nest' and t.longRun).toBeUndefined()
 
-    it 'forgets a promise not taken up', ->
+    it 'forgets an advised purchase not made', ->
       cfg = _.extend {ageMultiple: 10}, ON
       r = advisor.advise lrSnap(15000, 10), null, cfg
-      expect(r.memory.lrFaster.nest.levels).toBe 1
-      # the price went up before the purchase: LR-1 no longer passes and the promise goes
+      expect(r.memory.lrFaster.nest.bought).toBe false
+      # the price went up before the purchase: LR-1 no longer passes and the advice is forgotten
       r = advisor.advise lrSnap(15001, 10), r.memory, cfg
       expect(r.memory.lrFaster.nest).toBeUndefined()
 
@@ -190,6 +208,37 @@ describe 'Service: advisor, long-run climb mode', ->
       r = advisor.advise mksnap(meat: 650, units: units), null, ON
       expect(pushes r).toEqual [['greaterqueen', 37, 'meat'], ['nest', 20, 'share']]
       expect(advisor.renderAction tier r, 'greaterqueen').toBe 'feed upward: hatch 37 greaterqueens (half your meat)'
+
+    it 'holds back the larvae for the next nexus while the energy line saves for it', ->
+      # nexus 4, meat for nexus 5 in hand, its 500,000 larvae under 20,000 s x 100/s away: the energy
+      # line saves for it. floor(555,000 x 0.9) = 499,500 - 500,000 < 1 larva: no push line
+      energy = {nexus: 4, energy: D(1000), moths: D(4000), cap: D(5e4), next: {name: 'nexus5', level: 5, costs: [
+        {unit: 'meat', val: D(1e6), have: D(1e7)}, {unit: 'energy', val: D(36000), have: D(1000)}, {unit: 'larva', val: D(500000), have: D(555000)}]}}
+      r = advisor.advise mksnap(larvae: 555000, larvaRate: 100, energy: energy, units: base()), null, ON
+      expect(r.energy.type).toBe 'save'
+      expect(r.longRun.nexusLarvae.toNumber()).toBe 500000
+      expect(r.longRun.pushes).toEqual []
+      expect(_.find(r.longRun.lines, unit: 'nest').outcome).toBe 'no larvae'
+      # meat not yet there: nothing held, the push takes its 20 nests
+      energy.next.costs[0].have = D 1e5
+      r = advisor.advise mksnap(larvae: 555000, larvaRate: 100, energy: energy, units: base()), null, ON
+      expect(r.longRun.nexusLarvae.toNumber()).toBe 0
+      expect(pushes r).toEqual [['nest', 20, 'share']]
+
+    it 'records every tier it looked at, with the reason for no line', ->
+      r = advisor.advise mksnap(units: base()), null, ON
+      # from endless down to frontier + 1 (nest): nothing below everywhere but on nest
+      expect(r.longRun.lines.length).toBe 18
+      expect(_.uniq(_.map r.longRun.lines.slice(0, 17), 'outcome')).toEqual ['nothing below']
+      expect(_.last(r.longRun.lines).outcome).toBe 'hatch'
+
+    it 'computes a line from its inputs as the simulator does (first term on a tie)', ->
+      # share 0.5 x 10 / 1 = 5, larvae 5, meat 1e9 / 2 / 1 => tie between share and larvae: share
+      expect(_.values(advisor.pushLine 0.5, D(10), D(1), D(5), D(1e9), D(1))).toEqual [D(5), 'share']
+      expect(advisor.pushLine(0.5, D(10), D(1), D(4.9), D(1e9), D(1)).binding).toBe 'larvae'
+      # meat / 2 / price = 3.5 => 3
+      res = advisor.pushLine 0.02, D(1e6), D(1000), D(1e6), D(7), D(1)
+      expect([res.n.toNumber(), res.binding]).toEqual [3, 'meat']
 
     it 'cools down for 60 s per unit after a purchase is seen', ->
       r = advisor.advise mksnap(units: base()), null, ON
@@ -231,6 +280,16 @@ describe 'Service: advisor, long-run climb mode', ->
       mksnap larvaRate: 100, units: {drone: {count: 1e4}, queen: {count: 1e6, twinCost: 10}, nest: {count: nests, cost: 1000, prodEach: 1e-3}, greaterqueen: {prodEach: 1e-6}}
     twinTip = (r) -> _.find r.tips, type: 'twin'
 
+    it 'take the frontier of the state as it is, before this visit\'s purchases', ->
+      # nests (100 held) pass by LR-1 this visit, so they are the frontier after the climb; before it the
+      # frontier is queen, so the queens' twin paid in nests is guarded (100 < 1e6 x 10)
+      snap = mksnap age: 200000, larvaRate: 100, units: {drone: {count: 1e4}, queen: {count: 1e12, twinCost: 10}, nest: {count: 100, cost: 1000, prodEach: 1e-3, prodCost: 15000, prodFactor: 10}}
+      r = advisor.advise snap, null, _.extend({ageMultiple: 10}, ON)
+      expect(tier(r, 'nest').reason).toBe 'buyFaster'
+      expect([r.longRun.frontierBefore, r.longRun.frontier]).toEqual ['queen', 'nest']
+      expect(_.find r.tips, type: 'twin').toBeUndefined()
+      expect(r.longRun.suppressed[0].payIn).toBe 'nest'
+
     it 'are suggested only from 1e6 x their price held', ->
       expect(twinTip(advisor.advise twinSnap(1e7), null, ON).cost.toNumber()).toBe 10
       r = advisor.advise twinSnap(1e7 - 1), null, ON
@@ -270,11 +329,10 @@ describe 'Service: advisor, long-run climb mode', ->
       options.resetAdvisorConfig()
       expect(options.advisorSetting 'longRun').toBe 'off'
 
-    it 'leaves the memory of a run without its keys while off', ->
+    it 'leaves the memory of a run without its key while off', ->
       r = advisor.advise mksnap(units: base()), null, ON
-      expect(r.memory.push.seen.nest).toBe '0'
+      expect(r.memory.lrFaster).toEqual {}
       r = advisor.advise mksnap(units: base()), r.memory, {}
-      expect(r.memory.push).toBeUndefined()
       expect(r.memory.lrFaster).toBeUndefined()
 
 describe 'Service: advisor, long-run climb mode on a real save', ->
