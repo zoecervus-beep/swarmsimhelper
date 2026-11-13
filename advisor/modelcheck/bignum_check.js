@@ -45,4 +45,18 @@ h.unit('hive').buy(new Decimal('1e200'));
 h.upgrade('expansion').buy(1);
 out.buy = {hiveGained: S(h.unit('hive').count().minus(before.hive)), gqSpent: S(before.gq.minus(h.unit('greaterqueen').count())),
   premutagenGained: S(h.unit('premutagen').count().minus(before.pm))};
+// territory empower: production, meat cost and the next empower's price for every unit; then empower goons once
+out.empower = {};
+var e = load();
+TERR.forEach(function (n) {
+  var u = e.unit(n), meat = null;
+  u.eachCost().forEach(function (c) { if (c.unit.name === 'meat') meat = S(c.val); });
+  out.empower[n] = {level: S(e.upgrade(n + 'empower').count()), prodEach: S(u.eachProduction().territory), meatCost: meat,
+    price: S(e.upgrade(n + 'empower').totalCost()[0].val)};
+});
+e.unit('meat')._setCount(new Decimal('1e700'));
+var g0 = e.unit('goon').count();
+e.upgrade('goonempower').buy(1);
+out.empowerBuy = {goonBefore: S(g0), goonAfter: S(e.unit('goon').count()), level: S(e.upgrade('goonempower').count()),
+  prodEach: S(e.unit('goon').eachProduction().territory)};
 process.stdout.write(JSON.stringify(out) + '\n');

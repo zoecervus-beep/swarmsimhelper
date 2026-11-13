@@ -8,6 +8,6 @@
            "mutantfreq": "1e6", "mutantnexus": "1e9"},
  "upgrades": {"expansion": "1500", "hatchery": "600", "achievementbonus": "5", "nexus5": "1", "droneprod": "200", "dronetwin": "1100",
               "queenprod": "150", "queentwin": "900", "hivetwin": "400", "pantheon5twin": "60", "overmindtwin": "40",
-              "overmind5twin": "7", "overmind6prod": "3", "overmind5prod": "90", "goontwin": "300", "devourertwin": "200",
+              "overmind5twin": "7", "overmind6prod": "3", "overmind5prod": "90", "goontwin": "300", "devourertwin": "200", "spiderempower": "2", "goonempower": "1",
               "mutatehatchery": "1", "mutatemeat": "1", "mutatearmy": "1", "mutateeach": "1", "mutatefreq": "1", "mutatenexus": "1"}
 }

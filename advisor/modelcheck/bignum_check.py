@@ -3,7 +3,7 @@
 The 20.1 h save is edited (bignum_state.json) to hold up to 1e600 of resources, twin levels up to 1,100,
 faster levels up to 200, 1,500 expansions, units on every tier up to endless and mutants up to 1e330.
 Compares rates, production per unit, units per hatch, upgrade prices, one hour of idle production, a
-1e200-hive purchase and the premutagen of expansion 1,501.
+1e200-hive purchase, the premutagen of expansion 1,501, and territory empower (prices, production, costs, an empower purchase).
 
 Usage (from the repo root): python3 -I advisor/modelcheck/bignum_check.py     # about 3 s
 """
@@ -21,6 +21,7 @@ d['unittypes'].update(EDIT['units']); d['upgrades'].update(EDIT['upgrades'])
 tmp = os.path.join(OUT, '_bignum_save.json'); json.dump(d, open(tmp, 'w'))
 os.environ['SAVE'] = tmp
 sim.PREMUT = 'exact'
+sim.EMPOWER_MODEL = True        # the edited state holds empowered spiders and goons
 s = sim.load()
 rows = []; worst = [0.0, '']
 def row(name, gv, sv):
@@ -48,7 +49,7 @@ for k in range(1, sim.K + 1):
 for j, n in enumerate(sim.TN):
     if n == 'swarmling': continue          # empowered swarmling: not modelled (MODEL-CHECK.md)
     u = game['units'][n]
-    row(n + ' territory each', u['prodEach'], sim.TP[j] * s.tm[j]); row(n + ' units per hatch', u['twin'], sim.TWO ** s.tt[j])
+    row(n + ' territory each', u['prodEach'], sim.TP[j] * s.tm[j] * sim.EMP_PROD ** s.emp[j]); row(n + ' units per hatch', u['twin'], sim.TWO ** s.tt[j])
 row('hatchery price', game['prices']['hatchery'], sim.hatch_cost(s))
 row('expansion price', game['prices']['expansion'], sim.exp_cost(s))
 row('goontwin price (meat)', game['prices']['goontwin'], sim.tt_cost(s, 10)[0])
@@ -61,6 +62,17 @@ k = sim.NAMES.index('hive'); n = bn.num('1e200')
 row('buy 1e200 hives: hives gained', game['buy']['hiveGained'], n * sim.TWO ** s.twin[k])
 sp, q = sim.premut_roll(s, 'expansion', s.exp + 1)
 row('expansion %d: premutagen' % (s.exp + 1), game['buy']['premutagenGained'], q if sp else 0)
+# territory empower (sim.EMPOWER_MODEL, default off; on for this whole check)
+se = sim.load()
+for j, n in enumerate(sim.TN):
+    e = game['empower'][n]
+    row(n + ' empower level %s: territory each' % e['level'], e['prodEach'], sim.TP[j] * se.tm[j] * sim.EMP_PROD ** se.emp[j])
+    row(n + ' empower level %s: meat cost' % e['level'], e['meatCost'], sim.tcosts(se)[j])
+    row(n + ' next empower price', e['price'], sim.empower_price(se, j))
+eb = game['empowerBuy']
+row('goon empowered once more: goons left', eb['goonAfter'], 0)
+row('goon empowered once more: territory each', eb['prodEach'], sim.TP[10] * se.tm[10] * sim.EMP_PROD ** (se.emp[10] + 1))
+sim.EMPOWER_MODEL = False
 txt = ['# Beyond float range: game vs simulator', '', '| quantity | game | sim | sim/game |', '|---|---|---|---|'] + rows
 txt += ['', '**%d numbers compared; worst |sim/game - 1| = %.3g (%s).**' % (len(rows), worst[0], worst[1])]
 open(os.path.join(OUT, 'bignum_check.md'), 'w').write('\n'.join(txt) + '\n')

@@ -197,7 +197,7 @@ def load():
     s.prod=[0]*(K+2); s.twin=[0]*(K+2)
     for k in range(1,K+1):
         s.prod[k]=int(g.get(NAMES[k]+'prod',0)); s.twin[k]=int(g.get(NAMES[k]+'twin',0))
-    s.t=[bn.num(u[n]) for n in TN]; s.tt=[int(g.get(n+'twin',0)) for n in TN]
+    s.t=[bn.num(u[n]) for n in TN]; s.tt=[int(g.get(n+'twin',0)) for n in TN]; s.emp=[int(g.get(n+'empower',0)) for n in TN]; s.emp_log=[]
     s.hatch=int(g['hatchery']); s.exp=int(g['expansion']); s.ach=int(g['achievementbonus'])
     s.energy=float(u.get('energy',0)); s.nexus=int(float(u.get('nexus',0))); s.moth=float(u.get('moth',0)); s.bat=float(u.get('bat',0)); s.nightbug=float(u.get('nightbug',0)); s.mtx=float(u.get('mtxEnergy',0)); s.hatched=[0.0]*(K+2); s.hprev=[0.0]*(K+2); s.carry=[0.0]*(K+2); s.reserve=0.0; s.nexres=0.0; s.casts={}; s.earned=bn.F(0.0)
     s.lastbuy=[-1e18]*(K+2); s.firstclimb={}; s.fa_log=[]; s.purse=0.0; s.time=0.0; s.spent=[0.0]*(K+1); s.spentT=0.0
@@ -225,7 +225,29 @@ def load_ascension(s,d):
     refresh_mut(s)
 def lam(s): return LMULT*(1+s.hatch)*X11**s.exp*(1+0.001*s.achpts)**s.ach*s.lm+MUTAGEN_LARVA*s.mutagen
 def P(s,k): return BASEP[k]*TWO**s.prod[k]*(MMULT if k==1 else 1)*s.mm[k]
-def trate(s): return sum(s.t[j]*TP[j]*s.tm[j] for j in range(11))
+def trate(s):
+    if EMPOWER_MODEL: return sum(s.t[j]*TP[j]*s.tm[j]*EMP_PROD**s.emp[j] for j in range(11))
+    return sum(s.t[j]*TP[j]*s.tm[j] for j in range(11))
+# Territory empower (`<unit>empower` upgrades). EMPOWER_MODEL (default False, so earlier results are unchanged):
+# level e multiplies the unit's production by 1.53228e18^e (45^11) and its meat cost by 1.53228e29^e (450^11);
+# the next level costs EMP_BASE[j] x 1.53228e29^e meat; buying it wipes the units of that kind (compoundUnit 0).
+EMPOWER_MODEL=False
+EMP_PROD=bn.F(1.53228e18); EMP_COST=bn.F(1.53228e29)
+EMP_BASE=[1.14921e32,5.17144e34,2.32715e37,1.04722e40,4.71247e42,2.12061e45,9.54276e47,4.29424e50,1.93241e53,8.69584e55,3.91313e58]
+def tcosts(s):
+    if not EMPOWER_MODEL: return TC
+    return [TC[j]*EMP_COST**s.emp[j] for j in range(11)]
+def empower_price(s,j): return EMP_BASE[j]*EMP_COST**s.emp[j]
+def empower_policy(s,p,Mb,Lb):
+    """Policy option `empower` (needs EMPOWER_MODEL): the native advisor's empowerAdvice. Empower the cheapest
+    rung when the territory larvae (Lb, at least 1) all fit in the most expensive rung with the empower's price
+    still to spare, and the units it wipes make under 1% of territory income (`emp_share`)."""
+    tc=tcosts(s); order=sorted(range(11),key=lambda j:tc[j]); low=order[0]; top=order[-1]
+    price=empower_price(s,low)
+    if price+tc[top]*max(Lb,1)>Mb: return
+    inc=trate(s); wiped=s.t[low]*TP[low]*s.tm[low]*EMP_PROD**s.emp[low]
+    if inc>0 and wiped/inc>=p.get('emp_share',0.01): return
+    s.c[0]-=price; s.emp[low]+=1; s.t[low]=bn.F(0.0); s.emp_log.append((s.time,TN[low],s.emp[low]))
 # Upgrade prices (checked against the game's totalCost() in MODEL-CHECK.md).
 def anc_cost(s): return 5e6*1e4**s.ach, 500*1e4**s.ach          # accomplished ancestry: meat, territory
 def exp_cost(s): return 10*X245**s.exp                           # expansion: territory
@@ -252,6 +274,7 @@ def energy_policy(s,p,gained):
             break
     if ascend_saving(s,p): return
     mt=p.get('moth_N5',p.get('moth_N',0)) if s.nexus>=5 else p.get('moth_N',0)
+    if p.get('moth_late') and run_age(s,p)>=p['moth_late'][0]: mt=p['moth_late'][1]   # (run age, target): raise the target later in a run
     if s.nexus>=4 and s.moth<mt:
         n=math.floor(min(mt-s.moth,max(0,s.energy-hold)/10,s.larva))
         if n>0: s.moth+=n; s.energy-=10*n; s.larva-=n
@@ -287,7 +310,10 @@ def energy_policy(s,p,gained):
         if (mw and s.nexus>=5) or (sp==p.get('spells')[0] and not p.get('spill')): break
 def advance(s,dt,skip=False):
     L=lam(s)*dt; s.larva+=L; s.terr+=trate(s)*dt
-    if not skip: s.time+=dt; s.energy=min(ecap(s),s.energy+erate(s)*dt)
+    if not skip:
+        s.time+=dt; e=s.energy+erate(s)*dt; c=ecap(s)
+        if e>c: s.ewaste=getattr(s,'ewaste',0.0)+(e-c)   # energy lost to the cap (diagnostic only)
+        s.energy=min(c,e)
     new=s.c[:]
     top=K
     while top>0 and not s.c[top]>0: top-=1      # tiers above the highest one owned add nothing (same result, faster)
@@ -310,6 +336,8 @@ def allowed(s,p,k):
         if cap>p['sat']*lam(s): return True
     return False
 def policy(s,p,gained):
+    if p.get('lr_age') and run_age(s,p)<p['lr_age']:   # long-run rules switch on by themselves only from this run age
+        p=dict(p,faster_aware=None,push=None)
     if p.get('theta_age'): p['theta']=p['theta_age']*(p.get('age0',4306)+s.time-s.run_off)   # run age (run_off moves at an ascension)
     energy_policy(s,p,gained)
     # --- larva multipliers
@@ -331,18 +359,7 @@ def policy(s,p,gained):
             if s.c[k]>=p['prod_mult']*cost: s.c[k]-=cost; s.prod[k]+=1
             else: break
     # --- twin upgrades (twin of tier k costs tier k+1)
-    for k in range(1,K):
-        while True:
-            cost=twin_cost(s,k)
-            if p.get('twin_used') and s.time-s.lastbuy[k]>p['twin_used']: break
-            if p.get('twin_r') and s.c[k+1]*P(s,k+1) > p['twin_r']*lam(s)*(1-p['f'])*TWO**s.twin[k]/TWO**s.twin[k+1]: break
-            if p.get('twin_flow'):
-                inc=(s.c[k]*P(s,k)/UNITC[k]) if k>=2 else 1e99
-                R=TWO**s.twin[k]*min(lam(s)*(1-p['f']),inc)
-                if R < p['twin_flow']*cost*P(s,k+1): break
-            if p.get('push') and k+1>push_frontier(s,p) and s.c[k+1]<p['push'].get('twin_mult',1)*cost: break   # keep pushed units for climbing
-            if s.c[k+1]>=p['twin_mult']*cost and s.c[k+1]>=cost: s.c[k+1]-=cost; s.twin[k]+=1
-            else: break
+    twin_pass(s,p)
     # --- twin seeking: hatch just enough tier k+1 units to afford twin_k when its payback is short
     if p.get('twinseek'):
         for k in range(1,K):
@@ -364,28 +381,32 @@ def policy(s,p,gained):
     if f>0:
         terrmode=p['terr'] if not (s.casts.get('mirror') and 'terr_mirror' in p) else p['terr_mirror']
         Lb=s.purse; Mb=p['g']*s.c[0]; lr=lam(s)*f
+        if EMPOWER_MODEL and p.get('empower'): empower_policy(s,p,Mb,Lb); Mb=p['g']*s.c[0]
+        # rungs: territory units in order of meat cost (j order; with empowered units, by live cost)
+        TCs=tcosts(s); RG=list(range(11)) if not EMPOWER_MODEL else sorted(range(11),key=lambda j:TCs[j])
         if terrmode=='balanced':
-            js=max([j for j in range(11) if TC[j]*max(Lb,1)<=Mb] or [0])
+            ri=max([i for i in range(11) if TCs[RG[i]]*max(Lb,1)<=Mb] or [0])
         else:
-            js=max([j for j in range(11) if TC[j]<=Mb] or [0])
+            ri=max([i for i in range(11) if TCs[RG[i]]<=Mb] or [0])
+        js=RG[ri]; jn=RG[ri+1] if ri<10 else None
         # twin for js
         saving=False
-        for j in ([js,js+1] if js<10 else [js]):
+        for j in ([js,jn] if jn is not None else [js]):
             tm,tl=tt_cost(s,j)
-            if tl<=tts*lr and tm<=Mb and TC[j]<=Mb:
+            if tl<=tts*lr and tm<=Mb and TCs[j]<=Mb:
                 if Lb>=tl: s.larva-=tl; s.purse-=tl; Lb-=tl; s.c[0]-=tm; Mb-=tm; s.tt[j]+=1
                 else: saving=True
                 break
         if not saving and Lb>=1:
-            if terrmode=='balanced' and js<10 and TC[js+1]<=Mb and Lb*TC[js]<=Mb:   # last test: larvae can outrun meat (mutagen larvae)
-                y=max(0.0,min(Lb,(Mb-Lb*TC[js])/(TC[js+1]-TC[js]))); x=Lb-y
-                buys=[(js,x),(js+1,y)]
+            if terrmode=='balanced' and jn is not None and TCs[jn]<=Mb and Lb*TCs[js]<=Mb:   # last test: larvae can outrun meat (mutagen larvae)
+                y=max(0.0,min(Lb,(Mb-Lb*TCs[js])/(TCs[jn]-TCs[js]))); x=Lb-y
+                buys=[(js,x),(jn,y)]
             else:
-                buys=[(js,min(Lb,Mb/TC[js]))]
+                buys=[(js,min(Lb,Mb/TCs[js]))]
             for j,n in buys:
                 n=math.floor(n)
                 if n<=0: continue
-                s.t[j]+=n*TWO**s.tt[j]; s.c[0]-=n*TC[j]; s.larva-=n; s.purse-=n; s.spentT+=n; buy_stat(s,TN[j],n*TWO**s.tt[j])
+                s.t[j]+=n*TWO**s.tt[j]; s.c[0]-=n*TCs[j]; s.larva-=n; s.purse-=n; s.spentT+=n; buy_stat(s,TN[j],n*TWO**s.tt[j])
     # --- climb, top down
     avail=(s.larva-s.purse if f>0 else s.larva)-s.reserve-s.nexres
     first=True
@@ -393,13 +414,14 @@ def policy(s,p,gained):
     for k in range(min(top+1,K),0,-1):
         fa=False   # tier passes only on the faster-aware test (see faster_aware below)
         if not allowed(s,p,k):
-            if not (p.get('faster_aware') and k>=2): continue
+            if not (p.get('faster_aware') and k>=p.get('fa_from',2)): continue
             fa=True
         if k<=p.get('min_tier',1)-1: continue
         if p.get('bank') and k<K and s.c[k+1]>0 and allowed(s,p,k+1) and s.c[k+1]*P(s,k+1) > p['bank']*lam(s)*(1-p['f'])*TWO**s.twin[k]/TWO**s.twin[k+1]: continue
         n=avail
         sh=p.get('share',1.0)
         if first and p.get('share_top'): sh=p['share_top']
+        if p.get('time_share'): sh=tshare(sh,p)
         if k>=2 and p.get('alpha'): sh=1-math.exp(-p['alpha']*p['ci']/(H(s,k)/k))
         if k>=2 and p.get('prod_reserve'):
             pc=2*prod_cost(s,k-1)
@@ -439,14 +461,16 @@ def policy(s,p,gained):
                     if s.c[k]>=prod_cost(s,k): s.c[k]-=prod_cost(s,k); s.prod[k]+=1   # the level(s) the start relied on
                     else: break
                     if p.get('faster_aware')!='multi' or H(s,k)<=p['theta']: break
-    if p.get('push'): push_up(s,p)
+    if p.get('twin_after'): twin_pass(s,p)   # twin_after: twins for the tiers just hatched, in the same visit (as the native advisor's tips)
+    if p.get('push'):
+        for _ in range(p['push'].get('rounds',1)): push_up(s,p)   # rounds: the player follows the push suggestions several times in one visit
     earn_achievements(s)
 def hatch(s,k,n):
     """Buy n of meat tier k (n hatch events, n x 2^twin units), with the same bookkeeping as the climb."""
     if k>=2: s.c[k-1]-=n*UNITC[k]
     s.c[0]-=n*MEATC[k]; s.c[k]+=n*TWO**s.twin[k]; s.larva-=n; s.spent[k]+=n; s.lastbuy[k]=s.time
     s.hatched[k]+=n*TWO**s.twin[k]; buy_stat(s,NAMES[k],n*TWO**s.twin[k]); s.firstclimb.setdefault(NAMES[k],s.time)
-def push_frontier(s,p): return max([k for k in range(1,K+1) if s.c[k]>0 and allowed(s,p,k)] or [1])
+def push_frontier(s,p): return max([k for k in range(1,K+1) if s.c[k]>0 and allowed(s,p,k)] + [p['push'].get('from',2)-1])   # push only tiers >= push['from']
 def push_up(s,p):
     """Policy option `push` (default off), for the achievement objective: {'goal': tier, 'share': f, 'base': f0}.
     Tiers above the climb frontier (the highest tier whose break-even H passes the horizon) never pay back
@@ -458,12 +482,32 @@ def push_up(s,p):
     q=p['push']; G=min(q.get('goal',K),K)
     frontier=push_frontier(s,p)
     larva=s.larva-s.reserve-s.nexres-(s.purse if p['f']>0 else 0)
-    for k in range(G,frontier,-1):
+    order=range(frontier+1,G+1) if q.get('bottom_up') else range(G,frontier,-1)   # bottom_up: a visit can carry units several tiers up
+    for k in order:
         if s.c[k-1]<=0 or larva<1: continue
         sh=q.get('share',0.5) if k>frontier+1 else q.get('base',0.02)
+        if p.get('time_share'): sh=tshare(sh,p)
         n=math.floor(min(sh*s.c[k-1]/UNITC[k], larva, s.c[0]*0.5/MEATC[k]))
         if n<1: continue
         hatch(s,k,n); larva-=n
+def tshare(sh,p):
+    """`time_share` (default off): a share stated per minute, applied over the time since the last visit, as the
+    native advisor sizes purchases: 1 - (1 - share)^(minutes since). At one-minute visits it is the share itself."""
+    return 1-(1-sh)**(p['ci']/60.0)
+def twin_pass(s,p):
+    """Twin upgrades (twin of tier k costs tier k+1), as the tuned policy buys them."""
+    for k in range(1,K):
+        while True:
+            cost=twin_cost(s,k)
+            if p.get('twin_used') and s.time-s.lastbuy[k]>p['twin_used']+(p['ci'] if p.get('twin_used_gap') else 0): break   # twin_used_gap: 'recently' counts from the previous visit
+            if p.get('twin_r') and s.c[k+1]*P(s,k+1) > p['twin_r']*lam(s)*(1-p['f'])*TWO**s.twin[k]/TWO**s.twin[k+1]: break
+            if p.get('twin_flow'):
+                inc=(s.c[k]*P(s,k)/UNITC[k]) if k>=2 else 1e99
+                R=TWO**s.twin[k]*min(lam(s)*(1-p['f']),inc)
+                if R < p['twin_flow']*cost*P(s,k+1): break
+            if p.get('push') and k+1>push_frontier(s,p) and s.c[k+1]<p['push'].get('twin_mult',1)*cost: break   # keep pushed units for climbing
+            if s.c[k+1]>=p['twin_mult']*cost and s.c[k+1]>=cost: s.c[k+1]-=cost; s.twin[k]+=1
+            else: break
 def faster_aware_passes(s,p,k,n):
     """Policy option `faster_aware` (default off). A tier that fails the run-age test may still be climbed
     when its break-even clock, counted as if the next faster level were bought out of this purchase, is
@@ -530,7 +574,7 @@ def ascend(s,p,plan=None):
     for n,pts,val in ASC_ACH:
         if n not in s.ach_have and s.asc>=val: s.ach_have.add(n); s.achpts+=pts; log_ach(s,n)
     s.c=[bn.F(0.0)]*(K+1); s.c[0]=bn.F(35.0); s.larva=bn.F(10.0); s.terr=bn.F(0.0)
-    s.prod=[0]*(K+2); s.twin=[0]*(K+2); s.t=[bn.F(0.0)]*11; s.tt=[0]*11
+    s.prod=[0]*(K+2); s.twin=[0]*(K+2); s.t=[bn.F(0.0)]*11; s.tt=[0]*11; s.emp=[0]*11
     s.hatch=0; s.exp=0; s.ach=0; s.energy=0.0; s.nexus=0; s.moth=0.0; s.bat=0.0; s.nightbug=0.0
     s.hatched=[0.0]*(K+2); s.hprev=[0.0]*(K+2); s.carry=[0.0]*(K+2); s.reserve=0.0; s.nexres=0.0; s.purse=0.0
     s.casts={}; s.casts0={}; s.respecE=0.0; s.lastbuy=[-1e18]*(K+2); s.firstclimb={}; s.fa_log=[]
@@ -580,12 +624,14 @@ def run_cycles(p,ci,hours,plans=None,s0=None,every=3600,stop_on_overflow=True,un
     until(s): stop as soon as it returns True (checked after every check-in).
     Floats overflow when territory passes about 1e308 (~1,000 mirror casts in one run): the run stops there
     and the last row has 'overflow': True."""
-    p=dict(p,ci=ci); s=copy.deepcopy(s0) if s0 is not None else load()
+    gapf=ci if callable(ci) else None
+    p=dict(p,ci=(60.0 if gapf else ci)); s=copy.deepcopy(s0) if s0 is not None else load()
     rows=[snap(s,p)]; nxt=(math.floor(s.time/every)+1)*every; gained=0
     try:
         policy(s,p,0)
         while s.time<hours*3600:
-            gained=advance(s,ci)
+            if gapf: p['ci']=float(gapf(s.time))     # a person's irregular visits: the gap before this visit
+            gained=advance(s,p['ci'])
             if s.time>=nxt: rows.append(snap(s,p)); nxt+=every
             policy(s,p,gained)
             if s.want_asc:
