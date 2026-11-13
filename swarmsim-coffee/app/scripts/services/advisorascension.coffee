@@ -248,6 +248,7 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
         nextEndless: nextGoal(goals.endless, snap.endlessBought)
         ascensions: snap.ascensions
         of: target
+        climbMode: cfg.longRun == 'on' # whether the advisor's long-run climb mode is on (a hint if not)
     else
       line = {type: 'done', ascensions: snap.ascensions}
     if mut?

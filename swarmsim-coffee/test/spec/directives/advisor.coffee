@@ -298,6 +298,66 @@ describe 'Directive: advisorPanel', ->
     expect(options.advisorCollapsed()).toBe false
     expect(el.querySelectorAll('tbody tr').length).toBe 3
 
+  describe 'long-run climb mode', ->
+    D = (x) -> new Decimal x
+    # hand-built advice with the mode's fields, in the shape `advisor.update()` returns
+    lrAdvice = (over={}) ->
+      advice = fakeAdvice over
+      push = {type: 'push', unit: 'greaterqueen', below: 'nest', buys: D(50), twin: D(2), units: D(100), share: 0.5, limitedBy: 'share', belowCount: D(1e4)}
+      advice.tiers[2] = _.extend advice.tiers[2], {kind: 'push', reason: 'push', buys: D(50), twin: D(2), push: push}
+      advice.tiers[1] = _.extend advice.tiers[1], {reason: 'buyFaster', fasterLevels: 3}
+      advice.longRun = {active: true, startsIn: 0, mothsRaised: false, frontier: 'nest', pushes: [push], suppressed: [], above: ['hive', 'hivequeen', 'overmind6']}
+      return advice
+
+    it 'shows push rows, faster-level climbs and the empty tiers above on one row', ->
+      spyOn(advisor, 'update').and.returnValue lrAdvice()
+      el = render()
+      rows = el.querySelectorAll 'tbody tr'
+      expect(rows.length).toBe 4
+      expect(text rows[0]).toBe 'hive to endless: nothing to feed until you own the tier below'
+      expect(rows[1].className).toContain 'info'
+      expect(text rows[1].querySelector 'strong').toBe 'feed upward: hatch 50 (×2 twins) (half your nests)'
+      expect(text rows[2].querySelector 'strong').toBe 'buy 12 (×2 twins), then 3× faster nests'
+      expect(text el.querySelector '.advisor-header').toContain '· long-run climb'
+      # the summary when collapsed counts a push as something to do
+      options.advisorCollapsed true
+      $rootScope.$digest()
+      expect(text el.querySelector '.advisor-summary').toBe '— greater queen: feed upward: hatch 50 (×2 twins) (half your nests)'
+
+    it 'says when the mode starts, while the run is younger than 2 days', ->
+      advice = fakeAdvice()
+      advice.longRun = {active: false, startsIn: 3600 * 27.6, mothsRaised: false, frontier: null, pushes: [], suppressed: [], above: []}
+      spyOn(advisor, 'update').and.returnValue advice
+      el = render()
+      expect(text el.querySelector '.advisor-longrun').toBe '· long-run climb from run age 2 d (in 27.6 h)'
+      expect(el.querySelectorAll('.advisor-above').length).toBe 0
+
+    it 'shows nothing of it with the mode off', ->
+      spyOn(advisor, 'update').and.returnValue fakeAdvice()
+      el = render()
+      expect(el.querySelector '.advisor-longrun').toBe null
+      expect(el.querySelector '.advisor-above').toBe null
+
+    it 'says where the lepidoptera target comes from when the mode raised it', ->
+      moths = {type: 'buyMoths', count: D(10000), moths: D(4000), target: 30000, then: null, longRun: true, setting: 4000}
+      spyOn(advisor, 'update').and.returnValue fakeAdvice {energy: moths}
+      el = render()
+      expect(text el.querySelector '.advisor-energy').toBe 'Energy: buy ' + bignum(D 10000) + ' lepidoptera (' + bignum(D 4000) + '/' + bignum(D 30000) + ': long-run target, your setting is ' + bignum(D 4000) + ')'
+
+    it 'hints at the mode on the ascension long-run line while it is off', inject (advisorAscension) ->
+      spyOn(advisor, 'update').and.returnValue fakeAdvice()
+      long = {type: 'longRun', expansion: 0, nextExpansion: {val: D(100)}, lastExpansion: {val: D(5000)}, top: null, endlessBought: D(0), nextEndless: {val: D(1)}, ascensions: 1, of: 20, climbMode: false}
+      spyOn(advisorAscension, 'update').and.returnValue {stage: 'longRun', records: [long], plan: null, hold: null, mutagen: null}
+      el = render()
+      hint = el.querySelector '.advisor-hint a'
+      expect(text hint).toBe 'turn on long-run climb in Options'
+      expect(hint.getAttribute 'href').toBe '#/options'
+      long.climbMode = true
+      advisorAscension.invalidate()
+      $rootScope.$emit 'tick'
+      $rootScope.$digest()
+      expect(el.querySelector '.advisor-hint').toBe null
+
   describe 'ascension advice', ->
     D = (x) -> new Decimal x
     advisorAscension = null
@@ -426,6 +486,22 @@ describe 'Directive: advisorSuggest', ->
     angular.element(button).triggerHandler 'click'
     expect(scope.form.buyCount).toBe '12'
     expect(parseNumber(scope.form.buyCount, scope.unit).equals 12).toBe true
+
+  it 'fills the box for a push and for the purchase half of a faster-level climb', ->
+    advice = fakeAdvice()
+    push = {type: 'push', unit: 'greaterqueen', below: 'nest', buys: new Decimal(50), twin: new Decimal(2), share: 0.5, limitedBy: 'share'}
+    advice.tiers[2] = _.extend advice.tiers[2], {kind: 'push', reason: 'push', buys: new Decimal(50), twin: new Decimal(2), push: push}
+    advice.tiers[1] = _.extend advice.tiers[1], {reason: 'buyFaster', fasterLevels: 3}
+    spyOn(advisor, 'update').and.returnValue advice
+    el = render 'greaterqueen'
+    button = el.querySelector 'button'
+    # the count before twins, as for any purchase
+    expect(text button).toBe 'Use suggested: 50 greater queens'
+    angular.element(button).triggerHandler 'click'
+    expect(scope.form.buyCount).toBe '50'
+    el = render 'nest'
+    angular.element(el.querySelector 'button').triggerHandler 'click'
+    expect(scope.form.buyCount).toBe '12'
 
   it 'writes counts above 1e21 and 1e308 so they parse back exactly', ->
     for count in ['123456789012345678901234567', '9.87654321098765432109e+308', '1.2345678901234567890123e+400']
@@ -703,6 +779,20 @@ describe 'Directive: advisorOptions', ->
     expect(options.advisorConfig().ascension).toBe 'off'
     expect(el.querySelectorAll('input[name=advisor-ascension]')[0].checked).toBe true
 
+  it 'offers the long-run climb as off or on, off by default', ->
+    spyOn(options, 'advisorSetting').and.callThrough()
+    el = render()
+    radios = el.querySelectorAll 'input[name=advisor-longRun]'
+    expect(radios.length).toBe 2
+    expect(radios[0].checked).toBe true
+    expect(text el).toContain 'It does nothing before a run is 2 days old'
+    expect(text el).toContain 'It trades meat income for progress up the chain'
+    radios[1].checked = true
+    angular.element(radios[1]).triggerHandler 'click'
+    $rootScope.$digest()
+    expect(options.advisorSetting).toHaveBeenCalledWith 'longRun', 'on'
+    expect(options.session.state.options.advisor.longRun).toBe 'on'
+
   it 'turns the advisor on and off', ->
     el = render()
     box = el.querySelector 'input[type=checkbox]'
@@ -718,5 +808,5 @@ describe 'Directive: advisorOptions', ->
     el = render()
     angular.element(el.querySelector '.advisor-options button').triggerHandler 'click'
     $rootScope.$digest()
-    expect(options.advisorConfig()).toEqual {ageMultiple: 3, share: 0.5, cooldown: 60, bank: 3, territory: 0.1, moths: 4000, spareEnergy: 'larvarush', ascension: 'off'}
+    expect(options.advisorConfig()).toEqual {ageMultiple: 3, share: 0.5, cooldown: 60, bank: 3, territory: 0.1, moths: 4000, spareEnergy: 'larvarush', ascension: 'off', longRun: 'off'}
     expect(el.querySelector('#advisor-moths').value).toBe '4000'
