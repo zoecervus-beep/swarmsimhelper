@@ -46,4 +46,5 @@ A setting is saved when you leave its box or press Enter. Values outside the all
 
 - [HANDOFF.md](HANDOFF.md): what the rules are and the evidence behind them.
 - [MODEL-CHECK.md](MODEL-CHECK.md): how the simulator and the advisor were checked against the game's code.
+- [ASCENSION.md](ASCENSION.md): ascension and mutagen mechanics, the simulator's model of them, and first strategy findings (not yet in the panel).
 - [BUILDING.md](BUILDING.md): building, testing and running the game.
