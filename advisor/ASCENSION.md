@@ -1,24 +1,229 @@
-# Ascension and mutagen: mechanics, model and first strategy findings
+# Ascension, mutagen and achievements: plan, mechanics and model
 
-Nov 13, 2026. First pass. Nothing in the game or the advisor was changed; the simulator gained ascension and mutagen, checked against the game's own code.
+Nov 13, 2026. Second pass. The owner's goal is **every achievement, and a bunch of endless** (`overmind6`). They will keep ascending until every achievement is earned, and they will not use crystals. Part A is the plan for that goal. Part B holds the mechanics and the checks of the simulator against the game's code. Part C is the first pass, written for a different objective (most mutagen or most meat); this part overturns some of it (A.8).
 
-Scope: the mutagen side of the game is small enough to cover completely. There are 10 mutations, and every one of them was verified by running the game's code (section 2). The strategy work concentrates on what decides *when to ascend* and on the handful of purchases that matter. Three mutations (clone, warp, bat) do nothing under the advisor's current spell plan, so their strategic value was not explored beyond that.
+Nothing in the game or the advisor was changed. All strategy numbers come from the simulator, playing a perfect policy once every 5 minutes from the owner's 20.1 h save. A person plays more slowly, so read every number of days as a lower bound. The grades say how far to trust each finding.
 
-## 1. Conclusions
+Tier names: the fork renamed the five upper overmind tiers (display only). They are **ascended** (`overmind2`), **cosmic network** (`overmind3`), **galactic cluster** (`overmind4`), **universal cortex** (`overmind5`) and **endless** (`overmind6`), the last meat tier.
 
-"Measured" means run in the game's code or in the simulator. "Inferred" means reasoned from those runs. Every strategy number comes from a simulator tuned on one player's single run, starting from one save (20.1 h). The simulator plays a perfect once-a-minute policy, so it is faster than a person.
+## Part A. The plan for "every achievement, and a bunch of endless"
+
+### A.1 The plan in brief
+
+There are 121 achievements worth 2,410 points; the save has 48 of them (730 points). Every remaining one can be earned except `publictest1`, which is worth 0 points and has no trigger in the code. The full inventory, generated from the game data and checked in code, is in [ACHIEVEMENTS.md](ACHIEVEMENTS.md).
+
+Two achievements set the length of the project, and both are paid for in energy, not attention:
+- **"manifest destiny": 5,000 expansions in one run.** That is about 6,400 House of Mirrors casts in a single run. At the most energy the game can make (2.0 energy/s) that takes about 96 days.
+- **"prestigious": 20 ascensions.** Each ascension after the first needs 0.56 to 0.80 million energy spent and held within its run. That is about 75 days of energy for ascensions 2 to 20, plus each run's start-up. The simulator measured 3.6 to 3.9 days per ascension.
+
+Everything else falls inside those two:
+- every meat-tier achievement up to 1e62 endless bought, by day 60 of the long run
+- the territory, mutation and nexus achievements, which only need a deliberate purchase
+
+The route (simulator days at perfect play, 5-minute check-ins):
+
+| Stage | How long | What to aim for | What to buy | When it ends | Achievements that fall |
+| --- | --- | --- | --- | --- | --- |
+| **1. Finish run 1** (now: 20.1 h, nexus 4) | about 4 days (97.5 h in the simulator) | nexus 5, then House of Mirrors with all energy. Once the ascension cost falls to about 72,000 energy (or the energy cap, if lower), stop spending energy and save it. | lepidoptera to 4,000 (as now), then mirrors. Optionally 1e15 swarmlings/stingers/... once larvae allow (see stage 2). | Ascend as soon as the energy covers the cost (~58,000 here, at run age ~4.9 d) | nexus2 ("power overwhelming"), expansion4–5, a few hive/hive queen ones, ascension1 |
+| **2. First ascension: buy the lepidoptera mutation** | minutes | – | Unlock the lepidoptera ("nexus") mutation first (price 1), then buy about 1,000,000 of it (energy ×1.998). Unlock a second mutation (price 15,625): frequency or meat, it makes no difference to this goal (A.5). Keep the rest of the ~6e7 mutagen unspent: it makes larvae. | – | mutation1 |
+| **3. The long run** | about 96 days to the end (expansion 5,000) | All energy into mirrors. Lepidoptera to 30,000. Climb everything, and push units up the chain toward endless (A.4). | Lepidoptera 30,000. Faster upgrades as soon as they pay. Feed each tier above the climb frontier from the one below. Hold units for climbing rather than spending them on twins of the tier below. Once larvae exceed ~1e15/s (around day 5–10), hatch 1e15 of each territory unit once (twins count). | When expansion 5,000 is reached (day ~96); the ascension then costs almost nothing | Every meat-tier achievement: first endless ~day 52, 1e31 endless ~day 59, 1e62 endless ~day 60. Expansions 1,000 (day 20), 2,000 (day 39), 5,000 (day 96). The eleven territory "1 quadrillion" ones when you buy them. |
+| **4. Ascension 2: unlock everything** | minutes | – | With ~1e335 mutagen, unlock all 10 mutations; the 10th costs 15,625^9 ≈ 5.6e37. Keep the nexus mutation at ≥ 1e6. | – | mutation2–4, ascension11 at the 3rd ascension |
+| **5. Quick ascensions 3 to 20** | 18 runs × 3.6–4.6 days ≈ 75–80 days | Energy only: rebuild 5 nexus, lepidoptera, then spend energy (mirrors) until the cost reaches ~108,000, then save it. Climbing does not matter. | Nexus, lepidoptera; mirrors as the energy sink | Each run when the energy covers the cost | ascension2 (5), ascension21 (10), ascension3 (20) |
+
+**Total: about 175 days (6 months) at simulator pace; more like 7 to 9 months for a person** (A.6). The two energy-bound stages (the long run's expansions and the quick ascensions) are about 170 of those days, and no setting found shortens them. The stages can be swapped: do the 18 quick ascensions before the long run. The total is the same. Long run first is recommended, because:
+- the endless arrive about 2.5 months sooner;
+- its enormous mutagen pays for all 10 unlocks at once, with no respec needed;
+- the quick runs that follow are pure routine.
+
+**On a fresh game** (the owner's second game on the fork's site), the route is the same with two differences:
+- Run 1 starts from nothing. The first ascension comes at a run age of about 5 days in the simulator.
+- The one-off event achievements are still to do: import a save, the Konami code, the debug page, the patch notes, clicking the "clickme" slot, and typing s-e-q-u-e-l ("ask the right question", 0 points). Each takes seconds; see ACHIEVEMENTS.md.
+
+### A.2 Conclusions and grades
 
 | # | Finding | Grade |
 | --- | --- | --- |
-| 1 | **Mutagen comes almost entirely from expansions, and House of Mirrors drives them.** Premutagen (the game's "mutagen (inactive)") only spawns when a hatchery reaches level 40+ or an expansion reaches level 80+. The amount is about 1.2544^level per hatchery and 1.12^level per expansion. Each mirror cast doubles every territory unit, which pays for about 0.77 more expansions, so each cast multiplies future premutagen by about 1.09. Over a run the total grows exponentially: ×28 a day from the save in the simulator (+1.45 in log10 per day). Hatcheries add a few percent. | Mechanics **solid** (measured in game code). Growth rate **likely** (simulator, one trajectory) |
-| 2 | **Energy income sets the growth rate, so the lepidoptera ("nexus") mutation is the purchase that matters.** It raises energy production toward 2× (1.998× at 10^6 units, measured), and premutagen growth doubles with it: +2.56 instead of +1.45 log10 per day. Every other mutation is a fixed multiplier at best. Measured over 6 days of the next run, the best plan without it trails by 10^7. | **Likely** |
-| 3 | **When to ascend: as soon as the energy cost can be paid, *if* you will keep playing at least 5 to 6 days after ascending. Otherwise, don't.** The cost is paid in energy and falls as energy is spent. From the 20.1 h save the simulator can first ascend 84 h later (run age 4.3 days). That path overtakes never-ascending 4.7 days after the ascension in mutagen and 6.2 days after in meat/s. By 14 days it is 10^6.6 ahead in mutagen and 10^10.6 ahead in meat/s. Every day of delay costs about 10^2.3 of mutagen at the 14-day mark. | Shape **likely**. Break-even days **guess** to likely, since a person's next run starts slower than the simulator's (probably 1 to 2 days later) |
-| 4 | **First purchases:** unlock the lepidoptera mutation first (price 1), then buy about 10^6 of it. Unlock mutation frequency second (price 15,625), then buy about 10^6. Keep the rest unspent: each unspent mutagen makes 0.1 larva/s. A third unlock costs 2.44×10^8, more than the 4.4×10^7 the first ascension yields, so two is the limit. Frequency and "meta-mutation" (quantity) are tied as the second pick at 6 days; frequency is far cheaper to max. | Prices and limits **solid**. Ranking **likely** |
-| 5 | **After that, do not ascend again** under either objective. Once the nexus mutation is bought, nothing left raises the growth rate, and an ascension restarts the expansion ladder from zero. A second ascension at run ages 2 to 5 days left total mutagen 10^7.8 to 10^10.8 behind never ascending at the 13.5-day mark, with no catch-up. So runs after the first ascension should be open-ended. | **Likely** for horizons up to about 2 weeks. **Guess** beyond that: the simulator overflows floats after about 1,000 mirror casts, roughly 3 weeks |
-| 6 | **In-run advice:** (a) House of Mirrors is the mutagen engine on runs of any length. Casting swarmwarp instead leaves premutagen gaining only 0.15 log10 a day. (b) The age-multiple horizon does not matter for mutagen: 3, 5, 10 and 20 move premutagen by ≤0.05 log10 and the first ascension by ≤1 h. It matters for meat as before. (c) Lepidoptera: 4,000 is right until about 6 days after an ascension; 10,000 wins from there (+0.1 log10 at 8 days); 30,000 only pays after about 3 weeks. (d) Energy needs a reserve rule for the ascension: keep spending until the cost falls to 72,135, or the cap if that is lower, then stop spending and save. | (a) **solid** to likely. (b), (c) **likely**. (d) **solid** (it follows from the cost formula) |
-| 7 | **Crystals matter for timing.** Buying a hatchery or expansion grants 500 crystals once per 30 minutes (from nexus 1). Converting them to energy (the owner does) raises the cap for good and adds about 0.28 energy/s with frequent check-ins. In the simulator that brings the first ascension 14 h earlier and raises premutagen growth by about 20%. A player who checks in rarely gets 500 crystals per visit, not per 30 minutes. | Mechanics **solid**. Effect size **likely**, and it depends on check-in cadence |
+| 1 | **The inventory.** 121 achievements, 2,410 points, 73 left (1,680 points). Every one was checked through the game's own listener at and just below its threshold. Unit achievements count units *bought* (statistics, twins included, summed over every run); production and House of Mirrors clones never count. `publictest1` cannot be earned. | **solid** |
+| 2 | **Expansion 5,000 needs ~6,400 mirror casts in one run: ~96 days at the 2.0 energy/s maximum** (5 nexus × 0.1 × lepidoptera ≤2 × lepidoptera mutation ≤2). Each cast doubles territory, worth 0.774 expansions (measured 0.78). Nothing else lifts that rate: bats do not affect mirrors, crystals are excluded, territory rush only gives a one-off offset. | Mechanics **solid**. 96 days **likely** (simulator; a person loses days to late casts) |
+| 3 | **20 ascensions need ~13 million energy for ascensions 2–20: ~75 days at maximum energy, ~3.6–4.6 days per ascension.** It follows from the cost formula: hold C = min(cap, 50,000 × N / ln 2), spend 50,000 × N × log2(cost/C). Huge mutagen does not shorten a run, because energy is the limit (measured: 3.6–3.8 days with 6e7 or with 1e335 mutagen). | **solid** (formula), **likely** (days) |
+| 4 | **Ascend once, now (about 4 days from the save), to buy the lepidoptera mutation before the long run.** Without it the long run is about twice as slow: first endless at day 103 instead of 52, expansion 2,000 at day 77 instead of 39, and 5,000 out of reach for ~190 days. | **likely** |
+| 5 | **Endless are reachable, and "a bunch" follow quickly.** With the achievement policy the long run buys the first endless on about day 52, passes 1e31 on about day 59 and 1e62 on about day 60. By day 130 it holds ~1e270. The binding constraint on the way up is larvae for the top tiers (endless cannot be twinned, and universal cortex twins cost endless), and larvae come from expansions (1.1^level), i.e. again from mirrors. | **likely** for "about 2 months into the long run". Exact days **guess** (one policy, one start, perfect play) |
+| 6 | **Policy matters for the climb.** The tuned climbing rule (H ≤ multiple × run age) stalls at empresses on long runs, as MODEL-CHECK found. Two changes fix it: counting as many faster levels as one purchase pays for ("faster-aware, multi"), and feeding every tier above the frontier toward endless ("push"). The rest of the policy hardly matters: age multiple 5 or 20 makes no difference, and the second mutation does not move it. | **likely** |
+| 7 | **Attention matters for the climb, not for the long poles.** At 30-minute or 2-hour check-ins the simulator's push rule reaches the first endless at day ~108, not 52. Expansions and ascensions are unchanged, because energy is banked up to the cap of about 15 h. Some of the 108 comes from the simulator's per-check-in shares, which are not re-tuned for slow check-ins. | Direction **likely**; size **guess** |
+| 8 | **Mutations for this goal:** lepidoptera ("nexus") first, then any; all 10 once the long run's mutagen pays for them. Unspent mutagen makes 0.1 larva/s each and helps the early part of each run; meat, hatchery and frequency mutations did not change the day the first endless fell (52 either way). | **likely** |
+| 9 | **Lepidoptera 30,000 in the long run** (energy ×1.94 instead of ×1.8): the first endless 9 days sooner, expansion 5,000 7 days sooner than with 4,000. | **likely** |
+| 10 | **Territory "1 quadrillion" achievements (11 of them)** are cheap late in a run: buy 1e15 of each territory unit once (twins count, mirror clones do not). The simulator's territory rule only buys the top unit in bulk, so it earned goon's but none of the other ten; that is a policy blind spot, not a cost. | **likely** (arithmetic) |
 
-## 2. Mechanics, as the game computes them
+### A.3 What binds: the achievements that set the length
+
+From ACHIEVEMENTS.md, the remaining 73 achievements group like this:
+
+| Group | Remaining | What it needs | Effort |
+| --- | --- | --- | --- |
+| Meat tiers, first/second/third threshold, hive to endless | 45 (920 pts) | Units bought, all runs together. The largest thresholds: hive queen 1e14, empress 1e16, neuroprophet 1e18, hive neuron 1e20, neural cluster 1e22, … arch-mind 1e30, overmind 1e32, ascended 1e38, cosmic network 1e44, galactic cluster 1e50, universal cortex 1e56, **endless 1e62** | One long run, days 1–60 (A.4) |
+| Territory units, 1e15 bought each | 11 (110 pts) | 1 quadrillion bought of each of the 11 territory units | A deliberate purchase once larvae ≥ ~1e15/s |
+| Expansions 100, 200, 500, 1,000, 2,000, **5,000** in one run | 6 (390 pts) | Mirrors: 0.78 expansions per cast | **5,000 = ~96 days of one run** |
+| Nexus 5 ("power overwhelming") | 1 (10 pts) | Buy nexus 5 | Days, in run 1 |
+| Ascend 1, 3, 5, 10, **20** times | 5 (150 pts) | 20 ascensions; each needs its run's energy | **~75–80 days of quick runs** |
+| Unlock 1, 3, 6, **10** mutations | 4 (100 pts) | Unlocks cost 15,625^k; all 10 cost 5.6e37 together | Free after the long run; a respec does not take them back |
+| Events / secrets | 0 left in this save (`publictest1` is dead) | – | – |
+
+- **Minimum number of ascensions: 20.** Ascension 20's cost is 5e6 × 1.12^19 = 43 million energy before discounts. The 1.12 growth only adds about 13,000 energy per ascension to the bill (0.56M at the 2nd, 0.80M at the 20th), because spending halves the cost every 80,000 energy (with the lepidoptera mutation). So the count, not the growth, is what costs time.
+- **Time-based achievements:** none. Nothing asks for an ascension within N minutes or a run of N days; the long-run requirement is only through expansion 5,000.
+- **Last to fall:** expansion 5,000 (day ~96 of the long run) if the quick ascensions come first. Otherwise, with the recommended order, "prestigious" (20 ascensions), about 75–80 days after the long run ends.
+
+### A.4 Getting to endless, and to a lot of them
+
+The long run after the first ascension, under the achievement policy. Simulated days of the run:
+
+| Variant | arch-mind | overmind | ascended | cosmic network | galactic cluster | universal cortex | endless 1 | endless 1e31 | endless 1e62 | exp 1,000 | exp 2,000 | exp 5,000 | endless bought by day 130 (log10) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **achievement policy (base)** | 18 | 23 | 24 | 33 | 40 | 45 | **52** | 59 | **60** | 20 | 39 | **96** | 271 |
+| push, but twins may take the pushed units | 19 | 26 | 38 | 46 | 60 | 64 | 66 | 68 | 68 | 20 | 39 | 96 | 271 |
+| no push (climb rules only, faster-aware) | 34 | 46 | 62 | 83 | 109 | – | – | – | – | 20 | 39 | 96 | – |
+| age multiple 5 | 19 | 19 | 28 | 31 | 38 | 44 | 52 | 59 | 61 | 20 | 39 | 96 | 271 |
+| lepidoptera 4,000 | 17 | 23 | 28 | 34 | 39 | 48 | 61 | 65 | 67 | 20 | 41 | 103 | 247 |
+| check-in every 30 min | 22 | 39 | 41 | 52 | 62 | 83 | 108 | 108 | – | 20 | 39 | 96 | 56 |
+| check-in every 2 h | 26 | 40 | 42 | 53 | 65 | 86 | 109 | 109 | – | 21 | 40 | 97 | 57 |
+| second unlock meat (50% of mutagen) instead of frequency | 20 | 21 | 27 | 30 | 39 | 46 | 52 | 59 | 61 | 20 | 39 | 96 | 268 |
+| **no ascension first**: run 1 continued, no lepidoptera mutation | 33 | 48 | 48 | 63 | 80 | 92 | 103 | 116 | 120 | 39 | 77 | (~190) | 87 |
+
+The base run, every 10 days:
+
+| Run day | Expansions | log10 larvae/s | log10 meat/s | Top tier owned |
+| --- | --- | --- | --- | --- |
+| 0 | 0 | 7 | 0 | drone |
+| 10 | 474 | 23 | 137 | hive network (pantheon2) |
+| 20 | 999 | 46 | 298 | arch-mind (pantheon5) |
+| 30 | 1,525 | 68 | 495 | ascended |
+| 40 | 2,051 | 90 | 680 | cosmic network |
+| 50 | 2,576 | 112 | 987 | universal cortex |
+| 60 | 3,102 | 134 | 1,246 | endless |
+| 90 | 4,678 | 199 | 1,935 | endless |
+| 130 | 6,780 | 287 | 2,675 | endless |
+
+First unit of each tier (base):
+
+| Tier | Day |
+| --- | --- |
+| hive empress | 0.8 |
+| neuroprophet | 3.9 |
+| hive neuron | 5.0 |
+| neural cluster | 7.8 |
+| hive network | 8.4 |
+| lesser hive mind | 12.3 |
+| hive mind and arch-mind | 17.8 |
+| overmind | 23.0 |
+| ascended | 23.8 |
+| cosmic network | 33.0 |
+| galactic cluster | 40.0 |
+| universal cortex | 45.3 |
+| endless | 52.3 |
+
+Every meat-tier "_3" threshold up to universal cortex 1e56 falls by day 51.
+
+**What bottlenecks each step:**
+- **Low and middle tiers (to arch-mind).** These grow on their own. Once a tier is held by the 1e40, one purchase pays for dozens of faster levels, so its break-even time collapses. The old run-age rule did not see that, which is why it stalled at empresses (A.2 #6).
+- **The overminds.** They are bought with stock pushed up from below. Their twins (×12 to ×20 per level, paid in the tier above) only become affordable once the tier above is plentiful. That is why keeping pushed units for climbing, rather than for twins, saves 2 weeks.
+- **Universal cortex and endless.**
+  - Endless has no twin, and the cortex twin is paid in endless.
+  - So each cortex comes from a separate hatch (one larva per hatch event), and each endless costs 1e58 cortex.
+  - Larvae therefore bind. They come from expansions (1.1^level: 1e112/s at day 50), so mirrors set the pace here too.
+  - Meat is never short: 1e38 per endless against 1e987/s.
+- **Mutations** barely matter for the climb: meat mutation instead of frequency gives the same day 52. The **lepidoptera mutation is worth ~50 days**, through mirrors, expansions and larvae.
+- **Banking** (skip a tier when the tier above out-produces larvae) stops mattering once larvae are counted in 1e40s; it is harmless.
+- **House of Mirrors versus swarmwarp or clone larvae.** Mirrors drive expansions, and expansions drive larvae, so mirrors stay right for this goal too. Swarmwarp gives no energy and no expansions. Clone larvae is capped at 1e5 seconds of larva income, a one-off.
+
+**Time estimates:**
+- **First endless: day ~52 of the long run** (sensitivity: 52–66 with perfect play; ~108 at 30-minute check-ins), i.e. about 8 weeks after the first ascension.
+- **The top endless achievement (1e62 bought): ~day 60** (60–68; beyond 130 days at slow check-ins in this policy).
+- **All achievements: ~6 months of real time at simulator pace, 7–9 months for a person.** Weeks for the first endless; months for everything.
+
+### A.5 Ascensions: how many, when, and what each run is for
+
+- **How many: exactly 20.** More earns nothing. The cost multiplies by 1.12 each time, but that adds only ~13,000 energy per ascension; the energy bill is dominated by the count.
+- **Run 1 (now):** reach nexus 5 and cast mirrors. Ascend at the earliest moment (simulator: 97.5 h after the save, run age 4.9 days, no crystals). Its only purpose is the lepidoptera mutation.
+- **Run 2: the long run** (~96 days). Everything except the ascension count happens here. Ascend at the end, which is almost free: the energy spent on 6,400 mirrors has driven the cost to ~1 energy.
+- **Runs 3 to 20: quick runs**, 3.6–4.6 days each in the simulator, energy-bound. In each:
+  1. rebuild 5 nexus and 30,000 lepidoptera (they also count as spending);
+  2. spend energy on mirrors until the cost reaches about 108,000 (the cap, with the lepidoptera mutation);
+  3. stop and save, then ascend.
+
+  Climbing in these runs does not matter.
+- **Can the count be collected cheaply?** Not much cheaper than this:
+  - Every ascension needs its run to spend about b × log2(cost/cap) energy (b = 80,000 with the mutation) plus the cap held. That is ≥ 3.2 days at the maximum energy rate.
+  - Huge mutagen from the long run makes nexus 5 come within hours, but the energy itself still has to accrue.
+  - Nightbugs raise the cap (toward 6×) and count as spending, but the best amount to hold is already ~115,000, near the cap.
+  - Removing the lepidoptera mutation with a free respec (b = 50,000) halves the energy rate, which is worse: 101 days instead of 75 for ascensions 2–20.
+- **Mutation order for this goal:**
+  1. lepidoptera ("nexus") at the first ascension;
+  2. any second (15,625);
+  3. all ten at the second ascension (they cost 5.6e37 together, against ~1e335 held), keeping ≥1e6 nexus.
+
+  The meat, hatchery and frequency mutations did not move the climb. Unspent mutagen gives 0.1 larva/s each, which helps the early days of each run.
+
+### A.6 Settings per stage, and what a person should expect
+
+| Stage | Climb multiple | Lepidoptera target | Territory share | Energy |
+| --- | --- | --- | --- | --- |
+| 1 (finish run 1) | 5 (as tuned) | 4,000 | 0.1 | nexus 5, mirrors; save for the ascension once the cost is ≤ ~72,000 or the cap |
+| 3 (long run) | 20; the advisor also needs the two new rules (A.7) | 30,000 | 0.1 throughout: mirrors need units to double | mirrors, all of it, never letting energy reach the cap (~15 h at full rate) |
+| 5 (quick runs) | any | 30,000 | 0.1 | nexus, lepidoptera, mirrors until the cost is ≤ ~108,000, then save |
+
+- **Long run.** Cast mirrors at least twice a day. Climbing needs frequent visits: the simulator's push loses ~8 weeks to the first endless at 30-minute check-ins.
+- **Quick runs.** At least two visits a day are enough, because energy is banked up to the cap.
+- **For a person:** the energy-bound days (~170) are close to what the simulator says. The climbing part could add weeks.
+
+### A.7 What the advisor should show for this goal (proposal, not built)
+
+1. **Achievements line, always:**
+   `achievements: 730 / 2,410 pts · next closest: hive queens 1e7 bought (98%) · long poles: 5,000 expansions (65 now), 20 ascensions (0)`
+   - "Next closest" uses the game's own `achievement.progressPercent()` over unearned, unmasked achievements. The data supports it: every unit, upgrade and ascension achievement has a numeric requirement.
+2. **Stage line:**
+   `stage: long run, day 34 · expansions 1,780 / 5,000 (~62 days at 52/day) · next tier: galactic cluster (needs 1e41 cosmic network; you hold 1e30)`
+   - In the quick-run stage it becomes: `ascension 7 of 20: cost 107,000 energy; spend until ≤ 108,000, then save: ready in ~14 h`.
+3. **Push line** (new rule): `feed upward: hatch 3.2e15 universal cortex (half your galactic clusters)`, and `faster: buy 37 levels of neuroprophet faster with this purchase`.
+4. **Energy line:**
+   - long run: "mirrors (expansions are the long pole)";
+   - quick runs: "save for ascension";
+   - lepidoptera target 30,000 in both.
+
+**What it needs to read:**
+- `achievementlist()`: `isEarned`, `isMasked`, `progressPercent`
+- the expansion level and `ascension` count
+- per tier: counts, `faster`/`twin` levels and prices, hatch cost
+- energy rate, cap, `ascendCost()`
+- one setting for the stage
+
+The push and multi-faster rules should be ported from `sim.py` and checked with the script-versus-port harness, as the climbing rules were.
+
+### A.8 What this objective overturns in the first pass (Part C)
+
+- **"Ascend once, then never again"** is overturned. 20 ascensions are required. The first-pass reasoning still holds inside the long run: do not reset it.
+- **"First purchases: lepidoptera, then frequency"** still holds for the first unlock. The second does not matter for this goal. All ten are needed eventually, and are free after the long run.
+- **"Lepidoptera 10,000 for long runs"** becomes 30,000 for the long run.
+- **"The age multiple does not matter"** still holds for the long poles. The climb itself needs new rules: the run-age rule stalls at empresses.
+- **Crystals.** The first pass counted 500 crystals per 30 minutes as energy. Under the owner's choice they are excluded: the first ascension moves from 84 h to 97.5 h after the save.
+- **Break-even reasoning** ("ascend only if you play ≥5 more days") no longer applies: ascensions are required.
+- **Float overflow after ~1,000 mirrors** is fixed (B4). The first pass's longest results are unchanged.
+
+### A.9 Not modelled or not verified (this part)
+
+- **One start, one policy family, perfect play.**
+  - The push and faster-aware rules are a first design, lightly varied (5 variants), not optimised.
+  - The days to endless could move by weeks either way.
+  - Slow check-ins were only tried by stretching the same per-check-in shares.
+- **Territory "1e15" purchases, mutation unlocks after the long run, and the nexus 5 achievement** are by arithmetic, not simulated end to end. The quick runs were simulated for 4 ascensions from each of two starts, not all 18.
+- **The game's limits.** The game caps units at 1e100000; the simulator's long run stays far below (meat ~1e2,675 at day 130). The browser's speed at such numbers is untested.
+- **Event achievements** were not simulated; their triggers are read from the code and checked through the listener.
+- **The simulator's territory rule** buys only the top unit in bulk (A.2 #10).
+- **Swarmling empower** is still not modelled.
+
+## Part B. Mechanics and model check
+
+Unchanged from the first pass except where noted; B.4 is new.
+
+### B2. Mechanics, as the game computes them
 
 Sources:
 - Data: `swarmsim-coffee/app/scripts/spreadsheetpreload/v0.2.js`, the table the game loads; it is identical to `tables/src/spreadsheet/original-data.json` for these rows.
@@ -27,7 +232,7 @@ Sources:
 
 Every worked number below was **measured** by running the game's code in Node (`advisor/modelcheck/ascension_check.js`), on the 20.1 h save unless stated. Time zone: UTC.
 
-### 2.1 Premutagen: how it is earned
+#### B2.1 Premutagen: how it is earned
 
 Only two things produce it: buying a **hatchery** or an **expansion** (`addUnitRand` effect). Nothing else does, apart from a one-off backfill for very old saves.
 
@@ -65,7 +270,7 @@ E = 1 + 0.5 × (log10(10 + 0.1 × n_each) − 1)          (meta-mutation; 1 with
 - **On the real saves:** 0 premutagen. The 14.5 h save has hatchery 29 / expansion 57; the 20.1 h save has hatchery 32 / expansion 65. In the simulator the first premutagen comes 5 h after the 20 h save, at hatchery 40.
 - **No cap.** The game's unit limit is 1e100000.
 
-### 2.2 The ascension cost
+#### B2.2 The ascension cost
 
 The cost is paid in **energy**:
 
@@ -92,7 +297,7 @@ S    = energy spent this run = Σ (energy price × count) over units owned
 - **Spend or save?** Spending E more energy lowers the cost by about cost × E × ln 2 / (50,000 × N). So spending beats saving until the cost reaches 50,000 × N / ln 2: 72,135 without the nexus mutation, 115,416 with it maxed, and capped by the energy cap. Then stop spending and save. The simulator's `ascend` rule does exactly this. From the 20 h save it starts saving at hour 64 and ascends at hour 84, paying 71,270.
 - **Repeat cost.** With nothing spent, the cost is 5,600,000 / 6,272,000 / 7,024,640 / … after 1, 2, 3 ascensions (×1.12 each).
 
-### 2.3 What ascending resets and keeps
+#### B2.3 What ascending resets and keeps
 
 **Measured.** The 20 h save was given 40,000 lepidoptera (so the cost, 16,283, fits the cap), 123,456 premutagen, 777 crystals and 5 frequency mutants, then ascended.
 
@@ -109,7 +314,7 @@ S    = energy spent this run = Σ (energy price × count) over units owned
 - **The new run** starts with 1 larva/s plus 0.1/s per unspent mutagen (12,346.6/s here). After 600 s it holds 7,407,970 larvae and still 35 meat, because no drones exist yet.
 - **Ascension achievements:** +10 / +20 / +30 / +40 / +50 points at 1 / 3 / 5 / 10 / 20 ascensions. The first unlock adds 10 more ("mutation1"). With accomplished ancestry 5 and 730 points, +20 points is +6% larvae.
 
-### 2.4 From premutagen to mutagen, and what unspent mutagen does
+#### B2.4 From premutagen to mutagen, and what unspent mutagen does
 
 - Ascending moves all premutagen into mutagen 1:1. Nothing else converts it.
 - **Unspent mutagen makes 0.1 larva/s each.** It sits outside the hatchery, expansion, ancestry and hatchery-mutation multipliers. Measured larvae/s (mutagen / hatchery mutants):
@@ -123,7 +328,7 @@ S    = energy spent this run = Σ (energy price × count) over units owned
 
   The game's own tutorial says the same: "Mutagen you haven't spent yet will produce some larvae, don't spend it all right away!"
 
-### 2.5 What mutagen buys
+#### B2.5 What mutagen buys
 
 - **Unlocks.** Ten "mutation" upgrades, one per mutant unit, each max level 1. The k-th unlock you buy, *of any kind*, costs **15,625^k** mutagen: 1, 15,625, 2.44×10^8, 3.81×10^12, 5.96×10^16, 9.3×10^20, … (measured to the 4th). Order matters enormously: the first unlock is nearly free and the third already costs 2.4×10^8. Each unlock comes with one free mutant.
 - **Mutants.** 1 mutagen each, flat price, no cap. Effects (`effect.coffee`; n = count):
@@ -137,7 +342,7 @@ S    = energy spent this run = Σ (energy price × count) over units owned
 | Lepidoptera (`mutantnexus`) | energy production ×, energy cap ×, ascension-cost halving ÷ | asymp max 2, w=0.0005 (production and cap); max 1.6 for N | energy/s 1.637 / 1.784 / 1.786 (0.893); cap 100,167 / 108,400 / 108,500 (58,500); cost 2.26M / 2.38M (1.52M) |
 | Frequency (`mutantfreq`) | premutagen chance p | 0.2 × asymp max 5, w=0.001 | 0.927 / 0.9992 / 1.0 (0.2) |
 | Meta-mutation (`mutanteach`) | premutagen quantity E | log, v=0.1, c=0.5 | 2.00 / 3.00 / 4.5 (1) |
-| Meat (`mutantmeat`) | production of each meat tier | log, v=0.1, c from 0.48 (drone) falling ×0.85 per tier to 0.022 (overmind 6) | drone 2,009 / 2,990 / 4,465 (1,024); hive 60.1 / 80.1 / 110.2 (40) |
+| Meat (`mutantmeat`) | production of each meat tier | log, v=0.1, c from 0.48 (drone) falling ×0.85 per tier to 0.022 (endless, `overmind6`) | drone 2,009 / 2,990 / 4,465 (1,024); hive 60.1 / 80.1 / 110.2 (40) |
 | Rush (`mutantrush`) | larva rush power; meat and territory rush power | log, v=1, c=3; c=13 | larva rush 6.02×10^9 / 9.63×10^9 / 1.50×10^10 larvae (6.02×10^8); territory rush 5.8×10^27 / 9.5×10^27 / 1.5×10^28 (1.45×10^26) |
 | Clone (`mutantclone`) | clone larvae power (raises only its cap) | log, v=1, c=1.8 | 1.61×10^11 / 2.51×10^11 / 3.86×10^11 larvae (2.51×10^10) |
 | Warp (`mutantswarmwarp`) | swarmwarp power (longer skip) | log, v=1, c=2 | drones gained 5.2×10^30 / 3.1×10^31 / 1.7×10^32 (1.0×10^28) |
@@ -146,14 +351,14 @@ S    = energy spent this run = Σ (energy price × count) over units owned
 
 Nothing changes starting resources or unlock thresholds. `mutanteach` also carries the minimum levels 40 and 80 as constants (`initStat`), so the thresholds are fixed.
 
-### 2.6 Respec
+#### B2.6 Respec
 
 - **Refund.** A respec refunds **all** mutagen spent in the mutagen tab at 100%: every unlock price plus every mutant bought, minus the free unit per unlock. Measured: 1e13 → spend 3.81×10^12 → respec → exactly 1e13 again. All mutants and unlocks go to 0, so the unlock prices restart at 1.
 - **Paid respec.** It costs **30% of the current ascension cost** in energy. It also adds `respecEnergy` equal to the energy spent so far, which **wipes the discount** on the next ascension. Measured: the next ascension cost went from 152,103 to 2,974,830.
 - **Free respec.** You have 4 to start, plus 1 on every 3rd ascension. A free respec keeps the energy credit.
 - **When it is useful.** Only to change an unlock order or reallocate. A paid respec is costly just before an ascension.
 
-### 2.7 Crystals
+#### B2.7 Crystals
 
 Measured:
 - With energy visible (nexus ≥ 1), a hatchery or expansion bought at least 30 min after the last grant gives 500 crystals. A purchase 60 s later gives nothing; 31 min later, another 500.
@@ -161,19 +366,19 @@ Measured:
 - After an ascension (nexus 0) hatcheries grant nothing until nexus 1.
 - The owner's saves show this in use: 5,000 crystals at 14.5 h, then 8,500 crystal-bought energy at 20.1 h.
 
-### 2.8 Interactions with what the advisor already advises on
+#### B2.8 Interactions with what the advisor already advises on
 
 - **House of Mirrors and territory units.**
-  - Mirrors are the premutagen engine (2.1).
+  - Mirrors are the premutagen engine (B2.1).
   - Each cast is also 2,500 spent energy, so it lowers the ascension cost ×0.966.
   - Mirrors need territory units to double. With no territory larvae at all (f=0) premutagen growth collapses to 0.2 log10/day. Stopping territory purchases once mirrors run (`f_mirror=0`) makes no difference, as the handoff found.
 - **Lepidoptera** raise energy (the growth rate) and count as spent energy at 10 each.
 - **Bats / spell power** do nothing for mirrors; neither does the bat mutation.
 - **Clone larvae** only gets a larger cap from its mutation.
 - **Nexus.** Nexus 2 to 5 energy counts as spent. All five are lost at an ascension and must be rebought: 49,125 energy plus meat and larvae. In the simulator that is the bottleneck of a new run: nexus 5 about a day in, with or without mutagen.
-- **Achievement points and accomplished ancestry:** see 2.3.
+- **Achievement points and accomplished ancestry:** see B2.3.
 
-## 3. Model check: the new simulator parts against the game
+### B3. Model check: the new simulator parts against the game
 
 `advisor/modelcheck/ascension_compare.py` plays simulated runs with exact premutagen rolls. It hands their hatchery and expansion levels to `ascension_check.js`, which buys the same levels through the real `upgrade.buy()`. It then compares 3,444 numbers. **The largest sim/game difference is 2×10^-6**, which comes from the game table's rounded goon production (already noted in MODEL-CHECK.md); everything else agrees to 10^-12 or exactly. Full tables: `advisor/modelcheck/out/ascension_compare.md`.
 
@@ -204,9 +409,60 @@ Measured:
 - Event achievements are not modelled.
 - Floats overflow after about 1,000 mirror casts in one run, roughly 3 weeks.
 
-## 4. Strategy
+### B4. New in the second pass: every tier, numbers past 1e308, and the achievement check
 
-### 4.1 The objective
+- **All 20 meat tiers.** `sim.py` now models drone through endless (`K=20`).
+  - Unit costs come from the game data: 1e16 and 1e19 for hive mind and arch-mind (pantheon4 and 5), then 1e23, 1e28, 1e34, 1e41, 1e49, 1e58 for overmind through endless.
+  - Meat per hatch is the formula up to lesser hive mind, then the game's own rounded table values.
+  - Twin price factors are ×10 up to arch-mind and ×12, ×14, ×16, ×18, ×20 for overmind through universal cortex. Endless has no twin upgrade: its row in the game requires an impossible `invisiblehatchery` 2.
+  - `compare.py` and `ascension_compare.py` gained rows for the new tiers. The game's check scripts now report all 20 tiers, and every new row matches.
+- **Numbers that cannot overflow** (`advisor/sim/bignum.py`). Large quantities are an `F`, a float subclass whose every operation is the ordinary float operation. So while results fit in a double they are bit-for-bit what the simulator always computed. An operation that would overflow returns a `Big` instead: a float mantissa with an unbounded integer exponent, 53-bit precision. A `Big` falls back to an `F` under 2^1000.
+- **Proof that nothing moved.** `run_example.py` on both saves gives byte-identical output. `compare.py` on both saves and `ascension_compare.py` give the same rows as before; the only differences are added rows for the new tiers. The first pass's `ascension_strategy.py` tables are identical.
+- **Check against the game past 1e308.** `advisor/modelcheck/bignum_check.py` edits the 20 h save to hold up to 1e600 of resources, twin levels up to 1,100, faster up to 200, 1,500 expansions, units on every tier up to endless and mutants up to 1e330. It compares 131 numbers with the game (up to 1e1100):
+  - rates and production per unit on every tier
+  - units per hatch, faster/twin/hatchery/expansion prices
+  - one hour of idle production on every tier
+  - a 1e200-hive purchase, and the premutagen roll of expansion 1,501
+
+  The worst difference is 1.7e-6, the known rounded goon production. The game keeps only 20 significant digits, so 1e330 − 1e205 is 1e330 in the game; the simulator agrees.
+- **Speed.** The simulator is about 2× slower than before on early-game runs and up to 15× slower on runs full of large numbers. The first pass's strategy script now takes about 10 minutes instead of 40 s. A 130-day long run takes about 1 minute at 5-minute check-ins.
+- **New policy options, all off by default:**
+
+  | Option | What it does |
+  | --- | --- |
+  | `faster_aware='multi'` | A tier may be climbed when buying it plus any number of its own faster levels, paid out of that purchase, brings its break-even under the horizon |
+  | `push={'goal', 'share', 'base', 'twin_mult'}` | Feed every tier above the climb frontier toward the goal tier each check-in: half the tier below, 2% of the top growing tier. Keep those units from being spent on twins of the tier below unless 1e6× the twin's price is held |
+  | achievement logging | `s.ach_log`; the ascension and mutation achievements are now earned by `ascend` / `apply_plan` |
+
+- **Achievement check** (`advisor/modelcheck/achievement_check.js`).
+  - It runs the real `AchievementsListener` on all 121 achievements. Each is not earned just below its threshold and earned at it.
+  - Owning 10× a unit threshold without having bought it does not earn it.
+  - A wrong event parameter does not earn it.
+  - The ascension count is checked the way the ascend command does it.
+
+  All 121 pass. `advisor/sim/achievements.py` turns this into ACHIEVEMENTS.md.
+
+## Part C. Earlier analysis: objective most mutagen or most meat (first pass)
+
+Written before the owner chose the achievement goal; A.8 lists what it overturns. Crystals were counted as energy here.
+
+### C1. Conclusions
+
+"Measured" means run in the game's code or in the simulator. "Inferred" means reasoned from those runs. Every strategy number comes from a simulator tuned on one player's single run, starting from one save (20.1 h). The simulator plays a perfect once-a-minute policy, so it is faster than a person.
+
+| # | Finding | Grade |
+| --- | --- | --- |
+| 1 | **Mutagen comes almost entirely from expansions, and House of Mirrors drives them.** Premutagen (the game's "mutagen (inactive)") only spawns when a hatchery reaches level 40+ or an expansion reaches level 80+. The amount is about 1.2544^level per hatchery and 1.12^level per expansion. Each mirror cast doubles every territory unit, which pays for about 0.77 more expansions, so each cast multiplies future premutagen by about 1.09. Over a run the total grows exponentially: ×28 a day from the save in the simulator (+1.45 in log10 per day). Hatcheries add a few percent. | Mechanics **solid** (measured in game code). Growth rate **likely** (simulator, one trajectory) |
+| 2 | **Energy income sets the growth rate, so the lepidoptera ("nexus") mutation is the purchase that matters.** It raises energy production toward 2× (1.998× at 10^6 units, measured), and premutagen growth doubles with it: +2.56 instead of +1.45 log10 per day. Every other mutation is a fixed multiplier at best. Measured over 6 days of the next run, the best plan without it trails by 10^7. | **Likely** |
+| 3 | **When to ascend: as soon as the energy cost can be paid, *if* you will keep playing at least 5 to 6 days after ascending. Otherwise, don't.** The cost is paid in energy and falls as energy is spent. From the 20.1 h save the simulator can first ascend 84 h later (run age 4.3 days). That path overtakes never-ascending 4.7 days after the ascension in mutagen and 6.2 days after in meat/s. By 14 days it is 10^6.6 ahead in mutagen and 10^10.6 ahead in meat/s. Every day of delay costs about 10^2.3 of mutagen at the 14-day mark. | Shape **likely**. Break-even days **guess** to likely, since a person's next run starts slower than the simulator's (probably 1 to 2 days later) |
+| 4 | **First purchases:** unlock the lepidoptera mutation first (price 1), then buy about 10^6 of it. Unlock mutation frequency second (price 15,625), then buy about 10^6. Keep the rest unspent: each unspent mutagen makes 0.1 larva/s. A third unlock costs 2.44×10^8, more than the 4.4×10^7 the first ascension yields, so two is the limit. Frequency and "meta-mutation" (quantity) are tied as the second pick at 6 days; frequency is far cheaper to max. | Prices and limits **solid**. Ranking **likely** |
+| 5 | **After that, do not ascend again** under either objective. Once the nexus mutation is bought, nothing left raises the growth rate, and an ascension restarts the expansion ladder from zero. A second ascension at run ages 2 to 5 days left total mutagen 10^7.8 to 10^10.8 behind never ascending at the 13.5-day mark, with no catch-up. So runs after the first ascension should be open-ended. | **Likely** for horizons up to about 2 weeks. **Guess** beyond that: the simulator overflows floats after about 1,000 mirror casts, roughly 3 weeks |
+| 6 | **In-run advice:** (a) House of Mirrors is the mutagen engine on runs of any length. Casting swarmwarp instead leaves premutagen gaining only 0.15 log10 a day. (b) The age-multiple horizon does not matter for mutagen: 3, 5, 10 and 20 move premutagen by ≤0.05 log10 and the first ascension by ≤1 h. It matters for meat as before. (c) Lepidoptera: 4,000 is right until about 6 days after an ascension; 10,000 wins from there (+0.1 log10 at 8 days); 30,000 only pays after about 3 weeks. (d) Energy needs a reserve rule for the ascension: keep spending until the cost falls to 72,135, or the cap if that is lower, then stop spending and save. | (a) **solid** to likely. (b), (c) **likely**. (d) **solid** (it follows from the cost formula) |
+| 7 | **Crystals matter for timing.** Buying a hatchery or expansion grants 500 crystals once per 30 minutes (from nexus 1). Converting them to energy (the owner does) raises the cap for good and adds about 0.28 energy/s with frequent check-ins. In the simulator that brings the first ascension 14 h earlier and raises premutagen growth by about 20%. A player who checks in rarely gets 500 crystals per visit, not per 30 minutes. | Mechanics **solid**. Effect size **likely**, and it depends on check-in cadence |
+
+### C4. Strategy
+
+#### C4.1 The objective
 
 Mutagen compounds within a run, not across runs: it grows exponentially with mirror casts. Its uses between runs are either logarithmic (most mutations), asymptotic (frequency, nexus) or linear but small (0.1 larva/s per unspent mutagen). So "maximise long-run growth of mutagen per unit of real time" reduces to "maximise the in-run growth rate, then stop resetting".
 
@@ -217,7 +473,7 @@ Two objectives were scored, both from the 20.1 h save at fixed real-time marks:
 
 They give the same shape. B has a later break-even.
 
-### 4.2 When to ascend first
+#### C4.2 When to ascend first
 
 Run 1 continued from the save with no ascension: crystals converted, tuned policy, premutagen as the mean of the roll. Measured in the simulator.
 
@@ -235,7 +491,7 @@ Run 1 continued from the save with no ascension: crystals converted, tuned polic
 
 How to read it:
 - The marginal rate is about 3.3 × the current premutagen per day. In other words, waiting a day multiplies what you would bring by about 28.
-- The cost falls under the cap at hour 59 and under 72,135 at hour 64. With the saving rule (2.2) the first ascension happens at **hour 84 (run age 4.3 d) with 4.4×10^7 mutagen**.
+- The cost falls under the cap at hour 59 and under 72,135 at hour 64. With the saving rule (B2.2) the first ascension happens at **hour 84 (run age 4.3 d) with 4.4×10^7 mutagen**.
 - Saving for the cost means about 20 h without mirrors, which is why that is less than the never-ascend curve's 3.5×10^8 at hour 84.
 - Without crystals: hour 98, 6.2×10^7, and +1.18 log10/day.
 
@@ -261,7 +517,7 @@ Why the earliest moment is energy-bound, and what would move it:
 - More crystals, or lepidoptera bought earlier (they count as spent), move it slightly. With lepidoptera at 8,000 the ascension is at hour 82.
 - Climbing settings do not move it (age multiple 3 or 10: hour 83 or 84).
 
-### 4.3 What to buy first
+#### C4.3 What to buy first
 
 Every plan starts from the same ascension (4.42×10^7 mutagen, hour 84); run 2 is the tuned policy. The table shows log10 premutagen at each run age (measured, simulator).
 
@@ -289,7 +545,7 @@ Every plan starts from the same ascension (4.42×10^7 mutagen, hour 84); run 2 i
 - **Amounts.** The asymptotic mutations need ≥10^5 to reach 98% of their cap; 10^3 is clearly too few. Ten times more (10^6) adds 0.1 log10 for 2.2×10^6 mutagen, about 5% of the haul.
 - **A third unlock** (2.44×10^8) is out of reach on a 4.4×10^7 first ascension. Waiting for it costs more (2.3 log10 a day) than it gives: meta-mutation ×3.7 ≈ 0.57 log10.
 
-### 4.4 Later runs
+#### C4.4 Later runs
 
 Run 2 has the first purchases (lepidoptera and frequency mutations). It is ascended again once saving starts at run age 2 to 5 days; the second ascension unlocks meta-mutation, hatchery and meat and holds hatchery mutants at the larva-maximising count. The alternative is never ascending again. Total mutagen, log10:
 
@@ -306,7 +562,7 @@ Run 2 has the first purchases (lepidoptera and frequency mutations). It is ascen
 - This holds while nothing else raises energy income. Measured: lepidoptera beyond 4,000 raise it a little (+0.15 log10/day at 10,000).
 - Under objective B the same holds. Meat follows larvae (1.1^expansions), which follow the same mirror count.
 
-### 4.5 What this means for the existing in-run advice
+#### C4.5 What this means for the existing in-run advice
 
 All measured in run 2, after the first purchases, unless stated.
 
@@ -318,7 +574,7 @@ All measured in run 2, after the first purchases, unless stated.
 | Territory: 10% of larvae, nothing after mirrors start | f = 0 throughout: +0.20/day (collapse); 0.3: same as 0.1; stop after the first mirror: same | Keep it. Mirrors need a base of territory units to double. |
 | Energy plan | n/a | Add an ascension reserve when an ascension is planned: keep casting mirrors until the cost is ≤ min(cap, 72,135 × N), then stop all energy spending and save. Crystals: convert to energy every visit; the cap gain is permanent. Never pay for a respec just before an ascension. |
 
-## 5. What an ascension panel could show (proposal, not built)
+### C5. What an ascension panel could show (proposal, not built)
 
 Lines a player would see, with numbers the simulator gives around hour 70 to 84 from the 20 h save:
 
@@ -339,27 +595,27 @@ Lines a player would see, with numbers the simulator gives around hour 70 to 84 
 - Ascension: `game.ascendCost()`, `game.ascendEnergySpent()`, the `mutagen` unit's `stat('ascendCost')`.
 - Next premutagen: `upgrade('hatchery'|'expansion').effect[1].outputNext()`.
 - `session.state.date.restarted` for run age, and the premutagen history kept by the advisor for the rate.
-- Two settings from the player: **how long they plan to keep playing**, which decides line 2's "worth it" (§6), and whether to count crystals.
+- Two settings from the player: **how long they plan to keep playing**, which decides line 2's "worth it" (C6), and whether to count crystals.
 
-## 6. Questions for the owner
+### C6. Questions for the owner
 
 | Question | Why it matters | Findings that change |
 | --- | --- | --- |
 | **What is the goal?** Most mutagen (prestige), most meat or the next tier (progress), or achievements (an ascension is worth +10 points) | Objectives A and B agree on when to ascend and on the first unlock. They differ on the second unlock: frequency for mutagen, meat or hatchery for meat (10^3 at 6 d). | #4's second pick; the break-even (4.7 vs 6.2 d) |
 | **How many more days will you play?** | The whole case for ascending rests on playing at least 5 to 6 more days after it. Under that, never ascending wins. | #3, and whether line 2 says "ascend" at all |
 | **How often do you check in, and how long are you away?** | Crystals scale with visits: 500 per visit, at most one per 30 min. The energy cap (58,500 to 108,000) holds 18 to 30 h of energy, so mirrors can be cast in batches without loss. | #7: the ascension is about 14 h later without crystals, and growth is 20% lower; the break-even moves accordingly |
-| **How long are you willing to let a run go?** | After the first ascension the best run is open-ended. If you would rather restart periodically anyway, that costs about 10^8 per restart (§4.4). | #5, #6c |
+| **How long are you willing to let a run go?** | After the first ascension the best run is open-ended. If you would rather restart periodically anyway, that costs about 10^8 per restart (C4.4). | #5, #6c |
 | **Will you respec?** You have 4 free ones. | A free respec could undo a poor unlock order at no cost; a paid one wipes the ascension discount. | Only matters if the first unlocks were already bought differently |
 | **Which time zone does your browser use?** | Only for predicting individual rolls exactly; the mean is within 0.3 log10. | Line 1's "spawns: yes/no" if computed outside the game |
 | **Do you buy crystals with money or only earn them?** | Bought crystals are more energy: an earlier ascension and faster growth. | #3 timing, #7 |
 
-## 7. Not verified, not modelled, inferred
+### C7. Not verified, not modelled, inferred
 
 - **One save, one simulator.**
   - All strategy numbers start from the 20.1 h save and follow the tuned policy at one check-in per minute.
   - A person's next run will reach nexus 5 later than the simulator's (about a day), so the break-evens are probably 1 to 2 days longer.
   - The *shape* follows from the mechanics (growth rate = energy income) and is the more reliable part.
-- **Policies not re-tuned for run 2 or later:** climbing, twins, territory share, nexus timing. Lepidoptera and age multiple were spot-checked (§4.5); nothing else was.
+- **Policies not re-tuned for run 2 or later:** climbing, twins, territory share, nexus timing. Lepidoptera and age multiple were spot-checked (C4.5); nothing else was.
 - **Spells.**
   - The clone, warp and bat mutations were verified mechanically, but their strategic use is unexplored, because the policy never casts clone larvae or swarmwarp.
   - A strong warp mutation (×11 at 10^6) makes swarmwarp skip about 2.75 h per 2,000 energy. It gives no energy, so it cannot raise the growth rate, but it was not tested as a supplement.
@@ -371,13 +627,17 @@ Lines a player would see, with numbers the simulator gives around hour 70 to 84 
 - **Not exercised:** the browser build, the AngularJS views and the statistics service. The ascension achievements were checked through the achievement listener in Node.
 - **Inferred, not measured:** that the per-mirror premutagen gain (×1.092) holds at any run age. It held from 1 to 14 days here.
 
-## 8. Reproduce
+## Part D. Reproduce
 
 ```sh
 cd advisor/modelcheck && npm install && cd ../..                 # once; node on PATH (Node 22 used)
 python3 -I advisor/modelcheck/ascension_compare.py              # game vs sim, about 15 s; also advisor/modelcheck/out/ascension_compare.md
-python3 -I advisor/sim/ascension_strategy.py                    # all strategy tables, about 40 s
-python3 -I advisor/sim/ascension_strategy.py curve timing       # just 4.2, about 10 s
+python3 -I advisor/sim/achievements.py                          # ACHIEVEMENTS.md, with the code check, about 5 s
+python3 -I advisor/sim/achievement_strategy.py                  # Part A tables, about 8 minutes (--quick: base policy only, ~2 min)
+python3 -I advisor/modelcheck/bignum_check.py                   # game vs sim past 1e308, about 3 s
+node advisor/modelcheck/achievement_check.js                    # every achievement through the game's listener (JSON), about 4 s
+python3 -I advisor/sim/ascension_strategy.py                    # Part C tables, about 10 minutes (was 40 s before big numbers)
+python3 -I advisor/sim/ascension_strategy.py curve timing       # just C4.2
 # unchanged-by-default checks:
 (cd advisor/sim && SAVE=example_save_14h.json python3 -I run_example.py 52124)
 python3 -I advisor/modelcheck/compare.py; python3 -I advisor/modelcheck/compare.py --save advisor/sim/example_save_20h.json

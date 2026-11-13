@@ -47,5 +47,6 @@ A setting is saved when you leave its box or press Enter. Values outside the all
 
 - [HANDOFF.md](HANDOFF.md): what the rules are and the evidence behind them.
 - [MODEL-CHECK.md](MODEL-CHECK.md): how the simulator and the advisor were checked against the game's code.
-- [ASCENSION.md](ASCENSION.md): ascension and mutagen mechanics, the simulator's model of them, and first strategy findings (not yet in the panel).
+- [ASCENSION.md](ASCENSION.md): the plan for earning every achievement (ascensions, the long run to endless), ascension and mutagen mechanics, and the simulator checks (not yet in the panel).
+- [ACHIEVEMENTS.md](ACHIEVEMENTS.md): every achievement, how the game evaluates it, and which are earned in the example save (generated).
 - [BUILDING.md](BUILDING.md): building, testing and running the game.
