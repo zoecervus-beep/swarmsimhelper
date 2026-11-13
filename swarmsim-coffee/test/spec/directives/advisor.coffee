@@ -298,6 +298,96 @@ describe 'Directive: advisorPanel', ->
     expect(options.advisorCollapsed()).toBe false
     expect(el.querySelectorAll('tbody tr').length).toBe 3
 
+  describe 'ascension advice', ->
+    D = (x) -> new Decimal x
+    advisorAscension = null
+    beforeEach inject (_advisorAscension_) ->
+      advisorAscension = _advisorAscension_
+    # Hand-built advice in the shape `advisorAscension.update()` returns.
+    saving = ->
+      plan = {type: 'saveForAscension', stage: 'firstRun', cost: D(52791), energy: D(20000), cap: D(58500), halving: 50000, saveAt: D(58500), need: D(32791), seconds: 36728, ascension: 1, of: 20}
+      {stage: 'firstRun', records: [plan], plan: plan, hold: plan, mutagen: null}
+    tick = ->
+      advisor.invalidate()
+      advisorAscension.invalidate()
+      $rootScope.$emit 'tick'
+      $rootScope.$digest()
+
+    it 'adds nothing, and leaves the energy line as it was, while the setting is off', ->
+      expect(options.advisorSetting 'ascension').toBe 'off'
+      spyOn(advisor, 'update').and.returnValue fakeAdvice()
+      el = render()
+      expect(el.querySelectorAll('.advisor-ascension').length).toBe 0
+      expect(text el.querySelector '.advisor-energy').toBe 'Energy: cast House of Mirrors ×3'
+
+    it 'turns the cast into the save while saving for the ascension', ->
+      spyOn(advisor, 'update').and.returnValue fakeAdvice()
+      spyOn(advisorAscension, 'update').and.returnValue saving()
+      spyOn(game.unit('mutagen'), 'isVisible').and.returnValue true
+      el = render()
+      lines = el.querySelectorAll '.advisor-ascension'
+      expect(lines.length).toBe 1
+      expect(text lines[0]).toBe 'Ascension: stop casting and save for ascension 1 of 20: ' + bignum(D 20000) + '/' + bignum(D 52791) + ' energy, ready in 10.2 h'
+      expect(lines[0].querySelector('a').getAttribute 'href').toBe '#/tab/mutagen/unit/mutagen'
+      expect(lines[0].querySelector 'strong').not.toBe null
+      energy = el.querySelector '.advisor-energy'
+      expect(text energy).toBe 'Energy: saving for the ascension, no casting: ' + bignum(D 20000) + '/' + bignum(D 52791) + ' energy, ready in 10.2 h'
+      # the rest of the panel is as before
+      expect(el.querySelectorAll('tbody tr').length).toBe 3
+      expect(el.querySelectorAll('.advisor-tip').length).toBe 2
+      # once the save is done the energy line goes back to casting
+      advisorAscension.update.and.returnValue {stage: 'longRun', records: [], plan: null, hold: null, mutagen: null}
+      tick()
+      expect(text el.querySelector '.advisor-energy').toBe 'Energy: cast House of Mirrors ×3'
+
+    it 'cuts a cast short before saving starts', ->
+      spyOn(advisor, 'update').and.returnValue fakeAdvice {energy: {type: 'cast', spell: 'clonearmy', label: 'House of Mirrors', cost: 2500, casts: D(20)}}
+      plan = {type: 'spendForAscension', stage: 'firstRun', cost: D(80000), energy: D(50000), cap: D(58500), halving: 50000, saveAt: D(58500), toSpend: D(22579), nexus: 5, ascension: 1, of: 20}
+      spyOn(advisorAscension, 'update').and.returnValue {stage: 'firstRun', records: [plan], plan: plan, hold: null, mutagen: null}
+      el = render()
+      expect(text el.querySelector '.advisor-energy').toBe 'Energy: cast House of Mirrors ×10, then save for the ascension'
+      expect(text el.querySelector '.advisor-ascension').toBe 'Ascension: ascension 1 of 20 costs ' + bignum(D 80000) + ' energy (cap ' + bignum(D 58500) + '); every ' + bignum(D 50000) + ' energy spent halves it (House of Mirrors); spend ' + bignum(D 22579) + ' more, then save from ' + bignum(D 58500)
+
+    it 'lists the mutagen to spend, each linked, and the stage, on two lines', ->
+      spyOn(advisor, 'update').and.returnValue fakeAdvice {energy: null}
+      for name in ['mutagen', 'mutantnexus']
+        spyOn(game.unit(name), 'isVisible').and.returnValue true
+      mut = {type: 'mutagen', mutagen: D(6e7), keep: D(58984375), steps: [
+        {type: 'unlock', name: 'mutatenexus', label: 'mutate lepidoptera', unit: 'mutantnexus', price: D(1)}
+        {type: 'mutants', unit: 'mutantnexus', count: D(999999), have: D(1), target: D(1e6), price: D(999999)}
+        {type: 'unlocks', count: 1, price: D(15625), remaining: 9, all: false, any: true}
+      ]}
+      long = {type: 'longRun', expansion: 0, nextExpansion: {val: D(100)}, lastExpansion: {val: D(5000)}, top: 'drone', endlessBought: D(0), nextEndless: {val: D(1)}, ascensions: 1, of: 20}
+      spyOn(advisorAscension, 'update').and.returnValue {stage: 'longRun', records: [mut, long], plan: null, hold: null, mutagen: mut}
+      el = render()
+      lines = el.querySelectorAll '.advisor-ascension'
+      expect(lines.length).toBe 2
+      expect(text lines[0]).toBe 'Ascension: unlock mutate lepidoptera (1 mutagen), then buy ' + bignum(D 999999) + ' lepidoptera mutations (1/' + bignum(D 1e6) + '), then unlock 1 more mutation, any (' + bignum(D 15625) + ' mutagen); keep the rest (' + bignum(D 58984375) + ') unspent: it makes larvae'
+      links = (a.getAttribute('href') for a in lines[0].querySelectorAll 'a')
+      expect(links).toEqual ['#/tab/mutagen/unit/mutagen', '#' + game.unit('mutantnexus').url(), '#/tab/mutagen/unit/mutagen']
+      expect(text lines[1]).toBe 'long run, do not ascend yet: expansions 0/100 (last ' + bignum(D 5000) + '); endless bought 0/1 (top tier: drone)'
+      expect(el.querySelector '.advisor-energy').toBe null
+
+    it 'shows an ascension failure on its own line, and the energy line as without it', ->
+      spyOn(advisor, 'update').and.returnValue fakeAdvice()
+      spyOn(advisorAscension, 'update').and.throwError 'no mutagen data'
+      el = render()
+      line = el.querySelector '.advisor-ascension'
+      expect(text line).toBe 'Ascension: no mutagen data'
+      expect(line.className).toContain 'text-danger'
+      expect(text el.querySelector '.advisor-energy').toBe 'Energy: cast House of Mirrors ×3'
+      expect(el.querySelectorAll('tbody tr').length).toBe 3
+      # and back when it works again
+      advisorAscension.update.and.returnValue saving()
+      tick()
+      expect(el.querySelector('.advisor-ascension').className).not.toContain 'text-danger'
+      expect(text el.querySelector '.advisor-energy').toContain 'saving for the ascension'
+
+    it 'shows the live first-run line on a new game once the setting is on', ->
+      options.advisorSetting 'ascension', 'achievements'
+      el = render()
+      expect(text el.querySelector '.advisor-ascension').toContain 'Ascension: ascension 1 of 20 costs'
+
 describe 'Directive: advisorSuggest', ->
   beforeEach module 'swarmApp', 'mockFlashStorage'
 
@@ -592,6 +682,27 @@ describe 'Directive: advisorOptions', ->
     expect(options.advisorConfig().spareEnergy).toBe 'larvarush'
     expect(el.querySelectorAll('input[name=advisor-spareEnergy]')[0].checked).toBe true
 
+  it 'offers the ascension advice as off or the achievements route, off by default', inject (advisorAscension) ->
+    spyOn(options, 'advisorSetting').and.callThrough()
+    spyOn(advisorAscension, 'invalidate').and.callThrough()
+    el = render()
+    radios = el.querySelectorAll 'input[name=advisor-ascension]'
+    expect(radios.length).toBe 2
+    expect(radios[0].checked).toBe true
+    expect(text el).toContain 'The achievements route is a plan for earning every achievement'
+    expect(el.querySelector('.advisor-options').innerHTML).not.toContain 'http'
+    radios[1].checked = true
+    angular.element(radios[1]).triggerHandler 'click'
+    $rootScope.$digest()
+    expect(options.advisorSetting).toHaveBeenCalledWith 'ascension', 'achievements'
+    expect(options.advisorConfig().ascension).toBe 'achievements'
+    expect(options.session.state.options.advisor.ascension).toBe 'achievements'
+    expect(advisorAscension.invalidate).toHaveBeenCalled()
+    angular.element(el.querySelector '.advisor-options > .well > button').triggerHandler 'click'
+    $rootScope.$digest()
+    expect(options.advisorConfig().ascension).toBe 'off'
+    expect(el.querySelectorAll('input[name=advisor-ascension]')[0].checked).toBe true
+
   it 'turns the advisor on and off', ->
     el = render()
     box = el.querySelector 'input[type=checkbox]'
@@ -607,5 +718,5 @@ describe 'Directive: advisorOptions', ->
     el = render()
     angular.element(el.querySelector '.advisor-options button').triggerHandler 'click'
     $rootScope.$digest()
-    expect(options.advisorConfig()).toEqual {ageMultiple: 3, share: 0.5, cooldown: 60, bank: 3, territory: 0.1, moths: 4000, spareEnergy: 'larvarush'}
+    expect(options.advisorConfig()).toEqual {ageMultiple: 3, share: 0.5, cooldown: 60, bank: 3, territory: 0.1, moths: 4000, spareEnergy: 'larvarush', ascension: 'off'}
     expect(el.querySelector('#advisor-moths').value).toBe '4000'

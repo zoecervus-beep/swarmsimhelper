@@ -9,7 +9,7 @@
  # The advisor's own render* functions are the reference wording and the fallback for any record
  # this doesn't know.
 ###
-angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerritory, $filter) ->
+angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerritory, advisorAscension, $filter) ->
   bignum = (n, maxSmall=0) -> $filter('bignum')(n, maxSmall)
   time = advisor.formatTime
 
@@ -106,6 +106,9 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
         link = 'moth'
       when 'cast'
         text = 'cast ' + rec.label + ' \u00d7' + bignum(rec.casts)
+        if rec.thenSave
+          # cut short by the ascension advice: these casts bring the cost to where saving starts
+          text += ', then save for the ascension'
       when 'nextCast'
         text = 'next ' + rec.label + ' at ' + bignum(rec.cost) + ' energy (have ' + bignum(rec.energy) + ')'
       when 'hold'
@@ -124,6 +127,13 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
         link = 'nexus'
       when 'energyFull'
         text = 'energy is full (' + bignum(rec.energy) + '/' + bignum(rec.cap) + '): cast ' + rec.label + ' \u00d71 so the income isn\'t wasted'
+      when 'ascensionHold'
+        # the ascension advice is saving: no spending
+        if rec.ready
+          text = 'hold it for the ascension (' + bignum(rec.energy) + '/' + count(rec.cost, 'energy') + ')'
+        else
+          text = 'saving for the ascension, no casting: ' + bignum(rec.energy) + '/' + count(rec.cost, 'energy') + (if rec.seconds? then ', ready in ' + time(rec.seconds) else '')
+        link = 'mutagen'
       else
         text = advisor.renderEnergy rec
     return {type: rec.type, text: text, href: href(link)}
@@ -145,8 +155,18 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
       return count.toFixed(0).replace /\B(?=(\d{3})+(?!\d))/g, ','
     return count.toExponential()
 
+  # The energy record as the panel shows it: made to agree with the ascension advice when that is on
+  # (`acur`, from `advisorAscension.current()`). Without it, or if it failed, the record unchanged.
+  coupledEnergy = (rec, acur) ->
+    if not acur?.advice?
+      return rec
+    try
+      return advisorAscension.coupleEnergy rec, acur.advice
+    catch e
+      return rec
+
   # From `advisor.current()`'s {advice, error} to the panel's view model. Never throws.
-  panel = (cur) ->
+  panel = (cur, acur) ->
     if not cur?
       return null
     if cur.error?
@@ -173,7 +193,7 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
         rows: rows
         tips: (tip(t) for t in r.tips)
         # an energy failure costs only this line, as in the console script
-        energy: if r.energyError? then {type: 'error', error: true, text: errorText(r.energyError)} else energy r.energy
+        energy: if r.energyError? then {type: 'error', error: true, text: errorText(r.energyError)} else energy coupledEnergy(r.energy, acur)
         summary: if buys.length then {label: buys[0].label, action: buys[0].action} else null
       }
     catch e
@@ -299,8 +319,79 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
       return {buys: null, reason: territoryLine(why).text}
     return null
 
+  # ---------------------------------------------------------------------------
+  # Ascension lines (advisorAscension), at most two: the mutagen to spend, then the stage of the run.
+
+  of20 = (r) -> 'ascension ' + r.ascension + (if r.of? then ' of ' + r.of else '')
+
+  mutagenStep = (s) ->
+    switch s.type
+      when 'unlock'
+        {text: 'unlock ' + s.label + ' (' + count(s.price, 'mutagen') + ')', href: upgradeHref(s.name)}
+      when 'mutants'
+        {text: 'buy ' + count(s.count, s.unit) + ' (' + bignum(s.have) + '/' + bignum(s.target) + ')', href: href(s.unit)}
+      when 'unlocks'
+        what = if s.count == 1 then 'mutation' else 'mutations'
+        text = if s.any then 'unlock ' + s.count + ' more ' + what + ', any' else if s.all then 'unlock the ' + s.count + ' remaining ' + what else 'unlock ' + s.count + ' more ' + what
+        {text: text + ' (' + count(s.price, 'mutagen') + ')', href: href('mutagen')}
+      else {text: advisorAscension.renderStep(s), href: null}
+
+  ascensionLine = (rec) ->
+    line = {type: rec.type, href: null, strong: false}
+    switch rec.type
+      when 'mutagen'
+        line.parts = (mutagenStep(s) for s in rec.steps)
+        line.text = (p.text for p in line.parts).join(', then ')
+        line.after = 'keep the rest (' + bignum(rec.keep) + ') unspent: it makes larvae'
+        line.strong = true
+      when 'spendForAscension'
+        # below nexus 5 the cap still grows with each nexus, so no save point yet
+        line.text = of20(rec) + ' costs ' + count(rec.cost, 'energy') + ' (cap ' + bignum(rec.cap) + '); every ' + bignum(rec.halving) + ' energy spent halves it' +
+          (if rec.nexus >= 5 and rec.toSpend? then ' (House of Mirrors); spend ' + bignum(rec.toSpend) + ' more, then save from ' + bignum(rec.saveAt) else ', mostly House of Mirrors from nexus 5')
+        line.href = href 'mutagen'
+      when 'saveForAscension'
+        line.text = 'stop casting and save for ' + of20(rec) + ': ' + bignum(rec.energy) + '/' + count(rec.cost, 'energy') +
+          (if rec.seconds? then ', ready in ' + time(rec.seconds) else '')
+        line.href = href 'mutagen'
+        line.strong = true
+      when 'ascendNow'
+        if rec.noMutagen
+          line.text = 'energy covers ' + of20(rec) + ' (' + bignum(rec.energy) + '/' + count(rec.cost, 'energy') + '), but it would bring no mutagen: wait for ' + label('premutagen') + ' from hatcheries and expansions'
+          line.href = href 'premutagen'
+        else
+          line.text = 'ascend now (' + bignum(rec.energy) + '/' + count(rec.cost, 'energy') + '): brings ' + count(rec.premutagen, 'mutagen') + ', ' + of20(rec)
+          line.href = href 'mutagen'
+          line.strong = true
+      when 'longRun'
+        text = 'long run, do not ascend yet: expansions ' + bignum(rec.expansion)
+        if rec.nextExpansion?
+          text += '/' + bignum(rec.nextExpansion.val)
+          if rec.lastExpansion? and not rec.lastExpansion.val.equals(rec.nextExpansion.val)
+            text += ' (last ' + bignum(rec.lastExpansion.val) + ')'
+        if rec.nextEndless?
+          text += '; endless bought ' + bignum(rec.endlessBought) + '/' + bignum(rec.nextEndless.val) + (if rec.top? then ' (top tier: ' + label(rec.top) + ')' else '')
+        line.text = text
+        line.href = upgradeHref 'expansion'
+      when 'done'
+        line.text = 'every ascension achievement earned: no further ascension needed'
+      else
+        line.text = advisorAscension.render rec
+    return line
+
+  # From `advisorAscension.current()` to the panel's ascension lines. Never throws.
+  ascension = (acur) ->
+    if not acur?
+      return null
+    if acur.error?
+      return {error: errorText acur.error, lines: []}
+    try
+      return {error: null, lines: (ascensionLine(rec) for rec in acur.advice.records)}
+    catch e
+      return {error: errorText e, lines: []}
+
   return {
     panel: panel
+    ascension: ascension
     suggestion: suggestion
     territory: territory
     territorySuggestion: territorySuggestion
@@ -318,7 +409,7 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
  # The climbing advisor's panel: run age and larvae, a table of meat tiers with what to do with
  # each, upgrade tips and the energy line. Collapsible; hidden while the advisor is off.
 ###
-angular.module('swarmApp').directive 'advisorPanel', ($rootScope, $log, advisor, advisorTerritory, advisorView, options, ADVISOR_REFRESH_MILLIS) ->
+angular.module('swarmApp').directive 'advisorPanel', ($rootScope, $log, advisor, advisorTerritory, advisorAscension, advisorView, options, ADVISOR_REFRESH_MILLIS) ->
   restrict: 'E'
   # current-unit: on a unit page, the unit shown there; its row (or territory line) is marked.
   scope:
@@ -361,7 +452,7 @@ angular.module('swarmApp').directive 'advisorPanel', ($rootScope, $log, advisor,
       </tbody>
     </table>
   </div>
-  <ul class="list-group" ng-if="!collapsed() && (view.tips.length || view.energy || terr.error || terr.lines.length)">
+  <ul class="list-group" ng-if="!collapsed() && (view.tips.length || view.energy || terr.error || terr.lines.length || asc.error || asc.lines.length)">
     <li class="list-group-item advisor-tip" ng-repeat="tip in view.tips">
       <span class="glyphicon glyphicon-circle-arrow-up" aria-hidden="true"></span>
       <a ng-if="tip.href" ng-href="{{tip.href}}">{{tip.text}}</a><span ng-if="!tip.href">{{tip.text}}</span>
@@ -385,31 +476,55 @@ angular.module('swarmApp').directive 'advisorPanel', ($rootScope, $log, advisor,
         <span ng-repeat="part in line.parts" class="advisor-plan-part" ng-class="{'advisor-current': part.unit == currentUnit}"><span ng-if="!$first"> and </span><span ng-if="part.unit == currentUnit" class="glyphicon glyphicon-map-marker advisor-here" title="The unit on this page"></span><span ng-if="part.unit == currentUnit" class="sr-only">(this page) </span><a ng-if="part.href" ng-href="{{part.href}}"><strong>{{part.amount}}</strong></a><strong ng-if="!part.href">{{part.amount}}</strong></span><span ng-if="line.parts.length > 1" class="text-muted">, in any order</span>
       </span>
     </li>
+    <li class="list-group-item advisor-ascension text-danger" ng-if="asc.error">
+      <span class="glyphicon glyphicon-globe" aria-hidden="true"></span> Ascension: {{asc.error}}
+    </li>
+    <li class="list-group-item advisor-ascension" ng-repeat="line in asc.lines">
+      <span class="glyphicon glyphicon-globe" aria-hidden="true"></span> <span ng-if="$first">Ascension:</span>
+      <span ng-if="line.parts"><span ng-repeat="part in line.parts"><span ng-if="!$first">, then </span><a ng-if="part.href" ng-href="{{part.href}}"><strong>{{part.text}}</strong></a><strong ng-if="!part.href">{{part.text}}</strong></span><span class="text-muted">; {{line.after}}</span></span>
+      <span ng-if="!line.parts"><a ng-if="line.href" ng-href="{{line.href}}"><strong ng-if="line.strong">{{line.text}}</strong><span ng-if="!line.strong">{{line.text}}</span></a><span ng-if="!line.href"><strong ng-if="line.strong">{{line.text}}</strong><span ng-if="!line.strong">{{line.text}}</span></span></span>
+    </li>
   </ul>
 </div>
 """
   link: (scope, element, attrs) ->
     scope.view = null
     scope.terr = null
+    scope.asc = null
     scope.enabled = -> options.advisorEnabled()
     scope.collapsed = -> options.advisorCollapsed()
     scope.toggle = -> options.advisorCollapsed not options.advisorCollapsed()
 
     lastAt = null
     lastTerrAt = null
+    lastAscAt = null
     # Called on every game tick (each animation frame). The advice itself is kept current by the
     # service-level tick (advisor.coffee); `current()` here normally just returns that cached result,
     # and the view is only rebuilt when it changed. The meat and territory parts are built separately,
     # so a failure in one leaves the other. Never throws: an exception here would stop the game loop.
     scope.refresh = ->
       if not options.advisorEnabled()
-        scope.view = scope.terr = lastAt = lastTerrAt = null
+        scope.view = scope.terr = scope.asc = lastAt = lastTerrAt = lastAscAt = null
         return
+      # The ascension advice first: the energy line agrees with it. A failure there costs only the
+      # ascension lines (the energy line is then shown as without it).
+      acur = null
+      ascChanged = false
+      try
+        acur = advisorAscension.current ADVISOR_REFRESH_MILLIS
+        if acur != lastAscAt or not scope.asc?
+          lastAscAt = acur
+          ascChanged = true
+          scope.asc = advisorView.ascension acur
+      catch e
+        $log.warn 'advisor ascension', e
+        acur = null
+        scope.asc = {error: String(e?.message ? e), lines: []}
       try
         cur = advisor.current ADVISOR_REFRESH_MILLIS
-        if cur != lastAt or not scope.view?
+        if cur != lastAt or ascChanged or not scope.view?
           lastAt = cur
-          scope.view = advisorView.panel cur
+          scope.view = advisorView.panel cur, acur
       catch e
         $log.warn 'advisor panel', e
         scope.view = {error: String(e?.message ? e)}
@@ -503,7 +618,7 @@ angular.module('swarmApp').directive 'advisorSuggest', ($rootScope, $log, adviso
  # @description
  # Climbing advisor settings on the options page.
 ###
-angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, ADVISOR_SETTINGS) ->
+angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, advisorAscension, ADVISOR_SETTINGS) ->
   restrict: 'E'
   scope: {}
   template: """
@@ -528,6 +643,13 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
       <div class="radio"><label><input type="radio" name="advisor-spareEnergy" value="save" ng-model="form.values.spareEnergy" ng-change="setChoice('spareEnergy')"> Save it for the next nexus and lepidoptera</label></div>
       <p class="help-block">Larva rush suits runs of a day or two. Saving reaches nexus 4 and lepidoptera hours sooner, and came out ahead from about day 4 in the simulator. At nexus 5 spare energy always goes to House of Mirrors. Default: cast larva rush.</p>
       <p class="help-block" ng-if="errors.spareEnergy">{{errors.spareEnergy}}</p>
+    </div>
+    <div class="form-group" ng-class="{'has-error': !!errors.ascension}">
+      <label class="control-label">Ascension advice</label>
+      <div class="radio"><label><input type="radio" name="advisor-ascension" value="off" ng-model="form.values.ascension" ng-change="setChoice('ascension')"> Off</label></div>
+      <div class="radio"><label><input type="radio" name="advisor-ascension" value="achievements" ng-model="form.values.ascension" ng-change="setChoice('ascension')"> Achievements route</label></div>
+      <p class="help-block">The achievements route is a plan for earning every achievement: ascend once early for the lepidoptera mutation, then one long run to 5,000 expansions and the endless achievements, then quick runs up to 20 ascensions. The advisor says when to spend energy, when to save it and when to ascend, and what to buy with mutagen. Default: off.</p>
+      <p class="help-block" ng-if="errors.ascension">{{errors.ascension}}</p>
     </div>
     <button type="button" class="btn btn-default btn-sm" ng-click="reset()">Reset advisor settings to defaults</button>
   </div>
@@ -562,6 +684,7 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
       try
         options.advisorSetting key, scope.form.values[key]
         advisor.invalidate()
+        advisorAscension.invalidate()
       catch e
         $log.debug 'advisor setting rejected', key, e
         scope.errors[key] = 'Not a valid choice. Still using ' + options.advisorSetting(key) + '.'
@@ -605,4 +728,5 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
     scope.reset = ->
       options.resetAdvisorConfig()
       advisor.invalidate()
+      advisorAscension.invalidate()
       syncAll()
