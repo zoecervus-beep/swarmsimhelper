@@ -151,13 +151,12 @@ Karma runs PhantomJS 2.1.1 with the upstream configuration, plus one served fixt
 (`../advisor/sim/example_save_14h.json`, for the advisor spec). Karma warns that
 `konami-js/` and `appcache-nanny/` match no file: upstream lists them but never installs them.
 
-Container run (~41s for `yarn test`):
+Container run (Nov 13 2026, ~44s for `yarn test`):
 
 - `tables`: 10 passed, 3 skipped.
 - `swarmsim-ts`: 11 passed.
 - Karma unit, upstream baseline at commit 3a161e7: 168 specs, 141 passed, 27 skipped, 0 failed.
-- Karma unit with the advisor feature: 239 specs, 193 passed, 27 skipped, 19 failed.
-  All 19 failures are in the new `test/spec/directives/advisor.coffee`.
+- Karma unit with the advisor feature: 298 specs, 271 passed, 27 skipped, 0 failed.
 - Karma integration: 4 passed, 1 skipped (~6s).
 
 ### One spec file
@@ -232,3 +231,78 @@ Playwright, so this ran with the system Node, not Node 16). The game service ret
 object with meat 35 and larvae ~11. Units were listed and no raw `{{…}}` bindings remained.
 The Climbing Advisor panel was rendered on the main view. There were no console errors apart
 from the external requests the check itself blocks (Google Analytics, a Freshdesk stylesheet).
+
+## Deploying to GitHub Pages
+
+`.github/workflows/pages.yml` runs on every push to `master` and on manual dispatch
+(Actions → GitHub Pages → Run workflow). Its **build** job installs Node 16, Ruby 3.1 and
+compass, like `ci.yml`, then runs `yarn --frozen-lockfile`. It builds `tables` and
+`swarmsim-ts`, then runs `grunt build:pages` in `swarmsim-coffee`, and uploads
+`swarmsim-coffee/dist` as the Pages artifact. The **deploy** job runs only after the build
+succeeded and publishes the artifact with `actions/deploy-pages`. Tests are not repeated
+here; `ci.yml` runs them on the same pushes.
+
+`build:pages` is the `docker` build flavour, which has no in-app http→https redirect, with
+three changes:
+
+- It sends nothing to upstream's Google Analytics property (`gaTrackingID` is unset).
+- It drops upstream's Google API key.
+- The header shows the version as `v1.1.17 (fork <short commit>)`.
+
+Saves, the game data and everything else are the same as upstream. To build it locally:
+
+```bash
+cd swarmsim-coffee && yarn grunt build:pages && yarn _build:ts
+```
+
+Container run: the build took ~35s. I served `dist` under `/swarmsimhelper/` (and also at `/`)
+and checked it in headless Chromium:
+
+- every same-origin request returned 200 or 304;
+- Angular started, the advisor panel and a unit page rendered;
+- the 14 h example save imported on the options page and was still there after a reload;
+- a second load was fine.
+
+The service worker is upstream's no-op one, which registers but serves nothing from a
+cache, so a new deployment is never hidden behind a stale copy. The workflow itself has
+not been run yet.
+
+What only the owner can do, in this order:
+
+1. Make Pages available for the repository. GitHub's docs say: "If the account that owns
+   the repository uses GitHub Free or GitHub Free for organizations, the repository must
+   be public." A private repository needs a paid plan that includes Pages. The published
+   site is public either way.
+2. Settings → Pages → Build and deployment → Source: **GitHub Actions**.
+3. Push to `master`, or run the "GitHub Pages" workflow by hand. The site then appears at
+   `https://<owner>.github.io/<repo>/`, for this repository
+   `https://zoecervus-beep.github.io/swarmsimhelper/`.
+
+Moving a game from swarmsim.com to the fork: saves live in each site's browser storage,
+so the two sites don't share them.
+
+1. On swarmsim.com, open Options and copy the exported save text.
+2. On the fork, open Options and paste it into the same box. A green tick means it was read.
+3. Make any purchase or change any option before closing the tab. That is when the game
+   writes to storage; upstream behaves the same way, and the container check confirmed a
+   reload straight after an import loses it.
+
+What the fork build still contacts, outside its own site:
+
+- `s3.amazonaws.com`: the Freshdesk feedback widget's CSS and JS. Loaded on every page view
+  but never initialised by the game.
+- `www.google-analytics.com/analytics.js`: the loader, from an inline snippet in
+  `index.html`. With no tracking ID configured the game queues only `send` commands and no
+  `create`, so no tracker exists and no hits should go to any property. I checked the
+  command queue; analytics.js itself could not be run here.
+- `7487.playfabapi.com`: only if you log in or sign up for cloud saves (Options). This is
+  upstream's PlayFab title, so accounts and cloud saves are shared with swarmsim.com.
+  Not tested beyond the request being made.
+- `www.googleapis.com/urlshortener`: only on the Contact page, which posts the export
+  there (now without upstream's API key). Google shut that API down in 2019. In the
+  container the request was blocked, and the page showed no error and kept working.
+- Kongregate scripts and `/images/...` Kongregate badges: only when the game runs inside
+  Kongregate's frame.
+- Known gap at a subpath: the developer-only `#/debug/tables` page embeds `/swarmsim-ts`
+  with an absolute URL and will 404 on Pages. Players never see it.
+
