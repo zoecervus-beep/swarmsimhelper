@@ -85,7 +85,7 @@
   }],
   "lang": "en-US",
   "dir":"ltr",
-  "start_url": "/?utm_source=homescreen/#/",
+  "start_url": "./?utm_source=homescreen/#/",
   "theme_color": "#800080",
   "background_color":"#000000"
 }  

@@ -169,6 +169,18 @@ module.exports = function (grunt) {
   };
   ngconstant.preprod = JSON.parse(JSON.stringify(ngconstant.prod));
   ngconstant.preprod.constants.env.saveServerUrl = 'https://api-preprod.swarmsim.com';
+  // Fork builds, e.g. GitHub Pages (`grunt build:pages`): the docker flavour (no app-level
+  // https redirect, works from any host and path) minus upstream's Google Analytics
+  // property and Google API key, plus a short label after the version in the header.
+  ngconstant.pages = JSON.parse(JSON.stringify(ngconstant.docker));
+  ngconstant.pages.constants.env.name = 'pages';
+  ngconstant.pages.constants.env.gaTrackingID = null;
+  ngconstant.pages.constants.env.googleApiKey = null; // upstream's key; only used by the contact page's (defunct) URL shortener call
+  ngconstant.pages.constants.env.buildLabel = (function () {
+    var sha = process.env.GITHUB_SHA;
+    try { sha = sha || require('child_process').execSync('git rev-parse HEAD', {stdio: ['ignore', 'pipe', 'ignore']}).toString().trim(); } catch (e) { sha = null; }
+    return 'fork' + (sha ? ' ' + sha.slice(0, 7) : '');
+  })();
 
   // Define the configuration for all the tasks
   grunt.initConfig({
@@ -888,7 +900,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build', function(envname) {
     envname = envname || 'prod';
-    if (envname !== 'prod' && envname !== 'preprod' && envname !== 'docker') {
+    if (envname !== 'prod' && envname !== 'preprod' && envname !== 'docker' && envname !== 'pages') {
       throw new Error('invalid build envname: '+envname);
     }
     console.log('building envname '+envname);
