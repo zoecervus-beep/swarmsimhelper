@@ -35,7 +35,8 @@ angular.module('swarmApp').factory 'analytics', ($rootScope, $analytics, env, ga
   # no analytics during testing. also, window.ga might be blank if someone blocks google analytics.
   if not env.gaTrackingID or not window.ga?
     $log.debug 'skipping analytics event logging', window.ga, env.gaTrackingID
-    return
+    # Angular 1.6 rejects a factory that returns undefined ($injector:undef), which broke startup.
+    return null
   #console.log 'ga.set', dims.version, version
   window.ga 'set', dims.version, version
 
