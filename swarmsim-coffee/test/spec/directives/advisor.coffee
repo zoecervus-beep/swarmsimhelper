@@ -176,6 +176,23 @@ describe 'Directive: advisorPanel', ->
     ]
     expect(el.querySelector('.advisor-territory a').getAttribute 'href').toBe '#/options'
 
+  it 'names empowered units as the game does, and renders empower advice', ->
+    D = (x) -> new Decimal x
+    spyOn(advisor, 'update').and.returnValue fakeAdvice()
+    game.upgrade('swarmlingempower')._setCount 1
+    game.unit('swarmling').stats() # the game sets the "II" suffix while working out the stats
+    records = [
+      {type: 'empower', unit: 'stinger', name: 'stingerempower', label: 'empower stingers', level: 0, meat: D(5.17144e34), wipes: D(12345), becomes: 'stingers II', above: 'swarmlings II'}
+      {type: 'hatch', unit: 'swarmling', label: 'swarmlings II', role: 'main', buys: D(10), twin: D(1)}
+    ]
+    spyOn(advisorTerritory, 'update').and.returnValue fakeTerritory {records: records, hatch: [records[1]]}
+    el = render()
+    lines = (text l for l in el.querySelectorAll '.advisor-territory')
+    expect(lines).toEqual [
+      'Territory: buy empower stingers (' + bignum(D 5.17144e34) + ' meat): they become stingers II, the next unit above swarmlings II; your ' + bignum(D 12345) + ' stingers are lost'
+      'hatch 10 swarmlings II'
+    ]
+
   it 'keeps the meat advice when the territory advice fails, and the other way round', ->
     spyOn(advisor, 'update').and.returnValue fakeAdvice()
     spyOn(advisorTerritory, 'update').and.throwError 'no territory data'

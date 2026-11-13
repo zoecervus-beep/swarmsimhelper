@@ -26,10 +26,10 @@ describe 'Service: advisorTerritory', ->
       tier: j
       visible: visible
       count: D(u.count ? 0)
+      prodEach: D(u.prodEach ? 1)
       purchases: String(u.purchases ? 0)
       twin: D(u.twin ? 1)
       meat: D(u.meat ? Math.pow(10, j + 1))
-      prodEach: D(1)
       twinUpgrade:
         name: name + 'twin'
         label: 'twin ' + name + 's'
@@ -39,6 +39,14 @@ describe 'Service: advisorTerritory', ->
         meat: D(u.twinMeat ? 100)
         larvaFactor: D(50)
         meatFactor: D(500)
+      empower:
+        name: name + 'empower'
+        label: 'empower ' + name + 's'
+        level: u.empowerLevel ? 0
+        visible: u.empowerVisible ? false
+        meat: D(u.empowerMeat ? 1e300)
+        meatFactor: D(1e29)
+        becomes: name + 's II'
     upgrades = for name in territory.LARVA_UPGRADES
       up = opts.upgrades?[name] ? {}
       name: name
@@ -384,6 +392,112 @@ describe 'Service: advisorTerritory', ->
       expect(r.memory.purse.toNumber()).toBe 94
       expect(r.memory.meatSpent.toNumber()).toBe 0
 
+  describe 'the ladder once units are empowered', ->
+    # All 11 shown, meat cost 10^(j+1): stinger 100 ... goon 1e11. Empowering puts a unit above the
+    # top rung, as in the game (an empowered swarmling costs 450 x a goon): here swarmlings at 1e12.
+    names = (vis) -> _.map vis, 'name'
+
+    it 'orders the units by meat cost per larva', ->
+      snap = mksnap shown: 11, units: {swarmling: {meat: 1e12}}
+      expect(names territory.ladder snap).toEqual ['stinger', 'spider', 'mosquito', 'locust', 'roach', 'giantspider', 'centipede', 'wasp', 'devourer', 'goon', 'swarmling']
+      snap = mksnap shown: 11, units: {swarmling: {meat: 1e12}, stinger: {meat: 1e13}}
+      expect(_.takeRight names(territory.ladder snap), 3).toEqual ['goon', 'swarmling', 'stinger']
+
+    it 'splits the spare meat across the wrap-around: goons, then empowered swarmlings', ->
+      # purse 100, meat budget 4.5e13: 100 goons cost 1e13 <= 4.5e13, 100 swarmlings II 1e14 > it.
+      # y = (4.5e13 - 1e13) / (1e12 - 1e11) = 38.9 swarmlings, x = 61.1 goons.
+      # (sim.py's index order had no unit after goons: 100 goons and the rest of the meat unused.)
+      r = territory.advise mksnap(shown: 11, larvae: 1000, meat: 5e13, units: {swarmling: {meat: 1e12}}), null, {}
+      expect(counts r).toEqual [['goon', 61], ['swarmling', 38]]
+
+    it 'climbs past a second empowered unit', ->
+      # meat budget 4.5e14: 100 swarmlings II (1e14) fit, 100 stingers II (1e15) do not:
+      # y = (4.5e14 - 1e14) / 9e12 = 38.9 stingers, x = 61.1 swarmlings
+      r = territory.advise mksnap(shown: 11, larvae: 1000, meat: 5e14, units: {swarmling: {meat: 1e12}, stinger: {meat: 1e13}}), null, {}
+      expect(counts r).toEqual [['swarmling', 61], ['stinger', 38]]
+
+    it 'falls back to the cheapest unit, not swarmlings, when nothing fits all the larvae', ->
+      # meat budget 450: 100 stingers cost 1e4; the cheapest shown is stingers (swarmlings II 1e12):
+      # min(100, 450 / 100) = 4 stingers
+      r = territory.advise mksnap(shown: 11, larvae: 1000, meat: 500, units: {swarmling: {meat: 1e12}}), null, {}
+      expect(counts r).toEqual [['stinger', 4]]
+
+    it 'takes twin candidates in ladder order', ->
+      # Purse 3000 (larvae 30000, 100/s; twin limit 6000). Meat budget 9e14: 3000 goons (3e14) fit,
+      # 3000 swarmlings II (3e15) do not, so the candidates are goons, then swarmlings II. The goon
+      # twin is too dear; the swarmling twin (1000 larvae, 100 meat) is bought. Then 2000 larvae:
+      # y = (9e14 - 100 - 2000 x 1e11) / 9e11 = 777.8 swarmlings (x2), x = 1222.2 goons.
+      snap = mksnap shown: 11, larvae: 30000, larvaRate: 100, meat: 1e15, units: {swarmling: {meat: 1e12, twinLarvae: 1000}}
+      r = territory.advise snap, null, {}
+      expect(r.twin.name).toBe 'swarmlingtwin'
+      expect(counts r).toEqual [['goon', 1222], ['swarmling', 777]]
+      expect(r.hatch[1].twin.toNumber()).toBe 2
+
+  describe 'empower advice', ->
+    # All 11 shown at 10^(j+1) meat. Purse and share of larvae on hand: 100. The swarmling empower
+    # costs 1e13. Goons make 1000 x 1, swarmlings 5 x 1 of territory income (0.5%).
+    opts = (o={}) ->
+      _.extend {shown: 11, larvae: 1000, meat: 3e13, units: {swarmling: _.extend({count: 5, empowerVisible: true, empowerMeat: 1e13}, o.swarmling), goon: {count: 1000}}}, _.omit(o, 'swarmling')
+
+    it 'advises empowering the cheapest unit once all the larvae fit in the top one with meat to spare', ->
+      # meat budget 2.7e13 >= 1e13 + 100 x 1e11. Then 1.7e13 for units, swarmlings left out:
+      # 100 goons (1e13).
+      r = territory.advise mksnap(opts()), null, {}
+      expect(r.empower.name).toBe 'swarmlingempower'
+      expect(r.empower.wipes.toNumber()).toBe 5
+      expect(r.empower.wipedShare).toBeCloseTo 5 / 1005, 12
+      expect(counts r).toEqual [['goon', 100]]
+      expect(texts r).toEqual ['buy empower swarmlings (1.00e13 meat): they become swarmlings II, the next unit above goons; your 5 swarmlings are lost', 'hatch 100 goons']
+
+    it 'does not advise it when the game does not show it', ->
+      r = territory.advise mksnap(opts swarmling: {empowerVisible: false}), null, {}
+      expect(r.empower).toBe null
+      expect(counts r).toEqual [['goon', 100]]
+
+    it 'does not advise it before the larvae fit in the top unit with its price to spare', ->
+      # meat 2.1e13 => budget 1.89e13 < 1e13 + 1e13
+      r = territory.advise mksnap(opts meat: 2.1e13), null, {}
+      expect(r.empower).toBe null
+      # it counts the share of the larvae on hand: with 10000 larvae, 1000 goons (1e14) plus the price
+      # do not fit a 9e13 budget
+      r = territory.advise mksnap(opts larvae: 10000, meat: 1e14), null, {}
+      expect(r.empower).toBe null
+
+    it 'does not advise it while the units it wipes make 1% or more of territory income', ->
+      # 20 / (20 + 1000) = 1.96%
+      r = territory.advise mksnap(opts swarmling: {count: 20}), null, {}
+      expect(r.empower).toBe null
+      # 10 / 1010 = 0.99%
+      r = territory.advise mksnap(opts swarmling: {count: 10}), null, {}
+      expect(r.empower).not.toBe null
+
+    it 'does not advise it once House of Mirrors has been cast', ->
+      r = territory.advise mksnap(opts mirrorCasts: 1), null, {}
+      expect(r.empower).toBe null
+      expect(r.hatch).toEqual []
+
+    it 'says when none are lost', ->
+      r = territory.advise mksnap(opts swarmling: {count: 0}), null, {}
+      expect(texts(r)[0]).toBe 'buy empower swarmlings (1.00e13 meat): they become swarmlings II, the next unit above goons; you have none to lose'
+
+    it 'climbs onto the new unit after the empower, counting its meat in the cycle', ->
+      first = territory.advise mksnap(opts()), null, {}
+      # Bought: level 1, swarmlings wiped and now 1e13 meat per larva, meat 3e13 - 1e13.
+      # Purse still 100 (an empower is not a unit purchase); meat spent 1e13:
+      # budget 0.9 x (2e13 + 1e13) - 1e13 = 1.7e13, as the plan above assumed. Ladder ... goons (1e11),
+      # swarmlings II (1e13): 100 swarmlings II (1e15) do not fit; y = (1.7e13 - 1e13) / 9.9e12 = 0.7,
+      # x = 99.3 => 99 goons.
+      after = mksnap opts(meat: 2e13, swarmling: {count: 0, meat: 1e13, empowerLevel: 1, empowerMeat: 1e42})
+      r = territory.advise after, first.memory, {}
+      expect(r.memory.purse.toNumber()).toBe 100
+      expect(r.memory.meatSpent.toNumber()).toBe 1e13
+      expect(r.meatBudget.toNumber()).toBe 1.7e13
+      expect(r.empower).toBe null
+      expect(counts r).toEqual [['goon', 99]]
+      # with more meat (fresh memory, budget 1.8e15), all 100 go to swarmlings II
+      r = territory.advise mksnap(opts(meat: 2e15, swarmling: {count: 0, meat: 1e13, empowerLevel: 1, empowerMeat: 1e42})), null, {}
+      expect(counts r).toEqual [['swarmling', 100]]
+
   describe 'once House of Mirrors has been cast', ->
     it 'advises no territory units and a territory share of 0', ->
       snap = mksnap larvae: 30000, larvaRate: 100, meat: 1e9, mirrorCasts: 3, units: {spider: {twinLarvae: 10}}
@@ -481,6 +595,53 @@ describe 'Service: advisorTerritory', ->
       # go to stingers (6.24e7 of meat): the 184 of the plan plus the larva its flooring left over
       expect(r.memory.purse.toNumber()).toBe 185
       expect(counts r).toEqual [['stinger', 185]]
+
+    # A late-run state where the empower rule fires, bought through the game's own upgrade purchase.
+    # 10000 larvae (share 1000), meat 5e32, every territory unit owned; twins and hatcheries priced
+    # out of the way (twin level 3: 125000 larvae, over 600 s x 41 larvae/s x 0.1; hatchery 3e42).
+    empowerGame = (game) ->
+      game.reset true
+      for name, val of {larva: 10000, meat: 5e32, queen: 5, swarmling: 100, goon: 1000}
+        game.unit(name)._setCount val
+      for name in territory.UNITS
+        game.unit(name)._setCount(game.unit(name).count().plus 1)
+        game.upgrade(name + 'twin')._setCount 3
+      game.upgrade('hatchery')._setCount 40
+      return game
+
+    it 'advises an empower and follows it once bought through the game', inject (game, commands, statistics) ->
+      empowerGame game
+      r = territory.update()
+      # meat budget 4.5e32 >= 1.14921e32 + 1000 x 2.5538e29 = 3.703e32; 101 swarmlings make 7.07
+      # territory/s of about 2.4e18. Then 4.5e32 - 1.14921e32 for units, swarmlings left out:
+      # 1000 goons (2.5538e32).
+      expect(r.empower.name).toBe 'swarmlingempower'
+      expect(r.empower.meat.toNumber()).toBe 1.14921e32
+      expect(r.empower.becomes).toBe 'swarmlings II'
+      expect(r.empower.wipes.toNumber()).toBe 101
+      expect(r.empower.wipedShare).toBeLessThan 1e-17
+      expect(counts r).toEqual [['goon', 1000]]
+      expect(territory.render r.empower).toBe 'buy empower swarmlings (1.15e32 meat): they become swarmlings II, the next unit above goons; your 101 swarmlings are lost'
+
+      commands.buyUpgrade {upgrade: game.upgrade('swarmlingempower'), num: 1}
+      expect(game.unit('swarmling').count().toNumber()).toBe 0
+      r = territory.update()
+      swarmling = _.find territory.snapshot(game).units, name: 'swarmling'
+      expect(swarmling.label).toBe 'swarmlings II'
+      expect(swarmling.meat.toNumber()).toBe 1.14921e32
+      expect(_.last(territory.ladder territory.snapshot game).name).toBe 'swarmling'
+      # Meat spent this cycle 1.14921e32: budget 0.9 x 5e32 - 1.14921e32 = 3.35079e32, as planned.
+      # 1000 swarmlings II do not fit; y = (3.35079e32 - 2.5538e32) / (1.14921e32 - 2.5538e29) = 0.7,
+      # x = 999.3 => 999 goons. The stinger empower is shown now but 5.17e34 is far off.
+      expect(r.memory.meatSpent.toNumber()).toBe 1.14921e32
+      expect(r.empower).toBe null
+      expect(counts r).toEqual [['goon', 999]]
+      # With meat at 5e34: budget 0.9 x (5e34 + 1.14921e32) - 1.14921e32 = 4.49885e34;
+      # y = (4.49885e34 - 2.5538e32) / 1.1466562e32 = 390.1 swarmlings II, x = 609.9 goons
+      game.unit('meat')._setCount 5e34
+      r = territory.update()
+      expect(counts r).toEqual [['goon', 609], ['swarmling', 390]]
+      expect((territory.render h for h in r.hatch)).toEqual ['hatch 609 goons (x8 twins)', 'hatch 390 swarmlings II (x8 twins)']
 
     it 'forgets the purchase memory on import and reset', inject ($rootScope) ->
       territory.update()

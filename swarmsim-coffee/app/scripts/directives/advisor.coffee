@@ -18,8 +18,15 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
       return game.unit name
     catch e
       return null
-  label = (name) -> unitOf(name)?.unittype?.label ? name
-  plural = (name) -> unitOf(name)?.unittype?.plural ? name
+  # The game's names, with the suffix of an empowered territory unit ("swarmling II"). The game sets
+  # `unit.suffix` while it works out the unit's stats, which the territory advice reads every second.
+  suffixed = (u, text) -> if u?.suffix then text + ' ' + u.suffix else text
+  label = (name) ->
+    u = unitOf name
+    if u?.unittype?.label? then suffixed(u, u.unittype.label) else name
+  plural = (name) ->
+    u = unitOf name
+    if u?.unittype?.plural? then suffixed(u, u.unittype.plural) else name
   # "1 hive queen", "2 hive queens"
   count = (n, name) -> bignum(n) + ' ' + (if new Decimal(n).equals(1) then label(name) else plural(name))
   # Link to a unit's page, or null if the unit doesn't exist or isn't visible yet (the game
@@ -170,6 +177,10 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
       when 'upgrade'
         line.text = 'buy ' + rec.label + (if rec.levels > 1 then ' ×' + rec.levels else '') + ' (' + (count(c.val, c.unit) for c in rec.costs).join(', ') + ')'
         line.href = upgradeHref rec.name
+      when 'empower'
+        line.text = 'buy ' + rec.label + ' (' + count(rec.meat, 'meat') + '): they become ' + rec.becomes + ', the next unit above ' + rec.above + '; ' +
+          (if rec.wipes.greaterThan(0) then 'your ' + count(rec.wipes, rec.unit) + (if rec.wipes.equals(1) then ' is' else ' are') + ' lost' else 'you have none to lose')
+        line.href = href rec.unit
       when 'twin'
         line.text = 'buy ' + rec.label + ' (' + count(rec.larvae, 'larva') + ', ' + count(rec.meat, 'meat') + ')'
         line.href = href rec.unit

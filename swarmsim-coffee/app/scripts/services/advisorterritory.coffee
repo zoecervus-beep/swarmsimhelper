@@ -20,14 +20,23 @@
  #   never holding more than that share of the larvae on hand (see `updatePurse`).
  # - Fractional purchases are floored, as the simulator floors them before buying.
  # - Only units and upgrades the game shows (isVisible) are considered; the simulator has all 11.
+ # - The ladder of territory units is ordered by their live meat cost per larva, not by sim.py's fixed
+ #   index: an empowered unit ("swarmling II") costs 450 x the unit that was the top of the ladder,
+ #   and makes 45 x its territory, so it becomes the next rung above it. sim.py has no empower; the
+ #   empower advice (`empowerAdvice`) is reasoned, not tuned.
 ###
-angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScope) ->
+angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScope, romanize) ->
   ZERO = new Decimal 0
   ONE = new Decimal 1
   D = (x) -> new Decimal(if x? then x else 0)
 
   UNITS = ['swarmling', 'stinger', 'spider', 'mosquito', 'locust', 'roach', 'giantspider',
     'centipede', 'wasp', 'devourer', 'goon']
+  # Advise an empower only while the units it wipes make less than this share of territory income.
+  # When the meat test below first passes, the cheapest rung makes a vanishing share (each rung makes
+  # 45x the one below; on the 14.5 h save swarmlings make 1e-15 of it), so this is a guard against
+  # unusual states rather than a tuned value.
+  EMPOWER_MAX_SHARE = 0.01
   # Larva multipliers, in the order sim.py's loop tries them each pass: ancestry, expansion, hatchery.
   LARVA_UPGRADES = ['achievementbonus', 'expansion', 'hatchery']
   # policy.json "g": territory units may spend this fraction of the meat on hand.
@@ -63,10 +72,17 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
       for c in twinUp.totalCost()
         tcost[c.unit.name] = D c.val
         tfactor[c.unit.name] = D c.factor
+      empowerUp = g.upgrade name + 'empower'
+      # The game sets `unit.suffix` ("II" once empowered) while it works out the unit's stats, so read
+      # a stat first.
+      unit.stats()
+      suffix = if unit.suffix then ' ' + unit.suffix else ''
+      level = empowerUp.count().toNumber()
+      nextSuffix = ' ' + (if level + 1 < 3999 then romanize(level + 2) else String(level + 2))
       name: name
-      label: unit.unittype.plural # as the game shows it, e.g. 'arachnomorphs' for spider
-      label1: unit.unittype.label # singular
-      tier: j # 0 = swarmling, as sim.py's TN index
+      label: unit.unittype.plural + suffix # as the game shows it, e.g. 'arachnomorphs' for spider, 'swarmlings II'
+      label1: unit.unittype.label + suffix # singular
+      tier: j # 0 = swarmling, as sim.py's TN index; the ladder order is by `meat`, not this
       visible: unit.isVisible()
       count: D unit.count()
       # times hatched (larvae spent, before twins), from the game's statistics: buying through the
@@ -81,9 +97,19 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
         level: twinUp.count().toNumber()
         visible: twinUp.isVisible()
         larvae: tcost.larva
+        meat: tcost.meat
         larvaFactor: tfactor.larva # price growth per level
         meatFactor: tfactor.meat
-        meat: tcost.meat
+      # Empowering wipes the units owned and multiplies their meat cost and production (the price of
+      # a level equals the empowered unit's new meat cost).
+      empower:
+        name: empowerUp.name
+        label: empowerUp.type.label # 'empower swarmlings'
+        level: level
+        visible: empowerUp.isVisible()
+        meat: D empowerUp.totalCost()[0].val
+        meatFactor: D empowerUp.totalCost()[0].factor
+        becomes: unit.unittype.plural + nextSuffix # label once empowered, e.g. 'swarmlings II'
     upgrades = for name in LARVA_UPGRADES
       up = g.upgrade name
       name: name
@@ -156,6 +182,15 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
           meat = meat.plus price.meat.times(Decimal.pow t.meatFactor, i)
       mem.seen[t.name] = t.level
       mem.prices[t.name] = {larvae: t.larvae, meat: t.meat}
+      # an empower costs meat only; it is territory spending, so it counts in the cycle's meat
+      e = u.empower
+      prev = mem.seen[e.name]
+      price = mem.prices[e.name]
+      if prev? and price? and e.level > prev
+        for i in [0...e.level - prev]
+          meat = meat.plus price.meat.times(Decimal.pow e.meatFactor, i)
+      mem.seen[e.name] = e.level
+      mem.prices[e.name] = {meat: e.meat}
     return {larvae: larvae, meat: meat}
 
   # Live translation of sim.py's territory purse. The simulator adds f x the larvae gained since the
@@ -194,7 +229,7 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
         rate: rate # territory larvae per second
         # seconds until the purse holds one larva (null with no larva income)
         seconds: if rate.greaterThan(0) then ONE.minus(mem.purse).dividedBy(rate).toNumber() else null
-    return {budget: budget, refill: refill}
+    return {budget: budget, cap: cap, refill: refill}
 
   # ---------------------------------------------------------------------------
   # Rules.
@@ -240,10 +275,60 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
 
   # sim.py policy(), "territory", with terr='balanced'. `budget` is the territory larvae, `meatBudget`
   # the meat they may use. Returns {twin, hatch: [records], idle}.
-  territoryUnits = (snap, share, budget, meatBudget) ->
+  # Shown territory units, cheapest meat cost per larva first: the ladder the balanced rule climbs.
+  ladder = (snap) ->
     vis = (u for u in snap.units when u.visible)
+    # Decimal comparison (costs pass 1e308 after enough empowers); ties, which the game's costs never
+    # make, by sim.py's index
+    return vis.sort (a, b) -> a.meat.comparedTo(b.meat) or a.tier - b.tier
+
+  # Reasoning, not a tuned rule (sim.py has no empower): empowering the cheapest rung adds a rung
+  # above the top one. The balanced rule only reaches the top rung once all the territory larvae fit
+  # into it, so the new rung is of use only then. Advise it when its price still fits the meat budget
+  # after the whole territory share of the larvae on hand (`cap`, not the purse, which swings after
+  # each purchase) has gone into the top rung, and the units it wipes make under EMPOWER_MAX_SHARE of
+  # territory income. Returns the record or null.
+  empowerAdvice = (snap, vis, cap, meatBudget) ->
+    if vis.length < 2
+      return null
+    low = vis[0]
+    top = vis[vis.length - 1]
+    e = low.empower
+    if not e?.visible
+      return null
+    if e.meat.plus(top.meat.times Decimal.max(cap, 1)).greaterThan meatBudget
+      return null
+    income = ZERO
+    for u in snap.units
+      income = income.plus u.count.times(u.prodEach)
+    wiped = low.count.times low.prodEach
+    wipedShare = if income.greaterThan(0) then wiped.dividedBy(income).toNumber() else 0
+    if wipedShare >= EMPOWER_MAX_SHARE
+      return null
+    return {
+      type: 'empower'
+      unit: low.name
+      name: e.name
+      label: e.label
+      level: e.level
+      meat: e.meat
+      wipes: low.count # units lost
+      wipesLabel: low.label
+      wipesLabel1: low.label1
+      wipedShare: wipedShare # of territory income
+      becomes: e.becomes
+      above: top.label # the rung it lands above
+    }
+
+  territoryUnits = (snap, share, budget, meatBudget, cap) ->
+    vis = ladder snap
     if not vis.length
       return {twin: null, hatch: [], idle: {type: 'idle', reason: 'locked'}}
+    # Empower first; its price comes out of the meat budget and the rung it wipes is not hatched.
+    empower = empowerAdvice snap, vis, cap, meatBudget
+    if empower?
+      meatBudget = meatBudget.minus empower.meat
+      vis = vis.slice 1
     # The biggest unit all the territory larvae could go into within the meat budget (max(L, 1) as
     # sim.py), else the smallest shown unit.
     top = 0
@@ -289,7 +374,7 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
           seconds: if snap.larvaRate.greaterThan(0) then t.larvae.dividedBy(snap.larvaRate).toNumber() else null
         break
     if twin?.type == 'saveForTwin'
-      return {twin: twin, hatch: [], idle: null}
+      return {empower: empower, twin: twin, hatch: [], idle: null}
     if twin?
       budget = Decimal.max 0, budget.minus(twin.larvae)
       meatBudget = meatBudget.minus twin.meat
@@ -300,7 +385,7 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
         next = _.extend {}, next, twin: next.twin.times(2)
 
     if budget.lessThan 1
-      return {twin: twin, hatch: [], idle: (if twin? then null else {type: 'idle', reason: 'noLarvae', larvae: budget})}
+      return {empower: empower, twin: twin, hatch: [], idle: (if twin? or empower? then null else {type: 'idle', reason: 'noLarvae', larvae: budget})}
     # All into `unit`, except that the meat left over beyond that goes to the next unit up.
     if next? and next.meat.lessThanOrEqualTo meatBudget
       y = Decimal.max(0, Decimal.min(budget, meatBudget.minus(budget.times unit.meat).dividedBy(next.meat.minus unit.meat)))
@@ -324,8 +409,8 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
         twin: u.twin           # units per larva
         units: n.times u.twin
         meat: n.times u.meat
-    idle = if hatch.length or twin? then null else {type: 'idle', reason: 'noMeat', meat: meatBudget, cost: unit.meat, unit: unit.name, label: unit.label1}
-    return {twin: twin, hatch: hatch, idle: idle}
+    idle = if hatch.length or twin? or empower? then null else {type: 'idle', reason: 'noMeat', meat: meatBudget, cost: unit.meat, unit: unit.name, label: unit.label1}
+    return {empower: empower, twin: twin, hatch: hatch, idle: idle}
 
   # Territory advice for a snapshot, the remembered state and the advisor settings (only `territory`,
   # the larva share, is read). Returns the advice with the updated memory as `memory`; the inputs are
@@ -344,6 +429,7 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
     status = null
     setting = null
     twin = null
+    empower = null
     hatch = []
     if mirrors
       # Once House of Mirrors is being cast, territory units only matter through the mirrors' doubling:
@@ -354,7 +440,8 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
     else if not (share > 0)
       status = {type: 'idle', reason: 'shareZero'}
     else
-      res = territoryUnits snap, share, budget, meatBudget
+      res = territoryUnits snap, share, budget, meatBudget, purse.cap
+      empower = res.empower ? null
       twin = res.twin
       hatch = res.hatch
       status = res.idle
@@ -368,6 +455,8 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
     if status?.type == 'mirrors'
       records.push status
     Array::push.apply records, up.records
+    if empower?
+      records.push empower
     if twin?
       records.push twin
     Array::push.apply records, hatch
@@ -380,6 +469,7 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
       larvae: budget
       meatBudget: meatBudget
       upgrades: up.records
+      empower: empower
       twin: twin
       hatch: hatch
       status: status
@@ -404,6 +494,9 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
       return null
     switch rec.type
       when 'upgrade' then 'buy ' + rec.label + (if rec.levels > 1 then ' x' + rec.levels else '') + ' (' + renderCosts(rec.costs) + ')'
+      when 'empower'
+        'buy ' + rec.label + ' (' + fmt(rec.meat) + ' meat): they become ' + rec.becomes + ', the next unit above ' + rec.above + '; ' +
+          (if rec.wipes.greaterThan(0) then 'your ' + fmt(rec.wipes) + ' ' + (if rec.wipes.equals(1) then rec.wipesLabel1 + ' is' else rec.wipesLabel + ' are') + ' lost' else 'you have none to lose')
       when 'twin' then 'buy ' + rec.label + ' (' + larvaText(rec.larvae) + ', ' + fmt(rec.meat) + ' meat)'
       when 'saveForTwin' then 'save larvae for ' + rec.label + ': ' + fmt(rec.have) + '/' + fmt(rec.larvae)
       when 'hatch' then 'hatch ' + fmt(rec.buys) + ' ' + rec.label + (if rec.twin.greaterThan(1) then ' (x' + fmt(rec.twin) + ' twins)' else '')
@@ -431,9 +524,11 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
     LARVA_UPGRADES: LARVA_UPGRADES
     MEAT_SHARE: MEAT_SHARE
     TWIN_SECS: TWIN_SECS
+    EMPOWER_MAX_SHARE: EMPOWER_MAX_SHARE
     # pure
     snapshot: snapshot
     createMemory: createMemory
+    ladder: ladder
     advise: advise
     render: render
     # live
