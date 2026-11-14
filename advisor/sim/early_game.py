@@ -19,7 +19,8 @@ Policies (sim.py options; all with the advisor's own purchase sizing, `advisor_s
           spare energy to larva rush below nexus 5, larvae for the next nexus held once its meat is in hand and its
           larva price is under 20,000 s of income (the simulator's rule; see `literal` for the advisor taken literally)
   PLAN    the plan the new defaults give: spare energy saved for the next nexus (larva rush only at the cap), the
-          next nexus's larvae kept from the climb, at nexus 4 1,000 lepidoptera first, then only the energy nexus 5
+          next nexus's larvae kept from the climb just in time (A.11.9; `plan_a11` keeps them at once, as first
+          published), at nexus 4 1,000 lepidoptera first, then only the energy nexus 5
           needs "just in time" kept (the rest into lepidoptera), and after nexus 5 lepidoptera to the run's target:
           10,000 in a first run, 30,000 in a quick run, 4,000 then 30,000 from day 3 in the long run.
 
@@ -31,6 +32,8 @@ Sections (all by default):
   first5     first run: lepidoptera target after nexus 5 against the mutagen it leaves                       (~1 min)
   meat       first run: the meat-side settings (age multiple, share, bank, territory, nexus larva timing)    (~1 min)
   longstart  the long run's start with less mutagen left from the first run                                 (~30 s)
+  owner      today, A.11 and the plan from the owner's 19.5 h state (example_save_19h.json)               (~30 s)
+  margin     the just-in-time larvae (A.11.9) with a safety margin on the larva income                     (~1 min)
   cadence    today against the plan under more cadences: a 45-minute stay at the start, twice a day, glance+ (~1 min)
 Usage (from the repo root):
     python3 -I advisor/sim/early_game.py [sections] [--jobs N]
@@ -45,13 +48,16 @@ import sim, bignum as bn, cadence
 
 OUTD = os.path.join(HERE, '..', 'modelcheck', 'out'); os.makedirs(OUTD, exist_ok=True)
 POLICY = json.load(open(os.path.join(HERE, 'policy.json')))
+AGE19 = 70192   # run age of example_save_19h.json (the owner's first run on this fork at 19.5 h: nexus 4, 2,833 lepidoptera)
 AGE27 = 1631   # run age of example_save_27min.json (saved - restarted), s; ascensions keep this offset (sim.run_off)
 TODAY = dict(POLICY, theta_age=3, advisor_sizing=True, cooldown_s=60, age0=AGE27, ascend=[{'after': 0}])
 SAVE_PLAN = dict(spare_pre5='save')                                   # spare energy held for the next nexus
 EARLY = dict(moth_N=1000, moth_first=True)                            # at nexus 4: 1,000 lepidoptera first
 JIT = dict(pre5_excess='moths', jit5=True)                            # then keep only what nexus 5 needs just in time
 STAGE = {'first': dict(moth_N5=10000), 'second': dict(moth_N5=4000, moth_late=(3 * 86400, 30000)), 'late': dict(moth_N5=30000)}
-def plan(run): return dict(TODAY, **SAVE_PLAN, **EARLY, **JIT, **STAGE[run])
+JITL = dict(jit_larvae=True)                                          # A.11.9: the next nexus's larvae kept just in time too
+def plan(run): return dict(TODAY, **SAVE_PLAN, **EARLY, **JIT, **JITL, **STAGE[run])
+def plan_a11(run): return dict(TODAY, **SAVE_PLAN, **EARLY, **JIT, **STAGE[run])   # as first published: larvae held at once
 FIRST_PLAN = {'unlock': ['mutatenexus', 'mutatefreq'], 'buy': {'mutantnexus': 1e6, 'mutantfreq': 1e6}}
 CAD = [('ideal', None, [1]), ('human', 'human', [1, 2, 3, 4, 5]), ('busy', 'busy', [1, 2, 3, 4, 5]),
        ('human, 45 min stay at the start', 'human@stay', [1, 2, 3, 4, 5]), ('twice', 'twice', [1]), ('glance+', 'glance+', [1, 2, 3])]
@@ -64,6 +70,9 @@ def start(name):
     if os.path.exists(path): return pickle.load(open(path, 'rb'))
     if name == 'first':
         s = sim.load()
+    elif name == 'owner':   # the owner's state at 19.5 h; its run age differs from the 27-minute save's (see AGE19)
+        os.environ['SAVE'] = os.path.join(HERE, 'example_save_19h.json'); s = sim.load()
+        os.environ['SAVE'] = os.path.join(HERE, 'example_save_27min.json')
     elif name == 'second':
         s0 = start('first')
         s, rows, log = sim.run_cycles(TODAY, 60, 400, s0=copy.deepcopy(s0), every=86400, plans=[FIRST_PLAN], until=lambda s: bool(s.asc_log))
@@ -100,7 +109,9 @@ def run(p, s0, prof=None, seed=1, hours=400):
     def until(s):
         a = sim.run_age(s, p) / 3600
         for k in range(1, 6):
-            if s.nexus >= k and 'n%d' % k not in ev: ev['n%d' % k] = a; ev['m%d' % k] = s.moth; ev['w%d' % k] = s.ewaste
+            if s.nexus >= k and 'n%d' % k not in ev:
+                ev['n%d' % k] = a; ev['m%d' % k] = s.moth; ev['w%d' % k] = s.ewaste
+                if k == 5: ev['lm5'], ev['top5'] = meat_top(s)
         if s.casts.get('mirror') and 'mirror' not in ev: ev['mirror'] = a
         if s.saving_asc and 'save' not in ev: ev['save'] = a
         if s.saving_asc and not s.want_asc:
@@ -112,11 +123,24 @@ def run(p, s0, prof=None, seed=1, hours=400):
             return True
         ev['moth'] = s.moth; ev['mirrors'] = s.casts.get('mirror', 0); ev['rush'] = s.casts.get('larvarush', 0); ev['waste'] = s.ewaste
         return False
-    sim.run_cycles(p, ci, s.time / 3600 + hours, s0=s, every=86400, until=until)
+    orig = sim.ascend
+    def asc(st, pp, plan=None):        # the climb's state just before the ascension resets it
+        ev['lmA'], ev['topA'] = meat_top(st)
+        return orig(st, pp, plan)
+    sim.ascend = asc
+    try:
+        sim.run_cycles(p, ci, s.time / 3600 + hours, s0=s, every=86400, until=until)
+    finally:
+        sim.ascend = orig
     return ev
+
+def meat_top(s):
+    """log10 meat per second (drone output) and the highest meat tier owned."""
+    return (bn.lg(s.c[1] * sim.P(s, 1)) if s.c[1] > 0 else 0.0), max([k for k in range(1, sim.K + 1) if s.c[k] > 0] or [0])
 
 def job(a):
     name, p, st, prof, seed, relax = a
+    if st == 'owner': p = dict(p, age0=AGE19)
     keep = dict(sim.NEX)
     try:
         for k, (m, e, l, g) in list(sim.NEX.items()):
@@ -143,7 +167,7 @@ def runall(specs):
         name, p, st, cad = sp[:4]
         rs = [r for r in res if r['name'] == name and r['start'] == st and r['prof'] == ({c[0]: c[1] for c in CAD}[cad] or 'ideal')]
         row = {'name': name, 'start': st, 'cadence': cad, 'seeds': len(rs)}
-        for k in ('n1', 'n2', 'n3', 'n4', 'n5', 'mirror', 'save', 'afford', 'asc', 'm5', 'w5'):
+        for k in ('n1', 'n2', 'n3', 'n4', 'n5', 'mirror', 'save', 'afford', 'asc', 'm5', 'w5', 'lm5', 'top5', 'lmA', 'topA'):
             v = [r[k] for r in rs if r.get(k) is not None]
             row[k] = sum(v) / len(v) if len(v) == len(rs) and v else None
         row['premut_min'] = min((r.get('premut') or 0.0) for r in rs)
@@ -208,13 +232,20 @@ def section_bind():
         print('| %s | %s | %s | %s | %s | %s | %s | %s |' % (r['start'], r['name'][5:], f1(r['n1']), f1(r['n2']), f1(r['n3']), f1(r['n4']), f1(r['n5']), f1(r['afford'])))
     OUT['bind'] = rows
 
+def cell(r, c):
+    v = r[c]
+    if v is None: return '-'
+    if c == 'w5': return '%.0f' % v
+    if c in ('top5', 'topA'): return sim.LABEL.get(sim.NAMES[int(round(v))], sim.NAMES[int(round(v))]) + ('' if abs(v - round(v)) < 1e-9 else ' (%.1f)' % v)
+    return f1(v)
+
 def table(rows, title, cols=('n4', 'n5', 'mirror', 'afford', 'asc')):
     print('\n### %s\n' % title)
-    names = {'n4': 'nexus 4', 'n5': 'nexus 5', 'mirror': 'first mirror', 'afford': 'ascension affordable', 'asc': 'ascend (at a visit)', 'w5': 'energy lost to the cap by nexus 5'}
+    names = {'lm5': 'log10 meat/s at nexus 5', 'top5': 'top tier at nexus 5', 'lmA': 'log10 meat/s at the ascension', 'topA': 'top tier at the ascension', 'n4': 'nexus 4', 'n5': 'nexus 5', 'mirror': 'first mirror', 'afford': 'ascension affordable', 'asc': 'ascend (at a visit)', 'w5': 'energy lost to the cap by nexus 5'}
     print('| run | cadence | policy | ' + ' | '.join(names[c] for c in cols) + ' | premutagen at ascension |')
     print('|' + ' --- |' * (len(cols) + 4))
     for r in rows:
-        print('| %s | %s | %s | ' % (r['start'], r['cadence'], r['name']) + ' | '.join(f1(r[c]) if c != 'w5' else ('%.0f' % r[c] if r[c] is not None else '-') for c in cols) +
+        print('| %s | %s | %s | ' % (r['start'], r['cadence'], r['name']) + ' | '.join(cell(r, c) for c in cols) +
               ' | %s |' % (g2(r['premut_min']) if r['premut_min'] == r['premut_max'] else '%s to %s' % (g2(r['premut_min']), g2(r['premut_max']))))
 
 def section_plan():
@@ -223,9 +254,11 @@ def section_plan():
         for cad, _, _ in CAD:
             specs.append(('today', TODAY, st, cad))
             if st == 'first': specs.append(('today, literal (climb takes the nexus larvae)', dict(TODAY, no_nexres=True), st, cad))
+            specs.append(('plan A.11 (larvae held at once)', plan_a11(st), st, cad))
             specs.append(('plan', plan(st), st, cad))
     rows = runall(specs)
     table(rows, "Today's defaults against the plan (run age in hours; human and busy: mean of 5 seeds)", cols=('n4', 'n5', 'mirror', 'afford', 'asc', 'w5'))
+    table(rows, "What the climb has (log10 meat per second, top tier) at nexus 5 and just before the ascension", cols=('lm5', 'top5', 'lmA', 'topA'))
     OUT['plan'] = rows
 
 def section_parts():
@@ -236,17 +269,19 @@ def section_parts():
                  ('+ save below nexus 5', dict(TODAY, **SAVE_PLAN)),
                  ('+ 1,000 lepidoptera first at nexus 4', dict(TODAY, **SAVE_PLAN, **EARLY, moth_N5=4000)),
                  ('+ just-in-time hold for nexus 5', dict(TODAY, **SAVE_PLAN, **EARLY, **JIT, moth_N5=4000)),
-                 ('+ run target after nexus 5 (= plan)', plan(st))]
+                 ('+ run target after nexus 5', plan_a11(st)),
+                 ('+ just-in-time larvae (= plan)', plan(st))]
         out = [('plan without saving below nexus 5', dict(plan(st), spare_pre5=None, pre5_excess=None)),
                ('plan without the early lepidoptera', dict(plan(st), moth_N=0)),
                ('plan without the just-in-time hold', dict(plan(st), pre5_excess=None, jit5=None)),
+               ('plan, larvae held at once (A.11 as published)', plan_a11(st)),
                ('plan with 4,000 after nexus 5', dict(plan(st), moth_N5=4000)),
                ('plan, all energy into lepidoptera after nexus 5', dict(plan(st), moth_N5=1e9))]
         for cad in ('ideal', 'human', 'busy'):
             for name, p in steps + out:
                 specs.append((name, p, st, cad))
     rows = runall(specs)
-    table(rows, 'What each change contributes', cols=('n4', 'n5', 'afford'))
+    table(rows, 'What each change contributes', cols=('n4', 'n5', 'afford', 'lm5', 'lmA'))
     OUT['parts'] = rows
 
 def section_first5():
@@ -285,15 +320,37 @@ def section_cadence():
     specs = []
     for st in ('first', 'late'):
         for cad in ('human', 'human, 45 min stay at the start', 'twice', 'glance+'):
-            specs.append(('today', TODAY, st, cad)); specs.append(('plan', plan(st), st, cad))
+            specs.append(('today', TODAY, st, cad)); specs.append(('plan A.11 (larvae held at once)', plan_a11(st), st, cad)); specs.append(('plan', plan(st), st, cad))
     rows = runall(specs)
     table(rows, 'Other cadences: a 45-minute stay after the run starts, twice a day, single looks plus two more', cols=('n4', 'n5', 'afford', 'asc'))
     OUT['cadence'] = rows
 
+def section_owner():
+    """From the owner's own state (first run, 19.5 h, nexus 4, energy far from nexus 5, larvae near)."""
+    specs = []
+    for cad in ('ideal', 'human', 'busy'):
+        specs.append(('today', TODAY, 'owner', cad))
+        specs.append(('plan A.11 (larvae held at once)', plan_a11('first'), 'owner', cad))
+        specs.append(('plan', plan('first'), 'owner', cad))
+    rows = runall(specs)
+    table(rows, "From the owner's 19.5 h state (example_save_19h.json)", cols=('n5', 'mirror', 'afford', 'lm5', 'top5', 'lmA', 'topA'))
+    OUT['owner'] = rows
+
+def section_margin():
+    """The just-in-time larvae with a safety margin: only this share of the larva income is counted."""
+    specs = []
+    for st in ('first', 'second', 'late'):
+        for cad in ('ideal', 'human', 'busy'):
+            for lm in (1.0, 0.8, 0.5):
+                specs.append(('plan, larva income counted x%.1f' % lm, dict(plan(st), jit_lm=lm), st, cad))
+    rows = runall(specs)
+    table(rows, 'The just-in-time larvae: safety margin on the larva income', cols=('n5', 'mirror', 'afford', 'lm5', 'lmA'))
+    OUT['margin'] = rows
+
 if __name__ == '__main__':
     args = [a for a in sys.argv[1:] if not a.startswith('--')]
     if '--jobs' in sys.argv: JOBS = int(sys.argv[sys.argv.index('--jobs') + 1]); args = [a for a in args if a != str(JOBS)]
-    want = args or ['energy', 'bind', 'plan', 'parts', 'first5', 'meat', 'longstart', 'cadence']
+    want = args or ['energy', 'bind', 'plan', 'parts', 'first5', 'meat', 'longstart', 'cadence', 'margin', 'owner']
     for sec in want:
         globals()['section_' + sec](); note(sec)
     json.dump(OUT, open(os.path.join(OUTD, 'early_game.json'), 'w'), default=str)

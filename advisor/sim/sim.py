@@ -274,6 +274,7 @@ def energy_policy(s,p,gained):
             s.c[0]-=m; s.energy-=e; s.larva-=l; s.nexus+=1; s.energy=min(ecap(s),s.energy+g); s.reserve=min(s.reserve,s.larva)
         else:
             if s.c[0]>=m/p.get('nexus_soon',30) and l<=p.get('nexus_secs',3600)*lam(s): hold=e; s.nexres=0.0 if p.get('no_nexres') else min(l,s.larva)   # no_nexres (default off): the climb is not told to keep them
+            if p.get('jit_larvae'): s.nexres=nexus_wait(s,p)['keep_l']   # option (default off): only the larvae needed just in time
             break
     if ascend_saving(s,p): return
     mt=p.get('moth_N5',p.get('moth_N',0)) if s.nexus>=5 else p.get('moth_N',0)
@@ -348,6 +349,30 @@ def jit_hold(s,p,hold):
     have=s.larva if hold>0 else 0.0
     T=max(0.0,l-have)/lam(s) if lam(s)>0 else float('inf')
     return min(e,math.ceil(max(0.0,e-erate(s)*T*p.get('jit_f',1.0))))   # whole energy, as the advisor; jit_f < 1: count only part of that time
+def nexus_wait(s,p):
+    """Option `jit_larvae` (default off; advisor/ASCENSION.md A.11.9): the larvae to keep from the climb for the
+    next nexus, "just in time". Nothing while its meat is missing or its larvae are far (price over nexus_secs of
+    larva income: the climb then grows the larva rate, which is what brings them). Otherwise, on the same larva
+    clock as jit_hold (every larva on hand, the whole larva rate):
+      T_e  seconds until its energy is there: (price - energy) / energy rate; at nexus 4 with the early lepidoptera
+           (moth_first) still to buy, their price first at today's rate, then the price at the rate they give;
+      T_l  seconds until its larvae are there: 0 if in hand, else (price - larvae) / larvae per second;
+      keep_l = min(larvae, ceil(max(0, price - larvae per second x jit_lm x max(T_e, T_l)))):
+    all of them while larvae bind (T_l >= T_e), only what income will not bring before the energy while it binds.
+    jit_lm (default 1) < 1 counts only part of the larva income (a safety margin; it changed nothing measured)."""
+    m,e,l,g=NEX[s.nexus]
+    have=s.larva; inc=lam(s)   # the same larva clock as jit_hold's: every larva on hand, the whole larva rate
+    if s.c[0]<m or not l<=p.get('nexus_secs',3600)*lam(s): return {'keep_l':0.0,'T_e':None,'T_l':None}   # its meat missing, or its larvae far
+    r=erate(s)
+    if s.nexus==4 and p.get('moth_first') and s.moth<p.get('moth_N',0):
+        need=10*(p['moth_N']-s.moth); r2=0.1*s.nexus*(1+p['moth_N']/(1000.0+p['moth_N']))*s.em
+        T_e=max(0.0,e-(s.energy-need))/r2 if s.energy>=need else (need-s.energy)/r+e/r2
+    else:
+        T_e=max(0.0,e-s.energy)/r if r>0 else float('inf')
+    T_l=0.0 if s.larva>=l else (max(0.0,l-have)/inc if inc>0 else float('inf'))
+    T=max(T_e,T_l)
+    keep_l=min(have,math.ceil(max(0.0,l-inc*p.get('jit_lm',1.0)*T))) if T<float('inf') else have
+    return {'keep_l':keep_l,'T_e':T_e,'T_l':T_l}
 def advance(s,dt,skip=False):
     L=lam(s)*dt; s.larva+=L; s.terr+=trate(s)*dt
     if not skip:
