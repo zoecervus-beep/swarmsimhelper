@@ -369,13 +369,13 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
     # Without this, a player who follows every suggestion never gathers nexus 5's 3.33e9 larvae.
     nexusHeld = null
     if cfg.spareEnergy == 'save' and not lrActive
-      nexusHeld = Decimal.min nexusLarvae(energy, snap), left
+      nexusHeld = Decimal.min nexusLarvae(energy, snap, cfg), left
       left = left.minus nexusHeld
     # LR-2 reserve: in the mode, the larvae for the next nexus come out first, then R = floor(1%) of
     # what is left is set aside for the push; the climb (purchases, earmarks, banking) uses the rest.
     reserve = null
     if lrActive
-      nexus = nexusLarvae energy, snap
+      nexus = nexusLarvae energy, snap, cfg
       A = Decimal.max left.minus(nexus), 0
       R = A.times(LR.reserve).floor()
       if given?
@@ -517,7 +517,11 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
   # Larvae held for the next nexus, the native equivalent of the simulator's nexus saving: the next
   # nexus's whole larva price while the energy line says to buy that nexus or to save for it (the
   # 'save' record: its meat is in hand and its larvae are under 20,000 s away).
-  nexusLarvae = (energy, snap) ->
+  # Under spareEnergy 'save' (ASCENSION.md A.11.9) it is the record's just-in-time keep (`larvae.keep`, 0 while
+  # the record has none: no larva price, its meat missing or its larvae far).
+  nexusLarvae = (energy, snap, cfg) ->
+    if cfg?.spareEnergy == 'save'
+      return energy?.larvae?.keep ? ZERO
     rec = if energy?.type in ['buyMoths', 'mothTarget'] then energy.then else energy
     if rec?.type in ['save', 'buyNexus']
       for c in snap.energy?.next?.costs ? [] when c.unit == 'larva'
@@ -604,6 +608,64 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
   # Returns null below one nexus.
   energyAdvice = (snap, cfg) ->
     cfg = withDefaults cfg
+    rec = energyRecord snap, cfg
+    # the 'save' plan also says how many of the next nexus's larvae to keep from the climb, and why
+    if rec? and cfg.spareEnergy == 'save' and snap.energy.nexus < 5 and snap.energy.next?
+      plan = larvaPlan snap, cfg
+      if plan?
+        rec.larvae = plan
+    return rec
+
+  # spareEnergy 'save' (ASCENSION.md A.11.9): the next nexus's larvae to keep from the climb, just in time.
+  # None while its meat is missing or its larvae are far (price over NEXUS_LARVA_SECS of larva income): the
+  # climb is then what raises the larva rate. Otherwise, on the same larva clock as nexus5Plan's energy keep
+  # (every larva on hand, the whole larva rate; ASCENSION.md A.11.9 tried leaving the territory share out: no gain):
+  #   energyWait = seconds until its energy is there: (price - energy) / energy per s; at nexus 4 the first
+  #     lepidoptera still to buy are paid first at today's rate, the price then at the rate they give;
+  #     0 when the energy rate is not known (then everything is kept, as before)
+  #   larvaWait = 0 if in hand, else (price - larvae) / larvae per s
+  #   keep = min(larvae, ceil(max(0, price - larvae per s x max(energyWait, larvaWait))))
+  # so all of them while larvae are what it waits for, and only what income will not bring before its energy
+  # while energy is. Null when nothing applies.
+  larvaPlan = (snap, cfg) ->
+    e = snap.energy
+    price = {}
+    have = {}
+    for c in e.next.costs
+      price[c.unit] = c.val
+      have[c.unit] = c.have
+    if not price.larva?
+      return null
+    if price.meat? and have.meat.lessThan price.meat
+      return null
+    if price.larva.greaterThan snap.larvaRate.times(NEXUS_LARVA_SECS)
+      return null
+    onHand = have.larva
+    if _.every(e.next.costs, (c) -> c.have.greaterThanOrEqualTo c.val)
+      return {keep: Decimal.min(onHand, price.larva), price: price.larva, energyWait: 0, larvaWait: 0, binds: 'ready', level: e.nexus + 1}
+    income = snap.larvaRate
+    energyPrice = price.energy ? ZERO
+    energyWait = 0
+    rate = e.rate
+    if e.energy.lessThan(energyPrice) or (e.nexus == 4 and e.moths.lessThan Math.min(cfg.moths, EARLY_MOTHS))
+      if rate? and rate.greaterThan 0
+        early = Math.min cfg.moths, EARLY_MOTHS
+        if e.nexus == 4 and e.moths.lessThan early
+          mothCost = D(early).minus(e.moths).times(MOTH_ENERGY)
+          later = rate.times(1 + early / (1000 + early)).dividedBy(D(1).plus(e.moths.dividedBy(e.moths.plus(1000))))
+          if e.energy.greaterThanOrEqualTo mothCost
+            energyWait = Decimal.max(energyPrice.minus(e.energy.minus(mothCost)), 0).dividedBy(later).toNumber()
+          else
+            energyWait = mothCost.minus(e.energy).dividedBy(rate).plus(energyPrice.dividedBy(later)).toNumber()
+        else
+          energyWait = energyPrice.minus(e.energy).dividedBy(rate).toNumber()
+    larvaWait = if have.larva.greaterThanOrEqualTo(price.larva) then 0 else if income.greaterThan(0) then Decimal.max(price.larva.minus(onHand), 0).dividedBy(income).toNumber() else Infinity
+    wait = Math.max energyWait, larvaWait
+    keep = if wait == Infinity then onHand else Decimal.min(onHand, Decimal.max(price.larva.minus(income.times(wait)), 0).ceil())
+    binds = if wait == 0 then 'ready' else if energyWait > larvaWait then 'energy' else 'larvae'
+    return {keep: keep, price: price.larva, energyWait: energyWait, larvaWait: larvaWait, binds: binds, level: e.nexus + 1}
+
+  energyRecord = (snap, cfg) ->
     e = snap.energy
     nexus = e.nexus
     if not (nexus >= 1)
@@ -714,7 +776,7 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
         return rec
     if saving
       if keep.lessThan price
-        return _.extend {}, saving, keep: keep, wait: wait.toNumber()
+        return _.extend {}, saving, keep: keep, wait: wait.toNumber(), keepIdle: energy.greaterThanOrEqualTo(keep)
       return saving
     if e.cap? and energy.greaterThanOrEqualTo(e.cap)
       return {type: 'energyFull', energy: energy, cap: e.cap, spell: SPELLS.larvarush.spell, label: SPELLS.larvarush.label, cost: SPELLS.larvarush.cost}
@@ -722,6 +784,7 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
     if keep.lessThan price
       hold.keep = keep
       hold.wait = wait.toNumber()
+      hold.keepIdle = energy.greaterThanOrEqualTo keep
     return hold
 
   # ---------------------------------------------------------------------------
@@ -777,7 +840,7 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
 
   renderSaving = (rec) ->
     'save for nexus ' + rec.level + ': ' + ((formatNumber(m.have) + '/' + formatNumber(m.need) + ' ' + m.unit) for m in rec.missing).join(', ') +
-      (if rec.keep? then '; ' + (if rec.keep.isZero() then 'no energy' else 'only ' + formatNumber(rec.keep) + ' energy') + ' needed now: income brings the rest before the larvae (' + formatTime(rec.wait) + ')' else '')
+      (if rec.keep? and rec.keepIdle then '; ' + (if rec.keep.isZero() then 'no energy' else 'only ' + formatNumber(rec.keep) + ' energy') + ' needed now: income brings the rest before the larvae (' + formatTime(rec.wait) + ')' else '')
 
   # "saving energy for nexus 2: 2,000/625 energy (ready); still need 3.33e15 meat (have 8.95e11)"
   renderHold = (rec) ->
@@ -790,12 +853,30 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
       text += '; still need ' + ((formatNumber(m.need) + ' ' + m.unit + ' (have ' + formatNumber(m.have) + ')') for m in rec.missing).join(', ')
     if rec.mothsNext
       text += '; then lepidoptera'
-    if rec.keep?
+    if rec.keep? and rec.keepIdle
       text += '; ' + (if rec.keep.isZero() then 'none' else 'only ' + formatNumber(rec.keep)) + ' needed now: income brings the rest before its larvae (' + formatTime(rec.wait) + ')'
     return text
 
+  # "; keeping no larvae for nexus 5 yet: its energy is 11.9 h away, its larvae 3.6 h" (the 'save' plan)
+  renderLarvae = (rec) ->
+    lp = rec?.larvae
+    if not lp? then return ''
+    times = formatTime(lp.energyWait) + ' away, its larvae ' + formatTime(lp.larvaWait)
+    if lp.binds == 'ready'
+      return '; keeping its ' + formatNumber(lp.keep) + ' larvae'
+    if lp.binds == 'larvae'
+      return '; keeping all ' + formatNumber(lp.keep) + ' larvae for nexus ' + lp.level + ': larvae are what it waits for (' + formatTime(lp.larvaWait) + '; energy ' + formatTime(lp.energyWait) + ')'
+    if lp.keep.isZero()
+      return '; keeping no larvae for nexus ' + lp.level + ' yet: its energy is ' + times
+    '; keeping ' + formatNumber(lp.keep) + ' larvae for nexus ' + lp.level + ', the rest come in before its energy (' + formatTime(lp.energyWait) + ')'
+
   # Without the "energy: " prefix the panel puts in front. Null for null.
   renderEnergy = (rec) ->
+    text = renderEnergyRecord rec
+    if text? then text += renderLarvae(rec)
+    return text
+
+  renderEnergyRecord = (rec) ->
     if not rec?
       return null
     switch rec.type
@@ -858,6 +939,8 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
     renderPush: renderPush
     LR: LR
     EARLY_MOTHS: EARLY_MOTHS
+    larvaPlan: larvaPlan
+    renderLarvae: renderLarvae
     pushLine: pushLine
     # live
     config: -> options.advisorConfig()

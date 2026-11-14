@@ -58,6 +58,7 @@ module.exports = (config) ->
       {pattern: '../advisor/sim/example_save_14h.json', included: false, served: true, watched: false}
       # fixture for test/spec/services/advisorascension.coffee: the 20.1 h save, never ascended, nexus 4
       {pattern: '../advisor/sim/example_save_20h.json', included: false, served: true, watched: false}
+      {pattern: '../advisor/sim/example_save_19h.json', included: false, served: true, watched: false}
     ],
 
     # list of files / patterns to exclude

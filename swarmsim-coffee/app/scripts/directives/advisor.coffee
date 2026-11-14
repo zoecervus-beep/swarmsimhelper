@@ -108,7 +108,7 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
 
   saving = (rec) ->
     'save for nexus ' + rec.level + ': ' + ((bignum(m.have) + '/' + count(m.need, m.unit)) for m in rec.missing).join(', ') +
-      (if rec.keep? then '; ' + (if new Decimal(rec.keep).isZero() then 'no energy' else 'only ' + count(rec.keep, 'energy')) + ' needed now: income brings the rest before the larvae (' + time(rec.wait) + ')' else '')
+      (if rec.keep? and rec.keepIdle then '; ' + (if new Decimal(rec.keep).isZero() then 'no energy' else 'only ' + count(rec.keep, 'energy')) + ' needed now: income brings the rest before the larvae (' + time(rec.wait) + ')' else '')
 
   energy = (rec) ->
     if not rec?
@@ -154,7 +154,7 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
           text += (if rec.ready then '; waiting for ' else '; also needs ') + ((count(m.need, m.unit) + ' (have ' + bignum(m.have) + ')') for m in rec.missing).join(', ')
         if rec.mothsNext
           text += '; lepidoptera after that'
-        if rec.keep?
+        if rec.keep? and rec.keepIdle
           text += '; ' + (if new Decimal(rec.keep).isZero() then 'none' else 'only ' + count(rec.keep, 'energy')) + ' needed now: income brings the rest before its larvae (' + time(rec.wait) + ')'
         link = 'nexus'
       when 'energyFull'
@@ -167,8 +167,20 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
           text = 'saving for the ascension, no casting: ' + bignum(rec.energy) + '/' + count(rec.cost, 'energy') + (if rec.seconds? then ', ready in ' + time(rec.seconds) else '')
         link = 'mutagen'
       else
-        text = advisor.renderEnergy rec
-    return {type: rec.type, text: text, href: href(link)}
+        text = advisor.renderEnergy _.omit(rec, 'larvae') # the larvae part is added below, with the game's labels
+    return {type: rec.type, text: text + larvaeText(rec), href: href(link)}
+
+  # The 'save' plan (ASCENSION.md A.11.9): how many of the next nexus's larvae the climb leaves for it, and why.
+  larvaeText = (rec) ->
+    lp = rec?.larvae
+    if not lp? or rec.type == 'ascensionHold' then return ''
+    if lp.binds == 'ready'
+      return '; keeping its ' + count(lp.keep, 'larva')
+    if lp.binds == 'larvae'
+      return '; keeping all ' + count(lp.keep, 'larva') + ' for nexus ' + lp.level + ': larvae are what it waits for (' + time(lp.larvaWait) + '; energy ' + time(lp.energyWait) + ')'
+    if new Decimal(lp.keep).isZero()
+      return '; keeping no larvae for nexus ' + lp.level + ' yet: its energy is ' + time(lp.energyWait) + ' away, its larvae ' + time(lp.larvaWait)
+    '; keeping ' + count(lp.keep, 'larva') + ' for nexus ' + lp.level + ', the rest come in before its energy (' + time(lp.energyWait) + ')'
 
   errorText = (e) -> String(e?.message ? e)
 
@@ -196,12 +208,6 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
       return advisorAscension.coupleEnergy rec, acur.advice
     catch e
       return rec
-
-  # The 'save' plan keeps the next nexus's larvae out of the climb: say so on the energy line.
-  withHeld = (line, held) ->
-    if line? and held?.greaterThan?(0)
-      line.text += ' (the climb above leaves ' + count(held, 'larva') + ' for it)'
-    return line
 
   # From `advisor.current()`'s {advice, error} to the panel's view model. Never throws.
   panel = (cur, acur) ->
@@ -241,7 +247,7 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
         rows: rows
         tips: (tip(t) for t in r.tips)
         # an energy failure costs only this line, as in the console script
-        energy: if r.energyError? then {type: 'error', error: true, text: errorText(r.energyError)} else withHeld(energy(coupledEnergy(r.energy, acur)), r.nexusLarvae)
+        energy: if r.energyError? then {type: 'error', error: true, text: errorText(r.energyError)} else energy coupledEnergy(r.energy, acur)
         summary: if buys.length then {label: buys[0].label, action: buys[0].action} else null
       }
     catch e

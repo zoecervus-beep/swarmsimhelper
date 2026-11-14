@@ -18,7 +18,7 @@ cases.forEach(function (c, i) {
     {unit: 'larva', val: D(c.price.larva), have: D(c.larvae)}];
   var snap = {now: 0, restartedAt: 0, larvae: D(c.larvae), larvaRate: D(c.larva_rate), units: [],
     energy: {nexus: 4, energy: D(c.energy), rate: D(c.rate), cap: D(c.cap), moths: D(c.moths), next: {name: 'nexus5', level: 5, costs: costs}}};
-  var rec = adv.energyAdvice(snap, {spareEnergy: 'save', moths: c.target});
+  var rec = adv.energyAdvice(snap, {spareEnergy: 'save', moths: c.target, territory: c.territory});
   var sim = c.sim, what, ok;
   if (sim.nexus5) { what = 'nexus 5 bought'; ok = rec.type === 'buyNexus'; }
   else if (sim.moths) { what = 'lepidoptera bought'; ok = rec.type === 'buyMoths' && rec.count.equals(sim.moths); }
@@ -31,6 +31,13 @@ cases.forEach(function (c, i) {
     var k = Math.abs(keep - c.sim_keep) <= 1e-9 * c.price.energy;
     count('energy kept for nexus 5', k);
     if (!k) ok = false;
+  }
+  // the larvae kept from the climb for nexus 5 (A.11.9), within a larva of the simulator's (both ceil a float/Decimal)
+  if (!sim.nexus5) {
+    var lk = rec.larvae ? rec.larvae.keep : D(0), sk = D(c.sim_larvae.keep);
+    var lok = lk.minus(sk).abs().lessThanOrEqualTo(Decimal.max(1, sk.times(1e-12)));
+    count('larvae kept for nexus 5', lok);
+    if (!lok) { ok = false; what += ' / larvae kept ' + lk.toString() + ' vs sim ' + sk.toString(); }
   }
   if (!ok && diffs <= 10) console.log('DIFF case', i, c.run, c.cadence, c.seed, 'age', c.age_h.toFixed(2), 'h:', what, JSON.stringify(sim),
     'sim keep', c.sim_keep, '| advisor', rec.type, rec.count ? rec.count.toString() : '', rec.keep ? 'keep ' + rec.keep.toString() : '', adv.renderEnergy(rec));

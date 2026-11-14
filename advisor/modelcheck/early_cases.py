@@ -5,7 +5,7 @@ Plays advisor/sim/early_game.py's PLAN for the first run (ideal cadence and the 
 late quick run (ideal and human seed 1). At every visit at nexus 4 it records what energyAdvice reads (energy,
 energy rate, cap, lepidoptera, larvae, larvae per second, nexus 5's price and what is held of it) and what the
 simulator then did with energy: nexus 5 bought, lepidoptera bought, a larva rush cast, or nothing; and the energy it
-kept for nexus 5 (sim.jit_hold). The lepidoptera target after nexus 5 is the run's (10,000 / 30,000).
+kept for nexus 5 (sim.jit_hold) and the larvae it kept from the climb (sim.nexus_wait, A.11.9). The lepidoptera target after nexus 5 is the run's (10,000 / 30,000).
 Writes advisor/modelcheck/early_cases.json (about 150 states, chosen evenly from each run).
 Usage (from the repo root): python3 -I advisor/modelcheck/early_cases.py
 """
@@ -15,8 +15,9 @@ sys.path.insert(0, os.path.join(HERE, '..', 'sim'))
 import early_game as E, sim, cadence, bignum as bn
 N = lambda x: str(x) if bn.isbig(x) else float(x)   # past float range: the Big's own text (7 digits)
 
-def cases(run, prof, seed, keep=25):
-    p = E.plan(run); s = copy.deepcopy(E.start(run)); s.asc_log = []
+def cases(run, prof, seed, keep=25, start=None):
+    p = E.plan(run); s = copy.deepcopy(E.start(start or run)); s.asc_log = []
+    if start == 'owner': p = dict(p, age0=E.AGE19)
     out = []
     orig = sim.energy_policy
     def wrapped(st, pp, gained):
@@ -27,7 +28,10 @@ def cases(run, prof, seed, keep=25):
                    'energy': st.energy, 'rate': sim.erate(st), 'cap': sim.ecap(st), 'moths': st.moth,
                    'larvae': N(st.larva), 'larva_rate': N(sim.lam(st)), 'meat': N(st.c[0]),
                    'price': {'meat': m, 'energy': e, 'larva': l}, 'early': pp['moth_N'], 'target': pp['moth_N5'],
-                   'sim_keep': sim.jit_hold(st, pp, hold) if st.c[0] >= m else e}
+                   'sim_keep': sim.jit_hold(st, pp, hold) if st.c[0] >= m else e,
+                   'territory': pp['f']}
+            w = sim.nexus_wait(st, pp)
+            rec['sim_larvae'] = {'keep': N(w['keep_l']), 'T_e': w['T_e'], 'T_l': w['T_l']}
             before = (st.nexus, st.moth, st.casts.get('larvarush', 0))
             orig(st, pp, gained)
             rec['sim'] = {'nexus5': st.nexus == 5, 'moths': st.moth - before[1] if st.nexus == 4 else None,
@@ -49,8 +53,10 @@ def cases(run, prof, seed, keep=25):
 
 if __name__ == '__main__':
     allc = []
-    for run, prof, seed in [('first', None, 1), ('first', 'human', 1), ('first', 'human', 2), ('first', 'human', 3), ('late', None, 1), ('late', 'human', 1)]:
-        c = cases(run, prof, seed); allc += c
+    for run, prof, seed, st in [('first', None, 1, None), ('first', 'human', 1, None), ('first', 'human', 2, None), ('first', 'human', 3, None),
+                                ('late', None, 1, None), ('late', 'human', 1, None), ('first', None, 1, 'owner'), ('first', 'human', 1, 'owner')]:
+        c = cases(run, prof, seed, start=st); allc += c
+        for x in c: x['start'] = st or run
         print(run, prof or 'ideal', seed, len(c), 'states')
     json.dump(allc, open(os.path.join(HERE, 'early_cases.json'), 'w'), indent=0)
     print('wrote', len(allc))

@@ -297,24 +297,34 @@ describe 'Directive: advisorPanel', ->
     el = render()
     # the first 1,000 lepidoptera, then nexus 5 (its larvae kept from the climb)
     save = {type: 'save', level: 5, missing: [{unit: 'energy', have: D(8000), need: D(36000)}]}
-    early = {type: 'buyMoths', count: D(800), moths: D(0), target: D(1000), early: true, then: save}
-    expect(show early, {nexusLarvae: D(3333333000)}).toBe 'Energy: buy ' + bignum(D 800) + ' lepidoptera (0/' + bignum(D 1000) + ': the first ' + bignum(D 1000) + ', before nexus 5); then save for nexus 5: ' + bignum(D 8000) + '/' + bignum(D 36000) + ' energy (the climb above leaves ' + bignum(D 3333333000) + ' larvae for it)'
+    early = {type: 'buyMoths', count: D(800), moths: D(0), target: D(1000), early: true, then: save, larvae: {keep: D(0), energyWait: 43333, larvaWait: 2333, binds: 'energy', level: 5}}
+    expect(show early).toBe 'Energy: buy ' + bignum(D 800) + ' lepidoptera (0/' + bignum(D 1000) + ': the first ' + bignum(D 1000) + ', before nexus 5); then save for nexus 5: ' + bignum(D 8000) + '/' + bignum(D 36000) + ' energy; keeping no larvae for nexus 5 yet: its energy is 12.0 h away, its larvae 39 min'
+    # the three ways the larvae for the next nexus are kept (ASCENSION.md A.11.9)
+    early.larvae = {keep: D(133333000), energyWait: 16000, larvaWait: 11667, binds: 'energy', level: 5}
+    expect(show early).toContain 'energy; keeping ' + bignum(D 133333000) + ' larvae for nexus 5, the rest come in before its energy (4.4 h)'
+    early.larvae = {keep: D(1e9), energyWait: 10000, larvaWait: 11667, binds: 'larvae', level: 5}
+    expect(show early).toContain 'energy; keeping all ' + bignum(D 1e9) + ' larvae for nexus 5: larvae are what it waits for (3.2 h; energy 2.8 h)'
+    expect(show {type: 'buyNexus', level: 5, larvae: {keep: D(3333333000), energyWait: 0, larvaWait: 0, binds: 'ready', level: 5}}).toBe 'Energy: buy nexus 5; keeping its ' + bignum(D 3333333000) + ' larvae'
     expect(show {type: 'mothTarget', moths: D(0), target: D(1000), early: true, then: null}).toBe 'Energy: all energy into lepidoptera (0/' + bignum(D 1000) + ': the first ' + bignum(D 1000) + ', before nexus 5)'
     # just in time: keep part of the price, lepidoptera with the rest
     keep = {type: 'buyMoths', count: D(200), moths: D(1000), target: D(4000), keep: D(30000), wait: 10000, then: null}
     expect(show keep).toBe 'Energy: buy ' + bignum(D 200) + ' lepidoptera (' + bignum(D 1000) + '/' + bignum(D 4000) + '); keep ' + bignum(D 30000) + ' energy for nexus 5: income brings the rest before its larvae (2.8 h)'
     keep.keep = D 0
     expect(show keep).toBe 'Energy: buy ' + bignum(D 200) + ' lepidoptera (' + bignum(D 1000) + '/' + bignum(D 4000) + '); nothing to keep for nexus 5 yet: income brings it before its larvae (2.8 h)'
-    hold = {type: 'hold', level: 5, energy: D(1000), price: D(36000), ready: false, missing: [{unit: 'larva', have: D(1333333000), need: D(3333333000)}], mothsNext: false, keep: D(16001), wait: 33333.33}
-    expect(show hold).toBe 'Energy: saving for nexus 5: ' + bignum(D 1000) + '/' + bignum(D 36000) + ' energy; also needs ' + bignum(D 3333333000) + ' larvae (have ' + bignum(D 1333333000) + '); only ' + bignum(D 16001) + ' energy needed now: income brings the rest before its larvae (9.3 h)'
-    save.keep = D 25000
+    hold = {type: 'hold', level: 5, energy: D(20000), price: D(36000), ready: false, missing: [{unit: 'larva', have: D(1333333000), need: D(3333333000)}], mothsNext: false, keep: D(16001), wait: 33333.33, keepIdle: true}
+    expect(show hold).toBe 'Energy: saving for nexus 5: ' + bignum(D 20000) + '/' + bignum(D 36000) + ' energy; also needs ' + bignum(D 3333333000) + ' larvae (have ' + bignum(D 1333333000) + '); only ' + bignum(D 16001) + ' energy needed now: income brings the rest before its larvae (9.3 h)'
+    # energy behind what is needed now: no such note
+    hold.keepIdle = false
+    expect(show hold).toBe 'Energy: saving for nexus 5: ' + bignum(D 20000) + '/' + bignum(D 36000) + ' energy; also needs ' + bignum(D 3333333000) + ' larvae (have ' + bignum(D 1333333000) + ')'
+    save.keep = D 6000
     save.wait = 10000
-    expect(show save).toBe 'Energy: save for nexus 5: ' + bignum(D 8000) + '/' + bignum(D 36000) + ' energy; only ' + bignum(D 25000) + ' energy needed now: income brings the rest before the larvae (2.8 h)'
+    save.keepIdle = true
+    expect(show save).toBe 'Energy: save for nexus 5: ' + bignum(D 8000) + '/' + bignum(D 36000) + ' energy; only ' + bignum(D 6000) + ' energy needed now: income brings the rest before the larvae (2.8 h)'
     # the route's target for the run
     run = {type: 'buyMoths', count: D(600), moths: D(4000), target: D(30000), runStage: 'quickRun', setting: 4000, then: null}
     expect(show run).toBe 'Energy: buy ' + bignum(D 600) + ' lepidoptera (' + bignum(D 4000) + '/' + bignum(D 30000) + ': quick-run target, your setting is ' + bignum(D 4000) + ')'
-    # nothing kept: no note
-    expect(show run, {nexusLarvae: D(0)}).toBe 'Energy: buy ' + bignum(D 600) + ' lepidoptera (' + bignum(D 4000) + '/' + bignum(D 30000) + ': quick-run target, your setting is ' + bignum(D 4000) + ')'
+    # no larvae record: no note
+    expect(show run).toBe 'Energy: buy ' + bignum(D 600) + ' lepidoptera (' + bignum(D 4000) + '/' + bignum(D 30000) + ': quick-run target, your setting is ' + bignum(D 4000) + ')'
 
   it 'collapses to a one-line summary and remembers that with the save', ->
     spyOn(advisor, 'update').and.returnValue fakeAdvice()

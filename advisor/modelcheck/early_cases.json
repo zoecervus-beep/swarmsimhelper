@@ -19,11 +19,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 309.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -45,11 +52,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 3.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -71,11 +85,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 4.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -97,11 +118,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 4.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -123,11 +151,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 4.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -149,11 +184,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 3.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -175,11 +217,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 4.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -201,11 +250,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 4.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -227,11 +283,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 4.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -253,11 +316,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 4.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -279,11 +349,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 3.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -305,11 +382,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 4.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -331,11 +415,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 4.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -357,11 +448,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 4.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -383,11 +481,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 3.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -409,11 +514,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 4.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -435,11 +547,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 4.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -461,11 +580,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 4.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -487,11 +613,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 4.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -513,11 +646,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 3.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -539,11 +679,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 4.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -565,11 +712,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 4.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -591,11 +745,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 4.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -617,11 +778,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 4.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -643,11 +811,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 3.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -669,11 +844,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -695,11 +877,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -721,11 +910,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 4848,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -747,11 +943,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 7680,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -773,11 +976,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 11085,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -799,11 +1009,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 11085,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -825,11 +1042,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 13350,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -851,11 +1075,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 16053,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -877,11 +1108,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 16700,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -903,11 +1141,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 18986,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -929,11 +1174,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 21973,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -955,11 +1207,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 21973,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -970,9 +1229,9 @@
 "rate": 0.6701720220707563,
 "cap": 40000.0,
 "moths": 2081.0,
-"larvae": 386031077.51187086,
-"larva_rate": 180487.57650546098,
-"meat": 8.546686467746908e+34,
+"larvae": 274958793.80105126,
+"larva_rate": 175179.11837294744,
+"meat": 4.741246217819893e+33,
 "price": {
 "meat": 3.33333e+24,
 "energy": 36000,
@@ -980,12 +1239,19 @@
 },
 "early": 1000,
 "target": 10000,
-"sim_keep": 25057,
+"sim_keep": 24300,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 30189.726641363028,
+"T_l": 17458.554618866307
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -996,9 +1262,9 @@
 "rate": 0.6701720220707563,
 "cap": 40000.0,
 "moths": 2081.0,
-"larvae": 786713497.3539937,
-"larva_rate": 180487.57650546098,
-"meat": 3.0676662818453583e+35,
+"larvae": 638861339.989168,
+"larva_rate": 198993.78945838753,
+"meat": 8.658067077386608e+33,
 "price": {
 "meat": 3.33333e+24,
 "energy": 36000,
@@ -1006,12 +1272,19 @@
 },
 "early": 1000,
 "target": 10000,
-"sim_keep": 26545,
+"sim_keep": 26926,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 27969.726641363035,
+"T_l": 13540.481174535775
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1022,9 +1295,9 @@
 "rate": 0.6701720220707563,
 "cap": 40000.0,
 "moths": 2081.0,
-"larvae": 1212558008.7442303,
-"larva_rate": 204375.63810177203,
-"meat": 4.05235634478293e+35,
+"larvae": 1035183674.5867896,
+"larva_rate": 198993.78945838753,
+"meat": 1.4795607866123968e+34,
 "price": {
 "meat": 3.33333e+24,
 "energy": 36000,
@@ -1032,12 +1305,19 @@
 },
 "early": 1000,
 "target": 10000,
-"sim_keep": 29046,
+"sim_keep": 28261,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 25749.72664136309,
+"T_l": 11548.849497605986
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1048,9 +1328,9 @@
 "rate": 0.6701720220707563,
 "cap": 40000.0,
 "moths": 2081.0,
-"larvae": 1666271925.3301651,
-"larva_rate": 204375.63810177203,
-"meat": 1.090797657449966e+36,
+"larvae": 1430732646.1844072,
+"larva_rate": 198993.78945838753,
+"meat": 2.384111911618233e+34,
 "price": {
 "meat": 3.33333e+24,
 "energy": 36000,
@@ -1058,12 +1338,19 @@
 },
 "early": 1000,
 "target": 10000,
-"sim_keep": 30534,
+"sim_keep": 29593,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 23529.72664136314,
+"T_l": 9561.104188196054
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1074,9 +1361,9 @@
 "rate": 0.6701720220707563,
 "cap": 40000.0,
 "moths": 2081.0,
-"larvae": 2119985841.9161,
-"larva_rate": 204375.63810177203,
-"meat": 2.2197194267561662e+36,
+"larvae": 1868678225.4098725,
+"larva_rate": 225526.2947195059,
+"meat": 3.688945670245044e+34,
 "price": {
 "meat": 3.33333e+24,
 "energy": 36000,
@@ -1084,12 +1371,19 @@
 },
 "early": 1000,
 "target": 10000,
-"sim_keep": 32022,
+"sim_keep": 31648,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 21309.726641363195,
+"T_l": 6494.385838297766
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1100,9 +1394,9 @@
 "rate": 0.6701720220707563,
 "cap": 40000.0,
 "moths": 2081.0,
-"larvae": 2580006206.76346,
-"larva_rate": 210214.94204753693,
-"meat": 1.0043742997941183e+36,
+"larvae": 2310880503.6871743,
+"larva_rate": 225526.2947195059,
+"meat": 5.579309983659618e+34,
 "price": {
 "meat": 3.33333e+24,
 "energy": 36000,
@@ -1110,12 +1404,19 @@
 },
 "early": 1000,
 "target": 10000,
-"sim_keep": 33599,
+"sim_keep": 32962,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 19089.726641363246,
+"T_l": 4533.628761934309
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1126,9 +1427,9 @@
 "rate": 0.6701720220707563,
 "cap": 40000.0,
 "moths": 2081.0,
-"larvae": 3046683378.1089997,
-"larva_rate": 210214.94204753693,
-"meat": 3.7230059336768323e+36,
+"larvae": 2753239651.099138,
+"larva_rate": 248078.9241914565,
+"meat": 8.326949564871675e+34,
 "price": {
 "meat": 3.33333e+24,
 "energy": 36000,
@@ -1136,12 +1437,19 @@
 },
 "early": 1000,
 "target": 10000,
-"sim_keep": 35087,
+"sim_keep": 34433,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 16869.726641363297,
+"T_l": 2338.3419240127446
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1152,9 +1460,9 @@
 "rate": 0.6701720220707563,
 "cap": 40000.0,
 "moths": 2081.0,
-"larvae": 3498609834.945777,
-"larva_rate": 238792.54735006506,
-"meat": 3.093645828830894e+36,
+"larvae": 1096395759.8041759,
+"larva_rate": 248078.9241914565,
+"meat": 1.2636044032850848e+35,
 "price": {
 "meat": 3.33333e+24,
 "energy": 36000,
@@ -1162,12 +1470,19 @@
 },
 "early": 1000,
 "target": 10000,
-"sim_keep": 36000,
+"sim_keep": 29958,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 14649.72664136335,
+"T_l": 9017.038619812192
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1178,9 +1493,9 @@
 "rate": 0.6701720220707563,
 "cap": 40000.0,
 "moths": 2081.0,
-"larvae": 3972806521.062921,
-"larva_rate": 238792.54735006506,
-"meat": 2.4839695916740205e+35,
+"larvae": 17817905.136162356,
+"larva_rate": 296965.0651350671,
+"meat": 1.1938807056306272e+38,
 "price": {
 "meat": 3.33333e+24,
 "energy": 36000,
@@ -1188,12 +1503,19 @@
 },
 "early": 1000,
 "target": 10000,
-"sim_keep": 36000,
+"sim_keep": 28518,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 12429.726641363402,
+"T_l": 11164.663740348917
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1204,9 +1526,9 @@
 "rate": 0.6701720220707563,
 "cap": 40000.0,
 "moths": 2081.0,
-"larvae": 4493616321.691778,
-"larva_rate": 262671.80208507157,
-"meat": 3.968665795315573e+35,
+"larvae": 137512639.61460465,
+"larva_rate": 313017.2308180437,
+"meat": 3.618728183753585e+39,
 "price": {
 "meat": 3.33333e+24,
 "energy": 36000,
@@ -1214,12 +1536,19 @@
 },
 "early": 1000,
 "target": 10000,
-"sim_keep": 36000,
+"sim_keep": 29158,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 137512639.61460465,
+"T_e": 10209.726641363455,
+"T_l": 10209.726640394183
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1230,9 +1559,9 @@
 "rate": 0.6701720220707563,
 "cap": 40000.0,
 "moths": 2081.0,
-"larvae": 5047913862.070918,
-"larva_rate": 288938.9822935788,
-"meat": 1.208944087266421e+36,
+"larvae": 511779852.7026806,
+"larva_rate": 353147.6450254852,
+"meat": 7.653452149314526e+40,
 "price": {
 "meat": 3.33333e+24,
 "energy": 36000,
@@ -1240,12 +1569,19 @@
 },
 "early": 1000,
 "target": 10000,
-"sim_keep": 36000,
+"sim_keep": 30646,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 511779852.7026806,
+"T_e": 7989.726641363507,
+"T_l": 7989.726639954514
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1256,9 +1592,9 @@
 "rate": 0.6701720220707563,
 "cap": 40000.0,
 "moths": 2081.0,
-"larvae": 5571155750.018984,
-"larva_rate": 317832.8805229367,
-"meat": 7.663492346935211e+36,
+"larvae": 1244828490.074947,
+"larva_rate": 361976.33615112235,
+"meat": 5.259928883260932e+41,
 "price": {
 "meat": 3.33333e+24,
 "energy": 36000,
@@ -1266,12 +1602,19 @@
 },
 "early": 1000,
 "target": 10000,
-"sim_keep": 36000,
+"sim_keep": 32134,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 1244828490.0,
+"T_e": 5769.72664136356,
+"T_l": 5769.726640509224
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1282,9 +1625,9 @@
 "rate": 0.6701720220707563,
 "cap": 40000.0,
 "moths": 2081.0,
-"larvae": 3352402973.7798986,
-"larva_rate": 317832.8805229367,
-"meat": 2.130863743048838e+37,
+"larvae": 2017076517.2005928,
+"larva_rate": 370805.0272767595,
+"meat": 5.702050055774068e+41,
 "price": {
 "meat": 3.33333e+24,
 "energy": 36000,
@@ -1292,12 +1635,19 @@
 },
 "early": 1000,
 "target": 10000,
-"sim_keep": 36000,
+"sim_keep": 33622,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 2017076516.0,
+"T_e": 3549.7266413636116,
+"T_l": 3549.7266379211915
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1319,11 +1669,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 2319.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1345,11 +1702,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1371,11 +1735,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1397,11 +1768,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1423,11 +1801,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1449,11 +1834,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1475,11 +1867,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1501,11 +1900,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1527,11 +1933,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 903.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1553,11 +1966,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1579,11 +1999,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1605,11 +2032,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1631,11 +2065,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1657,11 +2098,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1683,11 +2131,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1709,11 +2164,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1735,11 +2197,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1761,11 +2230,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1787,11 +2263,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1813,11 +2296,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1839,11 +2329,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1865,11 +2362,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 867.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1891,11 +2395,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1917,11 +2428,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1943,11 +2461,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1969,11 +2494,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -1995,11 +2527,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2021,11 +2560,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2047,11 +2593,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2073,11 +2626,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2099,11 +2659,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2125,11 +2692,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2151,11 +2725,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2177,11 +2758,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 10193,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2203,11 +2791,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 10193,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2229,11 +2824,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 10193,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2255,11 +2857,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 10193,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2281,11 +2890,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 10193,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2307,11 +2923,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 12539,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2333,11 +2956,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 12539,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2359,11 +2989,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 12539,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2385,11 +3022,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 15318,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2411,11 +3055,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 15318,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2437,11 +3088,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 15318,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2463,11 +3121,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 17198,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2489,11 +3154,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 17198,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2515,11 +3187,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 17198,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2541,11 +3220,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 17198,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2567,11 +3253,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 17198,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2593,11 +3286,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 17198,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2619,11 +3319,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 2452.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2645,11 +3352,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2671,11 +3385,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2697,11 +3418,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2723,11 +3451,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2749,11 +3484,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2775,11 +3517,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2801,11 +3550,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2827,11 +3583,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2853,11 +3616,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2879,11 +3649,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2905,11 +3682,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2931,11 +3715,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2957,11 +3748,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -2983,11 +3781,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3009,11 +3814,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3035,11 +3847,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 713.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3061,11 +3880,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3087,11 +3913,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3113,11 +3946,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3139,11 +3979,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3165,11 +4012,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3191,11 +4045,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3217,11 +4078,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3243,11 +4111,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3269,11 +4144,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3295,11 +4177,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3321,11 +4210,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3347,11 +4243,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3373,11 +4276,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3399,11 +4309,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3425,11 +4342,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3451,11 +4375,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3477,11 +4408,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3503,11 +4441,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3529,11 +4474,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3555,11 +4507,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3581,11 +4540,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3607,11 +4573,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3633,11 +4606,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3659,11 +4639,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 7571,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3685,11 +4672,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 7571,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3711,11 +4705,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 10155,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3737,11 +4738,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 10155,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3763,11 +4771,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 10155,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3789,11 +4804,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 10155,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3815,11 +4837,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 10155,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3841,11 +4870,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 10155,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3867,11 +4903,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 10155,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3893,11 +4936,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 12505,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3919,11 +4969,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3945,11 +5002,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3971,11 +5035,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -3997,11 +5068,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4023,11 +5101,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4049,11 +5134,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4075,11 +5167,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4101,11 +5200,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4127,11 +5233,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4153,11 +5266,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4179,11 +5299,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 987.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4205,11 +5332,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4231,11 +5365,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4257,11 +5398,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4283,11 +5431,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4309,11 +5464,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4335,11 +5497,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4361,11 +5530,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4387,11 +5563,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4413,11 +5596,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4439,11 +5629,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4465,11 +5662,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4491,11 +5695,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4517,11 +5728,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 9.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4543,11 +5761,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 0,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 907.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4569,11 +5794,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 7712,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4595,11 +5827,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 8630,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4621,11 +5860,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 8630,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4647,11 +5893,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 11118,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4673,11 +5926,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 11118,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4699,11 +5959,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 17856,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4725,11 +5992,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 17856,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4751,11 +6025,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 17856,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4777,11 +6058,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 17856,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4803,11 +6091,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 17856,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4829,11 +6124,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 17856,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4855,11 +6157,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 18441,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4881,11 +6190,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 18441,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4907,11 +6223,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 20038,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": null,
+"T_l": null
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4933,11 +6256,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 21234.036912747368,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4959,11 +6289,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 20994.036912747368,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -4985,11 +6322,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 20754.036912747368,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -5011,11 +6355,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 20514.036912747368,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -5037,11 +6388,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 20274.036912747368,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -5063,11 +6421,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 20034.036912747368,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -5089,11 +6454,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 19794.036912747368,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -5115,11 +6487,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 19554.036912747368,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -5141,11 +6520,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 15022.497379895793,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -5167,11 +6553,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 14782.497379895793,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "first",
@@ -5193,11 +6586,18 @@
 "early": 1000,
 "target": 10000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 14542.497379895793,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "first"
 },
 {
 "run": "late",
@@ -5219,11 +6619,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 31679.345777082406,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5245,11 +6652,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 31616.89844319752,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5271,11 +6685,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 31554.565356204635,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5297,11 +6718,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 31492.34436443807,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5323,11 +6751,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 31430.233364114127,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5349,11 +6784,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 31368.230298048147,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5375,11 +6817,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 31306.3331544121,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5401,11 +6850,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 31244.539965531225,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5427,11 +6883,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 31182.84880671835,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5453,11 +6916,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 31121.25779514444,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5479,11 +6949,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 31059.765088744163,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5505,11 +6982,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 30998.368885155185,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5531,11 +7015,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 30937.067420689986,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5557,11 +7048,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 30875.858969339035,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5583,11 +7081,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 30814.74184180429,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5609,11 +7114,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 30753.714384561852,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5635,11 +7147,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 30692.77497895285,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5661,11 +7180,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 30631.922040301528,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5687,11 +7213,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 30571.154017059613,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5713,11 +7246,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 30510.469389976028,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 8.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5739,11 +7279,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 30449.78104597558,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5765,11 +7312,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 30389.259513804987,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5791,11 +7345,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 30328.816906657103,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5817,11 +7378,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 30268.45182929254,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5843,11 +7411,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 30208.16291489649,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 7.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5869,11 +7444,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 29967.732803320265,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5895,11 +7477,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 28767.73280332026,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5921,11 +7510,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 27567.73280332026,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5947,11 +7543,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 26367.732803320258,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5973,11 +7576,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 25167.73280332026,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -5999,11 +7609,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 23967.732803320265,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6025,11 +7642,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 22767.732803320272,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6051,11 +7675,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 21567.732803320276,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6077,11 +7708,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 20367.73280332028,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6103,11 +7741,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 19167.732803320283,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6129,11 +7774,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 17967.732803320287,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6155,11 +7807,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 16767.73280332029,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6181,11 +7840,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 15567.732803320296,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6207,11 +7873,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 14367.732803320301,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6233,11 +7906,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 13167.732803320305,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6259,11 +7939,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 11967.732803320308,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6285,11 +7972,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 10767.732803320314,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6311,11 +8005,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 9567.732803320318,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6337,11 +8038,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 8367.732803320321,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6363,11 +8071,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 7167.732803320326,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6389,11 +8104,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 5967.73280332033,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6415,11 +8137,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 4767.732803320335,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6441,11 +8170,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 3567.732803320339,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6467,11 +8203,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 2367.732803320343,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6493,11 +8236,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 1167.7328033203473,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6519,11 +8269,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 3333333000.0,
+"T_e": 0.0,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": true,
 "moths": null,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6545,11 +8302,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 28499.365490206357,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6571,11 +8335,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 28379.365490206357,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6597,11 +8368,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 28259.365490206357,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6623,11 +8401,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 28139.365490206357,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6649,11 +8434,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 28019.365490206357,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6675,11 +8467,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 27899.365490206357,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6701,11 +8500,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 27779.365490206357,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6727,11 +8533,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 27659.36549020636,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6753,11 +8566,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 27539.36549020636,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6779,11 +8599,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 27419.36549020636,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6805,11 +8632,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 27299.36549020636,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6831,11 +8665,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 27179.36549020636,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6857,11 +8698,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 27059.365490206357,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6883,11 +8731,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 18484.861990487978,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6909,11 +8764,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 18364.861990487978,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6935,11 +8797,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 18244.861990487978,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6961,11 +8830,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 18124.861990487978,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -6987,11 +8863,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 18004.861990487978,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -7013,11 +8896,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 17884.861990487978,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -7039,11 +8929,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 17764.861990487978,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -7065,11 +8962,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 17644.861990487978,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -7091,11 +8995,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 17524.861990487978,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -7117,11 +9028,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 17404.86199048798,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -7143,11 +9061,18 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 17284.86199048798,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
 },
 {
 "run": "late",
@@ -7169,10 +9094,1733 @@
 "early": 1000,
 "target": 30000,
 "sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 17164.86199048798,
+"T_l": 0.0
+},
 "sim": {
 "nexus5": false,
 "moths": 0.0,
 "rush": 0
-}
+},
+"start": "late"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 31.397777777777776,
+"energy": 36032.95316213748,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 3375348064.8247857,
+"larva_rate": 886940.3568890347,
+"meat": 3.067466757248132e+45,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 3333333000.0,
+"T_e": 0.0,
+"T_l": 0.0
+},
+"sim": {
+"nexus5": true,
+"moths": null,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 19.497777777777777,
+"energy": 6231.602783843272,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 861633069.261345,
+"larva_rate": 221456.29230740858,
+"meat": 2.813199204196663e+31,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 28236,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 42792.62921149443,
+"T_l": 11161.11854391399
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 19.964444444444446,
+"energy": 7400.283190835192,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 1197469916.3377914,
+"larva_rate": 221456.29230740858,
+"meat": 2.3278111562913486e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 29291,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 41112.629211494415,
+"T_l": 9644.62586006528
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 20.43111111111111,
+"energy": 8568.963597827104,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 1561505449.2603505,
+"larva_rate": 243601.92153814944,
+"meat": 3.684117311743027e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 30941,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 39432.629211494415,
+"T_l": 7273.454739404308
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 20.897777777777776,
+"energy": 9737.644004818998,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 1929902136.973672,
+"larva_rate": 267962.1136919644,
+"meat": 6.988010575720394e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 32357,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 37752.629211494444,
+"T_l": 5237.422722525769
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 21.364444444444445,
+"energy": 10906.324411810892,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 2332909646.9761744,
+"larva_rate": 267962.1136919644,
+"meat": 1.7131374405722164e+33,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 33403,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 36072.629211494466,
+"T_l": 3733.450745107427
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 21.83111111111111,
+"energy": 12075.004818802787,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 2754154874.000125,
+"larva_rate": 303427.09634936554,
+"meat": 4.070336231081516e+33,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 34673,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 34392.629211494495,
+"T_l": 1908.78841398202
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 22.297777777777778,
+"energy": 13243.685225794681,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 3205514895.8670607,
+"larva_rate": 303427.09634936554,
+"meat": 8.737640690300757e+33,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 35707,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 32712.629211494517,
+"T_l": 421.2481537435594
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 22.764444444444443,
+"energy": 14412.365632786576,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 3656001661.780668,
+"larva_rate": 333769.8059843021,
+"meat": 1.6925607562918946e+34,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 31032.629211494546,
+"T_l": 0.0
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 23.23111111111111,
+"energy": 15581.04603977847,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 4008737143.026988,
+"larva_rate": 343884.0425292809,
+"meat": 2.7749506603000286e+34,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 29352.62921149457,
+"T_l": 0.0
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 23.697777777777777,
+"energy": 16749.72644677038,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 22696347.731355693,
+"larva_rate": 378272.44678220904,
+"meat": 1.4028425383808734e+35,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 29912,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 27672.629211494575,
+"T_l": 8751.989949124549
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 24.164444444444445,
+"energy": 17918.406853762324,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 24698967.04358313,
+"larva_rate": 411649.42738063924,
+"meat": 3.4721740105066216e+38,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 30409,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 25992.629211494528,
+"T_l": 8037.504276416806
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 24.63111111111111,
+"energy": 19087.08726075427,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 28637450.37503845,
+"larva_rate": 477290.822557552,
+"meat": 5.341216978179252e+39,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 31184,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 24312.62921149448,
+"T_l": 6923.861497937097
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 25.09777777777778,
+"energy": 20255.767667746215,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 32308917.876070973,
+"larva_rate": 538481.9536546741,
+"meat": 8.412381497885031e+40,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 31736,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 22632.629211494434,
+"T_l": 6130.2408738489685
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 25.564444444444444,
+"energy": 21424.44807473816,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 36428305.26195214,
+"larva_rate": 607138.4027456451,
+"meat": 4.197840670373573e+41,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 32223,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 20952.629211494386,
+"T_l": 5430.23580756636
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 26.031111111111112,
+"energy": 22593.128481730106,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 36428304.87463594,
+"larva_rate": 607138.4027456451,
+"meat": 2.6209010962795755e+42,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 32223,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 19272.62921149434,
+"T_l": 5430.2358082042965
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 26.497777777777777,
+"energy": 23761.80888872205,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 41048480.52501726,
+"larva_rate": 684141.3221182637,
+"meat": 5.504472401894728e+42,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 32653,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 17592.62921149429,
+"T_l": 4812.2871883857115
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 26.964444444444446,
+"energy": 24930.489295713996,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 41048480.68370026,
+"larva_rate": 684141.3221182637,
+"meat": 2.3282051392418617e+43,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 32653,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 15912.629211494243,
+"T_l": 4812.287188153768
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 27.43111111111111,
+"energy": 26099.16970270594,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 42025824.50593102,
+"larva_rate": 700430.4012163174,
+"meat": 3.3556077387109776e+43,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 32732,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 14232.629211494195,
+"T_l": 4698.978185096792
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 27.897777777777776,
+"energy": 27267.850109697887,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 46228407.62232345,
+"larva_rate": 770473.4413379492,
+"meat": 1.093188697869017e+44,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 33033,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 12552.629211494148,
+"T_l": 4266.343803713111
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 28.364444444444445,
+"energy": 28436.530516689832,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 46228407.070078254,
+"larva_rate": 770473.4413379492,
+"meat": 2.383714946491478e+44,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 33033,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 10872.6292114941,
+"T_l": 4266.343804429871
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 28.83111111111111,
+"energy": 29605.210923681778,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 47303487.48632115,
+"larva_rate": 788391.4283458086,
+"meat": 1.4460513436704957e+44,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 33101,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 9192.629211494053,
+"T_l": 4168.017807357924
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 29.297777777777778,
+"energy": 30773.891330673723,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 47303487.10727966,
+"larva_rate": 788391.4283458086,
+"meat": 4.662051867421215e+44,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 33101,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 7512.629211494006,
+"T_l": 4168.017807838702
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 29.764444444444443,
+"energy": 31942.57173766567,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 52033835.298313014,
+"larva_rate": 867230.5711803895,
+"meat": 9.79783812160661e+44,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 33368,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 5832.629211493959,
+"T_l": 3783.652553017709
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 30.23111111111111,
+"energy": 33111.252144657614,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 52033835.88136729,
+"larva_rate": 867230.5711803895,
+"meat": 1.7902308368960683e+45,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 33368,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 4152.6292114939115,
+"T_l": 3783.652552345392
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 30.697777777777777,
+"energy": 34279.93255164956,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 1188993357.4644217,
+"larva_rate": 867230.5711803895,
+"meat": 3.030114610139415e+45,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 34280,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 1188993357.0,
+"T_e": 2472.629211493864,
+"T_l": 2472.6292104957884
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 38.54470757116489,
+"energy": 46500.0,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 19226469910.833138,
+"larva_rate": 562713.6415691345,
+"meat": 5.390678917423442e+44,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 3333333000.0,
+"T_e": 0.0,
+"T_l": 0.0
+},
+"sim": {
+"nexus5": true,
+"moths": null,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 19.497777777777777,
+"energy": 6231.602783843272,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 861633069.261345,
+"larva_rate": 221456.29230740858,
+"meat": 2.813199204196663e+31,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 28236,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 42792.62921149443,
+"T_l": 11161.11854391399
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 19.564444444444444,
+"energy": 6398.557127699259,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 912095469.4151231,
+"larva_rate": 221456.29230740858,
+"meat": 3.0576071670714536e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 28395,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 42552.62921149442,
+"T_l": 10933.25236035245
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 19.63111111111111,
+"energy": 6565.511471555245,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 959911517.5689012,
+"larva_rate": 221456.29230740858,
+"meat": 3.290609393436083e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 28545,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 42312.62921149443,
+"T_l": 10717.335947883106
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 19.697777777777777,
+"energy": 6732.465815411232,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 1007714100.7226793,
+"larva_rate": 221456.29230740858,
+"meat": 3.532166583438377e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 28695,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 42072.62921149443,
+"T_l": 10501.480337479306
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 19.764444444444443,
+"energy": 6899.420159267219,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 1055504192.8764573,
+"larva_rate": 221456.29230740858,
+"meat": 3.7834075878968725e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 28845,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 41832.62921149443,
+"T_l": 10285.681130981982
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 23.37341232192281,
+"energy": 15937.413118993261,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 3927356179.606885,
+"larva_rate": 221456.29230740858,
+"meat": 6.1778570299852e+35,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 28840.34485257232,
+"T_l": 0.0
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 23.440078988589477,
+"energy": 16104.36746284925,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 3698977340.2993,
+"larva_rate": 292560.56121839647,
+"meat": 3.0963286584355147e+34,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 28600.344852572314,
+"T_l": 0.0
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 23.506745655256143,
+"energy": 16271.321806705238,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 3761983961.9917154,
+"larva_rate": 292560.56121839647,
+"meat": 3.2051468767588172e+34,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 28360.344852572318,
+"T_l": 0.0
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 23.57341232192281,
+"energy": 16438.276150561225,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 3828407576.4187512,
+"larva_rate": 321816.6173402362,
+"meat": 3.605091766570611e+34,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 28120.344852572314,
+"T_l": 0.0
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 23.640078988589476,
+"energy": 16605.23049441721,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 3897553317.5804076,
+"larva_rate": 321816.6173402362,
+"meat": 4.0413210978767793e+34,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 27880.344852572318,
+"T_l": 0.0
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 23.706745655256142,
+"energy": 16772.184838273195,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 3966615505.742064,
+"larva_rate": 321816.6173402362,
+"meat": 4.5115106607353435e+34,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 27640.34485257232,
+"T_l": 0.0
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 23.77341232192281,
+"energy": 16939.13918212918,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 4035593576.9037204,
+"larva_rate": 321816.6173402362,
+"meat": 5.015912128191844e+34,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 27400.344852572325,
+"T_l": 0.0
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 23.840078988589475,
+"energy": 17106.093525985165,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 4104484109.0653768,
+"larva_rate": 321816.6173402362,
+"meat": 5.554812526514954e+34,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 27160.34485257233,
+"T_l": 0.0
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 23.90674565525614,
+"energy": 17273.04786984115,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 4173281226.227033,
+"larva_rate": 321816.6173402362,
+"meat": 6.128600878711121e+34,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 26920.344852572332,
+"T_l": 0.0
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 25.738619399141076,
+"energy": 21860.63705390095,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 6287039533.172228,
+"larva_rate": 321816.6173402362,
+"meat": 9.930616820745376e+36,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 20325.599374586578,
+"T_l": 0.0
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 25.805286065807742,
+"energy": 22027.591397756936,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 6126675898.295708,
+"larva_rate": 400523.7671811625,
+"meat": 6.193496580655493e+35,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 20085.59937458658,
+"T_l": 0.0
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 25.87195273247441,
+"energy": 22194.54574161292,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 6207267285.419188,
+"larva_rate": 400523.7671811625,
+"meat": 6.045520994044684e+35,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 19845.599374586585,
+"T_l": 0.0
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 25.938619399141075,
+"energy": 22361.500085468906,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 6277471798.542667,
+"larva_rate": 400523.7671811625,
+"meat": 6.549361182133281e+35,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 19605.59937458659,
+"T_l": 0.0
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 26.00528606580774,
+"energy": 22528.45442932489,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 6340742430.666147,
+"larva_rate": 400523.7671811625,
+"meat": 7.082405883114538e+35,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 19365.599374586593,
+"T_l": 0.0
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 26.071952732474408,
+"energy": 22695.408773180876,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 6393837020.789627,
+"larva_rate": 400523.7671811625,
+"meat": 7.639041859985013e+35,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 19125.599374586596,
+"T_l": 0.0
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 26.138619399141074,
+"energy": 22862.36311703686,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 6431223370.119281,
+"larva_rate": 440576.1438992788,
+"meat": 8.220070369317266e+35,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 18885.5993745866,
+"T_l": 0.0
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 28.553759260173955,
+"energy": 28910.634479324643,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 10162646954.143986,
+"larva_rate": 440576.1438992788,
+"meat": 5.462294189272026e+38,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 10191.095874868228,
+"T_l": 0.0
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 28.62042592684062,
+"energy": 29077.588823180628,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 1938431929.5772495,
+"larva_rate": 511557.85597194044,
+"meat": 1.859595485438317e+38,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 34104,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 9951.095874868231,
+"T_l": 2726.770890405918
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 28.687092593507288,
+"energy": 29244.543167036612,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 67525637.28217852,
+"larva_rate": 562713.6415691345,
+"meat": 2.644789387651762e+38,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 31963,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 9711.095874868235,
+"T_l": 5803.675478012358
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 28.753759260173954,
+"energy": 29411.497510892597,
+"rate": 0.6956430993999478,
+"cap": 46500.0,
+"moths": 2833.0,
+"larvae": 67525638.25877082,
+"larva_rate": 562713.6415691345,
+"meat": 3.587923743059415e+38,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 31963,
+"territory": 0.1,
+"sim_larvae": {
+"keep": 0.0,
+"T_e": 9471.095874868239,
+"T_l": 5803.675476276852
+},
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+},
+"start": "owner"
 }
 ]
