@@ -76,5 +76,6 @@ A number setting is saved when you leave its box or press Enter; the spare-energ
 - [HANDOFF.md](HANDOFF.md): what the rules are and the evidence behind them.
 - [MODEL-CHECK.md](MODEL-CHECK.md): how the simulator and the advisor were checked against the game's code.
 - [ASCENSION.md](ASCENSION.md): the plan for earning every achievement (ascensions, the long run to endless), ascension and mutagen mechanics, and the simulator checks. The "achievements route" setting follows its part A.
+- [NO-MIRRORS.md](NO-MIRRORS.md): whether every achievement can be earned without ever casting House of Mirrors (yes, with swarmwarp instead: about 7 to 8 months in the simulator), and how; analysis only, the advisor does not follow it.
 - [ACHIEVEMENTS.md](ACHIEVEMENTS.md): every achievement, how the game evaluates it, and which are earned in the example save (generated).
 - [BUILDING.md](BUILDING.md): building, testing and running the game.

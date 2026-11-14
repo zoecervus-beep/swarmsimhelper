@@ -1,0 +1,6 @@
+{
+ "units": {"nexus": "5", "energy": "100000", "bat": "2000", "moth": "30000", "mutantswarmwarp": "1e200", "mutantbat": "1e200",
+           "mutantrush": "1e200", "mutantclone": "1e200", "spider": "1e300"},
+ "upgrades": {"mutateswarmwarp": "1", "mutatebat": "1", "mutaterush": "1", "mutateclone": "1",
+              "goonempower": "60", "spiderempower": "40", "nexus5": "1"}
+}

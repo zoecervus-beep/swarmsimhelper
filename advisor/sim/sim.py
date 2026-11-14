@@ -658,6 +658,7 @@ def asc_cfg(s,p):
     """The ascension rule for the current run: p['ascend'] is a list, one entry per future ascension made in
     this simulation (None or a missing entry: never ascend). Entry: {'after': run age in seconds before
     which the policy does not start saving energy for the ascension}."""
+    if p.get('ascend_rule'): return p['ascend_rule'](s)   # option (default off): a function of the state gives the entry (advisor/NO-MIRRORS.md)
     A=p.get('ascend')
     if not A: return None
     k=len(s.asc_log)
@@ -712,6 +713,7 @@ def apply_plan(s,plan):
         if up in s.unlocked: continue
         c=unlock_cost(s)
         if s.mutagen<c: break
+        if plan.get('unlock_max_share') and s.unlocks>=plan.get('unlock_free',0) and c>plan['unlock_max_share']*s.mutagen: break   # option (default off)
         s.mutagen-=c; s.unlocks+=1; s.unlocked.append(up); s.mut[MUTATE[up]]+=1; out.append((up,c))
         for an,(pts,req,val) in _achievements().items():   # mutation1..4: 1, 3, 6, 10 unlocks
             if req=='mutatehidden' and an not in s.ach_have and s.unlocks>=float(val): s.ach_have.add(an); s.achpts+=pts; log_ach(s,an)
