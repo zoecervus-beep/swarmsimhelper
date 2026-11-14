@@ -170,6 +170,8 @@ Every meat-tier "_3" threshold up to universal cortex 1e56 falls by day 51.
 | 3 (long run) | 20; the advisor also needs the two new rules (A.7) | 30,000 | 0.1 throughout: mirrors need units to double | mirrors, all of it, never letting energy reach the cap (~15 h at full rate) |
 | 5 (quick runs) | any | 30,000 | 0.1 | nexus, lepidoptera, mirrors until the cost is ≤ ~108,000, then save |
 
+The early part of every run, up to nexus 5 and the ascension, is in A.11: save energy below nexus 5, 1,000 lepidoptera first at nexus 4, then only what nexus 5 needs just in time, and after nexus 5 lepidoptera to 10,000 (first run) or 30,000 (quick runs) before mirrors.
+
 - **Long run.** Cast mirrors at least twice a day. Climbing needs frequent visits: the simulator's push loses ~8 weeks to the first endless at 30-minute check-ins.
 - **Quick runs.** At least two visits a day are enough, because energy is banked up to the cap.
 - **For a person:** the energy-bound days (~170) are close to what the simulator says. The climbing part could add weeks.
@@ -516,6 +518,230 @@ The policy option `empower` follows the native advisor's `empowerAdvice` rule: e
 - **Raising lepidoptera at day 7 instead of day 3**, and nightbugs for players away longer than 15 hours.
 - **Quick-run behaviour with the mode left on.** LR-4's lepidoptera count as spent energy, so ascension timing should not move, but this was not simulated.
 - **A person's real check-in log.** The cadence profiles are guesses; the owner's actual pattern would replace them.
+
+### A.11 Early game: the fastest path to the first mirror cast
+
+Nov 14, 2026. The objective here is narrower than in A.1–A.10: **the real time from the start of a run to (a) nexus 5 and the first House of Mirrors cast, and (b) the ascension becoming affordable** under the save rule of A.5. Every one of the ~20 runs of the route starts from scratch, and the 18 quick runs are almost nothing but this stretch, so an hour saved here is paid back about twenty times. Meat, tiers and mutagen count only where they gate those two times.
+
+Three kinds of run are studied, as the route has them:
+- **first**: the very first run, no mutagen. It starts from the fresh run on this fork at 27 minutes (`advisor/sim/example_save_27min.json`; the 49-minute save of the same run is `example_save_49min.json`).
+- **second**: right after the first ascension, i.e. the start of the long run. Lepidoptera and frequency mutations at 10^6 each, ~7×10^7 mutagen unspent (made by playing `first` with today's defaults to its ascension).
+- **late**: a late quick run. All ten mutations unlocked (one mutant each, 10^6 lepidoptera mutation), 10^335 mutagen unspent, the 11th ascension's cost (made from `second` by editing the state).
+
+No crystals anywhere. Times are hours of run age. "Ideal" is a visit every minute; "human" and "busy" are `cadence.py`'s profiles (sessions with the panel open, away 1–4 h or 3–8 h, asleep 8 h), mean of 5 seeds. Every simulated policy uses the advisor's own purchase sizing (`advisor_sizing`), and the energy rules were checked state by state against the advisor's code (A.11.6). The simulator's runs are `advisor/sim/early_game.py`.
+
+#### A.11.1 The answer
+
+| Run | Cadence | Nexus 5: today → plan | First mirror: today → plan | Ascension affordable: today → plan | Saved |
+| --- | --- | --- | --- | --- | --- |
+| first | ideal | 29.5 → 24.6 | 31.8 → 46.0 | 120.2 → 113.3 | **6.9 h** |
+| first | human | 53.7 → 47.0 | 53.7 → 57.4 | 132.1 → 123.0 | **9.1 h** |
+| first | busy | 78.1 → 71.1 | 78.1 → 71.1 | 146.5 → 137.3 | **9.2 h** |
+| second (long run) | ideal | 11.6 → 9.8 | 16.9 → 13.3 | (89.7 → 86.4) | 1.8 h to nexus 5, 3.6 h to the first mirror |
+| second (long run) | human | 19.2 → 19.2 | 22.4 → 20.8 | (94.7 → 91.5) | 1.6 h to the first mirror |
+| second (long run) | busy | 41.0 → 35.2 | 44.7 → 41.0 | (115.4 → 107.1) | 3.7 h to the first mirror |
+| late quick run | ideal | 11.6 → 9.8 | 16.9 → 50.8 | 107.9 → 97.5 | **10.4 h** |
+| late quick run | human | 19.2 → 19.2 | 23.1 → 59.0 | 113.8 → 103.2 | **10.6 h** |
+| late quick run | busy | 43.1 → 35.2 | 48.4 → 76.8 | 135.3 → 122.2 | **13.1 h** |
+
+Other cadences (`early_game.py cadence`; twice a day one seed, glance+ three): first run twice-a-day 161.8 → 149.1, glance+ 140.4 → 128.0; late quick run twice-a-day 137.5 → 128.0, glance+ 123.9 → 111.9.
+
+- **About 10 h off every quick run, so about 8 days off the 18 quick runs, and 9 h off the first run.** The long run's start gains 1.6–3.7 h to the first mirror; it does not ascend early, so its "affordable" column (in brackets) is for comparison only.
+- **The first mirror comes later in the first run and in quick runs, on purpose.** Lepidoptera are bought first (A.11.3): they count as spent energy just as a cast does, and they raise the energy rate besides.
+- "Today" is today's defaults as the simulator plays them, with the next nexus's larvae held back from the climb. **The advisor itself does not hold them back** outside the long-run mode. Taken literally, at a visit a minute, the climb then eats nexus 5's 3.33×10^9 larvae every visit: nexus 5 slips to hour 93 and the ascension to 137 h. Under the human and busy cadences larvae pile up between visits and it makes no difference. The plan holds them (A.11.5).
+
+**The plan in a few lines:**
+1. **Below nexus 5, save energy for the next nexus** instead of casting larva rush (one larva rush only when energy is at the cap), and keep the next nexus's larvae out of the climb while saving for it.
+2. **At nexus 4, buy 1,000 lepidoptera first**, before saving for nexus 5.
+3. **Then keep for nexus 5 only what it will need by the time its larvae are there** ("just in time"): with its meat in hand, keep max(0, 36,000 − energy/s × larvae still missing ÷ larvae/s); put the rest into lepidoptera. Keep the whole 36,000 while its meat is missing.
+4. **After nexus 5, lepidoptera to the run's target before House of Mirrors:**
+   - **10,000** in the first run, because mirrors must still bring the mutagen the plan spends;
+   - **30,000** in a quick run;
+   - in the long run, 4,000, then **30,000 from day 3** (LR-4).
+5. Spend until the ascension cost reaches the save point, then save (A.5, unchanged). Lepidoptera purchases are cut at the save point just as casts are.
+
+#### A.11.2 What binds, step by step
+
+**Nexus prices** (game data): nexus 1 costs 3.33×10^12 meat and gives 2,000 energy. Nexus 2 to 5 cost 3.33×10^15/18/21/24 meat, 625 / 2,500 / 10,000 / 36,000 energy and 0 / 3.33×10^6 / 3.33×10^7 / 3.33×10^9 larvae, and give 4,000 / 6,000 / 8,000 / 10,000 energy. Lepidoptera need nexus 4. Energy comes at 0.1/s per nexus × (1 + M/(1,000 + M)) for M lepidoptera × the lepidoptera mutation (up to ×2). The cap is 10,000 per nexus.
+
+So **before nexus 5 the run must earn 29,125 + 10 M energy from income**: 36,000 + 625 + 2,500 + 10,000 for the prices, plus 10 per lepidoptera, less 20,000 given back by nexus 1–4. Only nexus 4 and later earn at a useful rate. Nexus 5 alone takes
+
+  time from nexus 4 = (D + 10 M) (1,000 + M) / ((1,000 + 2 M) × 0.4 × mutation),
+
+with D the energy still missing at nexus 4. That is lowest at **M = √(50 D − 250,000) − 500**: 0 for D ≤ 10,000, 306 at 18,000, 572 at 28,000 (the usual case), 745 at 36,000. **The mutation halves the time but does not move the best count.** (Solid: arithmetic.)
+
+What happens when each price is made free (the plan, ideal cadence):
+
+| Run | Free | Nexus 1 | 2 | 3 | 4 | 5 | Affordable |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| first | nothing | 0.8 | 1.2 | 2.5 | 5.4 | 24.6 | 113.3 |
+| first | meat | 0.5 | 0.5 | 3.5 | 8.2 | 28.8 | 114.9 |
+| first | larvae | 0.8 | 1.2 | 1.9 | 3.8 | 20.7 | 112.9 |
+| first | energy | 0.8 | 1.2 | 2.5 | 5.4 | 20.3 | 96.2 |
+| first | meat and larvae | 0.5 | 0.5 | 0.5 | 1.5 | 19.1 | 111.3 |
+| second / late | nothing | 0.4 | 0.4 | 0.4–0.5 | 0.9 | 9.8 | 86.4 / 97.5 |
+| second / late | meat and larvae | 0.0 | 0.0 | 0.0 | 0.5 | 9.3 | 86.0 / 97.1 |
+| second / late | energy | 0.4 | 0.4 | 0.4–0.5 | 0.5–0.6 | 0.5–0.9 | 75.6 / 86.6 |
+
+- **Nexus 1–4 are bound by meat, then larvae for nexus 3 and 4, in the first run.** After an ascension they are bound by meat for about 25 minutes; mutagen larvae make larvae free.
+- **Nexus 5 is bound by energy at a visit a minute in every kind of run.** Free meat and larvae together bring it at most 5.5 h sooner in the first run and 0.5 h sooner later. Their effect on the ascension is at most 2 h.
+- **Under a person's cadence the first run's nexus 5 is bound by larvae**, not energy. In the simulator the energy is ready at about hour 26 and the 3.33×10^9 larvae at about hour 43. Today's rule wastes little only by luck: its 4,000 lepidoptera soak the energy up. Saving all of it lets it sit at the 40,000 cap: with the early lepidoptera added, 32,000–80,000 energy is lost per run and the ascension comes 6–19 h later. The old "save" setting alone already costs 10 h under the busy cadence. The just-in-time keep (step 3) fixes that.
+- **The ascension is bound by energy alone.** A run needs C + b log2(C0 / C) energy in all: spend it until the cost is C = min(cap, b / ln 2), then hold C (b = 50,000 × the mutation's factor; C0 = 5×10^6 × 1.12^ascensions). That is 382,193 in the first run (cap 50,000), of which 30,000 comes from the nexus purchases. At 0.90 energy/s (5 nexus, 4,000 lepidoptera) the rest takes 109 h. **Every lepidoptera counts as 10 energy spent**, exactly like part of a cast. So in a run that ends in an ascension, lepidoptera cost nothing toward it and raise the rate: 30,000 make it 0.98 instead of 0.90 (×em).
+
+**How much faster meat or larva growth is worth.** Little: the meat-side settings move nexus 5 by ≤ 2 h and the ascension by ≤ 1 h (A.11.4). A better energy plan is worth 7–13 h.
+
+#### A.11.3 The energy plan
+
+The pure energy model, from the moment nexus 4 is bought with 8,000 energy left: hours to nexus 5 / to an affordable ascension, by lepidoptera bought before nexus 5 (columns) and after it (rows).
+
+| Run | After nexus 5 | 0 before | 300 | 600 | 1,000 | 1,500 | 2,000 | 4,000 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| first | 4,000 | 19.4 / 123.9 | 17.5 / 120.9 | 17.2 / 119.5 | 17.6 / 118.6 | 18.8 / 118.2 | 20.3 / 118.1 | 27.2 / 118.7 |
+| first | 10,000 | 19.4 / 118.9 | 17.5 / 115.9 | 17.2 / 114.5 | 17.6 / 113.6 | 18.8 / 113.1 | 20.3 / 113.0 | 27.2 / 113.7 |
+| first | 30,000 | 19.4 / 117.2 | 17.5 / 114.2 | 17.2 / 112.8 | 17.6 / 111.9 | 18.8 / 111.5 | 20.3 / 111.4 | 27.2 / 112.0 |
+| 11th ascension | 4,000 | 9.7 / 108.3 | 8.8 / 106.8 | 8.6 / 106.1 | 8.8 / 105.6 | 9.4 / 105.4 | 10.2 / 105.4 | 13.6 / 105.7 |
+| 11th ascension | 30,000 | 9.7 / 101.1 | 8.8 / 99.5 | 8.6 / 98.8 | 8.8 / 98.4 | 9.4 / 98.2 | 10.2 / 98.1 | 13.6 / 98.4 |
+| 11th ascension | all energy | 9.7 / 100.8 | 8.8 / 99.2 | 8.6 / 98.6 | 8.8 / 98.1 | 9.4 / 97.9 | 10.2 / 97.8 | 13.6 / 98.2 |
+
+- **Before nexus 5: 1,000.** Nexus 5 wants about 600, the ascension about 2,000, and both are flat around 1,000 (within 0.4 h of nexus 5's best and 0.5 h of the ascension's). Today's 4,000 before nexus 5 costs 10 h on nexus 5 in a first run and 5 h after an ascension. The optimum barely differs with the mutation, as the formula says.
+  - **Buy them first, before saving for nexus 5.** After an ascension, nexus 5's meat and larvae are in hand at once. Today's rule then saves the 36,000 first and buys no lepidoptera at all: 0.9 h later to nexus 5, 2.7 h later to the ascension (late quick run, a visit a minute).
+- **After nexus 5: lepidoptera are the better sink for any run that will ascend soon.** 30,000 instead of 4,000 is worth 7 h on the ascension; going further ("all energy") adds only 0.1–0.3 h.
+  - The first run is the exception: mirrors bring the mutagen. See A.11.4 for why 10,000.
+- **Larva rush.** Today's default casts it with spare energy below nexus 5, so each nexus waits for its energy again: nexus 4 comes at 7.5 h instead of 5.4 h. Cast into the surplus at nexus 4 instead of buying lepidoptera, it was worse (first run, human: affordable at 127.9 h against 123.0). Nexus 5 was the same. A rush aimed at nexus 5's larva price never pays: free larvae gain only 0.9 h on nexus 5.
+- **Swarmwarp** makes no energy (the game takes the skipped time's energy back), so it cannot help either target.
+- **Bats** raise spell power, which mirrors ignore. They never pay here.
+- **Nightbugs** raise the cap. In the first run, about 100 of them (1,000 energy, counted as spent) lift the cap from 50,000 to the ideal hold of 72,135. That saves 4,320 energy, about 1.3 h, once. With the mutation the cap (99,900) is already near 115,416, so the gain is about 10 minutes. Arithmetic only, not built.
+- **When to start saving for the next nexus.** The advisor's rule (meat in hand, larva price under 20,000 s of income) stays. Starting from 10,000 s or 40,000 s was up to 2 h worse under the human cadence and the same at a visit a minute.
+
+#### A.11.4 The meat side, mutagen and the first run's lepidoptera
+
+The plan's first run with the meat-side settings varied, ideal / human (hours):
+
+| Setting | Nexus 4 | Nexus 5 | Affordable |
+| --- | --- | --- | --- |
+| plan (age multiple 3, share 0.5, bank 3, territory 0.1) | 5.4 / 13.9 | 24.6 / 47.0 | 113.3 / 123.0 |
+| age multiple 5 or 10 | 5.5 / 13.9 | 24.5 / 45.1 | 113.3 / 122.7 |
+| share 0.3 / 0.8 | 5.5–5.6 / 13.9 | 24.2–24.3 / 45.1 | 113.3–113.4 / 122.6–122.8 |
+| bank 10 / off | 5.8–5.9 / 13.9 | 24.4–24.7 / 47.0 | 113.4–113.5 / 123.1–124.0 |
+| territory 0.05 / 0.2 | 5.5–5.7 / 13.9–14.0 | 24.2–25.0 / 44.2–46.9 | 113.3–113.4 / 122.6–122.8 |
+
+None moves the ascension by more than 1 h, so none is changed. Age multiple 5 (MODEL-CHECK's recommendation for meat) brings nexus 5 1.9 h sooner under the human cadence, which is within the noise of 5 seeds.
+
+**The first run's lepidoptera after nexus 5** trade the ascension's hour against the mutagen it brings (premutagen at the ascension, lowest of the runs):
+
+| After nexus 5 | Affordable, ideal / human / busy | Premutagen, ideal / human / busy |
+| --- | --- | --- |
+| 4,000 | 118.1 / 130.1 / 156.3 | 1.0×10^8 / 4.1×10^7 / 4.2×10^7 |
+| 8,000 | 114.0 / 125.2 / 141.9 | 2.5×10^7 / 2.1×10^7 / 9.4×10^6 |
+| **10,000** | **113.3 / 123.0 / 137.3** | **1.2×10^7 / 9.5×10^6 / 6.5×10^6** |
+| 15,000 | 112.4 / 122.4 / 134.3 | 3.5×10^6 / 1.9×10^6 / 1.8×10^6 |
+| 30,000 (no mirrors at all) | 111.7 / 122.0 / 133.9 | 1.8×10^5 / 1.5×10^5 / 1.0×10^5 |
+| 10,000, then 30,000 from day 3 (long-run mode left on) | 112.4 / 122.4 / – | 1.3×10^6 / 2.1×10^5 / – |
+
+- The plan needs 1 (unlock) + 10^6 (lepidoptera mutation) + 15,625 (second unlock) mutagen. Unspent mutagen helps the long run start.
+- With 9×10^6 left, the long run reaches nexus 5 and its first mirror exactly as with 7×10^7 (9.8 / 13.4 h ideal, 19.2 / 20.8 h human).
+- With 10^5 and a mutation of only 1.6×10^5, nexus 5 slips 1.4 h (ideal) to 6 h (human). The weaker mutation also costs about 0.5 % of the long run's energy, i.e. about half a day.
+- **So 10,000 is the most that keeps the mutagen safe in every run, and 30,000 is only for quick runs.** The long-run mode's day-3 raise must not apply in the first run: in the first run it leaves 2×10^5.
+
+#### A.11.5 Each change's contribution, and a person's cadence
+
+Ascension affordable (hours), first run and late quick run. The changes are added one at a time to today's defaults, and each is also left out of the full plan:
+
+| Change | First: ideal / human / busy | Late: ideal / human / busy |
+| --- | --- | --- |
+| today | 120.2 / 132.1 / 146.5 | 107.9 / 113.8 / 135.3 |
+| + save below nexus 5 (the old "save" setting, larvae held) | 118.5 / 130.1 / 156.3 | 107.2 / 113.2 / 130.0 |
+| + 1,000 lepidoptera first at nexus 4 | 118.6 / 138.6 / 165.4 | 104.6 / 109.9 / 128.3 |
+| + just-in-time keep for nexus 5 | 118.1 / 130.1 / 156.3 | 104.6 / 109.9 / 128.3 |
+| + the run's target after nexus 5 (= the plan) | **113.3 / 123.0 / 137.3** | **97.5 / 103.2 / 122.2** |
+| plan without saving below nexus 5 | 118.2 / 130.2 / 150.7 | 98.2 / 103.9 / 125.5 |
+| plan without the early lepidoptera | 113.6 / 126.1 / 138.1 | 100.2 / 106.2 / 124.7 |
+| plan without the just-in-time keep | 113.8 / 133.8 / 161.0 | 97.5 / 103.2 / 122.2 |
+| plan with 4,000 after nexus 5 | 118.1 / 130.1 / 156.3 | 104.6 / 109.9 / 128.3 |
+| plan, all energy into lepidoptera after nexus 5 | 111.7 / 122.1 / 133.9 (premutagen ~1.5×10^5) | 97.2 / 103.1 / 122.0 |
+
+- **The run's target after nexus 5 is the biggest single gain: 5–7 h in a quick run, 5–14 h in the first.** The early lepidoptera are worth about 3 h in a quick run.
+- **The parts interact under a person's cadence.** Saving everything for nexus 5 (the old "save") is worse than today's larva rush in the first run under the busy cadence (156 h against 147 h). Adding the early lepidoptera alone makes it worse still (165 h). Energy then sits at the cap while the larvae come. The just-in-time keep repairs it: without it the plan loses 11 h (human) to 24 h (busy).
+- **Nexus 5 in a person's quick run is set by the night.** At a visit a minute it comes at 9.8 h. Under the human cadence it comes at 19.2 h with any rule: the energy is there at night and is used at the first visit after 7:00. A 45-minute stay at the start of the run (visits every 2 minutes, then the human profile, 5 seeds) brought, under the plan, nexus 4 at 3.4 h instead of 5.0 h, nexus 5 at 17.3 h instead of 19.2 h and the ascension 1.2 h sooner in the late quick run; in the first run nexus 4 at 9.5 h instead of 13.9 h and the ascension 3.3 h sooner. **Stay about an hour at the start of a run, until nexus 4 is bought.** A run that starts in the evening could also be timed so that nexus 5 falls in waking hours.
+- **Larvae held for the nexus.** The plan keeps the next nexus's larvae out of the climb while it saves for it. The simulator always did this; the advisor did only in the long-run mode. With a visit a minute and nothing held, the first run's nexus 5 slipped from 29.5 h to 93 h in the simulator. Under the human and busy cadences it made no difference.
+- **Which gains survive a person's cadence?** All of them, and they grow: 9 h in the first run and 10.6–13.1 h in a quick run under the human and busy cadences, against 6.9 and 10.4 h at a visit a minute. The just-in-time keep is what makes saving safe when visits are hours apart.
+
+#### A.11.6 What the advisor does now (and the console script's equivalent)
+
+Implemented in `advisor.coffee` (`energyAdvice`, `nexus5Plan`, the climb's larvae) and `advisorascension.coffee` (`runMoths`, `coupleEnergy`); see README.md for the panel's wording.
+
+| Setting | Old default | New default | Console-script value |
+| --- | --- | --- | --- |
+| Spare energy before House of Mirrors (`spareEnergy`) | `larvarush` | **`save`**: the plan of A.11.1, steps 1–3 | `larvarush` |
+| Ascension advice (`ascension`) | `off` | **`achievements`**: needed for step 4, which comes from the route's stage | `off` (the script had none; the meat and energy rules do not read it) |
+| Lepidoptera target (`moths`) | 4,000 | 4,000, now "after nexus 5"; the route raises it per run (never lowers it) | 4,000 |
+| everything else | unchanged | unchanged | – |
+
+No new setting. What now comes from the game state:
+- **The first 1,000 lepidoptera at nexus 4** (or the target, if lower), and the just-in-time keep. Both are under `spareEnergy: 'save'`; the keep uses the game's energy rate and larva rate.
+- **The larvae held for the next nexus** while the energy line says to buy it or save for it, also under `save`. The panel says "(the climb above leaves N larvae for it)".
+- **The lepidoptera target after nexus 5, by the route's stage** (`advisorAscension.runMoths`):
+  - first run and "needs the mutation": 10,000;
+  - quick run: 30,000;
+  - long run: 30,000 from a run age of 3 days, else the setting.
+
+  A higher setting stays. The route's target replaces the long-run mode's LR-4 raise, so a first run stays at 10,000 with the mode on. The energy line names the target ("first-run target, your setting is 4,000").
+- **The ascension coupling** now cuts a lepidoptera purchase at the save point as it cuts casts (both are spent energy).
+
+**Checks.**
+- `script_vs_port.js` passes `spareEnergy: 'larvarush'` explicitly, which is the console script's plan. The ascension route does not reach `advise()` unless `update()` passes the stage's target, which the check never does. Result: 0 differences in 6,000 comparisons (seed 1) and 4,000 (seed 2).
+- `longrun_check.js` passes `larvarush` too, since its reference cases come from a simulator policy that rushes. All 30 cases pass. The output is identical with `save`.
+- **New: `early_check.js`** compares the advisor's `energyAdvice` with the simulator's decisions on 276 states at nexus 4, taken from the plan's runs (`early_cases.py`: first run at a visit a minute and human seeds 1–3, late quick run). It checks nexus 5 bought, lepidoptera bought and how many, nothing spent, and the energy kept. Result: 0 differences.
+
+#### A.11.7 Grades
+
+| Finding | Grade |
+| --- | --- |
+| Nexus 5 needs 29,125 + 10 M energy from income; the best count before it is √(50 D − 250,000) − 500, the same with or without the mutation | **solid** (arithmetic from the game data) |
+| Lepidoptera count as spent energy, so a run that will ascend soon should prefer them to mirrors after nexus 5; 30,000 instead of 4,000 ≈ 7 h per run | **solid** (cost formula), **likely** (hours) |
+| Nexus 5 is energy-bound at a visit a minute in every kind of run; faster meat or larvae gain ≤ 5.5 h on nexus 5 and ≤ 2 h on the ascension | **likely** |
+| Under a person's cadence the first run's nexus 5 is larva-bound, and holding the full price wastes energy at the cap; the just-in-time keep fixes it | **likely** (simulator, 5 seeds × 2 profiles) |
+| 1,000 lepidoptera first at nexus 4 | **likely** (flat optimum 600–2,000) |
+| 10,000 after nexus 5 in the first run keeps ≥ 6.5×10^6 mutagen in every run tried; 30,000 leaves ~1.5×10^5 | **likely** |
+| The plan saves ~7–9 h in the first run and ~10–13 h per quick run (≈ 8 days over 18 quick runs) | **likely** for "about 10 h"; exact hours **guess** (one start per kind of run, simulated person) |
+| Holding the nexus's larvae matters only with frequent visits (the climb eats them otherwise) | **likely** |
+| Staying ~45 min at the start of a run saves ~1 h (quick run) to ~3 h (first run) | **likely** (5 seeds, one profile) |
+| Nightbugs to the ideal hold save ~1.3 h in the first run | **likely** (arithmetic; not simulated, not built) |
+| The meat-side settings (age multiple, share, bank, territory, when to hold larvae) do not move either target by more than ~2 h | **likely** |
+
+#### A.11.8 Not verified, simulator-only
+
+- **The starts.**
+  - Every number comes from one start per kind of run.
+  - The fresh run at 27 minutes is real; the other two are the simulator's own states. The late quick run is an edited state, not the end of a simulated long run.
+- **The just-in-time keep projects larvae linearly** at today's larva rate. Larvae usually grow faster, so the keep is a little low and nexus 5 can come up to ~3 h later than it would with the whole price held at a visit a minute (24.6 h against 21.6 h); the ascension still comes 0.5 h sooner. Counting only half the waiting time gave nexus 5 back but cost 2–3 h on the ascension under the human cadence.
+- **Mutagen.** The first run's mutagen is the mean of the game's roll, and a real roll could differ by tens of percent.
+- **The quick run's mutants.** Its mutants were not tuned (one each, apart from the lepidoptera mutation). Meat, rush or hatchery mutants change nothing here, since energy binds.
+- **The browser check** used states advanced partly by hand (A.11 commands below). The advisor's own lines were compared with the simulator on states, not over whole runs in the game.
+- **A real person** follows the lines exactly in the simulator. The cadence profiles are guesses, as in A.10.
+
+**Commands** (from the repo root):
+
+```sh
+python3 -I advisor/sim/early_game.py --jobs 4      # every A.11 table, about 6 minutes; also advisor/modelcheck/out/early_game.json
+python3 -I advisor/sim/early_game.py energy        # just the energy model (A.11.3), 1 s
+python3 -I advisor/modelcheck/early_cases.py       # the 276 reference states for early_check.js, about 20 s
+node advisor/modelcheck/early_check.js             # the advisor's energy rules against them
+node advisor/modelcheck/script_vs_port.js 1 300 20 # console script vs port (spareEnergy 'larvarush')
+node advisor/modelcheck/longrun_check.js           # the long-run mode's 30 reference cases
+```
+
+New `sim.py` policy options, all off by default (the earlier results and `run_example.py` output are unchanged):
+
+| Option | What it does |
+| --- | --- |
+| `spare_pre5='save'` | below nexus 5, no larva rush except one at the energy cap (the advisor's `save`) |
+| `moth_first` | at nexus 4, the lepidoptera target `moth_N` is bought before energy is held for nexus 5 |
+| `pre5_excess='moths'` / `'larvarush'` | at nexus 4, energy above what nexus 5 needs goes to lepidoptera (up to `moth_N5`) or larva rush |
+| `jit5` (with `pre5_excess`) | what nexus 5 needs is kept just in time (`jit_hold`); `jit_f` scales the waiting time |
+| `no_nexres` | the climb is not told to keep the next nexus's larvae (the advisor before this change) |
+
+`bignum.Big.of` now accepts a Python integer past float range (`math.ceil` of a huge number), which the late quick run reached.
 
 ## Part B. Mechanics and model check
 
