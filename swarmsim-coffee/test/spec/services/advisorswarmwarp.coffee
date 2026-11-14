@@ -345,6 +345,24 @@ describe 'Service: advisor, the game clock and the swarmwarp route', ->
       expect(r.plan.type).toBe 'spendForAscension'
       expect(r.test.need.toNumber()).toBe 1000
 
+    it 'final counts the share mutants with the mutagen held, so following the mutagen line keeps the stage (12.6 departure)', ->
+      for held in ['1.5e270', '2.5e270']
+        s = amk mutagen: D(held), premutagen: D('1e300'), unlocked: ALL, mutants: {mutantnexus: 1e6, mutantfreq: 1e6}
+        r = asc.advise s, WARP
+        expect([held, r.stage]).toEqual [held, 'final']
+        # follow the line
+        for st in r.mutagen.steps
+          u = _.find s.unlocks, unit: st.unit
+          u.have = u.have.plus st.count
+          s.mutagen = s.mutagen.minus st.count
+        expect(s.mutagen.lessThan D('1e270')).toBe held == '1.5e270' # unspent alone would fall below
+        expect([held, asc.advise(s, WARP).stage]).toEqual [held, 'final']
+      # held under 1e270 but share mutants that bring it over: final (warp_route.py says build here)
+      s = amk mutagen: D('0.9e270'), unlocked: ALL, mutants: {mutantarmy: 2e269}
+      s.unlocks = (_.extend({}, u, (if u.unit == 'mutantarmy' then {have: D('2e269')} else {})) for u in s.unlocks)
+      expect(asc.warpWealth(s).toExponential(1)).toBe '1.1e+270'
+      expect(asc.advise(s, WARP).stage).toBe 'final'
+
     it 'final from 1e270 mutagen held while 5,000 expansions are missing, never ascending', ->
       r = asc.advise amk(mutagen: D('1e270').times(1.000001), premutagen: D('1e300'), unlocked: ALL), WARP
       expect(r.stage).toBe 'final'
@@ -459,10 +477,26 @@ describe 'Service: advisor, the game clock and the swarmwarp route', ->
         expect(asc.advise(near(ascensions: 0, mutagen: 0), WARP).stage).toBe 'build'
         expect(asc.advise(near(earned: ['expansion9']), WARP).stage).toBe 'build'
 
-      it 'keeps the swarmwarp route\'s mutagen line', ->
+      it 'shows the swarmwarp route\'s mutagen line without a respec or shares: nothing at the mirrors run\'s expense', ->
+        # (before the review fix this advised the respec, dropping the frequency mutation for the rest of the run)
         r = asc.advise near(unlocked: ['mutatenexus', 'mutatefreq'], mutants: {mutantnexus: 1e6, mutantfreq: 1}), WARP
         expect(r.mutagen.route).toBe 'swarmwarp'
-        expect(r.mutagen.respec).toBe true
+        expect(r.mutagen.respec).toBe false
+        # frequency to 1e6 (both routes use it); no warp, bat, territory or meta-mutation shares
+        expect(([st.type, st.unit] for st in r.mutagen.steps)).toEqual [['mutants', 'mutantfreq']]
+        r = asc.advise near(mutagen: 1e20, unlocked: ['mutatenexus', 'mutateswarmwarp', 'mutatebat', 'mutatefreq'], mutants: {mutantnexus: 1e6, mutantfreq: 1e6, mutantswarmwarp: 1, mutantbat: 1}), WARP
+        expect(_.some r.mutagen.steps, kind: 'share').toBe false
+
+    it 'advises no free respec while the route wants this run ended (the ascension pays for the warp unlock)', ->
+      o = {ascensions: 1, mutagen: 64300788, unlocked: ['mutatenexus', 'mutatefreq'], mutants: {mutantnexus: 1e6, mutantfreq: 1}}
+      # premutagen far below 1,000 x held: the G3 respec
+      expect(asc.advise(amk(_.extend {premutagen: 1e6}, o), WARP).mutagen.respec).toBe true
+      # the test passes (spend, save or ascend now): none
+      for extra in [{premutagen: 6.5e10, energy: 10}, {premutagen: 6.5e10, cost: 50000, energy: 30000}, {premutagen: 6.5e10, energy: 2e6}]
+        r = asc.advise amk(_.extend {}, o, extra), WARP
+        expect(r.plan).not.toBe null
+        expect(r.mutagen.respec).toBe false
+        expect(_.some r.mutagen.steps, type: 'respec').toBe false
 
     it 'saves for the ascension: no warps, no bats (E5)', ->
       held = 2e32
@@ -573,6 +607,47 @@ describe 'Service: advisor, switching routes on real states', ->
     expect(s1.runSkipped).toBeCloseTo skip * 1000, 0
     expect(s1.energy.warp.casts).toBe 1
     expect(advisor.advise(s1, null, W).age - advisor.advise(s0, null, W).age).toBeCloseTo skip, 0
+
+  it 'bounds this run\'s skipped time by the save\'s whole skipped time (power raised after warps)', ->
+    # a first run that never warped: 3 warps at 1 bat, then 2,000 bats raise the skip of every past cast in the estimate
+    game = load 'first_bats', (j) -> j.unittypes.energy = '9000'
+    expect(game.session.state.skippedMillis).toBe 0
+    game.upgrade('swarmwarp').buy 1 for i in [0...3]
+    truth = game.session.state.skippedMillis
+    game.unit('bat')._setCount 2000
+    game.cache.onUpdate()
+    estimate = 3 * game.upgrade('swarmwarp').effect[0].output().toNumber() * 1000
+    expect(estimate).toBeGreaterThan 1.3 * truth
+    s = advisor.snapshot game
+    expect(s.runSkipped).toBe truth # min(estimate, the save's total): exact in a save's first run
+    expect(advisor.advise(s, null, W).age).toBeCloseTo (s.now - s.restartedAt + truth) / 1000, 3
+
+  it 'the free respec: after the first ascension yes; beside an ascension or under the near-complete guard no', ->
+    {w} = both load 'switch_mirrors_purchases_made'
+    expect(w.a.mutagen.respec).toBe true
+    # 1,542 expansions: the test passes, ascend now (it brings 2.00e76 mutagen); no respec
+    {w} = both load 'switch_mirrors_long_day30'
+    expect(w.a.plan.type).toBe 'ascendNow'
+    expect(w.a.mutagen.respec).toBe false
+    expect(w.texts.ascension.join(' ')).not.toContain 'respec'
+    # 4,500 expansions: the guard keeps the House of Mirrors run; no respec, no warp or bat mutations
+    {w} = both load 'switch_mirrors_long_day30', (j) -> j.upgrades.expansion = '4500'
+    expect(w.a.route.guard?).toBe true
+    expect(w.a.mutagen?.respec ? false).toBe false
+    joined = w.texts.ascension.join(' ')
+    expect(joined).not.toContain 'respec'
+    expect(joined).not.toContain 'mutantswarmwarp'
+    expect(joined).not.toContain 'mutantbat'
+
+  it 'keeps the final stage after the mutagen line is followed in the game (1.5e270 and 2.5e270 held)', ->
+    for held in ['1.5e270', '2.5e270']
+      game = load 'asc_28_lgM272', (j) -> j.unittypes.mutagen = held
+      a = asc.advise asc.snapshot(game), W
+      expect([held, a.stage]).toEqual [held, 'final']
+      for st in a.mutagen.steps
+        if st.type == 'unlock' then game.upgrade(st.name).buy 1 else game.unit(st.unit).buy st.count
+      b = asc.advise asc.snapshot(game), W
+      expect([held, b.stage, b.mutagen]).toEqual [held, 'final', null]
 
   it 'a warp cast in the game releases every climbing tier at once', ->
     game = load 'late_warp_test_fails', (j) -> j.unittypes.energy = '6500'

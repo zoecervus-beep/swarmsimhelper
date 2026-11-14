@@ -4,7 +4,7 @@
 //
 // Each case's save is loaded into the real game (lib/game.js); the advisor services' own snapshot() functions read it;
 // advise() runs with the owner's settings and the route set to swarmwarp. Field classes (README, "what must match"):
-//   exact                stage, test passes, wants ascension, test need (1e-12), save_at / threshold / halving /
+//   exact                stage (one departure class, NO-MIRRORS.md 12.6), test passes, wants ascension, test need, save_at / threshold / halving /
 //                        ascension cost, mutagen respec and steps (counts floored; 1e-12 past 2^53), steps again
 //                        after applying them in the game (empty), swarmwarp power and skip, the game run age estimate,
 //                        horizon and long-run gate given that age, the energy line up to the first cast (nexus,
@@ -128,11 +128,18 @@ cases.forEach(function (name) {
   var a = x.a, asnap = x.asnap, snap = x.snap;
 
   // --- exact, from the save alone
-  say('stage', a.stage === st.stage, 'port ' + a.stage + ', ref ' + st.stage);
+  // Departure (NO-MIRRORS.md 12.6): the port's final test is mutagen held + the mutants the shares buy (warp_route.py:
+  // held alone). The one class where they may differ: port final, reference build, held < 1e270 <= that wealth.
+  var E270 = D('1e270'), wealth = S.asc.warpWealth(asnap);
+  var departure = a.stage === 'final' && st.stage === 'build' && asnap.mutagen.lessThan(E270) && wealth.greaterThanOrEqualTo(E270);
+  if (departure) say('stage: final from held + share mutants >= 1e270 (held < 1e270; reference build)', null,
+    'held ' + asnap.mutagen.toExponential(6) + ', with share mutants ' + wealth.toExponential(6));
+  else say('stage', a.stage === st.stage, 'port ' + a.stage + ', ref ' + st.stage);
   var test = S.asc.warpTest(asnap);
   say('test passes', test.passes === st.test.passes, 'port ' + test.passes + ', ref ' + st.test.passes);
   say('test need (1e-12)', rel(test.need, st.test.need) <= 1e-12, 'port ' + test.need.toExponential(10) + ', ref ' + st.test.need);
-  say('wants ascension', (a.plan !== null) === st.wants_ascension, 'port ' + (a.plan !== null) + ', ref ' + st.wants_ascension);
+  if (departure) say('wants ascension: final never ascends (departure class)', a.plan === null, 'port ' + (a.plan !== null) + ', ref ' + st.wants_ascension);
+  else say('wants ascension', (a.plan !== null) === st.wants_ascension, 'port ' + (a.plan !== null) + ', ref ' + st.wants_ascension);
   var p = S.asc.plan(asnap);
   say('save_at', rel(p.saveAt, st.save_at) <= 1e-12, 'port ' + p.saveAt.toString() + ', ref ' + st.save_at);
   say('threshold', p.threshold.equals(st.threshold), 'port ' + p.threshold.toString() + ', ref ' + st.threshold);
@@ -140,7 +147,12 @@ cases.forEach(function (name) {
   say('halving (round trip 1e-6)', rel(p.halving, st.halving) <= 1e-6, 'port ' + p.halving + ', ref ' + st.halving + ', rel ' + rel(p.halving, st.halving).toExponential(2));
   // the port reads the game's own ascendCost(); the reference is the simulator's, one below the game where the game's
   // unrounded cost is just above an integer (final_nexus4: 99,319,568.047 ceils to 99,319,569)
-  say('ascension cost = the game\'s', D(p.cost).equals(game.ascendCost()), 'port ' + p.cost.toString() + ', game ' + game.ascendCost().toString());
+  // the cost worked out independently from the case's numbers and the cost formula (game.coffee ascendCost; ASCENSION.md
+  // B2.2): ceil(5e6 x 1.12^ascensions / 2^(spent / (50,000 x (1 + 0.6 x (1 - 1 / (1 + 0.0005 x lepidoptera mutants))))))
+  var nm = Number(st.mutants.mutantnexus || 0);
+  var vel = D(50000).times(D(1).plus(D(0.6).times(D(1).minus(D(1).dividedBy(D(1).plus(D(0.0005).times(nm)))))));
+  var indep = D(1.12).pow(st.ascensions).times(5e6).dividedBy(D(2).pow(D(st.energy_spent).dividedBy(vel))).ceil();
+  say('ascension cost = the formula on the case\'s numbers', D(p.cost).equals(indep), 'port ' + p.cost.toString() + ', formula ' + indep.toString());
   var dc = D(p.cost).minus(D(st.ascension_cost));
   say('ascension cost vs ref (exact, or the game\'s ceil 1 above)', dc.isZero() || dc.equals(1), 'port ' + p.cost.toString() + ', ref ' + st.ascension_cost);
 
@@ -154,8 +166,7 @@ cases.forEach(function (name) {
   say('run age = exact game age (bats before the first warp)', Math.abs(x.r.age - ck.run_age_game_s) <= 1e-3 + 1e-9 * ck.run_age_game_s,
     'port ' + x.r.age + ', ref ' + ck.run_age_game_s + ' (skipped this run ' + ck.skipped_this_run_s + ' s)');
   say('skipped total (game)', Math.abs(game.session.state.skippedMillis / 1000 - ck.skipped_total_s) <= 1e-3, 'game ' + game.session.state.skippedMillis / 1000 + ', ref ' + ck.skipped_total_s);
-  say('horizon given the run age', rel(x.r.horizon, D(x.r.age).times(c.config.age_multiple)) <= 1e-12 && Math.abs(ck.horizon_s - ck.run_age_game_s * c.config.age_multiple) <= 1e-6 * ck.horizon_s,
-    'port ' + x.r.horizon + ', ref ' + ck.horizon_s);
+  say('horizon', Math.abs(x.r.horizon - ck.horizon_s) <= 5e-3 + 1e-12 * ck.horizon_s, 'port ' + x.r.horizon + ', ref ' + ck.horizon_s);
   say('long-run gate', x.r.longRun.active === ck.long_run_gate_active, 'port ' + x.r.longRun.active + ', ref ' + ck.long_run_gate_active);
 
   // --- the energy line up to the first cast; saving; ascend now
@@ -201,7 +212,12 @@ cases.forEach(function (name) {
   if (dec.mutagen) {
     var m = dec.mutagen, mut = a.mutagen;
     var steps = mut ? mut.steps : [];
-    say('mutagen respec', (mut ? mut.respec : false) === m.respec_first, 'port ' + (mut ? mut.respec : false) + ', ref ' + m.respec_first);
+    // Second departure (the review's fix): no free respec while the route wants this run ended (the ascension brings
+    // the mutagen for the warp unlock). warp_route.respec_advised does not look at the test. Narrow class: the port
+    // wants an ascension, the reference advises a respec, the port does not; the steps are then printed, not compared.
+    var heldBack = a.plan !== null && m.respec_first && !(mut && mut.respec);
+    if (heldBack) say('mutagen: respec held back while an ascension is wanted (reference respecs)', null, 'port steps ' + (mut ? mut.steps.map(function (q) { return q.type + ' ' + (q.unit || q.name); }).join(', ') : 'none'));
+    else say('mutagen respec', (mut ? mut.respec : false) === m.respec_first, 'port ' + (mut ? mut.respec : false) + ', ref ' + m.respec_first);
     var portSteps = steps.filter(function (s) { return s.type !== 'respec'; });
     // Reference share purchases under 1e-9 of W are float rounding of shares bought at an earlier ascension (W past
     // 1e32: 1e16 of 1e32, 7.5e255 of 1e270); the port counts a share short by under 1e-9 of its target as held.
@@ -216,7 +232,7 @@ cases.forEach(function (name) {
       return s.type === 'mutants' && s.unit === r.name && sameCount(s.count, r.count);
     });
     var show = function (list) { return list.map(function (s) { return s.type === 'unlock' ? 'unlock ' + s.name + ' ' + D(s.price).toExponential(4) : s.type === 'respec' ? 'respec' : (s.unit || s.name) + ' ' + D(s.count).toExponential(6); }).join(', '); };
-    say('mutagen steps', okSteps, 'port [' + show(portSteps) + '], ref [' + show(refSteps) + ']');
+    if (!heldBack) say('mutagen steps', okSteps, 'port [' + show(portSteps) + '], ref [' + show(refSteps) + ']');
     // apply them in the game and run the rule again: nothing (and no respec)
     var applied = true;
     try {
@@ -227,7 +243,7 @@ cases.forEach(function (name) {
       });
     } catch (err) { applied = false; say('mutagen steps apply in the game', false, err.message); }
     if (applied) {
-      var again = S.asc.warpMutagen(S.asc.snapshot(game));
+      var again = S.asc.advise(S.asc.snapshot(game), CFG).mutagen;   // the line as the panel shows it
       say('mutagen again (applied in the game): nothing', again === null, again ? show(again.steps) : 'nothing');
       L = G.loadSave(path.join(DIR, c.save)); game = L.game; S = services(L);   // back to the save for what follows
     }
@@ -252,6 +268,32 @@ cases.forEach(function (name) {
       });
       mem = before.r.memory; tmem = before.t.memory;
     }
+    // Follow the panel's purchases until the next warp is offered (a pass can reveal more: one empower per look).
+    // Fails the check if the hold has not cleared within 100 passes.
+    var followUntilOffered = function (Sx, gx, cur0, label) {
+      var done = {climb: 0, tips: 0, territory: 0, expansions: 0, hatcheries: 0, empowers: 0}, cur = cur0, passes = 0;
+      while (cur.ordered && cur.ordered.type === 'warpAfter' && passes < 100) {
+        var d1 = follow(Sx, gx, cur); passes++;
+        Object.keys(done).forEach(function (k2) { done[k2] += d1[k2]; });
+        cur = energyLine(Sx, gx, cur.r.memory, cur.t.memory);
+        if (process.env.DEBUG) console.log('pass', passes, cur.t.records.map(Sx.terr.render).join(' / '), '|', cur.r.tips.map(Sx.adv.renderTip).join(' / '));
+      }
+      say(label + ': the hold clears once the purchases are made', !(cur.ordered && cur.ordered.type === 'warpAfter'),
+        passes + ' pass(es), line ' + (cur.ordered && cur.ordered.type) + ' ' + JSON.stringify((cur.ordered && cur.ordered.pending) || {}));
+      return {cur: cur, done: done, passes: passes};
+    };
+    // Warp 1, on a copy of the save: the reference casts at the start of the visit, before the purchases; the panel
+    // holds the warp until they are made. Follow them on the copy and the warp must be offered.
+    (function () {
+      var Lc = G.loadSave(path.join(DIR, c.save)), Sc = services(Lc);
+      var sc = Sc.adv.snapshot(Lc.game);
+      var mc = seedMemory(Sc.adv, sc, seq[0].tiers_before_climb, sc.gameNow + skipMs);
+      var c0 = energyLine(Sc, Lc.game, mc, null);
+      say('warp 1: held while the visit\'s purchases are open', c0.ordered && c0.ordered.type === 'warpAfter', 'port ' + (c0.ordered && c0.ordered.type));
+      var f = followUntilOffered(Sc, Lc.game, c0, 'before warp 1 (copy)');
+      say('warp 1: offered only once the purchases are made', f.cur.ordered && f.cur.ordered.type === 'warp' && f.cur.ordered.casts.equals(1),
+        'port ' + (f.cur.ordered && f.cur.ordered.type) + ' ' + S.adv.renderEnergy(f.cur.ordered));
+    })();
     for (var i = 0; i < seq.length; i++) {
       var sq = seq[i];
       var pre = energyLine(S, game, mem, tmem);
@@ -300,15 +342,7 @@ cases.forEach(function (name) {
       var hold = post.ordered;
       var more = i + 1 < seq.length;
       if (more) say('after warp ' + (i + 1) + ': the next warp waits for the purchases', hold && hold.type === 'warpAfter', 'port ' + (hold && hold.type) + ' ' + S.adv.renderEnergy(hold));
-      // follow the panel until the next warp is offered: a pass can reveal more (one empower per look)
-      var done = {climb: 0, tips: 0, territory: 0, expansions: 0, hatcheries: 0, empowers: 0}, cur = post, passes = 0;
-      while (passes < 100) {
-        var d1 = follow(S, game, cur); passes++;
-        Object.keys(done).forEach(function (k2) { done[k2] += d1[k2]; });
-        cur = energyLine(S, game, cur.r.memory, cur.t.memory);
-        if (!cur.ordered || cur.ordered.type !== 'warpAfter') break;
-        if (process.env.DEBUG) console.log('pass', passes, cur.t.records.map(S.terr.render).join(' / '), '|', cur.r.tips.map(S.adv.renderTip).join(' / '));
-      }
+      var fw = followUntilOffered(S, game, post, 'after warp ' + (i + 1)), done = fw.done, cur = fw.cur, passes = fw.passes;
       say('after warp ' + (i + 1) + ': bought between warps (likely equal, not exact)', null,
         'port expansions ' + done.expansions + ' hatcheries ' + done.hatcheries + ' empowers ' + done.empowers + ' in ' + passes + ' pass(es) (climb rows ' + done.climb + ', tips ' + done.tips + ', territory lines ' + done.territory + '); sim expansions ' +
         sq.bought.expansions + ' hatcheries ' + sq.bought.hatcheries + ' empowers ' + JSON.stringify(sq.bought.empowers));

@@ -517,6 +517,7 @@ The stage comes from the game state:
 - **The final threshold:** 5,000 expansions need a run started from about 1e270 (expansions ≈ 18.5 × log10 M). In the simulated routes a run starting at ~1e265 reached 5,000 before its own test passed, so 1e250–1e300 all gave 141. The threshold is the safety that stops a run near 5,000 from being ended.
 - **No guard for a mirrors long run** (13): ascending out of one under this route's test was faster in every case simulated.
 - Mutation achievements and the 20 ascensions come in the build stage (6 unlocks day 34, 10 unlocks day 58, 20 ascensions day 95).
+- **The port departs from this section's final test (deliberately).** `warp_route.py` tests the mutagen held, unspent, against 1e270. Its own mutagen rule (12.7) then spends about 51% of that on the shares, so a run judged final (1.5e270 held) is judged build right after its purchases. The advisor (`advisorascension.coffee`, `warpWealth`) tests the mutagen held **plus** the warp, bat, territory and meta-mutation mutants held (the kinds the shares buy, one mutagen each). Following the mutagen line leaves this sum unchanged, so the stage is the same before and after it. It differs from the reference only when the held mutagen is under 1e270 and that sum is not: `final_just_below` is the one such case (`swarmwarp_check.js` reports it in its own class).
 
 ### 12.7 Mutagen purchases (idempotent, on current holdings)
 
@@ -531,6 +532,12 @@ Shown whenever mutagen is held. Applied twice, the second time buys nothing. In 
    The refund is every unlock price paid (15,625^0 … 15,625^(n−1)) plus every mutant bought, minus the free mutant per unlock. A free respec keeps the energy credit (ASCENSION.md B2.6). This is the state after the mirrors route's first ascension: lepidoptera and frequency unlocked, so warp would be the 3rd unlock at 2.44e8 against ~6e7 held. Measured: 148 days with the respec, 181 without, 173 with a 16-day wall-clock backstop instead.
 
    Say: "respec (free, n left): the swarmwarp route needs the warp mutation, which you cannot afford as your 3rd unlock".
+
+   **The port adds two conditions** (not in `warp_route.respec_advised`):
+   - no respec while the route wants the run ended (test passing: spend, save or ascend now), since the ascension brings the mutagen for the warp unlock;
+   - no respec under the near-complete guard (13), where the run continues as a House of Mirrors run that uses the mutations a respec would drop.
+
+   In `switch_mirrors_long_day10` and `_day30` the reference advises the respec beside "ascend now"; the port does not, and `swarmwarp_check.js` reports these in their own class. Under the guard the port also buys no shares: it shows only the unlocks and the lepidoptera and frequency mutations.
 2. **Unlocks**, in the order lepidoptera, warp, bat, frequency, meta-mutation, territory, rush, clone, meat, hatchery, skipping those held.
    - The k-th costs 15,625^(k−1) (read from the game).
    - The first three unlocks: whenever affordable.

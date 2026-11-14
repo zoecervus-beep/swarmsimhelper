@@ -136,8 +136,11 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
 
   # The game clock (NO-MIRRORS.md 11, 12.1): wall time plus `session.state.skippedMillis`, the time swarmwarp has
   # skipped over the whole save (exact; kept across reloads and ascensions). This run's skipped time is estimated
-  # without memory: this run's swarmwarp casts x what one cast skips now (exact while the power has not changed
-  # since the first cast; the route buys its bats first). Without a cast both are the wall clock's.
+  # without memory: this run's swarmwarp casts x what one cast skips now, and never more than the save's whole
+  # skipped time. Exact while the power has not changed since this run's first cast (the swarmwarp route buys its
+  # bats first). Inexact otherwise: bats or warp mutants bought after earlier casts make it count those casts at the
+  # new power, too long, and the bound only binds while earlier runs skipped little (in a first run it is exact).
+  # Without a cast both clocks are the wall clock's.
   gameClock = (g, now) ->
     skipped = Number(g.session?.state?.skippedMillis ? 0) or 0
     runSkipped = 0
@@ -146,7 +149,7 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
       casts = D(warp.count())
       if casts.greaterThan 0
         effect = _.find(warp.effect, (e) -> e.type?.name == 'skipTime') ? warp.effect[0]
-        runSkipped = casts.times(effect.output()).times(1000).toNumber()
+        runSkipped = Math.min casts.times(effect.output()).times(1000).toNumber(), skipped
     catch e
       runSkipped = 0
     return {gameNow: now + skipped, skipped: skipped, runSkipped: runSkipped}

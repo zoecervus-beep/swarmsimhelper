@@ -258,7 +258,10 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
     if route.route == 'swarmwarp'
       return warpAdvise snap, cfg, route
     if route.guard?
-      return _.extend mirrorsAdvise(snap, cfg, warpMutagen(snap), route.guard), route: route
+      # the run is a House of Mirrors run: no respec (it would drop mutations this run uses) and no swarmwarp-route
+      # shares (they spend mutagen that makes larvae now, for warps this run will not cast); only the unlocks and the
+      # lepidoptera and frequency mutations, which serve both routes
+      return _.extend mirrorsAdvise(snap, cfg, warpMutagen(snap, {respec: false, shares: false}), route.guard), route: route
     return _.extend mirrorsAdvise(snap, cfg, mutagenPlan(snap), null), route: route
 
   mirrorsAdvise = (snap, cfg, mut, guard) ->
@@ -332,9 +335,22 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
     target = lastGoal(goals.ascension)?.val.toNumber() ? 0
     if not _.some(longGoals, (g) -> not g.earned)
       return if snap.ascensions < target then 'quick' else 'done'
-    if snap.mutagen.greaterThanOrEqualTo(D('1e' + SW.finalLog10)) and not exp?.earned
+    if warpWealth(snap).greaterThanOrEqualTo(D('1e' + SW.finalLog10)) and not exp?.earned
       return 'final'
     return 'build'
+
+  # 12.6 final, as the port tests it (a deliberate departure from warp_route.py, NO-MIRRORS.md 12.6): mutagen held
+  # plus the mutants the route's shares buy (warp, bat, territory, meta-mutation; unlocked kinds), in mutagen. The
+  # mutagen line moves mutagen into those mutants one for one, so following it leaves this, and the stage, unchanged;
+  # unspent mutagen alone would drop below 1e270 once the shares are bought (about 51% of it) and turn a final run
+  # back into a build run.
+  warpWealth = (snap) ->
+    w = snap.mutagen
+    for [mu, sh] in SW.shares
+      u = _.find snap.unlocks, unit: mu
+      if u?.unlocked and u.have?
+        w = w.plus u.have.times(u.mutantPrice ? 1)
+    return w
 
   # 12.6 build: premutagen >= SW.ratio x max(mutagen held, 1).
   warpTest = (snap) ->
@@ -358,10 +374,12 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
   # while the price is at most SW.unlockShare of the mutagen held); lepidoptera and frequency mutations to 1e6; then
   # W = mutagen held + the warp, bat, territory and meta-mutation mutants held (unlocked kinds): hold SW.shares of W
   # in each; the rest stays unspent. Prices are the game's. Null when there is nothing to do.
-  warpMutagen = (snap) ->
+  # opts.respec false: never a respec (the near-complete guard, or an ascension the route wants: it will bring the
+  # mutagen for the warp unlock); opts.shares false: no share purchases (the near-complete guard).
+  warpMutagen = (snap, opts={}) ->
     if snap.ascensions < 1
       return null
-    respec = warpRespec snap
+    respec = opts.respec != false and warpRespec snap
     held = snap.mutagen
     count = snap.unlockCount
     units = for u in snap.unlocks
@@ -412,7 +430,7 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
       u = byUnit[mu]
       if u?.unlocked
         buy u, D(want), 'fixed'
-    managed = ([byUnit[mu], sh] for [mu, sh] in SW.shares when byUnit[mu]?.unlocked)
+    managed = if opts.shares == false then [] else ([byUnit[mu], sh] for [mu, sh] in SW.shares when byUnit[mu]?.unlocked)
     W = held
     for [u, sh] in managed
       W = W.plus u.have
@@ -427,12 +445,14 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
     goals = snap.goals
     target = lastGoal(goals.ascension)?.val.toNumber() ? null
     stage = warpStage snap
-    mut = warpMutagen snap
     test = null
     wants = stage == 'quick'
     if stage == 'build'
       test = warpTest snap
       wants = test.passes
+    # no free respec while the route wants this run ended: the ascension brings mutagen for the warp unlock, and the
+    # respec would be spent for nothing (13 G3 is for a run that has only started, far below the test)
+    mut = warpMutagen snap, {respec: not wants}
     p = null
     if wants
       p = _.extend plan(snap), stage: stage, of: target, route: WARP_ROUTE, test: test
@@ -599,6 +619,7 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
     warpTest: warpTest
     warpRespec: warpRespec
     warpMutagen: warpMutagen
+    warpWealth: warpWealth
     NEXUS_MUTANTS: NEXUS_MUTANTS
     # pure
     snapshot: snapshot
