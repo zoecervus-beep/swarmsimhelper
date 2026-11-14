@@ -551,7 +551,7 @@ Other cadences (`early_game.py cadence`; twice a day one seed, glance+ three): f
 - "Today" is today's defaults as the simulator plays them, with the next nexus's larvae held back from the climb. **The advisor itself does not hold them back** outside the long-run mode. Taken literally, at a visit a minute, the climb then eats nexus 5's 3.33×10^9 larvae every visit: nexus 5 slips to hour 93 and the ascension to 137 h. Under the human and busy cadences larvae pile up between visits and it makes no difference. The plan holds them (A.11.5).
 
 **The plan in a few lines:**
-1. **Below nexus 5, save energy for the next nexus** instead of casting larva rush (one larva rush only when energy is at the cap), and keep the next nexus's larvae out of the climb while saving for it.
+1. **Below nexus 5, save energy for the next nexus** instead of casting larva rush (one larva rush only when energy is at the cap). Keep the next nexus's larvae out of the climb **just in time** (A.11.9): none while its meat is missing or its larvae are far; once they are near, only those that larva income will not bring before the energy is there; all of them while larvae are what it waits for.
 2. **At nexus 4, buy 1,000 lepidoptera first**, before saving for nexus 5.
 3. **Then keep for nexus 5 only what it will need by the time its larvae are there** ("just in time"): with its meat in hand, keep max(0, 36,000 − energy/s × larvae still missing ÷ larvae/s); put the rest into lepidoptera. Keep the whole 36,000 while its meat is missing.
 4. **After nexus 5, lepidoptera to the run's target before House of Mirrors:**
@@ -663,7 +663,7 @@ Ascension affordable (hours), first run and late quick run. The changes are adde
 - **The run's target after nexus 5 is the biggest single gain: 5–7 h in a quick run, 5–14 h in the first.** The early lepidoptera are worth about 3 h in a quick run.
 - **The parts interact under a person's cadence.** Saving everything for nexus 5 (the old "save") is worse than today's larva rush in the first run under the busy cadence (156 h against 147 h). Adding the early lepidoptera alone makes it worse still (165 h). Energy then sits at the cap while the larvae come. The just-in-time keep repairs it: without it the plan loses 11 h (human) to 24 h (busy).
 - **Nexus 5 in a person's quick run is set by the night.** At a visit a minute it comes at 9.8 h. Under the human cadence it comes at 19.2 h with any rule: the energy is there at night and is used at the first visit after 7:00. A 45-minute stay at the start of the run (visits every 2 minutes, then the human profile, 5 seeds) brought, under the plan, nexus 4 at 3.4 h instead of 5.0 h, nexus 5 at 17.3 h instead of 19.2 h and the ascension 1.2 h sooner in the late quick run; in the first run nexus 4 at 9.5 h instead of 13.9 h and the ascension 3.3 h sooner. **Stay about an hour at the start of a run, until nexus 4 is bought.** A run that starts in the evening could also be timed so that nexus 5 falls in waking hours.
-- **Larvae held for the nexus.** The plan keeps the next nexus's larvae out of the climb while it saves for it. The simulator always did this; the advisor did only in the long-run mode. With a visit a minute and nothing held, the first run's nexus 5 slipped from 29.5 h to 93 h in the simulator. Under the human and busy cadences it made no difference.
+- **Larvae held for the nexus.** The plan keeps the next nexus's larvae out of the climb (as first published, all of them from the moment it saved for the nexus; since A.11.9 just in time). The simulator always held them; the advisor did only in the long-run mode. With a visit a minute and nothing held, the first run's nexus 5 slipped from 29.5 h to 93 h in the simulator. Under the human and busy cadences it made no difference.
 - **Which gains survive a person's cadence?** All of them, and they grow: 9 h in the first run and 10.6–13.1 h in a quick run under the human and busy cadences, against 6.9 and 10.4 h at a visit a minute. The just-in-time keep is what makes saving safe when visits are hours apart.
 
 #### A.11.6 What the advisor does now (and the console script's equivalent)
@@ -679,7 +679,7 @@ Implemented in `advisor.coffee` (`energyAdvice`, `nexus5Plan`, the climb's larva
 
 No new setting. What now comes from the game state:
 - **The first 1,000 lepidoptera at nexus 4** (or the target, if lower), and the just-in-time keep. Both are under `spareEnergy: 'save'`; the keep uses the game's energy rate and larva rate.
-- **The larvae held for the next nexus** while the energy line says to buy it or save for it, also under `save`. The panel says "(the climb above leaves N larvae for it)".
+- **The larvae held for the next nexus**, also under `save`, just in time since A.11.9 (as first published: all of them while the line said to buy it or save for it). The energy line says how many and why ("keeping no larvae for nexus 5 yet: its energy is 11.9 h away, its larvae 3.1 h").
 - **The lepidoptera target after nexus 5, by the route's stage** (`advisorAscension.runMoths`):
   - first run and "needs the mutation": 10,000;
   - quick run: 30,000;
@@ -725,7 +725,7 @@ No new setting. What now comes from the game state:
 ```sh
 python3 -I advisor/sim/early_game.py --jobs 4      # every A.11 table, about 6 minutes; also advisor/modelcheck/out/early_game.json
 python3 -I advisor/sim/early_game.py energy        # just the energy model (A.11.3), 1 s
-python3 -I advisor/modelcheck/early_cases.py       # the 276 reference states for early_check.js, about 20 s
+python3 -I advisor/modelcheck/early_cases.py       # the 328 reference states for early_check.js, about 30 s
 node advisor/modelcheck/early_check.js             # the advisor's energy rules against them
 node advisor/modelcheck/script_vs_port.js 1 300 20 # console script vs port (spareEnergy 'larvarush')
 node advisor/modelcheck/longrun_check.js           # the long-run mode's 30 reference cases
@@ -740,8 +740,78 @@ New `sim.py` policy options, all off by default (the earlier results and `run_ex
 | `pre5_excess='moths'` / `'larvarush'` | at nexus 4, energy above what nexus 5 needs goes to lepidoptera (up to `moth_N5`) or larva rush |
 | `jit5` (with `pre5_excess`) | what nexus 5 needs is kept just in time (`jit_hold`); `jit_f` scales the waiting time |
 | `no_nexres` | the climb is not told to keep the next nexus's larvae (the advisor before this change) |
+| `jit_larvae` (A.11.9) | the next nexus's larvae kept just in time (`nexus_wait`); `jit_lm` scales the larva income counted |
 
 `bignum.Big.of` now accepts a Python integer past float range (`math.ceil` of a huge number), which the late quick run reached.
+
+#### A.11.9 Correction: the next nexus's larvae, just in time
+
+Nov 14, 2026, after the owner's report. **What was wrong.** As first published, the `save` plan kept every larva the next nexus needs out of the climb from the moment the energy line said to save for it: its meat in hand and its larva price under 20,000 s of larva income. That gate is about larvae alone. When energy is what the nexus waits for, the larvae just sit there.
+
+The owner's first run at 19.5 h (`advisor/sim/example_save_19h.json`) shows it:
+- nexus 4, 2,833 lepidoptera;
+- energy 6,231 of 36,000 at 0.696/s, so the energy is **11.9 h** away;
+- larvae 8.62×10^8 of 3.33×10^9 at 221,456/s, so the larvae are **3.1 h** away.
+
+The advisor told them to hatch nothing: hive "skip: larvae used above", every tier below banked. About nine hours of climbing would have been lost for nothing.
+
+**Why the study did not catch it.**
+- The simulator has held the larvae this way since the original tuning, in "today" and in the plan alike, so no comparison could show the loss.
+- The two target times are set by energy, so they could not show it either. Meat, which is what the hold costs, was not scored.
+- In the simulator's runs the window is also short. Nexus 4 comes while larvae are still far (larva rate under 1.67×10^5/s), and by the time they are near, the energy is about an hour away.
+- The owner's run reached nexus 4 later, with little energy: by today's former larva rush and early lepidoptera. Its window is nine hours.
+
+Holding is needed, though: at a visit a minute the climb otherwise eats nexus 5's larvae at every visit, and nexus 5 slips from 29.5 h to 93 h (A.11.1). What matters is when the hold starts.
+
+**The rule now** (`larvaPlan` in the advisor, `nexus_wait` in the simulator):
+1. **No hold while the nexus's meat is missing or its larvae are far.** Far means a larva price over 20,000 s of larva income, the old gate, unchanged. The climb is then what raises the larva rate.
+2. **Otherwise compute two waits.**
+   - Energy: (price − energy) / energy rate. At nexus 4, any of the first 1,000 lepidoptera still to buy are paid for first, at today's rate; the price then comes at the rate they give.
+   - Larvae: 0 if they are in hand, else (price − larvae) / larvae per second.
+3. **Keep** = min(larvae, ⌈max(0, price − larvae per second × the longer wait)⌉):
+   - all of them while larvae bind;
+   - while energy binds, only what larva income will not bring before the energy is there;
+   - nothing while the energy is further away than price / larvae per second.
+4. **The climb gets everything else.**
+5. **The energy line says which case it is:**
+   - "keeping no larvae for nexus 5 yet: its energy is 11.9 h away, its larvae 3.1 h";
+   - "keeping 235M larvae for nexus 5, the rest come in before its energy (3.9 h)";
+   - "keeping all 1.33e9 larvae for nexus 5: larvae are what it waits for (2.8 h; energy 1.9 h)";
+   - "buy nexus 5; keeping its 3.33B larvae".
+6. **The energy side's "only N energy needed now"** is shown only while more energy is held than that, i.e. when energy is not what binds. Its keep itself is unchanged.
+7. **Nexus 2 to 4:** the same rule. Nexus 2 has no larva price. After an ascension, larvae are in hand within the hour and the keep is the whole price as soon as the energy is near.
+8. **`spareEnergy: 'larvarush'`** (the console script) holds nothing, as before.
+
+**One clock for both sides.** Both waits use every larva on hand and the whole larva rate, the clock the energy keep has used since A.11. So the energy keep and the larva keep never disagree about which one binds.
+- Leaving the territory share out of the larva clock (on hand × 0.9, income × 0.9) changed no target time in the larva rule alone.
+- Applied to the energy keep as well, it made glance+ first runs 2.6 h later to the ascension (energy lost at the cap). So it was not adopted.
+
+**Safety margin.** Counting only 80% or 50% of the larva income (`jit_lm`) changed no target time in any of the 9 run × cadence cases (it only cost the climb a little), so none is used. The estimate is conservative anyway: the larva rate only grows, and discrete visits do not matter because larvae accrue between them.
+
+**Evidence** (`early_game.py plan parts margin owner`; "A.11" = larvae held at once). **No target time changed** for any of the three runs under any of the six cadences (ideal, human, busy, human with a 45-minute stay, twice a day, glance+). Nexus 5, the first mirror, the ascension and the energy lost to the cap are all identical. What the climb gains, as log10 meat per second:
+
+| Run, cadence | At nexus 5: A.11 → now | Just before the ascension: A.11 → now | Mutagen at the ascension: A.11 → now |
+| --- | --- | --- | --- |
+| first, ideal | 36.7 → **40.2** | 60.1 → 60.0 | 1.2×10^7 → 1.2×10^7 |
+| first, human | 34.1 → 34.2 | 54.4 → 54.6 | 0.95–1.9×10^7 → 0.95–1.9×10^7 |
+| first, busy | 33.5 → 33.5 | 49.4 → 49.4 | same |
+| first, glance+ | 34.3 → 34.4 | 51.2 → 50.5 | 0.94–1.1×10^7 → 0.94–1.6×10^7 |
+| second (long run), ideal / human / busy | 36.2 / 38.2 / 31.3 → 36.3 / 38.4 / 31.3 | same | same |
+| late quick run, every cadence | same | same | same |
+| **the owner's 19.5 h state**, ideal / human / busy | 41.5 / 41.1 / 36.4 → **42.2 / 41.8** / 36.4 | 60.9 / 58.3 / 51.5 → 60.9 / **58.8** / 51.5 | same |
+
+- The top tier at nexus 5 and at the ascension is the same everywhere (hive, then hive queen).
+- The gain is real but modest in the simulator: up to 3.5 log10 meat/s at nexus 5, and 0.7 from the owner's state. That is because the window is short in the simulator's runs. In the owner's state it is nine hours of climbing kept.
+- Busy and twice-a-day cadences gain nothing: larvae pile up between visits anyway.
+
+**Check.** `early_check.js` now also compares the larvae kept, on 328 states (the owner's state added, at a visit a minute and human seed 1).
+- 0 differences.
+- The states cover 176 cases with no hold, 144 where energy binds and nothing is kept, 5 partial keeps and 3 where larvae bind.
+
+**Grades.**
+- The defect and its cause: **solid**. The rule's arithmetic and its agreement with the simulator's: **solid**.
+- "No target time gets worse": **likely** (simulator, 3 runs × 6 cadences, 1–5 seeds).
+- The size of the climb's gain: **likely** for the direction, **guess** for the amount in a real run.
 
 ## Part B. Mechanics and model check
 

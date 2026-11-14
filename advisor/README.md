@@ -18,7 +18,13 @@ The climbing advisor is a panel in this fork of Swarm Simulator. It suggests wha
 - **Tips**: faster and twin upgrades worth buying now, and multi-step plans to get a twin upgrade.
 - **Energy**: what to do with energy. In order: build the next nexus, save for it, buy lepidoptera up to the target, then cast House of Mirrors. By default energy is planned for the next nexus ([ASCENSION.md](ASCENSION.md) A.11):
   - Below nexus 5 it is held for the next nexus, not cast; a full energy bar gets one larva rush so income isn't wasted.
-  - While the line says to save for (or buy) a nexus, the climb leaves that nexus's larvae alone, and the line says how many it keeps ("the climb above leaves 3.33B larvae for it").
+  - The climb leaves the next nexus's larvae alone just in time, and the line says how many and why ([ASCENSION.md](ASCENSION.md) A.11.9):
+    - none while its meat is missing or its larvae are far away;
+    - none while its energy is further off than its larvae ("keeping no larvae for nexus 5 yet: its energy is 11.9 h away, its larvae 3.1 h");
+    - then only those your larva income won't bring before the energy is there ("keeping 235M larvae for nexus 5, the rest come in before its energy (3.9 h)");
+    - all of them while larvae are what it waits for.
+
+    Every other larva goes to the climb as usual.
   - At nexus 4, the first 1,000 lepidoptera come first ("the first 1,000, before nexus 5").
   - Then it keeps only the energy nexus 5 will need by the time its larvae are there: its price less what your energy income brings while the larvae come in. The rest goes into lepidoptera. While nexus 5's meat is missing, the whole price is kept. The line says how much is kept and when the larvae will be there.
   - After nexus 5, lepidoptera up to the target, then House of Mirrors. With the achievements route on, the target depends on the kind of run (see Ascension below).
