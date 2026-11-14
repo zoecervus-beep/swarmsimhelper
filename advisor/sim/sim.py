@@ -273,18 +273,22 @@ def energy_policy(s,p,gained):
         if s.c[0]>=m and s.energy>=e and s.larva>=l:
             s.c[0]-=m; s.energy-=e; s.larva-=l; s.nexus+=1; s.energy=min(ecap(s),s.energy+g); s.reserve=min(s.reserve,s.larva)
         else:
-            if s.c[0]>=m/p.get('nexus_soon',30) and l<=p.get('nexus_secs',3600)*lam(s): hold=e; s.nexres=min(l,s.larva)
+            if s.c[0]>=m/p.get('nexus_soon',30) and l<=p.get('nexus_secs',3600)*lam(s): hold=e; s.nexres=0.0 if p.get('no_nexres') else min(l,s.larva)   # no_nexres (default off): the climb is not told to keep them
             break
     if ascend_saving(s,p): return
     mt=p.get('moth_N5',p.get('moth_N',0)) if s.nexus>=5 else p.get('moth_N',0)
     if p.get('moth_late') and run_age(s,p)>=p['moth_late'][0]: mt=p['moth_late'][1]   # (run age, target): raise the target later in a run
     if TRACE is not None: tr('moth_target',mt)
     if s.nexus>=4 and s.moth<mt:
-        n=math.floor(min(mt-s.moth,max(0,s.energy-hold)/10,s.larva))
+        # moth_first (default off): below nexus 5 the lepidoptera target is bought before energy is held for nexus 5
+        h=0.0 if (p.get('moth_first') and s.nexus==4) else hold
+        n=math.floor(min(mt-s.moth,max(0,s.energy-h)/10,s.larva))
         if n>0: s.moth+=n; s.energy-=10*n; s.larva-=n
     if s.nexus>=5 and s.bat<p.get('bat_N',0) and s.moth>=mt:
         n=math.floor(min(p['bat_N']-s.bat,max(0,s.energy-hold)/100,s.larva))
         if n>0: s.bat+=n; s.energy-=100*n; s.larva-=n
+    if s.nexus<5 and p.get('spare_pre5')=='save':
+        spare_save(s,p,hold); return
     pw=epow(s)
     if 'clone' in p.get('spells',()) and s.nexus>=4:
         s.reserve=min(lam(s)*1e5*pw*s.spw['clone'], s.larva, s.reserve+p.get('res_in',0)*gained)
@@ -312,6 +316,38 @@ def energy_policy(s,p,gained):
                 s.reserve=min(lam(s)*1e5*q,max(s.reserve,p.get('clone_keep',0.5)*s.larva))
             elif sp=='mirror': s.t=[x*2 for x in s.t]
         if (mw and s.nexus>=5) or (sp==p.get('spells')[0] and not p.get('spill')): break
+def spare_save(s,p,hold):
+    """Policy option `spare_pre5='save'` (default off): the native advisor's spareEnergy 'save' below nexus 5.
+    Spare energy is held for the next nexus instead of cast; the one exception is energy at its cap, where one
+    larva rush brings it back under. While saving for the next nexus (hold > 0) the advisor shows the save,
+    so nothing is cast then either."""
+    if s.nexus<1: return
+    ex=p.get('pre5_excess')   # (default off) at nexus 4, energy above what nexus 5 needs: 'moths' up to moth_N5, or 'larvarush'
+    if ex and s.nexus==4:
+        keep=NEX[4][1] if not p.get('jit5') else jit_hold(s,p,hold)
+        if ex=='moths':
+            n=math.floor(min(max(0.0,s.energy-keep)/10,s.larva,max(0.0,p.get('moth_N5',p.get('moth_N',0))-s.moth)))
+            if n>0: s.moth+=n; s.energy-=10*n; s.larva-=n
+        elif ex=='larvarush':
+            q=epow(s)*s.spw['larvarush']
+            while s.energy-keep>=SPELL['larvarush'][0]:
+                s.energy-=SPELL['larvarush'][0]; s.casts['larvarush']=s.casts.get('larvarush',0)+1
+                s.larva+=lam(s)*2400*q+1e5*q
+    if hold>0: return
+    if s.energy>=ecap(s) and s.energy>=SPELL['larvarush'][0]:
+        q=epow(s)*s.spw['larvarush']
+        s.energy-=SPELL['larvarush'][0]; s.casts['larvarush']=s.casts.get('larvarush',0)+1
+        s.larva+=lam(s)*2400*q+1e5*q
+def jit_hold(s,p,hold):
+    """Option `jit5` (with pre5_excess, default off): at nexus 4, the energy to keep for nexus 5 "just in time".
+    Its meat not in hand: keep the whole price. Otherwise keep only what the energy income will not refill before
+    the larvae are there: max(0, price - energy/s x T), T = larvae still missing / larvae per second (the larvae
+    held for the nexus count only while they are being held, i.e. hold > 0)."""
+    m,e,l,g=NEX[4]
+    if s.c[0]<m: return e
+    have=s.larva if hold>0 else 0.0
+    T=max(0.0,l-have)/lam(s) if lam(s)>0 else float('inf')
+    return min(e,math.ceil(max(0.0,e-erate(s)*T*p.get('jit_f',1.0))))   # whole energy, as the advisor; jit_f < 1: count only part of that time
 def advance(s,dt,skip=False):
     L=lam(s)*dt; s.larva+=L; s.terr+=trate(s)*dt
     if not skip:

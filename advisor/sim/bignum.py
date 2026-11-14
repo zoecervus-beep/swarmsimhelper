@@ -40,6 +40,10 @@ class Big(object):
     def of(x):
         if isinstance(x, Big):
             return x
+        if isinstance(x, int) and abs(x).bit_length() > 1000:   # a Python int past float range (math.ceil of a Big)
+            sh = abs(x).bit_length() - 64
+            m, e = math.frexp(float(x >> sh) if x > 0 else -float((-x) >> sh))
+            return Big(m, e + sh)
         m, e = math.frexp(float(x))
         b = Big(m, e)
         return b

@@ -1,0 +1,217 @@
+{
+ "unittypes": {
+  "invisiblehatchery": "1",
+  "meat": "15960261442.65659948",
+  "larva": "2787.808006706335069",
+  "cocoon": "0",
+  "territory": "15527238.070189000472",
+  "energy": "0",
+  "respecEnergy": "0",
+  "mtxEnergy": "0",
+  "nexus": "0",
+  "crystal": "0",
+  "mutagen": "0",
+  "premutagen": "0",
+  "ascension": "0",
+  "freeRespec": "4",
+  "drone": "40990696.511378",
+  "queen": "29081.825",
+  "nest": "79",
+  "greaterqueen": "0",
+  "hive": "0",
+  "hivequeen": "0",
+  "empress": "0",
+  "prophet": "0",
+  "goddess": "0",
+  "pantheon": "0",
+  "pantheon2": "0",
+  "pantheon3": "0",
+  "pantheon4": "0",
+  "pantheon5": "0",
+  "overmind": "0",
+  "overmind2": "0",
+  "overmind3": "0",
+  "overmind4": "0",
+  "overmind5": "0",
+  "overmind6": "0",
+  "swarmling": "861",
+  "stinger": "3908",
+  "spider": "1136",
+  "mosquito": "0",
+  "locust": "0",
+  "roach": "0",
+  "giantspider": "0",
+  "centipede": "0",
+  "wasp": "0",
+  "devourer": "0",
+  "goon": "0",
+  "nightbug": "0",
+  "moth": "0",
+  "bat": "0",
+  "mutanthatchery": "0",
+  "mutantbat": "0",
+  "mutantclone": "0",
+  "mutantswarmwarp": "0",
+  "mutantrush": "0",
+  "mutanteach": "0",
+  "mutantfreq": "0",
+  "mutantnexus": "0",
+  "mutantarmy": "0",
+  "mutantmeat": "0"
+ },
+ "date": {
+  "started": "2026-11-13T06:03:35.838Z",
+  "restarted": "2026-11-13T06:03:35.838Z",
+  "saved": "2026-11-13T06:30:46.561Z",
+  "reified": "2026-11-13T06:30:46.547Z",
+  "closed": "2026-11-13T06:03:35.838Z"
+ },
+ "options": {
+  "advisor": {
+   "ageMultiple": 5
+  },
+  "showAdvancedUnitData": true
+ },
+ "upgrades": {
+  "hatchery": "8",
+  "droneprod": "2",
+  "dronetwin": "1",
+  "swarmlingtwin": "2",
+  "expansion": "16",
+  "stingertwin": "3",
+  "queenprod": "1",
+  "achievementbonus": "1",
+  "queentwin": "2",
+  "spidertwin": "3"
+ },
+ "statistics": {
+  "byUnit": {
+   "drone": {
+    "clicks": 9,
+    "num": "504",
+    "twinnum": "729",
+    "elapsedFirst": 174727
+   },
+   "queen": {
+    "clicks": 22,
+    "num": "23816",
+    "twinnum": "72711",
+    "elapsedFirst": 272818
+   },
+   "swarmling": {
+    "clicks": 9,
+    "num": "236",
+    "twinnum": "861",
+    "elapsedFirst": 394528
+   },
+   "stinger": {
+    "clicks": 10,
+    "num": "695",
+    "twinnum": "3908",
+    "elapsedFirst": 597978
+   },
+   "nest": {
+    "clicks": 10,
+    "num": "90",
+    "twinnum": "90",
+    "elapsedFirst": 863689
+   },
+   "spider": {
+    "clicks": 7,
+    "num": "164",
+    "twinnum": "1136",
+    "elapsedFirst": 1068859
+   }
+  },
+  "byUpgrade": {
+   "hatchery": {
+    "clicks": 8,
+    "num": "8",
+    "elapsedFirst": 243328
+   },
+   "droneprod": {
+    "clicks": 2,
+    "num": "2",
+    "elapsedFirst": 269687
+   },
+   "dronetwin": {
+    "clicks": 1,
+    "num": "1",
+    "elapsedFirst": 284208
+   },
+   "swarmlingtwin": {
+    "clicks": 2,
+    "num": "2",
+    "elapsedFirst": 399168
+   },
+   "expansion": {
+    "clicks": 16,
+    "num": "16",
+    "elapsedFirst": 406318
+   },
+   "stingertwin": {
+    "clicks": 2,
+    "num": "3",
+    "elapsedFirst": 499428
+   },
+   "queenprod": {
+    "clicks": 1,
+    "num": "1",
+    "elapsedFirst": 620018
+   },
+   "achievementbonus": {
+    "clicks": 1,
+    "num": "1",
+    "elapsedFirst": 759308
+   },
+   "queentwin": {
+    "clicks": 2,
+    "num": "2",
+    "elapsedFirst": 869228
+   },
+   "spidertwin": {
+    "clicks": 2,
+    "num": "3",
+    "elapsedFirst": 895808
+   }
+  },
+  "clicks": 104
+ },
+ "achievements": {
+  "konami": 7397,
+  "changelog": 12708,
+  "import": 130743,
+  "drone1": 174727,
+  "clickme": 181798,
+  "therightquestion": 187407,
+  "drone2": 270327,
+  "queen1": 272818,
+  "swarmling1": 394528,
+  "expansion1": 406318,
+  "tutorial": 567208,
+  "queen2": 837098,
+  "stinger1": 854178,
+  "nest1": 863689,
+  "spider1": 1219409
+ },
+ "watched": {
+  "droneprod": 2,
+  "dronetwin": 0,
+  "swarmlingtwin": 4,
+  "stingertwin": 4,
+  "queenprod": 2,
+  "nestprod": 2
+ },
+ "skippedMillis": 0,
+ "version": {
+  "started": "1.1.17",
+  "saved": "1.1.17"
+ },
+ "achievementsShown": {
+  "earned": false,
+  "unearned": true,
+  "masked": true,
+  "order": "percentComplete",
+  "reverse": true
+ }
+}
