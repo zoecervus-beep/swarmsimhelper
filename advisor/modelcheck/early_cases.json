@@ -1,0 +1,7178 @@
+[
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.336388888888889,
+"energy": 3091.0,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 654601.0180896095,
+"larva_rate": 10909.986591742281,
+"meat": 3.7858774010891277e+24,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 309.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.353055555555556,
+"energy": 38.60588999566912,
+"rate": 0.6267648332611521,
+"cap": 40000.0,
+"moths": 1309.0,
+"larvae": 683062.0481813002,
+"larva_rate": 11384.333834861513,
+"meat": 4.784955421337356e+24,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 3.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.369722222222222,
+"energy": 46.225267158298884,
+"rate": 0.6269896193771627,
+"cap": 40000.0,
+"moths": 1312.0,
+"larvae": 683062.0782729909,
+"larva_rate": 11384.333834861513,
+"meat": 6.723525296929419e+24,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 4.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.386388888888889,
+"energy": 43.86257285778075,
+"rate": 0.6272884283246978,
+"cap": 40000.0,
+"moths": 1316.0,
+"larvae": 683062.1083646816,
+"larva_rate": 11384.333834861513,
+"meat": 8.825080272110667e+24,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 4.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.4030555555555555,
+"energy": 41.51774527157386,
+"rate": 0.6275862068965519,
+"cap": 40000.0,
+"moths": 1320.0,
+"larvae": 683062.1384563723,
+"larva_rate": 11384.333834861513,
+"meat": 1.1351511958018855e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 4.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.419722222222222,
+"energy": 39.19072289635872,
+"rate": 0.627882960413081,
+"cap": 40000.0,
+"moths": 1324.0,
+"larvae": 683061.168548063,
+"larva_rate": 11384.333834861513,
+"meat": 1.437291818625998e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 3.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.436388888888889,
+"energy": 46.87701425862774,
+"rate": 0.628104856037817,
+"cap": 40000.0,
+"moths": 1327.0,
+"larvae": 683061.1986397537,
+"larva_rate": 11384.333834861513,
+"meat": 1.7936984594704238e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 4.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.453055555555555,
+"energy": 44.581003962617444,
+"rate": 0.6283998283998284,
+"cap": 40000.0,
+"moths": 1331.0,
+"larvae": 683061.2287314445,
+"larva_rate": 11384.333834861513,
+"meat": 2.209016268256806e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 4.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.469722222222222,
+"energy": 42.30263137161102,
+"rate": 0.6286937901498929,
+"cap": 40000.0,
+"moths": 1335.0,
+"larvae": 683061.2588231352,
+"larva_rate": 11384.333834861513,
+"meat": 2.6882070107096087e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 4.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.4863888888888885,
+"energy": 40.041836159982125,
+"rate": 0.6289867464728517,
+"cap": 40000.0,
+"moths": 1339.0,
+"larvae": 683061.2889148259,
+"larva_rate": 11384.333834861513,
+"meat": 3.236709468512372e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 4.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.503055555555555,
+"energy": 37.79855831107048,
+"rate": 0.6292787025181392,
+"cap": 40000.0,
+"moths": 1343.0,
+"larvae": 711522.1535936705,
+"larva_rate": 11858.681077980742,
+"meat": 3.5595819146607223e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 3.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.519722222222223,
+"energy": 45.56837928293749,
+"rate": 0.6294970161977835,
+"cap": 40000.0,
+"moths": 1346.0,
+"larvae": 782674.1047403995,
+"larva_rate": 13044.549185778818,
+"meat": 4.5324048394821515e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 4.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.536388888888889,
+"energy": 43.35561332549069,
+"rate": 0.6297872340425532,
+"cap": 40000.0,
+"moths": 1350.0,
+"larvae": 811028.8467275207,
+"larva_rate": 13517.129033118686,
+"meat": 5.348171192589489e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 4.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.553055555555556,
+"energy": 41.16020126091974,
+"rate": 0.6300764655904842,
+"cap": 40000.0,
+"moths": 1354.0,
+"larvae": 811029.5887146419,
+"larva_rate": 13517.129033118686,
+"meat": 6.231298254694475e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 4.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.5697222222222225,
+"energy": 38.98208421257369,
+"rate": 0.6303647158608991,
+"cap": 40000.0,
+"moths": 1358.0,
+"larvae": 811029.330701763,
+"larva_rate": 13517.129033118686,
+"meat": 7.90389260691532e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 3.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.586388888888889,
+"energy": 46.81689996860927,
+"rate": 0.630580262600593,
+"cap": 40000.0,
+"moths": 1361.0,
+"larvae": 811029.0726888842,
+"larva_rate": 13517.129033118686,
+"meat": 1.0039797193508761e+26,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 4.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.603055555555556,
+"energy": 44.668908425268896,
+"rate": 0.6308668076109938,
+"cap": 40000.0,
+"moths": 1365.0,
+"larvae": 811029.8146760054,
+"larva_rate": 13517.129033118686,
+"meat": 1.2422336515019128e+26,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 4.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.619722222222222,
+"energy": 42.538051523622634,
+"rate": 0.6311523849725623,
+"cap": 40000.0,
+"moths": 1369.0,
+"larvae": 811028.5566631266,
+"larva_rate": 13517.129033118686,
+"meat": 1.5041595267335737e+26,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 4.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.636388888888889,
+"energy": 40.424271498338186,
+"rate": 0.6314369995785926,
+"cap": 40000.0,
+"moths": 1373.0,
+"larvae": 811029.2986502477,
+"larva_rate": 13517.129033118686,
+"meat": 1.79096914917637e+26,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 4.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.6530555555555555,
+"energy": 38.32751087570462,
+"rate": 0.6317206562894405,
+"cap": 40000.0,
+"moths": 1377.0,
+"larvae": 811029.0406373689,
+"larva_rate": 13517.129033118686,
+"meat": 2.1040200281327976e+26,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 3.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.669722222222222,
+"energy": 46.24347726225924,
+"rate": 0.6319327731092437,
+"cap": 40000.0,
+"moths": 1380.0,
+"larvae": 811028.7826244901,
+"larva_rate": 13517.129033118686,
+"meat": 2.4444623457112157e+26,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 4.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.686388888888889,
+"energy": 44.17636316829951,
+"rate": 0.6322147651006712,
+"cap": 40000.0,
+"moths": 1384.0,
+"larvae": 892132.2988103235,
+"larva_rate": 14868.841936430556,
+"meat": 2.8132379694711144e+26,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 4.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.703055555555555,
+"energy": 42.126111912018104,
+"rate": 0.6324958123953099,
+"cap": 40000.0,
+"moths": 1388.0,
+"larvae": 892131.8149961568,
+"larva_rate": 14868.841936430556,
+"meat": 3.21778259457164e+26,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 4.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.719722222222222,
+"energy": 40.09266709596459,
+"rate": 0.6327759197324415,
+"cap": 40000.0,
+"moths": 1392.0,
+"larvae": 927817.5518294236,
+"larva_rate": 15463.59561388778,
+"meat": 3.3402207467670464e+26,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 4.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.7363888888888885,
+"energy": 38.07597260514657,
+"rate": 0.6330550918196995,
+"cap": 40000.0,
+"moths": 1396.0,
+"larvae": 961188.5621420728,
+"larva_rate": 16019.78350521082,
+"meat": 4.0739985700081125e+26,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 3.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 5.453055555555555,
+"energy": 1183.0,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 364811.1508924868,
+"larva_rate": 6080.1600814546455,
+"meat": 1.5122105259490676e+23,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.0697222222222225,
+"energy": 2515.0,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 8956641.085521555,
+"larva_rate": 9918.16962885662,
+"meat": 2.800788571404893e+23,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 10.003055555555555,
+"energy": 889.8709610234084,
+"rate": 0.6701720220707563,
+"cap": 40000.0,
+"moths": 2081.0,
+"larvae": 4302477.237628238,
+"larva_rate": 71707.91593540469,
+"meat": 8.245668668282693e+30,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 4848,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 10.619722222222222,
+"energy": 2377.6528500204863,
+"rate": 0.6701720220707563,
+"cap": 40000.0,
+"moths": 2081.0,
+"larvae": 4732723.535250368,
+"larva_rate": 78878.70752894516,
+"meat": 1.7016897757194455e+31,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 7680,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 11.23638888888889,
+"energy": 3865.434739017564,
+"rate": 0.6701720220707563,
+"cap": 40000.0,
+"moths": 2081.0,
+"larvae": 5379529.170936397,
+"larva_rate": 89658.79755790102,
+"meat": 3.195000156460624e+31,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 11085,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 11.853055555555555,
+"energy": 5353.216628014642,
+"rate": 0.6701720220707563,
+"cap": 40000.0,
+"moths": 2081.0,
+"larvae": 5379528.749476654,
+"larva_rate": 89658.79755790102,
+"meat": 5.6656716929863295e+31,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 11085,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 12.469722222222222,
+"energy": 6840.99851701172,
+"rate": 0.6701720220707563,
+"cap": 40000.0,
+"moths": 2081.0,
+"larvae": 5917481.459133928,
+"larva_rate": 98624.67731369114,
+"meat": 9.59552931010083e+31,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 13350,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 13.086388888888889,
+"energy": 8328.7804060088,
+"rate": 0.6701720220707563,
+"cap": 40000.0,
+"moths": 2081.0,
+"larvae": 7391124.873210322,
+"larva_rate": 111986.73036909445,
+"meat": 1.4249099632095192e+33,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 16053,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 13.703055555555556,
+"energy": 9816.562295005911,
+"rate": 0.6701720220707563,
+"cap": 40000.0,
+"moths": 2081.0,
+"larvae": 6944661.864779312,
+"larva_rate": 115744.3414239631,
+"meat": 3.810640106830809e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 16700,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 14.319722222222222,
+"energy": 11304.344184003023,
+"rate": 0.6701720220707563,
+"cap": 40000.0,
+"moths": 2081.0,
+"larvae": 7877851.028346878,
+"larva_rate": 131297.48730280812,
+"meat": 6.699206773604564e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 18986,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 14.936388888888889,
+"energy": 12792.126073000134,
+"rate": 0.6701720220707563,
+"cap": 40000.0,
+"moths": 2081.0,
+"larvae": 9555226.851557413,
+"larva_rate": 159253.74397540672,
+"meat": 1.2494448497878651e+33,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 21973,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 15.553055555555556,
+"energy": 14279.907961997245,
+"rate": 0.6701720220707563,
+"cap": 40000.0,
+"moths": 2081.0,
+"larvae": 18141771.476960354,
+"larva_rate": 159253.74397540672,
+"meat": 2.4597878318546495e+33,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 21973,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 16.169722222222223,
+"energy": 15767.689850994357,
+"rate": 0.6701720220707563,
+"cap": 40000.0,
+"moths": 2081.0,
+"larvae": 386031077.51187086,
+"larva_rate": 180487.57650546098,
+"meat": 8.546686467746908e+34,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 25057,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 16.78638888888889,
+"energy": 17255.47173999143,
+"rate": 0.6701720220707563,
+"cap": 40000.0,
+"moths": 2081.0,
+"larvae": 786713497.3539937,
+"larva_rate": 180487.57650546098,
+"meat": 3.0676662818453583e+35,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 26545,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 17.403055555555557,
+"energy": 18743.253628988474,
+"rate": 0.6701720220707563,
+"cap": 40000.0,
+"moths": 2081.0,
+"larvae": 1212558008.7442303,
+"larva_rate": 204375.63810177203,
+"meat": 4.05235634478293e+35,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 29046,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 18.01972222222222,
+"energy": 20231.035517985518,
+"rate": 0.6701720220707563,
+"cap": 40000.0,
+"moths": 2081.0,
+"larvae": 1666271925.3301651,
+"larva_rate": 204375.63810177203,
+"meat": 1.090797657449966e+36,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 30534,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 18.636388888888888,
+"energy": 21718.81740698256,
+"rate": 0.6701720220707563,
+"cap": 40000.0,
+"moths": 2081.0,
+"larvae": 2119985841.9161,
+"larva_rate": 204375.63810177203,
+"meat": 2.2197194267561662e+36,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 32022,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 19.253055555555555,
+"energy": 23206.599295979606,
+"rate": 0.6701720220707563,
+"cap": 40000.0,
+"moths": 2081.0,
+"larvae": 2580006206.76346,
+"larva_rate": 210214.94204753693,
+"meat": 1.0043742997941183e+36,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 33599,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 19.869722222222222,
+"energy": 24694.38118497665,
+"rate": 0.6701720220707563,
+"cap": 40000.0,
+"moths": 2081.0,
+"larvae": 3046683378.1089997,
+"larva_rate": 210214.94204753693,
+"meat": 3.7230059336768323e+36,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 35087,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 20.48638888888889,
+"energy": 26182.163073973694,
+"rate": 0.6701720220707563,
+"cap": 40000.0,
+"moths": 2081.0,
+"larvae": 3498609834.945777,
+"larva_rate": 238792.54735006506,
+"meat": 3.093645828830894e+36,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 21.103055555555557,
+"energy": 27669.944962970738,
+"rate": 0.6701720220707563,
+"cap": 40000.0,
+"moths": 2081.0,
+"larvae": 3972806521.062921,
+"larva_rate": 238792.54735006506,
+"meat": 2.4839695916740205e+35,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 21.719722222222224,
+"energy": 29157.726851967782,
+"rate": 0.6701720220707563,
+"cap": 40000.0,
+"moths": 2081.0,
+"larvae": 4493616321.691778,
+"larva_rate": 262671.80208507157,
+"meat": 3.968665795315573e+35,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 22.336388888888887,
+"energy": 30645.508740964826,
+"rate": 0.6701720220707563,
+"cap": 40000.0,
+"moths": 2081.0,
+"larvae": 5047913862.070918,
+"larva_rate": 288938.9822935788,
+"meat": 1.208944087266421e+36,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 22.953055555555554,
+"energy": 32133.29062996187,
+"rate": 0.6701720220707563,
+"cap": 40000.0,
+"moths": 2081.0,
+"larvae": 5571155750.018984,
+"larva_rate": 317832.8805229367,
+"meat": 7.663492346935211e+36,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 23.56972222222222,
+"energy": 33621.072518958914,
+"rate": 0.6701720220707563,
+"cap": 40000.0,
+"moths": 2081.0,
+"larvae": 3352402973.7798986,
+"larva_rate": 317832.8805229367,
+"meat": 2.130863743048838e+37,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 19.499985348942673,
+"energy": 23198.748497253095,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 191391052.92763782,
+"larva_rate": 5368.936303941736,
+"meat": 2.8117152145488244e+27,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 2319.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 19.533318682276008,
+"energy": 93.63481353001063,
+"rate": 0.7073859689742996,
+"cap": 40000.0,
+"moths": 3319.0,
+"larvae": 173152544.630971,
+"larva_rate": 14057.814194443436,
+"meat": 3.2446756150729904e+26,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 19.566652015609343,
+"energy": 88.54424051707163,
+"rate": 0.7075785582255083,
+"cap": 40000.0,
+"moths": 3328.0,
+"larvae": 174701294.376994,
+"larva_rate": 14563.439550191653,
+"meat": 1.0983125960731404e+26,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 19.599985348942674,
+"energy": 93.47412981596463,
+"rate": 0.707749077490775,
+"cap": 40000.0,
+"moths": 3336.0,
+"larvae": 176335570.3976193,
+"larva_rate": 16019.78350521082,
+"meat": 8.914759571286004e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 19.63331868227601,
+"energy": 88.42694914853081,
+"rate": 0.7079401611047181,
+"cap": 40000.0,
+"moths": 3345.0,
+"larvae": 177953085.4182446,
+"larva_rate": 16019.78350521082,
+"meat": 8.786381343218664e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 19.66665201560934,
+"energy": 93.40007113336885,
+"rate": 0.7081093498736504,
+"cap": 40000.0,
+"moths": 3353.0,
+"larvae": 179563004.4388699,
+"larva_rate": 16019.78350521082,
+"meat": 8.851654922875983e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 19.699985348942676,
+"energy": 88.39594458591355,
+"rate": 0.7082989454378725,
+"cap": 40000.0,
+"moths": 3362.0,
+"larvae": 181101086.4594952,
+"larva_rate": 16019.78350521082,
+"meat": 8.93653189681612e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 19.733318682276007,
+"energy": 93.41196289254972,
+"rate": 0.7084668192219681,
+"cap": 40000.0,
+"moths": 3370.0,
+"larvae": 182992588.2022814,
+"larva_rate": 19563.54785655172,
+"meat": 9.023465437182773e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 23.27394732736895,
+"energy": 9036.114342711851,
+"rate": 0.7086549440511534,
+"cap": 40000.0,
+"moths": 3379.0,
+"larvae": 431685064.7882746,
+"larva_rate": 19563.54785655172,
+"meat": 2.5617548226787667e+28,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 903.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 23.307280660702283,
+"energy": 93.02687584324097,
+"rate": 0.7242711094282469,
+"cap": 40000.0,
+"moths": 4282.0,
+"larvae": 3594727.6798785515,
+"larva_rate": 29956.057430033045,
+"meat": 3.4596115441450626e+27,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 23.340613994035618,
+"energy": 89.95486677123192,
+"rate": 0.7243999243999245,
+"cap": 40000.0,
+"moths": 4291.0,
+"larvae": 3717824.30182072,
+"larva_rate": 30981.855182851406,
+"meat": 1.6006715914195612e+27,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 23.373947327368953,
+"energy": 96.89655388200754,
+"rate": 0.7245140592564635,
+"cap": 40000.0,
+"moths": 4299.0,
+"larvae": 3717824.9237628886,
+"larva_rate": 30981.855182851406,
+"meat": 1.473984048951763e+27,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 23.407280660702284,
+"energy": 93.85359985035721,
+"rate": 0.7246420497362472,
+"cap": 40000.0,
+"moths": 4308.0,
+"larvae": 3717824.545705057,
+"larva_rate": 30981.855182851406,
+"meat": 1.5264973582155806e+27,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 23.44061399403562,
+"energy": 90.82595268090076,
+"rate": 0.7247696069211962,
+"cap": 40000.0,
+"moths": 4317.0,
+"larvae": 3717824.167647226,
+"larva_rate": 30981.855182851406,
+"meat": 1.6059340454087423e+27,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 23.47394732736895,
+"energy": 87.81356064184706,
+"rate": 0.7248967330078859,
+"cap": 40000.0,
+"moths": 4326.0,
+"larvae": 3717824.7895893943,
+"larva_rate": 30981.855182851406,
+"meat": 1.7024028625770028e+27,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 23.507280660702286,
+"energy": 94.81468550123964,
+"rate": 0.7250093738282715,
+"cap": 40000.0,
+"moths": 4334.0,
+"larvae": 3717824.411531563,
+"larva_rate": 30981.855182851406,
+"meat": 1.8167847383691868e+27,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 23.540613994035617,
+"energy": 91.83096848832554,
+"rate": 0.7251356915590492,
+"cap": 40000.0,
+"moths": 4343.0,
+"larvae": 4089606.295667948,
+"larva_rate": 34080.040701136546,
+"meat": 1.9534259898470006e+27,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 23.573947327368952,
+"energy": 88.86235862285469,
+"rate": 0.7252615844544096,
+"cap": 40000.0,
+"moths": 4352.0,
+"larvae": 4089607.1798043335,
+"larva_rate": 34080.040701136546,
+"meat": 2.117375439874817e+27,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 23.607280660702283,
+"energy": 95.90713474225768,
+"rate": 0.7253731343283583,
+"cap": 40000.0,
+"moths": 4360.0,
+"larvae": 4089606.063940719,
+"larva_rate": 34080.040701136546,
+"meat": 2.3138787995467983e+27,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 23.64061399403562,
+"energy": 92.96692241221484,
+"rate": 0.7254982305829764,
+"cap": 40000.0,
+"moths": 4369.0,
+"larvae": 4089605.948077104,
+"larva_rate": 34080.040701136546,
+"meat": 2.5469068563369665e+27,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 23.67394732736895,
+"energy": 90.04167138952984,
+"rate": 0.7256229081442916,
+"cap": 40000.0,
+"moths": 4378.0,
+"larvae": 4089606.8322134893,
+"larva_rate": 34080.040701136546,
+"meat": 2.8241982338499374e+27,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 26.994120908076113,
+"energy": 8674.62534914668,
+"rate": 0.7257471691108224,
+"cap": 40000.0,
+"moths": 4387.0,
+"larvae": 407345943.58743125,
+"larva_rate": 34080.040701136546,
+"meat": 3.3298774687859435e+31,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 867.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 27.027454241409444,
+"energy": 92.95026120296357,
+"rate": 0.7360409338023666,
+"cap": 40000.0,
+"moths": 5254.0,
+"larvae": 5685245.325470699,
+"larva_rate": 47377.03948366206,
+"meat": 5.351756511570602e+30,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 27.06078757474278,
+"energy": 91.28620244517977,
+"rate": 0.736132843685135,
+"cap": 40000.0,
+"moths": 5263.0,
+"larvae": 6465027.555559775,
+"larva_rate": 53875.218584075636,
+"meat": 3.020495776288943e+30,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 27.09412090807611,
+"energy": 89.63314122068998,
+"rate": 0.7362244897959185,
+"cap": 40000.0,
+"moths": 5272.0,
+"larvae": 6465027.785648851,
+"larva_rate": 53875.218584075636,
+"meat": 2.921877203760733e+30,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 9.542370371285065,
+"energy": 1690.3001455126614,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 568788.9769339092,
+"larva_rate": 4739.897293929303,
+"meat": 8.698280652686172e+22,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 9.609037037951731,
+"energy": 1834.3001455126591,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 1563705.3274769248,
+"larva_rate": 4739.897293929303,
+"meat": 4.143113939678664e+22,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 9.675703704618398,
+"energy": 1978.3001455126591,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 2643019.678019957,
+"larva_rate": 4739.897293929303,
+"meat": 8.23812339367446e+22,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 9.742370371285066,
+"energy": 2122.300145512659,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 3607642.0285629896,
+"larva_rate": 4739.897293929303,
+"meat": 5.509193945449462e+22,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 9.809037037951732,
+"energy": 2266.300145512659,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 4628296.379106022,
+"larva_rate": 4739.897293929303,
+"meat": 5.0686970274335796e+22,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 9.875703704618399,
+"energy": 2410.300145512659,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 5705025.497176208,
+"larva_rate": 5213.887023322233,
+"meat": 5.405560393608016e+22,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 9.942370371285065,
+"energy": 2554.300145512659,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 6861813.210122224,
+"larva_rate": 5368.936303941736,
+"meat": 5.765889063957375e+22,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 10.009037037951732,
+"energy": 2698.300145512659,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 8015922.92306824,
+"larva_rate": 5368.936303941736,
+"meat": 6.1461336035120405e+22,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 29.663615823573846,
+"energy": 185.2190352621313,
+"rate": 0.7423963133640554,
+"cap": 40000.0,
+"moths": 5944.0,
+"larvae": 11506509.544784889,
+"larva_rate": 95887.5591867476,
+"meat": 6.6598887436588795e+31,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 10193,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 29.730282490240512,
+"energy": 363.3941504695046,
+"rate": 0.7423963133640554,
+"cap": 40000.0,
+"moths": 5944.0,
+"larvae": 11506508.749604315,
+"larva_rate": 95887.5591867476,
+"meat": 6.024195112878185e+31,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 10193,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 29.79694915690718,
+"energy": 541.5692656768779,
+"rate": 0.7423963133640554,
+"cap": 40000.0,
+"moths": 5944.0,
+"larvae": 11506507.95442374,
+"larva_rate": 95887.5591867476,
+"meat": 6.352792471400305e+31,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 10193,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 29.86361582357385,
+"energy": 719.7443808842511,
+"rate": 0.7423963133640554,
+"cap": 40000.0,
+"moths": 5944.0,
+"larvae": 11506508.159243166,
+"larva_rate": 95887.5591867476,
+"meat": 6.7052904853233865e+31,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 10193,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 29.930282490240515,
+"energy": 897.9194960916243,
+"rate": 0.7423963133640554,
+"cap": 40000.0,
+"moths": 5944.0,
+"larvae": 11506508.364062592,
+"larva_rate": 95887.5591867476,
+"meat": 7.072954026661892e+31,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 10193,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 29.99694915690718,
+"energy": 1076.0946112989975,
+"rate": 0.7423963133640554,
+"cap": 40000.0,
+"moths": 5944.0,
+"larvae": 13807810.27912299,
+"larva_rate": 105476.31510542237,
+"meat": 1.3992836488549368e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 12539,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 30.063615823573848,
+"energy": 1254.269726506371,
+"rate": 0.7423963133640554,
+"cap": 40000.0,
+"moths": 5944.0,
+"larvae": 16339241.904424358,
+"larva_rate": 105476.31510542237,
+"meat": 2.79926058288634e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 12539,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 30.130282490240514,
+"energy": 1432.4448417137444,
+"rate": 0.7423963133640554,
+"cap": 40000.0,
+"moths": 5944.0,
+"larvae": 18870673.529725727,
+"larva_rate": 105476.31510542237,
+"meat": 4.273767556504635e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 12539,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 31.88323582071854,
+"energy": 6117.434765879806,
+"rate": 0.7423963133640554,
+"cap": 40000.0,
+"moths": 5944.0,
+"larvae": 14357964.372959603,
+"larva_rate": 119649.69494771352,
+"meat": 7.89630539167159e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 15318,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 31.949902487385206,
+"energy": 6295.60988108718,
+"rate": 0.7423963133640554,
+"cap": 40000.0,
+"moths": 5944.0,
+"larvae": 14357964.160410848,
+"larva_rate": 119649.69494771352,
+"meat": 3.720855033467295e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 15318,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 32.01656915405187,
+"energy": 6473.784996294554,
+"rate": 0.7423963133640554,
+"cap": 40000.0,
+"moths": 5944.0,
+"larvae": 14357964.947862092,
+"larva_rate": 119649.69494771352,
+"meat": 3.940008949371812e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 15318,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 32.083235820718535,
+"energy": 6651.960111501928,
+"rate": 0.7423963133640554,
+"cap": 40000.0,
+"moths": 5944.0,
+"larvae": 15793762.0746859,
+"larva_rate": 131614.66444248488,
+"meat": 4.212825614908303e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 17198,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 32.149902487385205,
+"energy": 6830.135226709302,
+"rate": 0.7423963133640554,
+"cap": 40000.0,
+"moths": 5944.0,
+"larvae": 15793761.540882269,
+"larva_rate": 131614.66444248488,
+"meat": 4.4962697926121074e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 17198,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 32.21656915405187,
+"energy": 7008.3103419166755,
+"rate": 0.7423963133640554,
+"cap": 40000.0,
+"moths": 5944.0,
+"larvae": 15793762.007078638,
+"larva_rate": 131614.66444248488,
+"meat": 4.790310826182176e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 17198,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 32.28323582071854,
+"energy": 7186.485457124049,
+"rate": 0.7423963133640554,
+"cap": 40000.0,
+"moths": 5944.0,
+"larvae": 15793761.473275008,
+"larva_rate": 131614.66444248488,
+"meat": 5.09535111465439e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 17198,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 32.34990248738521,
+"energy": 7364.660572331423,
+"rate": 0.7423963133640554,
+"cap": 40000.0,
+"moths": 5944.0,
+"larvae": 15793760.939471377,
+"larva_rate": 131614.66444248488,
+"meat": 5.4118086543450884e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 17198,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 1,
+"age_h": 32.41656915405187,
+"energy": 7542.835687538797,
+"rate": 0.7423963133640554,
+"cap": 40000.0,
+"moths": 5944.0,
+"larvae": 15793761.405667746,
+"larva_rate": 131614.66444248488,
+"meat": 5.740121894862703e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 17198,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 19.756027638394787,
+"energy": 24527.623239915338,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 177701353.17517287,
+"larva_rate": 5527.418255867859,
+"meat": 4.7467099755590255e+26,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 2452.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 19.789360971728122,
+"energy": 92.84156875630812,
+"rate": 0.7101527403414196,
+"cap": 40000.0,
+"moths": 3452.0,
+"larvae": 161065317.92119586,
+"larva_rate": 14563.439550191653,
+"meat": 2.7668279729899815e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 19.822694305061454,
+"energy": 88.08164945570287,
+"rate": 0.7103340058282896,
+"cap": 40000.0,
+"moths": 3461.0,
+"larvae": 162688876.15176642,
+"larva_rate": 15083.51025475456,
+"meat": 1.655945054525553e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 19.85602763839479,
+"energy": 93.34099159040863,
+"rate": 0.7104945177892147,
+"cap": 40000.0,
+"moths": 3469.0,
+"larvae": 164291383.38233697,
+"larva_rate": 15083.51025475456,
+"meat": 1.5736101836940106e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 19.88936097172812,
+"energy": 88.62192057656317,
+"rate": 0.7106744082179545,
+"cap": 40000.0,
+"moths": 3478.0,
+"larvae": 166073345.73596457,
+"larva_rate": 16591.861280230016,
+"meat": 1.5940659208119253e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 19.922694305061455,
+"energy": 93.92196515971075,
+"rate": 0.7108337048595632,
+"cap": 40000.0,
+"moths": 3486.0,
+"larvae": 167831942.08959216,
+"larva_rate": 16591.861280230016,
+"meat": 1.624906650067488e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 19.956027638394787,
+"energy": 89.24343345781976,
+"rate": 0.7110122358175751,
+"cap": 40000.0,
+"moths": 3495.0,
+"larvae": 169589555.44321975,
+"larva_rate": 16591.861280230016,
+"meat": 1.6568473116107881e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 19.98936097172812,
+"energy": 94.58387316468185,
+"rate": 0.7111703308905174,
+"cap": 40000.0,
+"moths": 3503.0,
+"larvae": 171341284.79684734,
+"larva_rate": 16591.861280230016,
+"meat": 1.6887959598803917e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 20.022694305061453,
+"energy": 89.94557529234143,
+"rate": 0.7113475177304965,
+"cap": 40000.0,
+"moths": 3512.0,
+"larvae": 173083242.15047494,
+"larva_rate": 16591.861280230016,
+"meat": 1.7207865542687435e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 20.056027638394788,
+"energy": 95.32610626579276,
+"rate": 0.7115044247787611,
+"cap": 40000.0,
+"moths": 3520.0,
+"larvae": 175257624.82002622,
+"larva_rate": 20247.52224626057,
+"meat": 1.7531365304811078e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 20.08936097172812,
+"energy": 90.72774018056423,
+"rate": 0.7116802826230956,
+"cap": 40000.0,
+"moths": 3529.0,
+"larvae": 177375729.4895775,
+"larva_rate": 20247.52224626057,
+"meat": 1.7851352067101426e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 20.122694305061454,
+"energy": 86.15039333173215,
+"rate": 0.7118554429263994,
+"cap": 40000.0,
+"moths": 3538.0,
+"larvae": 179483160.1591288,
+"larva_rate": 20247.52224626057,
+"meat": 1.8173133366675337e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 20.156027638394786,
+"energy": 91.5916603796864,
+"rate": 0.7120105587329522,
+"cap": 40000.0,
+"moths": 3546.0,
+"larvae": 181572013.82868007,
+"larva_rate": 20247.52224626057,
+"meat": 1.8497348395034174e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 20.18936097172812,
+"energy": 87.05378990767763,
+"rate": 0.7121844127332602,
+"cap": 40000.0,
+"moths": 3555.0,
+"larvae": 183642031.49823135,
+"larva_rate": 20247.52224626057,
+"meat": 1.8819179583701004e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 20.222694305061452,
+"energy": 92.53439477289788,
+"rate": 0.7123383738768355,
+"cap": 40000.0,
+"moths": 3563.0,
+"larvae": 185682885.16778263,
+"larva_rate": 20247.52224626057,
+"meat": 1.9145193840212496e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 20.256027638394787,
+"energy": 88.0357071088559,
+"rate": 0.7125109361329834,
+"cap": 40000.0,
+"moths": 3572.0,
+"larvae": 187619984.5160806,
+"larva_rate": 20950.494569149618,
+"meat": 1.9470859854845237e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 23.03297302306413,
+"energy": 7132.53768265878,
+"rate": 0.7126637554585153,
+"cap": 40000.0,
+"moths": 3580.0,
+"larvae": 396375943.6373052,
+"larva_rate": 20950.494569149618,
+"meat": 6.484783368067664e+27,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 713.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 23.066306356397465,
+"energy": 89.46910151387152,
+"rate": 0.724428490459097,
+"cap": 40000.0,
+"moths": 4293.0,
+"larvae": 329154270.9030319,
+"larva_rate": 26325.10221438916,
+"meat": 7.135306974695749e+26,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 23.099639689730797,
+"energy": 96.41420621109846,
+"rate": 0.7245425391435578,
+"cap": 40000.0,
+"moths": 4301.0,
+"larvae": 303257793.1687586,
+"larva_rate": 26325.10221438916,
+"meat": 4.622497530653242e+26,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 23.13297302306413,
+"energy": 93.3746581884996,
+"rate": 0.7246704331450095,
+"cap": 40000.0,
+"moths": 4310.0,
+"larvae": 217041924.43448526,
+"larva_rate": 26325.10221438916,
+"meat": 4.6467071866068705e+26,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 23.166306356397463,
+"energy": 90.35040550942459,
+"rate": 0.7247978943410416,
+"cap": 40000.0,
+"moths": 4319.0,
+"larvae": 13947394.926784627,
+"larva_rate": 28957.61243582808,
+"meat": 4.965833093592056e+26,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 23.199639689730798,
+"energy": 87.34139650041558,
+"rate": 0.724924924924925,
+"cap": 40000.0,
+"moths": 4328.0,
+"larvae": 3474915.4190839967,
+"larva_rate": 28957.61243582808,
+"meat": 5.421818076360286e+26,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 23.23297302306413,
+"energy": 94.34589425154003,
+"rate": 0.7250374812593704,
+"cap": 40000.0,
+"moths": 4336.0,
+"larvae": 3474915.911383366,
+"larva_rate": 28957.61243582808,
+"meat": 6.138160235481131e+26,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 23.266306356397465,
+"energy": 91.36553877913592,
+"rate": 0.7251637043966324,
+"cap": 40000.0,
+"moths": 4345.0,
+"larvae": 3474915.4036827357,
+"larva_rate": 28957.61243582808,
+"meat": 7.283243690593438e+26,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 23.299639689730796,
+"energy": 88.40027916015947,
+"rate": 0.7252895031751962,
+"cap": 40000.0,
+"moths": 4354.0,
+"larvae": 3474915.8959821053,
+"larva_rate": 28957.61243582808,
+"meat": 9.031366544435449e+26,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 10.359063969415939,
+"energy": 4230.181714921022,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 498341.4334306914,
+"larva_rate": 4152.831146407106,
+"meat": 4.605052355575887e+22,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 10.392397302749272,
+"energy": 4302.181714921022,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 548175.1447564294,
+"larva_rate": 4568.114261047816,
+"meat": 1.944379396988154e+22,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 10.425730636082605,
+"energy": 4374.181714921022,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 548174.8560821674,
+"larva_rate": 4568.114261047816,
+"meat": 1.703910069644155e+22,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 10.45906396941594,
+"energy": 4446.181714921022,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 548175.5674079054,
+"larva_rate": 4568.114261047816,
+"meat": 1.706815723598225e+22,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 10.492397302749273,
+"energy": 4518.181714921022,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 657809.6498662172,
+"larva_rate": 5024.925687152599,
+"meat": 3.2707935889037923e+22,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 10.525730636082606,
+"energy": 4590.181714921022,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 718108.732324529,
+"larva_rate": 5024.925687152599,
+"meat": 4.863477814277902e+22,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 10.55906396941594,
+"energy": 4662.181714921022,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 602992.8147828408,
+"larva_rate": 5024.925687152599,
+"meat": 2.109169956760866e+22,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 10.592397302749273,
+"energy": 4734.181714921022,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 602991.8972411526,
+"larva_rate": 5024.925687152599,
+"meat": 1.864336756879682e+22,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 10.625730636082606,
+"energy": 4806.181714921022,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 602992.9796994644,
+"larva_rate": 5024.925687152599,
+"meat": 1.8719124534062056e+22,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 10.65906396941594,
+"energy": 4878.181714921022,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 663292.1704036075,
+"larva_rate": 5527.418255867859,
+"meat": 1.9056005696036757e+22,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 10.692397302749272,
+"energy": 4950.181714921022,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 663291.3611077507,
+"larva_rate": 5527.418255867859,
+"meat": 1.942722045528994e+22,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 10.725730636082606,
+"energy": 5022.181714921022,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 663291.5518118938,
+"larva_rate": 5527.418255867859,
+"meat": 1.9817123074115845e+22,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 10.759063969415939,
+"energy": 5094.181714921022,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 663291.742516037,
+"larva_rate": 5527.418255867859,
+"meat": 2.0226768774466795e+22,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 10.792397302749272,
+"energy": 5166.181714921022,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 663291.9332201801,
+"larva_rate": 5527.418255867859,
+"meat": 2.065183084091454e+22,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 10.825730636082605,
+"energy": 5238.181714921022,
+"rate": 0.6000000000000001,
+"cap": 40000.0,
+"moths": 1000.0,
+"larvae": 663291.1239243232,
+"larva_rate": 5527.418255867859,
+"meat": 2.108885035428848e+22,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 29.294018187650334,
+"energy": 89.360064872432,
+"rate": 0.742288270090896,
+"cap": 40000.0,
+"moths": 5931.0,
+"larvae": 10443833.659559242,
+"larva_rate": 87031.93783765528,
+"meat": 4.382153205487033e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 7571,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 29.32735152098367,
+"energy": 178.43465728333953,
+"rate": 0.742288270090896,
+"cap": 40000.0,
+"moths": 5931.0,
+"larvae": 10443834.200077876,
+"larva_rate": 87031.93783765528,
+"meat": 2.0962409341165244e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 7571,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 29.360684854317,
+"energy": 267.50924969424705,
+"rate": 0.742288270090896,
+"cap": 40000.0,
+"moths": 5931.0,
+"larvae": 11488217.994648373,
+"larva_rate": 95735.1316214208,
+"meat": 1.900847329641809e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 10155,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 29.394018187650335,
+"energy": 356.5838421051546,
+"rate": 0.742288270090896,
+"cap": 40000.0,
+"moths": 5931.0,
+"larvae": 11488217.789218869,
+"larva_rate": 95735.1316214208,
+"meat": 1.91500103717672e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 10155,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 29.427351520983667,
+"energy": 445.65843451606213,
+"rate": 0.742288270090896,
+"cap": 40000.0,
+"moths": 5931.0,
+"larvae": 11488217.583789365,
+"larva_rate": 95735.1316214208,
+"meat": 1.950629338806878e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 10155,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 29.460684854317,
+"energy": 534.7330269269696,
+"rate": 0.742288270090896,
+"cap": 40000.0,
+"moths": 5931.0,
+"larvae": 11488217.378359862,
+"larva_rate": 95735.1316214208,
+"meat": 1.988929551490187e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 10155,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 29.494018187650333,
+"energy": 623.8076193378771,
+"rate": 0.742288270090896,
+"cap": 40000.0,
+"moths": 5931.0,
+"larvae": 11488218.172930358,
+"larva_rate": 95735.1316214208,
+"meat": 2.0280459436786278e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 10155,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 29.527351520983668,
+"energy": 712.8822117487846,
+"rate": 0.742288270090896,
+"cap": 40000.0,
+"moths": 5931.0,
+"larvae": 11488216.967500854,
+"larva_rate": 95735.1316214208,
+"meat": 2.0677980250718138e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 10155,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 29.560684854317003,
+"energy": 801.9568041596921,
+"rate": 0.742288270090896,
+"cap": 40000.0,
+"moths": 5931.0,
+"larvae": 11488217.76207135,
+"larva_rate": 95735.1316214208,
+"meat": 2.108197273354113e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 10155,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 2,
+"age_h": 29.594018187650335,
+"energy": 891.0313965705996,
+"rate": 0.742288270090896,
+"cap": 40000.0,
+"moths": 5931.0,
+"larvae": 13785860.136098899,
+"larva_rate": 105308.64478356291,
+"meat": 4.0466294395008806e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 12505,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 19.616065896052895,
+"energy": 89.02208247116833,
+"rate": 0.6792270531400967,
+"cap": 40000.0,
+"moths": 2312.0,
+"larvae": 157787913.22096172,
+"larva_rate": 6802.523359660649,
+"meat": 2.7049511677065913e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 19.64939922938623,
+"energy": 90.56425114586715,
+"rate": 0.6795180722891567,
+"cap": 40000.0,
+"moths": 2320.0,
+"larvae": 158838721.1173531,
+"larva_rate": 9455.507469928303,
+"meat": 7.847380852640563e+24,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 19.68273256271956,
+"energy": 82.14550677818916,
+"rate": 0.6798437969360168,
+"cap": 40000.0,
+"moths": 2329.0,
+"larvae": 160082153.10338366,
+"larva_rate": 10401.058216921134,
+"meat": 1.30694607809601e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 19.716065896052896,
+"energy": 83.7613293733345,
+"rate": 0.6801318549595445,
+"cap": 40000.0,
+"moths": 2337.0,
+"larvae": 161209950.78801724,
+"larva_rate": 11441.164038613248,
+"meat": 6.606169505833611e+24,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 19.74939922938623,
+"energy": 85.41155358858116,
+"rate": 0.6804185351270554,
+"cap": 40000.0,
+"moths": 2345.0,
+"larvae": 162436731.47265083,
+"larva_rate": 11441.164038613248,
+"meat": 6.037411342648756e+24,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 19.782732562719563,
+"energy": 87.09601526469211,
+"rate": 0.6807038473009246,
+"cap": 40000.0,
+"moths": 2353.0,
+"larvae": 163661565.1572844,
+"larva_rate": 11441.164038613248,
+"meat": 6.0576183085152e+24,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 19.816065896052898,
+"energy": 88.81455141464748,
+"rate": 0.6809878012496281,
+"cap": 40000.0,
+"moths": 2361.0,
+"larvae": 164934528.8866421,
+"larva_rate": 11858.681077980742,
+"meat": 6.136659567851878e+24,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 19.84939922938623,
+"energy": 90.56700021251037,
+"rate": 0.6812704066488573,
+"cap": 40000.0,
+"moths": 2369.0,
+"larvae": 166335236.78893554,
+"larva_rate": 13044.549185778818,
+"meat": 6.222186946845075e+24,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 19.882732562719564,
+"energy": 82.35740873826525,
+"rate": 0.6815867377146241,
+"cap": 40000.0,
+"moths": 2378.0,
+"larvae": 167725289.691229,
+"larva_rate": 13044.549185778818,
+"meat": 6.306625987378354e+24,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 19.916065896052896,
+"energy": 84.18138983690673,
+"rate": 0.6818665091553456,
+"cap": 40000.0,
+"moths": 2386.0,
+"larvae": 169114783.59352243,
+"larva_rate": 13044.549185778818,
+"meat": 6.393166588237783e+24,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 23.936333735917618,
+"energy": 9876.841015728865,
+"rate": 0.6821449616971127,
+"cap": 40000.0,
+"moths": 2394.0,
+"larvae": 357729031.2711549,
+"larva_rate": 13044.549185778818,
+"meat": 1.8960378396738315e+27,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 987.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 23.969667069250953,
+"energy": 91.88461308106808,
+"rate": 0.7086966446016891,
+"cap": 40000.0,
+"moths": 3381.0,
+"larvae": 338411185.52024484,
+"larva_rate": 20788.00207574983,
+"meat": 1.9639384016453652e+26,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 24.003000402584284,
+"energy": 86.95067230658061,
+"rate": 0.7088838268792711,
+"cap": 40000.0,
+"moths": 3390.0,
+"larvae": 340219366.7693348,
+"larva_rate": 20788.00207574983,
+"meat": 5.70599935838511e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 24.03633373591762,
+"energy": 92.03662046483437,
+"rate": 0.7090495679854479,
+"cap": 40000.0,
+"moths": 3398.0,
+"larvae": 341693886.01842475,
+"larva_rate": 20788.00207574983,
+"meat": 4.376103576665621e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 24.06966706925095,
+"energy": 87.14485736068188,
+"rate": 0.709235307465396,
+"cap": 40000.0,
+"moths": 3407.0,
+"larvae": 341939657.2675147,
+"larva_rate": 20788.00207574983,
+"meat": 4.307151767966665e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 24.103000402584286,
+"energy": 92.27283018061392,
+"rate": 0.7093997734994337,
+"cap": 40000.0,
+"moths": 3415.0,
+"larvae": 341460476.51660466,
+"larva_rate": 20788.00207574983,
+"meat": 4.365126391995303e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 24.136333735917617,
+"energy": 87.42292059652712,
+"rate": 0.7095840867992766,
+"cap": 40000.0,
+"moths": 3424.0,
+"larvae": 341841748.7656946,
+"larva_rate": 20788.00207574983,
+"meat": 4.436918245362714e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 24.169667069250952,
+"energy": 92.59259568677983,
+"rate": 0.7097472924187725,
+"cap": 40000.0,
+"moths": 3432.0,
+"larvae": 340159096.0396936,
+"larva_rate": 22866.802283324818,
+"meat": 4.51193397504959e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 24.203000402584287,
+"energy": 87.78421919499871,
+"rate": 0.709930195901824,
+"cap": 40000.0,
+"moths": 3441.0,
+"larvae": 335474351.31369257,
+"larva_rate": 22866.802283324818,
+"meat": 4.590843061105294e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 24.23633373591762,
+"energy": 92.99527785986723,
+"rate": 0.7100921555405709,
+"cap": 40000.0,
+"moths": 3449.0,
+"larvae": 325945960.58769155,
+"larva_rate": 22866.802283324818,
+"meat": 4.676604601600177e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 24.269667069250954,
+"energy": 88.22811769835984,
+"rate": 0.7102736653207717,
+"cap": 40000.0,
+"moths": 3458.0,
+"larvae": 299649407.8616905,
+"larva_rate": 22866.802283324818,
+"meat": 4.7773901006741965e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 24.303000402584285,
+"energy": 93.48024488152151,
+"rate": 0.7104343931930139,
+"cap": 40000.0,
+"moths": 3466.0,
+"larvae": 236150732.1356895,
+"larva_rate": 22866.802283324818,
+"meat": 4.912524338773261e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 24.33633373591762,
+"energy": 88.7539878982813,
+"rate": 0.7106145251396648,
+"cap": 40000.0,
+"moths": 3475.0,
+"larvae": 87684733.40968847,
+"larva_rate": 22866.802283324818,
+"meat": 5.1334230105612645e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 24.36966706925095,
+"energy": 94.04687212759204,
+"rate": 0.7107740352442562,
+"cap": 40000.0,
+"moths": 3483.0,
+"larvae": 2744017.683687451,
+"larva_rate": 22866.802283324818,
+"meat": 5.861835569285269e+25,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 9.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 27.912384756407448,
+"energy": 9071.385149182526,
+"rate": 0.7109528049866429,
+"cap": 40000.0,
+"moths": 3492.0,
+"larvae": 291638251.31593096,
+"larva_rate": 22866.802283324818,
+"meat": 6.973937515098995e+31,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 0,
+"sim": {
+"nexus5": false,
+"moths": 907.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 31.329589178039935,
+"energy": 89.99388572552441,
+"rate": 0.7363564041368338,
+"cap": 40000.0,
+"moths": 5285.0,
+"larvae": 10411991.746306539,
+"larva_rate": 86766.57828183968,
+"meat": 8.072424131646679e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 7712,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 31.3962558447066,
+"energy": 266.7194227183645,
+"rate": 0.7363564041368338,
+"cap": 40000.0,
+"moths": 5285.0,
+"larvae": 10761354.862332724,
+"larva_rate": 89677.95048344244,
+"meat": 3.1250799432639695e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 8630,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 31.46292251137327,
+"energy": 443.44495971120466,
+"rate": 0.7363564041368338,
+"cap": 40000.0,
+"moths": 5285.0,
+"larvae": 10761354.97835891,
+"larva_rate": 89677.95048344244,
+"meat": 3.28161720338133e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 8630,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 31.529589178039938,
+"energy": 620.1704967040447,
+"rate": 0.7363564041368338,
+"cap": 40000.0,
+"moths": 5285.0,
+"larvae": 11837490.905987717,
+"larva_rate": 98645.7455317867,
+"meat": 3.4950309401486476e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 11118,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 31.596255844706604,
+"energy": 796.8960336968847,
+"rate": 0.7363564041368338,
+"cap": 40000.0,
+"moths": 5285.0,
+"larvae": 11837491.833616525,
+"larva_rate": 98645.7455317867,
+"meat": 3.715020381060811e+32,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 11118,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 34.567504486228835,
+"energy": 8673.32870938083,
+"rate": 0.7363564041368338,
+"cap": 40000.0,
+"moths": 5285.0,
+"larvae": 16233144.906281268,
+"larva_rate": 135276.19903925687,
+"meat": 1.0435314171857612e+34,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 17856,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 34.634171152895505,
+"energy": 8850.05424637367,
+"rate": 0.7363564041368338,
+"cap": 40000.0,
+"moths": 5285.0,
+"larvae": 19479773.675702915,
+"larva_rate": 135276.19903925687,
+"meat": 1.4954956953058698e+34,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 17856,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 34.70083781956217,
+"energy": 9026.779783366508,
+"rate": 0.7363564041368338,
+"cap": 40000.0,
+"moths": 5285.0,
+"larvae": 16233146.445124565,
+"larva_rate": 135276.19903925687,
+"meat": 4.1053587644806544e+33,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 17856,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 34.76750448622884,
+"energy": 9203.505320359347,
+"rate": 0.7363564041368338,
+"cap": 40000.0,
+"moths": 5285.0,
+"larvae": 16233146.214546213,
+"larva_rate": 135276.19903925687,
+"meat": 2.758664494210703e+33,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 17856,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 34.8341711528955,
+"energy": 9380.230857352186,
+"rate": 0.7363564041368338,
+"cap": 40000.0,
+"moths": 5285.0,
+"larvae": 17856459.983967863,
+"larva_rate": 135276.19903925687,
+"meat": 5.378425348794317e+33,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 17856,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 34.90083781956217,
+"energy": 9556.956394345025,
+"rate": 0.7363564041368338,
+"cap": 40000.0,
+"moths": 5285.0,
+"larvae": 21103088.753389515,
+"larva_rate": 135276.19903925687,
+"meat": 1.0691490980124061e+34,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 17856,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 34.96750448622883,
+"energy": 9733.681931337864,
+"rate": 0.7363564041368338,
+"cap": 40000.0,
+"moths": 5285.0,
+"larvae": 16774202.505403042,
+"larva_rate": 139785.01146672302,
+"meat": 3.174890214585858e+33,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 18441,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 35.0341711528955,
+"energy": 9910.407468330703,
+"rate": 0.7363564041368338,
+"cap": 40000.0,
+"moths": 5285.0,
+"larvae": 16774203.257416569,
+"larva_rate": 139785.01146672302,
+"meat": 3.226019296515497e+33,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 18441,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 35.100837819562166,
+"energy": 10087.133005323542,
+"rate": 0.7363564041368338,
+"cap": 40000.0,
+"moths": 5285.0,
+"larvae": 18451623.284631453,
+"larva_rate": 153763.51261339535,
+"meat": 3.3578612105328784e+33,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 20038,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 43.85701481698964,
+"energy": 20130.05733708689,
+"rate": 0.7473822678242569,
+"cap": 40000.0,
+"moths": 6602.0,
+"larvae": 4351094006.697348,
+"larva_rate": 210214.94204753693,
+"meat": 1.6182663384730663e+36,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 43.9236814836563,
+"energy": 20309.429081364713,
+"rate": 0.7473822678242569,
+"cap": 40000.0,
+"moths": 6602.0,
+"larvae": 4403004811.061363,
+"larva_rate": 238792.54735006506,
+"meat": 7.560622148753471e+35,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 43.99034815032297,
+"energy": 20488.800825642535,
+"rate": 0.7473822678242569,
+"cap": 40000.0,
+"moths": 6602.0,
+"larvae": 4454561657.425379,
+"larva_rate": 238792.54735006506,
+"meat": 2.9895327383431434e+35,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 44.057014816989636,
+"energy": 20668.172569920356,
+"rate": 0.7473822678242569,
+"cap": 40000.0,
+"moths": 6602.0,
+"larvae": 4506108307.789394,
+"larva_rate": 238792.54735006506,
+"meat": 3.019859174147735e+35,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 44.123681483656306,
+"energy": 20847.544314198178,
+"rate": 0.7473822678242569,
+"cap": 40000.0,
+"moths": 6602.0,
+"larvae": 4557645424.15341,
+"larva_rate": 238792.54735006506,
+"meat": 3.0988618966593673e+35,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 44.19034815032297,
+"energy": 21026.916058476,
+"rate": 0.7473822678242569,
+"cap": 40000.0,
+"moths": 6602.0,
+"larvae": 4609173521.517426,
+"larva_rate": 238792.54735006506,
+"meat": 3.267752558654032e+35,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 44.25701481698964,
+"energy": 21206.28780275382,
+"rate": 0.7473822678242569,
+"cap": 40000.0,
+"moths": 6602.0,
+"larvae": 4663558496.449642,
+"larva_rate": 262671.80208507157,
+"meat": 3.437535062572755e+35,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 44.3236814836563,
+"energy": 21385.659547031642,
+"rate": 0.7473822678242569,
+"cap": 40000.0,
+"moths": 6602.0,
+"larvae": 4720227515.95006,
+"larva_rate": 262671.80208507157,
+"meat": 3.612693546400697e+35,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 45.582442465003965,
+"energy": 24772.451839829526,
+"rate": 0.7473822678242569,
+"cap": 40000.0,
+"moths": 6602.0,
+"larvae": 5790960608.8889475,
+"larva_rate": 288938.9822935788,
+"meat": 2.586499033398371e+36,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 45.64910913167063,
+"energy": 24951.823584107347,
+"rate": 0.7473822678242569,
+"cap": 40000.0,
+"moths": 6602.0,
+"larvae": 5853335253.639407,
+"larva_rate": 288938.9822935788,
+"meat": 2.2938374110983874e+36,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "first",
+"cadence": "human",
+"seed": 3,
+"age_h": 45.7157757983373,
+"energy": 25131.19532838517,
+"rate": 0.7473822678242569,
+"cap": 40000.0,
+"moths": 6602.0,
+"larvae": 5915665127.389867,
+"larva_rate": 288938.9822935788,
+"meat": 2.0544638076578294e+36,
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 10000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 0.9666666666666667,
+"energy": 75.1440062142604,
+"rate": 1.1548950944277039,
+"cap": 79920.1597603196,
+"moths": 802.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "1.744996e502",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 0.9833333333333333,
+"energy": 74.54068225157938,
+"rate": 1.1566112672886497,
+"cap": 79920.1597603196,
+"moths": 809.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "1.202259e512",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.0,
+"energy": 74.039534836104,
+"rate": 1.1583142097420769,
+"cap": 79920.1597603196,
+"moths": 816.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "1.778944e514",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.0166666666666666,
+"energy": 73.63977928782282,
+"rate": 1.1600040741953137,
+"cap": 79920.1597603196,
+"moths": 823.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "1.686306e515",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.0333333333333334,
+"energy": 73.34063993124909,
+"rate": 1.1616810107237712,
+"cap": 79920.1597603196,
+"moths": 830.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "8.224474e515",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.05,
+"energy": 73.14134995817166,
+"rate": 1.1633451671153763,
+"cap": 79920.1597603196,
+"moths": 837.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "2.622684e516",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.0666666666666667,
+"energy": 73.04115129301083,
+"rate": 1.1649966889139862,
+"cap": 79920.1597603196,
+"moths": 844.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "1.136601e517",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.0833333333333333,
+"energy": 73.03929446072026,
+"rate": 1.1666357194618238,
+"cap": 79920.1597603196,
+"moths": 851.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "3.181398e517",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.1,
+"energy": 73.13503845717712,
+"rate": 1.1682623999409476,
+"cap": 79920.1597603196,
+"moths": 858.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "5.938304e517",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.1166666666666667,
+"energy": 73.32765062200473,
+"rate": 1.1698768694137935,
+"cap": 79920.1597603196,
+"moths": 865.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "1.981829e518",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.1333333333333333,
+"energy": 73.61640651377299,
+"rate": 1.1714792648628043,
+"cap": 79920.1597603196,
+"moths": 872.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "6.118782e518",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.15,
+"energy": 74.00058978752331,
+"rate": 1.173069721229172,
+"cap": 79920.1597603196,
+"moths": 879.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "1.728760e519",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.1666666666666667,
+"energy": 74.47949207456654,
+"rate": 1.1746483714507205,
+"cap": 79920.1597603196,
+"moths": 886.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "5.899241e519",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.1833333333333333,
+"energy": 75.05241286450328,
+"rate": 1.1762153464989458,
+"cap": 79920.1597603196,
+"moths": 893.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "2.161805e520",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.2,
+"energy": 75.71865938941745,
+"rate": 1.1777707754152362,
+"cap": 79920.1597603196,
+"moths": 900.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "6.945347e520",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.2166666666666666,
+"energy": 76.47754651019544,
+"rate": 1.1793147853462997,
+"cap": 79920.1597603196,
+"moths": 907.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "1.490593e521",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.2333333333333334,
+"energy": 77.32839660492391,
+"rate": 1.1808475015788078,
+"cap": 79920.1597603196,
+"moths": 914.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "3.865033e521",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.25,
+"energy": 78.27053945932109,
+"rate": 1.1823690475732862,
+"cap": 79920.1597603196,
+"moths": 921.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "5.896737e521",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.2666666666666666,
+"energy": 79.30331215915702,
+"rate": 1.1838795449972654,
+"cap": 79920.1597603196,
+"moths": 928.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "1.923933e522",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.2833333333333334,
+"energy": 80.42605898461974,
+"rate": 1.185379113757712,
+"cap": 79920.1597603196,
+"moths": 935.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "6.077458e522",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 8.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.3,
+"energy": 71.65083955125351,
+"rate": 1.1870796761105629,
+"cap": 79920.1597603196,
+"moths": 943.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "2.556204e523",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.3166666666666667,
+"energy": 72.96421287584637,
+"rate": 1.1885562220765478,
+"cap": 79920.1597603196,
+"moths": 950.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "9.511086e523",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.3333333333333333,
+"energy": 74.36554518291985,
+"rate": 1.1900222051178913,
+"cap": 79920.1597603196,
+"moths": 957.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "2.447551e524",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.35,
+"energy": 75.85420947361713,
+"rate": 1.1914777381782882,
+"cap": 79920.1597603196,
+"moths": 964.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "6.656194e524",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.3666666666666667,
+"energy": 77.42958542943457,
+"rate": 1.1929229325969573,
+"cap": 79920.1597603196,
+"moths": 971.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "1.295436e525",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 7.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.4333333333333333,
+"energy": 74.61010056111343,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "8.681885e526",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 1.7666666666666666,
+"energy": 1513.1729762468658,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "1.196200e536",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 2.1,
+"energy": 2951.735851932621,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "9.611330e544",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 2.433333333333333,
+"energy": 4390.298727618376,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "8.671403e553",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 2.7666666666666666,
+"energy": 5828.8616033041235,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "9.949574e562",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 3.1,
+"energy": 7267.424478989871,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "1.137441e572",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 3.433333333333333,
+"energy": 8705.987354675619,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "1.029189e581",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 3.7666666666666666,
+"energy": 10144.550230361367,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "1.478531e590",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 4.1,
+"energy": 11583.113106047114,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "1.524650e599",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 4.433333333333334,
+"energy": 13021.675981732862,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "1.866870e608",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 4.766666666666667,
+"energy": 14460.23885741861,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "2.578700e617",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 5.1,
+"energy": 15898.801733104357,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "1.925529e626",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 5.433333333333334,
+"energy": 17337.364608790107,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "1.803484e635",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 5.766666666666667,
+"energy": 18775.927484475855,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "2.122469e644",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.1,
+"energy": 20214.490360161602,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "7.206411e652",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.433333333333334,
+"energy": 21653.05323584735,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "1.438784e656",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 6.766666666666667,
+"energy": 23091.616111533098,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "3.228007e657",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 7.1,
+"energy": 24530.178987218846,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "2.385692e658",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 7.433333333333334,
+"energy": 25968.741862904593,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "1.118643e659",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 7.766666666666667,
+"energy": 27407.30473859034,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "2.197017e659",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 8.1,
+"energy": 28845.86761427609,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "1.341248e660",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 8.433333333333334,
+"energy": 30284.430489961836,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "8.289408e659",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 8.766666666666667,
+"energy": 31722.993365647584,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "5.607287e660",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 9.1,
+"energy": 33161.55624133333,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "1.392150e661",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "ideal",
+"seed": 1,
+"age_h": 9.433333333333334,
+"energy": 34600.11911701908,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "6.000000e335",
+"larva_rate": "10.000000e333",
+"meat": "2.738970e661",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 19.046929793387115,
+"energy": 56958.12514785162,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "3.416741e338",
+"larva_rate": "10.000000e333",
+"meat": "2.739358e587",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": true,
+"moths": null,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 6.27417495469663,
+"energy": 1834.8923543245296,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "1.304434e563",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 6.307508288029963,
+"energy": 1978.7486418931048,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "2.771878e563",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 6.340841621363296,
+"energy": 2122.60492946168,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "5.110226e563",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 6.374174954696629,
+"energy": 2266.4612170302553,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "5.029724e563",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 6.4075082880299625,
+"energy": 2410.3175045988305,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "8.983118e563",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 6.440841621363297,
+"energy": 2554.1737921674057,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "1.413980e564",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 6.47417495469663,
+"energy": 2698.030079735981,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "2.052026e564",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 6.507508288029963,
+"energy": 2841.886367304556,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "2.814499e564",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 6.540841621363296,
+"energy": 2985.7426548731314,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "3.703448e564",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 6.5741749546966295,
+"energy": 3129.5989424417066,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "1.720923e564",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 6.607508288029963,
+"energy": 3273.455230010282,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "2.868973e564",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 6.640841621363296,
+"energy": 3417.311517578857,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "4.149646e564",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 6.674174954696629,
+"energy": 3561.1678051474323,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "5.564994e564",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 9.05598148239618,
+"energy": 13840.303148591123,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "8.574503e337",
+"larva_rate": "10.000000e333",
+"meat": "5.851934e566",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 9.089314815729514,
+"energy": 13984.159436159698,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "2.718195e566",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 9.122648149062847,
+"energy": 14128.015723728273,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "2.887309e566",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 9.15598148239618,
+"energy": 14271.872011296848,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "3.059295e566",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 9.189314815729514,
+"energy": 14415.728298865422,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "3.234174e566",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 9.222648149062847,
+"energy": 14559.584586433997,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "3.411966e566",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 9.25598148239618,
+"energy": 14703.440874002572,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "3.592692e566",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 9.289314815729513,
+"energy": 14847.297161571147,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "3.776373e566",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 9.322648149062847,
+"energy": 14991.153449139721,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "3.963029e566",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 9.35598148239618,
+"energy": 15135.009736708296,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "4.430818e566",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 9.389314815729513,
+"energy": 15278.866024276871,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "5.527535e570",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+},
+{
+"run": "late",
+"cadence": "human",
+"seed": 1,
+"age_h": 9.422648149062846,
+"energy": 15422.722311845446,
+"rate": 1.198802396404794,
+"cap": 79920.1597603196,
+"moths": 1000.0,
+"larvae": "1.200000e336",
+"larva_rate": "10.000000e333",
+"meat": "2.090525e573",
+"price": {
+"meat": 3.33333e+24,
+"energy": 36000,
+"larva": 3333333000
+},
+"early": 1000,
+"target": 30000,
+"sim_keep": 36000,
+"sim": {
+"nexus5": false,
+"moths": 0.0,
+"rush": 0
+}
+}
+]

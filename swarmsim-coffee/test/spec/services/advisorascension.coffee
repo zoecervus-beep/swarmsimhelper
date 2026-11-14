@@ -62,14 +62,16 @@ describe 'Service: advisorAscension', ->
   ascEarned = (n) -> (g[0] for g in ASCENSIONS when g[1] <= n)
   texts = (r) -> (asc.render x for x in r.records)
 
-  it 'does nothing while the setting is off', ->
+  it 'does nothing while the setting is off', inject (options) ->
     for cfg in [{}, {ascension: 'off'}, null, undefined]
       r = asc.advise mksnap(), cfg
       expect(r.stage).toBe 'off'
       expect(r.records).toEqual []
       expect(r.plan).toBe null
       expect(r.hold).toBe null
-    # the live update does not even read the game
+      expect(r.moths).toBe null
+    # the live update does not even read the game (the route is on by default: turn it off)
+    options.advisorSetting 'ascension', 'off'
     spyOn(asc, 'snapshot').and.callThrough()
     expect(asc.update().stage).toBe 'off'
     expect(asc.snapshot).not.toHaveBeenCalled()
@@ -81,7 +83,7 @@ describe 'Service: advisorAscension', ->
       expect(r.plan.type).toBe 'spendForAscension'
       expect(r.plan.ascension).toBe 1
       expect(r.plan.of).toBe 20 # the largest ascension achievement
-      expect(texts r).toEqual ['ascension 1 of 20 costs 2.51e6 energy (cap 48,500): every 50,000 energy spent halves it, mostly House of Mirrors from nexus 5']
+      expect(texts r).toEqual ['ascension 1 of 20 costs 2.51e6 energy (cap 48,500): every 50,000 energy spent halves it, mostly lepidoptera and House of Mirrors from nexus 5']
 
     it 'at nexus 5, says how much more to spend before saving', ->
       # saving starts at min(cap 58,500, 50,000 / ln 2 = 72,134); spend 50,000 x log2(80,000 / 58,500) = 22,578.5
@@ -89,7 +91,7 @@ describe 'Service: advisorAscension', ->
       expect(r.plan.saveAt.toNumber()).toBe 58500
       expect(r.plan.threshold.toNumber()).toBe 72134
       expect(r.plan.toSpend.toNumber()).toBe 22579
-      expect(texts r).toEqual ['ascension 1 of 20 costs 80,000 energy (cap 58,500): every 50,000 energy spent halves it (House of Mirrors); spend 22,579 more, then save from 58,500']
+      expect(texts r).toEqual ['ascension 1 of 20 costs 80,000 energy (cap 58,500): every 50,000 energy spent halves it (lepidoptera and House of Mirrors); spend 22,579 more, then save from 58,500']
 
     it 'starts saving when the cost reaches the cap, if the cap is under 50,000 / ln 2', ->
       # 50,000 x log2(58,501 / 58,500) = 1.23
@@ -257,6 +259,33 @@ describe 'Service: advisorAscension', ->
       for snap in [mksnap(), mksnap(ascensions: 1, mutagen: 6e7), mksnap(ascensions: 2, mutagen: 1e40, earned: LONG), mksnap(ascensions: 20, earned: LONG.concat ascEarned 20)]
         expect(asc.advise(snap, ON).records.length).toBeLessThan 3
 
+  # ASCENSION.md A.11: the lepidoptera target after nexus 5 for each kind of run
+  describe 'the lepidoptera target for the run', ->
+    it 'is 10,000 in a first run and in a run still short of the mutation', ->
+      expect(asc.advise(mksnap(), ON).moths).toEqual {moths: 10000, stage: 'firstRun'}
+      r = asc.advise mksnap(ascensions: 1), ON
+      expect(r.stage).toBe 'needMutation'
+      expect(r.moths).toEqual {moths: 10000, stage: 'needMutation'}
+
+    it 'is 30,000 in a quick run', ->
+      r = asc.advise mksnap(ascensions: 2, mutagen: 1e40, earned: LONG), ON
+      expect(r.stage).toBe 'quickRun'
+      expect(r.moths).toEqual {moths: 30000, stage: 'quickRun'}
+
+    it "is 30,000 in the long run from a run age of 3 days (LR-4's gate), none before", ->
+      snap = mksnap ascensions: 1, unlocked: ['mutatenexus'], nexusMutants: 1e6
+      expect(asc.advise(snap, ON).stage).toBe 'longRun'
+      expect(asc.advise(snap, ON).moths).toBe null
+      snap.now = 3 * 86400e3 - 1
+      expect(asc.advise(snap, ON).moths).toBe null
+      snap.now = 3 * 86400e3
+      expect(asc.advise(snap, ON).moths).toEqual {moths: 30000, stage: 'longRun'}
+
+    it 'is none once every ascension achievement is earned', ->
+      r = asc.advise mksnap(ascensions: 20, earned: LONG.concat ascEarned 20), ON
+      expect(r.stage).toBe 'done'
+      expect(r.moths).toBe null
+
   describe 'the energy line', ->
     cast = -> {type: 'cast', spell: 'clonearmy', label: 'House of Mirrors', cost: 2500, casts: D(20)}
 
@@ -280,6 +309,17 @@ describe 'Service: advisorAscension', ->
       ready = asc.coupleEnergy cast(), asc.advise(mksnap(cost: 52791, energy: 52791), ON)
       expect(ready.ready).toBe true
       expect(asc.render ready).toBe 'hold it for the ascension (52,791/52,791)'
+
+    it 'cuts lepidoptera to those that bring the cost to the save point, as casts', ->
+      # spend 22,579 more: ceil(22,579 / 10) = 2,258 lepidoptera
+      a = asc.advise mksnap(cost: 80000), ON
+      moths = -> {type: 'buyMoths', count: D(5000), moths: D(4000), target: D(10000), then: null}
+      c = asc.coupleEnergy moths(), a
+      expect(c.count.toNumber()).toBe 2258
+      expect(c.thenSave).toBe true
+      expect(c.target.toNumber()).toBe 10000
+      few = _.extend moths(), count: D(2258)
+      expect(asc.coupleEnergy few, a).toBe few
 
     it 'cuts the casts to those that bring the cost to the save point', ->
       # spend 22,579 more: ceil(22,579 / 2,500) = 10 casts of House of Mirrors
@@ -396,7 +436,7 @@ describe 'Service: advisorAscension on a real save', ->
     expect(_.map(_.filter(snap.goals.expansion, 'earned'), 'name')).toEqual ['expansion1', 'tutorial', 'expansion2', 'expansion3']
     r = asc.advise snap, ON
     expect(r.stage).toBe 'firstRun'
-    expect(texts r).toEqual ['ascension 1 of 20 costs 2.51e6 energy (cap 48,500): every 50,000 energy spent halves it, mostly House of Mirrors from nexus 5']
+    expect(texts r).toEqual ['ascension 1 of 20 costs 2.51e6 energy (cap 48,500): every 50,000 energy spent halves it, mostly lepidoptera and House of Mirrors from nexus 5']
 
   it 'follows the run through nexus 5, mirror casts and an ascension, all through the game', ->
     game = loadGame()

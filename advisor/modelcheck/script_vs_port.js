@@ -76,7 +76,10 @@ function mutate(json) {
 var differences = 0, bothFailed = 0, compared = 0, seen = {};
 for (var n = 0; n < N; n++) {
   var cfg = {ageMultiple: pick([3, 5, 1, 0.5, 10]), share: pick([0.5, 0.25, 1, 0.01]), territory: pick([0.1, 0, 0.5]),
-    cooldown: pick([60, 0, 5, 600]), bank: pick([3, 0, 1, 100]), moths: pick([4000, 0, 2000, 1e6])};
+    cooldown: pick([60, 0, 5, 600]), bank: pick([3, 0, 1, 100]), moths: pick([4000, 0, 2000, 1e6]),
+    // The console script's energy plan. The default is now 'save' (ASCENSION.md A.11), which the script
+    // never had; the other settings at their defaults (ascension, long-run mode) do not reach advise().
+    spareEnergy: 'larvarush'};
   var g;
   try { g = G.loadSave(SAVE, mutate); } catch (e) { console.log('state', n, 'does not load:', e.message); differences++; continue; }
   var game = g.game, script = scriptFor(game, cfg), port = g.get('advisor'), memory = null;

@@ -92,11 +92,23 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
       else advisor.renderTip t
     return {type: t.type, unit: t.unit, text: text, href: href(t.unit)}
 
-  # the long-run mode's raised lepidoptera target, said where it shows
-  longRunMoths = (rec) -> ': long-run target, your setting is ' + bignum(rec.setting)
+  # Why a lepidoptera target is not simply the setting, said where it shows: the first ones before
+  # nexus 5 ('save' plan), the ascension route's target for this kind of run, or the long-run mode's.
+  RUN_STAGE = {firstRun: 'first-run target', needMutation: 'first-run target', longRun: 'long-run target', quickRun: 'quick-run target'}
+  mothWhy = (rec) ->
+    if rec.early then return ': the first ' + bignum(rec.target) + ', before nexus 5'
+    if rec.runStage? then return ': ' + (RUN_STAGE[rec.runStage] ? 'run target') + ', your setting is ' + bignum(rec.setting)
+    if rec.longRun then return ': long-run target, your setting is ' + bignum(rec.setting)
+    return ''
+  # the 'save' plan at nexus 4 keeps only part of nexus 5's energy price while its larvae are hours away
+  keepText = (rec) ->
+    if not rec.keep? then return ''
+    if new Decimal(rec.keep).isZero() then return '; nothing to keep for nexus 5 yet: income brings it before its larvae (' + time(rec.wait) + ')'
+    '; keep ' + count(rec.keep, 'energy') + ' for nexus 5: income brings the rest before its larvae (' + time(rec.wait) + ')'
 
   saving = (rec) ->
-    'save for nexus ' + rec.level + ': ' + ((bignum(m.have) + '/' + count(m.need, m.unit)) for m in rec.missing).join(', ')
+    'save for nexus ' + rec.level + ': ' + ((bignum(m.have) + '/' + count(m.need, m.unit)) for m in rec.missing).join(', ') +
+      (if rec.keep? then '; ' + (if new Decimal(rec.keep).isZero() then 'no energy' else 'only ' + count(rec.keep, 'energy')) + ' needed now: income brings the rest before the larvae (' + time(rec.wait) + ')' else '')
 
   energy = (rec) ->
     if not rec?
@@ -110,12 +122,17 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
         text = saving rec
         link = 'nexus'
       when 'buyMoths'
-        text = 'buy ' + bignum(rec.count) + ' ' + plural('moth') + ' (' + bignum(rec.moths) + '/' + bignum(rec.target) + (if rec.longRun then longRunMoths(rec) else '') + ')'
+        text = 'buy ' + bignum(rec.count) + ' ' + plural('moth') + ' (' + bignum(rec.moths) + '/' + bignum(rec.target) + mothWhy(rec) + ')' + keepText(rec)
+        if rec.thenSave
+          # cut short by the ascension advice: these bring the cost to where saving starts
+          text += ', then save for the ascension'
         if rec.then
           text += '; then ' + saving(rec.then)
         link = 'moth'
       when 'mothTarget'
-        text = 'all energy into ' + plural('moth') + ' (' + bignum(rec.moths) + '/' + bignum(rec.target) + (if rec.longRun then longRunMoths(rec) else '') + ')'
+        text = 'all energy into ' + plural('moth') + ' (' + bignum(rec.moths) + '/' + bignum(rec.target) + mothWhy(rec) + ')'
+        if rec.then
+          text += '; then ' + saving(rec.then)
         link = 'moth'
       when 'cast'
         text = 'cast ' + rec.label + ' \u00d7' + bignum(rec.casts)
@@ -137,6 +154,8 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
           text += (if rec.ready then '; waiting for ' else '; also needs ') + ((count(m.need, m.unit) + ' (have ' + bignum(m.have) + ')') for m in rec.missing).join(', ')
         if rec.mothsNext
           text += '; lepidoptera after that'
+        if rec.keep?
+          text += '; ' + (if new Decimal(rec.keep).isZero() then 'none' else 'only ' + count(rec.keep, 'energy')) + ' needed now: income brings the rest before its larvae (' + time(rec.wait) + ')'
         link = 'nexus'
       when 'energyFull'
         text = 'energy is full (' + bignum(rec.energy) + '/' + bignum(rec.cap) + '): cast ' + rec.label + ' \u00d71 so the income isn\'t wasted'
@@ -178,6 +197,12 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
     catch e
       return rec
 
+  # The 'save' plan keeps the next nexus's larvae out of the climb: say so on the energy line.
+  withHeld = (line, held) ->
+    if line? and held?.greaterThan?(0)
+      line.text += ' (the climb above leaves ' + count(held, 'larva') + ' for it)'
+    return line
+
   # From `advisor.current()`'s {advice, error} to the panel's view model. Never throws.
   panel = (cur, acur) ->
     if not cur?
@@ -216,7 +241,7 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
         rows: rows
         tips: (tip(t) for t in r.tips)
         # an energy failure costs only this line, as in the console script
-        energy: if r.energyError? then {type: 'error', error: true, text: errorText(r.energyError)} else energy coupledEnergy(r.energy, acur)
+        energy: if r.energyError? then {type: 'error', error: true, text: errorText(r.energyError)} else withHeld(energy(coupledEnergy(r.energy, acur)), r.nexusLarvae)
         summary: if buys.length then {label: buys[0].label, action: buys[0].action} else null
       }
     catch e
@@ -370,7 +395,7 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
       when 'spendForAscension'
         # below nexus 5 the cap still grows with each nexus, so no save point yet
         line.text = of20(rec) + ' costs ' + count(rec.cost, 'energy') + ' (cap ' + bignum(rec.cap) + '); every ' + bignum(rec.halving) + ' energy spent halves it' +
-          (if rec.nexus >= 5 and rec.toSpend? then ' (House of Mirrors); spend ' + bignum(rec.toSpend) + ' more, then save from ' + bignum(rec.saveAt) else ', mostly House of Mirrors from nexus 5')
+          (if rec.nexus >= 5 and rec.toSpend? then ' (lepidoptera and House of Mirrors); spend ' + bignum(rec.toSpend) + ' more, then save from ' + bignum(rec.saveAt) else ', mostly lepidoptera and House of Mirrors from nexus 5')
         line.href = href 'mutagen'
       when 'saveForAscension'
         line.text = 'stop casting and save for ' + of20(rec) + ': ' + bignum(rec.energy) + '/' + count(rec.cost, 'energy') +
@@ -802,9 +827,9 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
     </div>
     <div class="form-group" ng-class="{'has-error': !!errors.spareEnergy}">
       <label class="control-label">Spare energy before House of Mirrors</label>
-      <div class="radio"><label><input type="radio" name="advisor-spareEnergy" value="larvarush" ng-model="form.values.spareEnergy" ng-change="setChoice('spareEnergy')"> Cast larva rush</label></div>
-      <div class="radio"><label><input type="radio" name="advisor-spareEnergy" value="save" ng-model="form.values.spareEnergy" ng-change="setChoice('spareEnergy')"> Save it for the next nexus and lepidoptera</label></div>
-      <p class="help-block">Larva rush suits runs of a day or two. Saving reaches nexus 4 and lepidoptera hours sooner, and came out ahead from about day 4 in the simulator. At nexus 5 spare energy always goes to House of Mirrors. Default: cast larva rush.</p>
+      <div class="radio"><label><input type="radio" name="advisor-spareEnergy" value="save" ng-model="form.values.spareEnergy" ng-change="setChoice('spareEnergy')"> Plan it for the next nexus</label></div>
+      <div class="radio"><label><input type="radio" name="advisor-spareEnergy" value="larvarush" ng-model="form.values.spareEnergy" ng-change="setChoice('spareEnergy')"> Cast larva rush (as the console script did)</label></div>
+      <p class="help-block">Planning holds energy for the next nexus and keeps its larvae out of the climb; at nexus 4 it buys 1,000 lepidoptera first, then keeps only the energy nexus 5 will need by the time its larvae are there and puts the rest into lepidoptera. In the simulator that reached nexus 5 and the next ascension 5 to 10 hours sooner than larva rush. Default: plan it.</p>
       <p class="help-block" ng-if="errors.spareEnergy">{{errors.spareEnergy}}</p>
     </div>
     <div class="form-group" ng-class="{'has-error': !!errors.longRun}">
@@ -818,7 +843,7 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
       <label class="control-label">Ascension advice</label>
       <div class="radio"><label><input type="radio" name="advisor-ascension" value="off" ng-model="form.values.ascension" ng-change="setChoice('ascension')"> Off</label></div>
       <div class="radio"><label><input type="radio" name="advisor-ascension" value="achievements" ng-model="form.values.ascension" ng-change="setChoice('ascension')"> Achievements route</label></div>
-      <p class="help-block">The achievements route is a plan for earning every achievement: ascend once early for the lepidoptera mutation, then one long run to 5,000 expansions and the endless achievements, then quick runs up to 20 ascensions. The advisor says when to spend energy, when to save it and when to ascend, and what to buy with mutagen. Default: off.</p>
+      <p class="help-block">The achievements route is a plan for earning every achievement: ascend once early for the lepidoptera mutation, then one long run to 5,000 expansions and the endless achievements, then quick runs up to 20 ascensions. The advisor says when to spend energy, when to save it and when to ascend, and what to buy with mutagen. It also sets the lepidoptera target for the kind of run it sees: 10,000 in a first run, 30,000 in a quick run and from day 3 of the long run (your setting, if higher). Default: achievements route.</p>
       <p class="help-block" ng-if="errors.ascension">{{errors.ascension}}</p>
     </div>
     <button type="button" class="btn btn-default btn-sm" ng-click="reset()">Reset advisor settings to defaults</button>
@@ -833,7 +858,7 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
       {key: 'cooldown', label: 'Cooldown (seconds)', help: "After you hatch a unit, wait this many seconds before suggesting it again."}
       {key: 'bank', label: 'Banking threshold', help: "Stop hatching a unit, and save its larvae, once the tier above already makes this many times what larvae could."}
       {key: 'territory', label: 'Territory share', help: "Fraction of larvae held back for territory units (0.10 = 10%). Set to 0 once House of Mirrors is casting."}
-      {key: 'moths', label: 'Lepidoptera target', help: "How many lepidoptera to buy with energy before House of Mirrors. 0 for runs under about two days; 2,000 to 4,000 for about four days; 4,000 for a week or two."}
+      {key: 'moths', label: 'Lepidoptera target', help: "How many lepidoptera to buy with energy at nexus 5 before House of Mirrors. With the achievements route on, the advisor raises it for the kind of run (10,000 in a first run, 30,000 in a quick run and from day 3 of the long run). The console script used 4,000."}
     ]
     limits = ADVISOR_SETTINGS.limits
 

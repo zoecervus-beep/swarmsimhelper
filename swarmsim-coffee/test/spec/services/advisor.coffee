@@ -386,7 +386,9 @@ describe 'Service: advisor', ->
         moths: D moths
         next: if next then {name: "nexus#{nexus + 1}", level: nexus + 1, costs: ({unit: c[0], val: D(c[1]), have: D(c[2])} for c in next)} else null
       return snap
-    say = (snap, cfg={}) -> advisor.renderEnergy advisor.energyAdvice snap, cfg
+    # The console script's rules are spareEnergy 'larvarush'; the default is now 'save' (ASCENSION.md A.11).
+    SCRIPT = {spareEnergy: 'larvarush'}
+    say = (snap, cfg=SCRIPT) -> advisor.renderEnergy advisor.energyAdvice snap, cfg
 
     it 'says nothing without a nexus', ->
       expect(advisor.energyAdvice mk(0, 0, 0, 1, null), {}).toBe null
@@ -413,7 +415,7 @@ describe 'Service: advisor', ->
       snap = mk 3, 2000, 0, 2000, [['meat', 3.33333e21, 1e20], ['energy', 10000, 2000], ['larva', 33333330, 1e6]]
       expect(say snap).toBe 'cast larva rush x1'
       snap = mk 3, 1000, 0, 1000, [['meat', 3.33333e21, 1e22], ['energy', 10000, 1000], ['larva', 33333330, 1e6]]
-      expect(advisor.energyAdvice(snap, {}).type).toBe 'nextCast'
+      expect(advisor.energyAdvice(snap, SCRIPT).type).toBe 'nextCast'
       expect(say snap).toBe 'next larva rush at 1,600 energy (have 1,000)'
 
     describe 'at nexus 4', ->
@@ -422,7 +424,7 @@ describe 'Service: advisor', ->
       it 'buys lepidoptera with energy beyond the nexus reserve, then saves', ->
         # saving: 3333333000 <= 2e5 x 20000; spare 40000 - 36000 = 4000 => 400 moths
         snap = mk 4, 40000, 2416, 2e5, nexus5(40000, 3e9)
-        rec = advisor.energyAdvice snap, {}
+        rec = advisor.energyAdvice snap, SCRIPT
         expect(rec.type).toBe 'buyMoths'
         expect(rec.count.toNumber()).toBe 400
         expect(rec.then.type).toBe 'save'
@@ -434,7 +436,7 @@ describe 'Service: advisor', ->
 
       it 'puts all energy into lepidoptera when not saving', ->
         snap = mk 4, 5, 2416, 1000, nexus5(5, 3e9)
-        expect(advisor.energyAdvice(snap, {}).type).toBe 'mothTarget'
+        expect(advisor.energyAdvice(snap, SCRIPT).type).toBe 'mothTarget'
         expect(say snap).toBe 'all energy into lepidoptera 2,416/4,000'
         snap = mk 4, 1000, 2416, 1000, nexus5(1000, 3e9)
         expect(say snap).toBe 'buy 100 lepidoptera (lepidoptera 2,416/4,000)'
@@ -443,7 +445,7 @@ describe 'Service: advisor', ->
         snap = mk 4, 3300, 4000, 1000, nexus5(3300, 3e9)
         expect(say snap).toBe 'cast larva rush x2'
         snap = mk 4, 3300, 2416, 1000, nexus5(3300, 3e9)
-        expect(say snap, {moths: 0}).toBe 'cast larva rush x2'
+        expect(say snap, {spareEnergy: 'larvarush', moths: 0}).toBe 'cast larva rush x2'
 
     describe 'at nexus 5', ->
       it 'finishes the lepidoptera', ->
@@ -452,6 +454,7 @@ describe 'Service: advisor', ->
       it 'then casts House of Mirrors', ->
         rec = advisor.energyAdvice mk(5, 6000, 4000, 1, null), {}
         expect(rec.type).toBe 'cast'
+        expect(rec).toEqual advisor.energyAdvice(mk(5, 6000, 4000, 1, null), SCRIPT)
         expect(rec.spell).toBe 'clonearmy'
         expect(rec.casts.toNumber()).toBe 2
         expect(say mk 5, 6000, 4000, 1, null).toBe 'cast House of Mirrors x2'
@@ -490,21 +493,22 @@ describe 'Service: advisor', ->
         # the existing saving rule, with its own text
         snap = withCap mk(3, 2000, 0, 2000, [['meat', 3.33333e21, 1e22], ['energy', 10000, 2000], ['larva', 33333330, 1e6]]), 30000
         expect(say snap, SAVE).toBe 'save for nexus 4: 2,000/10,000 energy, 1.00e6/3.33e7 larva'
-        # lepidoptera first at nexus 4
-        snap = withCap mk(4, 6000, 2416, 1, [['meat', 3.33333e24, 1e25], ['energy', 36000, 6000], ['larva', 3333333000, 1]]), 40000
-        expect(say snap, SAVE).toBe 'buy 600 lepidoptera (lepidoptera 2,416/4,000)'
-        expect(say snap, SAVE).toBe say(snap)
         # nexus 5: House of Mirrors, setting or not
         snap = withCap mk(5, 6000, 4000, 1, null), 50000
         expect(say snap, SAVE).toBe 'cast House of Mirrors x2'
         expect(say snap, SAVE).toBe say(snap)
 
-      it 'holds for nexus 5 once the lepidoptera are done at nexus 4', ->
+      it 'holds for nexus 5 once the lepidoptera are done at nexus 4, with no energy income known', ->
+        # no energy rate in the snapshot: the whole price is kept, as before
         snap = withCap mk(4, 6000, 4000, 1, [['meat', 3.33333e24, 1e25], ['energy', 36000, 6000], ['larva', 3333333000, 1]]), 40000
         expect(say snap).toBe 'cast larva rush x3'
         rec = advisor.energyAdvice snap, SAVE
         expect(rec.type).toBe 'hold'
         expect(rec.mothsNext).toBe false
+        expect(rec.keep).toBeUndefined()
+        expect(say snap, SAVE).toBe 'saving energy for nexus 5: 6,000/36,000 energy; still need 3.33e9 larva (have 1)'
+        # lepidoptera below the target: none, the whole price is kept and 6,000 < 36,000
+        snap.energy.moths = D 2416
         expect(say snap, SAVE).toBe 'saving energy for nexus 5: 6,000/36,000 energy; still need 3.33e9 larva (have 1)'
 
       it 'suggests one larva rush when energy is full, so income is not wasted', ->
@@ -524,9 +528,159 @@ describe 'Service: advisor', ->
         snap = advisor.snapshot()
         expect(snap.energy.cap?.toString()).toBe game.unit('energy').capValue()?.toString()
 
+    # The 'save' plan at nexus 4 (ASCENSION.md A.11): nexus 5 if affordable; else the first 1,000
+    # lepidoptera; else energy beyond what nexus 5 needs just in time into lepidoptera, up to the target.
+    describe "the 'save' plan at nexus 4", ->
+      SAVE = {spareEnergy: 'save'}
+      # nexus 5's price: 3.33333e24 meat, 36,000 energy, 3,333,333,000 larvae
+      n5 = (energy, meat, larvae) -> [['meat', 3.33333e24, meat], ['energy', 36000, energy], ['larva', 3333333000, larvae]]
+      at4 = (energy, moths, larvaRate, meat, larvae, rate=0.6, cap=40000) ->
+        snap = mk 4, energy, moths, larvaRate, n5(energy, meat, larvae)
+        snap.energy.cap = D cap
+        snap.energy.rate = D rate
+        return snap
+
+      it 'is the default', ->
+        snap = at4 8000, 0, 1e6, 1e25, 1e9
+        expect(advisor.energyAdvice snap, {}).toEqual advisor.energyAdvice(snap, SAVE)
+
+      it 'buys nexus 5 as soon as everything is in hand, before any lepidoptera', ->
+        expect(say at4(40000, 0, 2e5, 1e25, 4e9), SAVE).toBe 'buy nexus 5'
+
+      it 'buys the first 1,000 lepidoptera with all the energy there is', ->
+        # 8,000 energy / 10 = 800 of the 1,000; its meat in hand and 3.33e9 <= 1e6 x 20,000: then save, larvae kept
+        rec = advisor.energyAdvice at4(8000, 0, 1e6, 1e25, 1e9), SAVE
+        expect(rec.type).toBe 'buyMoths'
+        expect(rec.early).toBe true
+        expect(rec.count.toNumber()).toBe 800
+        expect(rec.target).toBe 1000
+        expect(rec.then.type).toBe 'save'
+        expect(say at4(8000, 0, 1e6, 1e25, 1e9), SAVE).toBe 'buy 800 lepidoptera (lepidoptera 0/1,000, first 1,000 before nexus 5); then save for nexus 5: 8,000/36,000 energy, 1.00e9/3.33e9 larva'
+        # 600 already: 400 more, though 8,000 energy would buy 800
+        expect(advisor.energyAdvice(at4(8000, 600, 1e6, 1e25, 1e9), SAVE).count.toNumber()).toBe 400
+        # under 10 energy: all of it into lepidoptera; meat missing: nothing to save yet
+        expect(say at4(5, 0, 1e6, 1e20, 1e9), SAVE).toBe 'all energy into lepidoptera 0/1,000 (first 1,000 before nexus 5)'
+        # a setting under 1,000 is the whole target
+        rec = advisor.energyAdvice at4(8000, 0, 1e6, 1e25, 1e9), {spareEnergy: 'save', moths: 300}
+        expect(rec.count.toNumber()).toBe 300
+        expect(rec.target).toBe 300
+
+      it 'keeps only what nexus 5 needs by the time its larvae are there, and buys lepidoptera with the rest', ->
+        # larvae held (3.33e9 <= 2e5 x 20,000): missing 3,333,333,000 - 1,333,333,000 = 2e9, in 2e9 / 2e5 = 10,000 s;
+        # income 0.6 x 10,000 = 6,000, so keep 36,000 - 6,000 = 30,000; spare 32,000 - 30,000 = 2,000 => 200
+        rec = advisor.energyAdvice at4(32000, 1000, 2e5, 1e25, 1333333000), SAVE
+        expect(rec.type).toBe 'buyMoths'
+        expect(rec.count.toNumber()).toBe 200
+        expect(rec.target).toBe 4000
+        expect(rec.keep.toNumber()).toBe 30000
+        expect(rec.wait).toBe 10000
+        expect(rec.then.type).toBe 'save'
+        expect(say at4(32000, 1000, 2e5, 1e25, 1333333000), SAVE).toBe 'buy 200 lepidoptera (lepidoptera 1,000/4,000); keeping 30,000 energy for nexus 5 (its larvae in 2.8 h); then save for nexus 5: 32,000/36,000 energy, 1.33e9/3.33e9 larva'
+
+      it 'counts the larvae from none while they are not yet held for nexus 5', ->
+        # 3.33e9 > 5e4 x 20,000: not near, so the larvae in hand (they go to the climb) do not count;
+        # wait 3,333,333,000 / 5e4 = 66,666.66 s, income 0.6 x that = 40,000 > 36,000: keep nothing;
+        # 12,345 energy => 1,234 lepidoptera; nothing to save yet
+        rec = advisor.energyAdvice at4(12345, 1000, 5e4, 1e25, 3e9), SAVE
+        expect(rec.count.toNumber()).toBe 1234
+        expect(rec.keep.toNumber()).toBe 0
+        expect(rec.then).toBe null
+        expect(say at4(12345, 1000, 5e4, 1e25, 3e9), SAVE).toBe 'buy 1,234 lepidoptera (lepidoptera 1,000/4,000); nothing kept for nexus 5 yet (its larvae in 18.5 h)'
+
+      it 'keeps the whole price while nexus 5 has only energy missing, or its meat is missing', ->
+        # only energy missing: save it all
+        expect(say at4(30000, 1000, 2e5, 1e25, 4e9), SAVE).toBe 'save for nexus 5: 30,000/36,000 energy'
+        # meat missing: keep 36,000; 39,000 - 36,000 = 3,000 => 300 lepidoptera
+        rec = advisor.energyAdvice at4(39000, 1000, 2e5, 1e24, 4e9), SAVE
+        expect(rec.count.toNumber()).toBe 300
+        expect(rec.keep).toBeUndefined()
+        expect(rec.then).toBe null
+        expect(say at4(39000, 1000, 2e5, 1e24, 4e9), SAVE).toBe 'buy 300 lepidoptera (lepidoptera 1,000/4,000)'
+
+      it 'holds what it keeps once the lepidoptera are done, saying how much is needed now', ->
+        # not near (3.33e9 > 1e5 x 20,000): wait 3,333,333,000 / 1e5 = 33,333.33 s; income 0.6 x that = 19,999.998;
+        # keep = ceil(36,000 - 19,999.998) = 16,001
+        rec = advisor.energyAdvice at4(1000, 4000, 1e5, 1e25, 1333333000), SAVE
+        expect(rec.type).toBe 'hold'
+        expect(rec.keep.toNumber()).toBe 16001
+        expect(say at4(1000, 4000, 1e5, 1e25, 1333333000), SAVE).toBe 'saving energy for nexus 5: 1,000/36,000 energy; still need 3.33e9 larva (have 1.33e9); only 16,001 needed now: income brings the rest before its larvae (9.3 h)'
+        # held, near: the save record, with what is needed now (30,000 as above: 2e9 larvae in 10,000 s)
+        rec = advisor.energyAdvice at4(20000, 4000, 2e5, 1e25, 1333333000), SAVE
+        expect(rec.type).toBe 'save'
+        expect(rec.keep.toNumber()).toBe 30000
+        expect(say at4(20000, 4000, 2e5, 1e25, 1333333000), SAVE).toBe 'save for nexus 5: 20,000/36,000 energy, 1.33e9/3.33e9 larva; only 30,000 energy needed now: income brings the rest before the larvae (2.8 h)'
+
+      it 'casts one larva rush at the cap once the lepidoptera are done and nothing is being saved', ->
+        # keep 0 (larvae far), lepidoptera at 4,000, energy at the 40,000 cap
+        expect(say at4(40000, 4000, 5e4, 1e25, 0), SAVE).toBe 'energy is full (40,000/40,000): cast larva rush x1 so the income is not wasted'
+
     it 'is part of the full advice', ->
       snap = mk 5, 6000, 4000, 1, null
       expect(advisor.advise(snap, null, {}).energy.type).toBe 'cast'
+
+    describe "the next nexus's larvae under the 'save' plan", ->
+      # nest climbs (as in 'when a tier may be climbed'): first look, buys min(left, 1000 x 0.5, spare 60)
+      units = drone: {count: 1e12}, queen: {count: 1e6}, nest: {cost: 1000, prodEach: 1}
+      snapWith = (larvae) ->
+        snap = mksnap now: 1000e3, units: units, larvae: larvae, larvaRate: 2000
+        # nexus 4's price: its meat in hand, its 33,333,330 larvae under 2,000 x 20,000 = 4e7 s away: save
+        snap.energy = {nexus: 3, energy: D(2000), moths: D(0), next: {name: 'nexus4', level: 4, costs: [
+          {unit: 'meat', val: D(3.33333e21), have: D(1e22)}, {unit: 'energy', val: D(10000), have: D(2000)}, {unit: 'larva', val: D(33333330), have: D(larvae)}]}}
+        return snap
+
+      it 'keeps them from the climb while the energy line saves for the nexus', ->
+        # floor(37,037,070 x 0.9) = 33,333,363; less 33,333,330 for nexus 4 leaves 33 for the nest
+        r = advisor.advise snapWith(37037070), null, {}
+        expect(r.energy.type).toBe 'save'
+        expect(r.nexusLarvae.toNumber()).toBe 33333330
+        expect(tier(r, 'nest').buys.toNumber()).toBe 33
+        # the console script's plan leaves them to the climb: the spare-stock limit, 60
+        r = advisor.advise snapWith(37037070), null, {spareEnergy: 'larvarush'}
+        expect(tier(r, 'nest').buys.toNumber()).toBe 60
+        expect(r.nexusLarvae).toBeUndefined()
+
+      it 'keeps nothing while not saving for the nexus', ->
+        snap = snapWith 37037070
+        snap.energy.next.costs[0].have = D 1e20 # its meat missing: hold, not save
+        r = advisor.advise snap, null, {}
+        expect(r.energy.type).toBe 'hold'
+        expect(r.nexusLarvae.toNumber()).toBe 0
+        expect(tier(r, 'nest').buys.toNumber()).toBe 60
+
+    describe "the ascension route's lepidoptera target for the run", ->
+      at5 = (moths, now=1000e3) ->
+        snap = mk 5, 6000, moths, 1, null
+        snap.now = now
+        snap.meat = D 0 # read by the long-run mode's push
+        return snap
+
+      it 'raises the setting after nexus 5', ->
+        r = advisor.advise at5(4000), null, {runMoths: 30000, runStage: 'quickRun'}
+        expect(r.energy.type).toBe 'buyMoths'
+        expect(r.energy.count.toNumber()).toBe 600
+        expect(r.energy.target).toBe 30000
+        expect(r.energy.runStage).toBe 'quickRun'
+        expect(r.energy.setting).toBe 4000
+        expect(advisor.renderEnergy r.energy).toBe 'buy 600 lepidoptera (lepidoptera 4,000/30,000, quick-run target)'
+        expect(r.config.runMoths).toBeUndefined()
+        expect(advisor.renderEnergy advisor.advise(at5(4000), null, {runMoths: 10000, runStage: 'firstRun'}).energy).toBe 'buy 600 lepidoptera (lepidoptera 4,000/10,000, first-run target)'
+        # without it, the setting: House of Mirrors
+        expect(advisor.advise(at5(4000), null, {}).energy.type).toBe 'cast'
+
+      it 'never lowers a higher setting', ->
+        r = advisor.advise at5(4000), null, {moths: 50000, runMoths: 10000, runStage: 'firstRun'}
+        expect(r.energy.target).toBe 50000
+        expect(r.energy.runStage).toBeUndefined()
+
+      it "decides instead of the long-run mode's raise", ->
+        # run age 4 d: LR-4 would raise to 30,000, but a first run's target is 10,000
+        r = advisor.advise at5(4000, 4 * 86400e3), null, {longRun: 'on', runMoths: 10000, runStage: 'firstRun'}
+        expect(r.energy.target).toBe 10000
+        expect(r.longRun.mothsRaised).toBe false
+        # without a route target the mode raises it, as before
+        r = advisor.advise at5(4000, 4 * 86400e3), null, {longRun: 'on'}
+        expect(r.energy.target).toBe 30000
+        expect(r.longRun.mothsRaised).toBe true
 
   describe 'live wiring', ->
     it 'keeps the live advice current on the game tick, with no view on screen', inject ($rootScope, options) ->
@@ -587,6 +741,24 @@ describe 'Service: advisor', ->
       cur = advisor.current 1000, 1
       expect(cur.advice).toBe null
       expect(cur.error.message).toBe 'boom'
+
+    it "takes the lepidoptera target for the run from the ascension route", inject (game, advisorAscension) ->
+      game.unit('nexus')._setCount 5
+      game.unit('energy')._setCount 6000
+      game.unit('moth')._setCount 3990
+      spyOn(advisorAscension, 'current').and.returnValue {advice: {moths: {moths: 30000, stage: 'quickRun'}}}
+      r = advisor.update()
+      expect(r.energy.target).toBe 30000
+      expect(r.energy.count.toNumber()).toBe 600
+      expect(r.energy.runStage).toBe 'quickRun'
+      # the route off (or without a target): the setting, 4,000
+      advisorAscension.current.and.returnValue {advice: {stage: 'off', moths: null}}
+      r = advisor.update()
+      expect(r.energy.target).toBe 4000
+      expect(r.energy.count.toNumber()).toBe 10
+      # a failing route costs only the target
+      advisorAscension.current.and.throwError 'broken'
+      expect(advisor.update().energy.target).toBe 4000
 
     it 'finds the advice for one unit', ->
       r = advisor.update()
@@ -697,8 +869,16 @@ describe 'Service: advisor on a real save', ->
     expect(_.find(r.tiers, name: 'greaterqueen').buys.toNumber()).toBe 3005192
     # hive twin plan: 1 hive queen = 1e6 hives, more than half the 175270 held => no tip
     expect(r.tips).toEqual []
-    # 104.8 energy at nexus 4 with 2416 lepidoptera; nexus 5's 3.3e9 larvae are too far off to save for
-    expect(advisor.renderEnergy r.energy).toBe 'buy 10 lepidoptera (lepidoptera 2,416/4,000)'
+    # 'save', the default (ASCENSION.md A.11): 2,416 lepidoptera >= the first 1,000; nexus 5's meat is in hand and
+    # its 3.33e9 larvae are not near (> 94,610 x 20,000), so they come in 3,333,333,000 / 94,610.17 = 35,232 s,
+    # while 0.4 x (1 + 2416/3416) = 0.6829 energy/s brings 24,060: keep ceil(36,000 - 24,060.3) = 11,940 > 104.8 held
+    expect(advisor.renderEnergy r.energy).toBe 'saving energy for nexus 5: 104/36,000 energy; still need 3.33e9 larva (have 3.34e6); only 11,940 needed now: income brings the rest before its larvae (9.8 h)'
+    expect(r.nexusLarvae.toNumber()).toBe 0
+    # the console script: 104.8 energy at nexus 4 with 2416 lepidoptera; nexus 5's 3.3e9 larvae are too far off to save for
+    script = advisor.advise advisor.snapshot(game), null, {spareEnergy: 'larvarush'}
+    expect(advisor.renderEnergy script.energy).toBe 'buy 10 lepidoptera (lepidoptera 2,416/4,000)'
+    expect(script.nexusLarvae).toBeUndefined()
+    expect((advisor.renderAction t for t in script.tiers)).toEqual (advisor.renderAction t for t in r.tiers)
     # 30 x 1.1^57 x 1.69^5 = 94610.17 larvae/s
     expect(advisor.renderHeader r).toBe 'run 14.5 h | climb if H < 43.4 h | larvae 3.34e6 (+94,610/s)'
 

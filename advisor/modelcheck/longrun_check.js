@@ -57,7 +57,8 @@ cases.forEach(function (name) {
   var game = g.game, adv = g.get('advisor');
   var conf = c.config, st = c.state, dec = c.decisions || {};
   var cfg = {ageMultiple: conf.age_multiple, territory: conf.territory_share, bank: conf.bank, moths: conf.moth_target,
-    cooldown: conf.cooldown_s || conf.push_cooldown_s, share: 0.5, longRun: 'on'};
+    cooldown: conf.cooldown_s || conf.push_cooldown_s, share: 0.5, longRun: 'on',
+    spareEnergy: 'larvarush'};   // the simulator's reference policy casts spare energy below nexus 5, as the script did
   var snap = adv.snapshot(game);
   var seed = function () {
     var mem = adv.createMemory(snap.now, snap.restartedAt);

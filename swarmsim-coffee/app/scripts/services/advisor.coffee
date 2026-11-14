@@ -9,9 +9,12 @@ angular.module('swarmApp').constant 'ADVISOR_SETTINGS',
     cooldown: 60      # seconds after hatching a unit before it is suggested again
     bank: 3           # stop hatching a unit once the tier above makes this many x what larvae could
     territory: 0.10   # fraction of larvae held back for territory units
-    moths: 4000       # lepidoptera target
-    spareEnergy: 'larvarush' # below nexus 5, spare energy: 'larvarush' casts it, 'save' holds it for the next nexus
-    ascension: 'off'  # ascension advice (advisorascension.coffee): 'off', or 'achievements' for ASCENSION.md's route
+    moths: 4000       # lepidoptera target after nexus 5 (the achievements route raises it per run: see `runMoths`)
+    # below nexus 5: 'save' plans energy for the next nexus (ASCENSION.md A.11: hold it, keep the nexus's larvae
+    # from the climb, at nexus 4 1,000 lepidoptera first and then only what nexus 5 needs just in time);
+    # 'larvarush' casts spare energy as larva rush, as the console script did
+    spareEnergy: 'save'
+    ascension: 'achievements' # ascension advice (advisorascension.coffee): 'off', or 'achievements' for ASCENSION.md's route
     longRun: 'off'    # long-run climb mode (ASCENSION.md A.10): 'on' adds rules LR-1 to LR-4 from a run age of 2 days
   limits:
     ageMultiple: {min: 0.01, max: 1000}
@@ -38,7 +41,7 @@ angular.module('swarmApp').constant 'ADVISOR_SETTINGS',
 # The live advice is re-run at most this often.
 angular.module('swarmApp').constant 'ADVISOR_REFRESH_MILLIS', 1000
 
-angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISOR_SETTINGS) ->
+angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, options, ADVISOR_SETTINGS, ADVISOR_REFRESH_MILLIS) ->
   ZERO = new Decimal 0
   ONE = new Decimal 1
   D = (x) -> new Decimal(if x? then x else 0)
@@ -49,6 +52,9 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
   DEFAULTS = ADVISOR_SETTINGS.defaults
   NEXUS_LARVA_SECS = 20000 # save for the next nexus once its larva price is under this many seconds of larvae
   MOTH_ENERGY = 10
+  # spareEnergy 'save' at nexus 4 (ASCENSION.md A.11): this many lepidoptera are bought first, before
+  # saving for nexus 5. Nexus 5 alone would want ~600 and the ascension ~2,000; both are flat around 1,000.
+  EARLY_MOTHS = 1000
   # Long-run climb mode (ASCENSION.md A.10.2), all of it gated on the setting and the run age.
   LR =
     age: 2 * 86400        # LR-0: the mode acts from this run age (s)
@@ -154,6 +160,7 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
         cap: if cap? then D(cap) else null # as the game computes it: nexus, nightbugs, crystal energy
         nexus: nexus
         energy: D g.unit('energy').count()
+        rate: D g.unit('energy').velocity() # energy per second (the 'save' plan's just-in-time hold)
         moths: D g.unit('moth').count()
         next: next
     catch e
@@ -265,7 +272,13 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
   # `given` is for the long-run reference-case check only (advisor/modelcheck/longrun_check.js): with
   # the mode acting, {reserve, climbLarvae} replace the R and A - R worked out here, so the climb and the
   # push can be compared with the simulator's given the same larvae. The app never passes it.
+  #
+  # `cfg.runMoths` / `cfg.runStage` (not stored settings): the lepidoptera target after nexus 5 that the
+  # ascension route's stage asks for (advisorAscension `runMoths`), passed by `update()`. It raises the
+  # `moths` setting, never lowers it, and takes the place of LR-4's raise. Without it the setting applies.
   advise = (snap, memory, cfg, given) ->
+    runMoths = cfg?.runMoths ? null
+    runStage = cfg?.runStage ? null
     cfg = withDefaults cfg
     now = snap.now
     mem = copyMemory memory, now, snap.restartedAt
@@ -329,11 +342,17 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
 
     energy = null
     energyError = snap.energyError ? null
-    # LR-4: from a run age of 3 days the mode raises the lepidoptera target to 30,000 (never lowers it)
-    raiseMoths = lrOn and age >= LR.mothAge and cfg.moths < LR.moths
+    # LR-4: from a run age of 3 days the mode raises the lepidoptera target to 30,000 (never lowers it).
+    # The route's run target, when there is one, decides instead (it asks the same in a long run).
+    raiseMoths = lrOn and age >= LR.mothAge and cfg.moths < LR.moths and not runMoths?
     if not energyError?
       try
-        if raiseMoths
+        if runMoths? and runMoths > cfg.moths
+          energy = energyAdvice snap, _.extend({}, cfg, moths: runMoths)
+          if energy?.type in ['buyMoths', 'mothTarget'] and not energy.early
+            energy.runStage = runStage
+            energy.setting = cfg.moths
+        else if raiseMoths
           energy = energyAdvice snap, _.extend({}, cfg, moths: LR.moths)
           if energy?.type in ['buyMoths', 'mothTarget']
             energy.longRun = true
@@ -345,6 +364,13 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
 
     # Larvae go to the highest tier that passes first; lower tiers get what is left.
     left = larvae.times(1 - cfg.territory).floor()
+    # spareEnergy 'save' (ASCENSION.md A.11): the larvae the next nexus needs are kept from the climb while
+    # the energy line says to buy it or save for it (the long-run mode below does the same in its own way).
+    # Without this, a player who follows every suggestion never gathers nexus 5's 3.33e9 larvae.
+    nexusHeld = null
+    if cfg.spareEnergy == 'save' and not lrActive
+      nexusHeld = Decimal.min nexusLarvae(energy, snap), left
+      left = left.minus nexusHeld
     # LR-2 reserve: in the mode, the larvae for the next nexus come out first, then R = floor(1%) of
     # what is left is set aside for the push; the climb (purchases, earmarks, banking) uses the rest.
     reserve = null
@@ -455,6 +481,9 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
       config: cfg
       memory: mem
     }
+    # Only with the 'save' plan, so the result is unchanged with 'larvarush' (the console script).
+    if nexusHeld?
+      ret.nexusLarvae = nexusHeld # larvae the climb leaves for the next nexus (0 while not saving for it)
     # Only with the setting on, so the result is unchanged with it off.
     if lrOn
       ret.longRun =
@@ -489,7 +518,7 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
   # nexus's whole larva price while the energy line says to buy that nexus or to save for it (the
   # 'save' record: its meat is in hand and its larvae are under 20,000 s away).
   nexusLarvae = (energy, snap) ->
-    rec = if energy?.type == 'buyMoths' then energy.then else energy
+    rec = if energy?.type in ['buyMoths', 'mothTarget'] then energy.then else energy
     if rec?.type in ['save', 'buyNexus']
       for c in snap.energy?.next?.costs ? [] when c.unit == 'larva'
         return c.val
@@ -579,6 +608,8 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
     nexus = e.nexus
     if not (nexus >= 1)
       return null
+    if nexus == 4 and cfg.spareEnergy == 'save' and e.next?
+      return nexus5Plan snap, cfg
     energy = e.energy
     moths = e.moths
     saveFor = ZERO
@@ -627,6 +658,72 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
       return {type: 'cast', spell: spell.spell, label: spell.label, cost: spell.cost, casts: casts}
     return {type: 'nextCast', spell: spell.spell, label: spell.label, cost: spell.cost, energy: energy}
 
+  # spareEnergy 'save' at nexus 4 (ASCENSION.md A.11), in this order:
+  # 1. nexus 5, if everything it costs is in hand;
+  # 2. the first EARLY_MOTHS lepidoptera (or the target, if lower), with all the energy there is;
+  # 3. energy beyond what nexus 5 needs "just in time" into lepidoptera, up to the target. While its meat
+  #    is missing, that is the whole price. Once its meat is in hand and only larvae (and energy) are
+  #    missing, it is the price less what the energy income brings before the larvae are there:
+  #    keep = max(0, price - energy/s x larvae missing / larvae per s), the larvae counted only while they
+  #    are held for it (larva price under NEXUS_LARVA_SECS of income, as for saving), else from 0;
+  # 4. then save (its meat in hand, its larvae near), one larva rush if energy is at its cap, or hold.
+  # Holding the whole price from the start (the earlier 'save') let energy sit at the 40,000 cap for
+  # hours while the larvae came, under a person's cadence.
+  nexus5Plan = (snap, cfg) ->
+    e = snap.energy
+    energy = e.energy
+    moths = e.moths
+    need = {}
+    missing = []
+    for c in e.next.costs
+      need[c.unit] = c
+      if c.have.lessThan c.val
+        missing.push c
+    if not missing.length
+      return {type: 'buyNexus', level: 5}
+    meatReady = not _.some missing, (c) -> c.unit == 'meat'
+    larva = need.larva
+    larvaNear = not larva? or larva.val.lessThanOrEqualTo(snap.larvaRate.times(NEXUS_LARVA_SECS))
+    # as for saving below: its meat in hand and its larvae near, so the climb keeps the larvae for it
+    saving = null
+    if meatReady and larvaNear
+      saving = {type: 'save', level: 5, missing: ({unit: c.unit, have: c.have, need: c.val} for c in missing)}
+    # targets are plain numbers in the records, as the console script's
+    target = cfg.moths
+    early = Math.min target, EARLY_MOTHS
+    if moths.lessThan early
+      n = Decimal.min(D(early).minus(moths), energy.dividedBy(MOTH_ENERGY)).floor()
+      if n.greaterThanOrEqualTo 1
+        return {type: 'buyMoths', count: n, moths: moths, target: early, early: true, then: saving}
+      return {type: 'mothTarget', moths: moths, target: early, early: true, then: saving}
+    price = need.energy?.val ? ZERO
+    keep = price
+    wait = null # seconds until nexus 5's larvae are there, when that sets how much energy to keep
+    if meatReady and larva? and larva.have.lessThan(larva.val) and e.rate? and e.rate.greaterThan(0) and snap.larvaRate.greaterThan(0)
+      have = if larvaNear then larva.have else ZERO
+      wait = larva.val.minus(have).dividedBy(snap.larvaRate)
+      keep = Decimal.min price, Decimal.max(price.minus(e.rate.times(wait)), 0).ceil()
+    spare = Decimal.max energy.minus(keep), 0
+    if moths.lessThan target
+      n = Decimal.min(D(target).minus(moths), spare.dividedBy(MOTH_ENERGY)).floor()
+      if n.greaterThanOrEqualTo 1
+        rec = {type: 'buyMoths', count: n, moths: moths, target: target, then: saving}
+        if keep.lessThan price
+          rec.keep = keep
+          rec.wait = wait.toNumber()
+        return rec
+    if saving
+      if keep.lessThan price
+        return _.extend {}, saving, keep: keep, wait: wait.toNumber()
+      return saving
+    if e.cap? and energy.greaterThanOrEqualTo(e.cap)
+      return {type: 'energyFull', energy: energy, cap: e.cap, spell: SPELLS.larvarush.spell, label: SPELLS.larvarush.label, cost: SPELLS.larvarush.cost}
+    hold = {type: 'hold', level: 5, energy: energy, price: price, ready: energy.greaterThanOrEqualTo(price), missing: ({unit: c.unit, have: c.have, need: c.val} for c in missing when c.unit != 'energy'), mothsNext: false}
+    if keep.lessThan price
+      hold.keep = keep
+      hold.wait = wait.toNumber()
+    return hold
+
   # ---------------------------------------------------------------------------
   # Plain-text rendering, matching the console script's wording.
 
@@ -664,8 +761,23 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
         (renderStep(s) for s in tip.steps).join(' > ') + ' > twin ' + tip.unit + 's (pays back in ' + formatTime(tip.payback) + ')'
       else ''
 
+  # Why a lepidoptera target is what it is, when it is not simply the setting.
+  RUN_STAGE = {firstRun: 'first-run target', needMutation: 'first-run target', longRun: 'long-run target', quickRun: 'quick-run target'}
+  mothWhy = (rec, sep) ->
+    if rec.early then return sep + 'first ' + formatNumber(rec.target) + ' before nexus 5'
+    if rec.runStage? then return sep + (RUN_STAGE[rec.runStage] ? 'run target')
+    if rec.longRun then return sep + 'long-run target'
+    return ''
+
+  # "; keeping 12,000 energy for nexus 5 (its larvae in 9.6 h)"
+  renderKeep = (rec) ->
+    if not rec.keep? then return ''
+    if rec.keep.isZero() then return '; nothing kept for nexus 5 yet (its larvae in ' + formatTime(rec.wait) + ')'
+    '; keeping ' + formatNumber(rec.keep) + ' energy for nexus 5 (its larvae in ' + formatTime(rec.wait) + ')'
+
   renderSaving = (rec) ->
-    'save for nexus ' + rec.level + ': ' + ((formatNumber(m.have) + '/' + formatNumber(m.need) + ' ' + m.unit) for m in rec.missing).join(', ')
+    'save for nexus ' + rec.level + ': ' + ((formatNumber(m.have) + '/' + formatNumber(m.need) + ' ' + m.unit) for m in rec.missing).join(', ') +
+      (if rec.keep? then '; ' + (if rec.keep.isZero() then 'no energy' else 'only ' + formatNumber(rec.keep) + ' energy') + ' needed now: income brings the rest before the larvae (' + formatTime(rec.wait) + ')' else '')
 
   # "saving energy for nexus 2: 2,000/625 energy (ready); still need 3.33e15 meat (have 8.95e11)"
   renderHold = (rec) ->
@@ -678,6 +790,8 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
       text += '; still need ' + ((formatNumber(m.need) + ' ' + m.unit + ' (have ' + formatNumber(m.have) + ')') for m in rec.missing).join(', ')
     if rec.mothsNext
       text += '; then lepidoptera'
+    if rec.keep?
+      text += '; ' + (if rec.keep.isZero() then 'none' else 'only ' + formatNumber(rec.keep)) + ' needed now: income brings the rest before its larvae (' + formatTime(rec.wait) + ')'
     return text
 
   # Without the "energy: " prefix the panel puts in front. Null for null.
@@ -688,9 +802,9 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
       when 'buyNexus' then 'buy nexus ' + rec.level
       when 'save' then renderSaving rec
       when 'buyMoths'
-        want = 'lepidoptera ' + formatNumber(rec.moths) + '/' + formatNumber(rec.target) + (if rec.longRun then ', long-run target' else '')
-        'buy ' + formatNumber(rec.count) + ' lepidoptera (' + want + ')' + (if rec.then then '; then ' + renderSaving(rec.then) else '')
-      when 'mothTarget' then 'all energy into lepidoptera ' + formatNumber(rec.moths) + '/' + formatNumber(rec.target) + (if rec.longRun then ' (long-run target)' else '')
+        want = 'lepidoptera ' + formatNumber(rec.moths) + '/' + formatNumber(rec.target) + mothWhy(rec, ', ')
+        'buy ' + formatNumber(rec.count) + ' lepidoptera (' + want + ')' + renderKeep(rec) + (if rec.then then '; then ' + renderSaving(rec.then) else '')
+      when 'mothTarget' then 'all energy into lepidoptera ' + formatNumber(rec.moths) + '/' + formatNumber(rec.target) + (if mothWhy(rec, '') then ' (' + mothWhy(rec, '') + ')' else '') + (if rec.then then '; then ' + renderSaving(rec.then) else '')
       when 'cast' then 'cast ' + rec.label + ' x' + formatNumber(rec.casts)
       when 'nextCast' then 'next ' + rec.label + ' at ' + formatNumber(rec.cost) + ' energy (have ' + formatNumber(rec.energy) + ')'
       when 'hold' then renderHold rec
@@ -705,6 +819,15 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
   # Live wiring for the panel: one remembered state per page load.
 
   liveMemory = null
+
+  # The ascension route's lepidoptera target for this run ({moths, stage}, from advisorAscension), looked
+  # up lazily because that service depends on this one. Null when the route is off or has none; never
+  # throws (a failure there only loses the run target).
+  runTarget = ->
+    try
+      return $injector.get('advisorAscension').current(ADVISOR_REFRESH_MILLIS)?.advice?.moths ? null
+    catch e
+      return null
   # Shared by the panel and the buy-box button, so the rules run at most once per `maxAgeMs`
   # however many views ask. Wall-clock time, so a page left in the background doesn't skew it.
   cached = null
@@ -734,12 +857,18 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, game, options, ADVISO
     renderHeader: renderHeader
     renderPush: renderPush
     LR: LR
+    EARLY_MOTHS: EARLY_MOTHS
     pushLine: pushLine
     # live
     config: -> options.advisorConfig()
     enabled: -> options.advisorEnabled()
     update: (now) ->
-      result = advise snapshot(game, now), liveMemory, options.advisorConfig()
+      cfg = options.advisorConfig()
+      # the ascension route's run target for lepidoptera (null while the route is off or has none)
+      run = runTarget()
+      if run?
+        cfg = _.extend {}, cfg, runMoths: run.moths, runStage: run.stage
+      result = advise snapshot(game, now), liveMemory, cfg
       liveMemory = result.memory
       return result
     memory: -> liveMemory

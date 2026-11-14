@@ -41,8 +41,16 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
   FIRST_UNLOCKS = 2
   # The halving energy is measured from the game's own cost function at two amounts of energy spent.
   PROBE_SPENT = 1e5
+  MOTH_ENERGY = 10 # energy per lepidoptera (game data), as advisor.coffee
   # Energy line records that spend energy; while saving for the ascension they give way to the save.
   SPENDING = ['cast', 'nextCast', 'buyMoths', 'mothTarget', 'energyFull']
+  # ASCENSION.md A.11: the lepidoptera target after nexus 5 for each kind of run (the advisor's `moths`
+  # setting still applies when it is higher). Every lepidoptera counts as energy spent, as a House of
+  # Mirrors cast does, and raises the energy rate besides, so a run that is only waiting to ascend wants
+  # many. A first run (or one still short of the lepidoptera mutation) stops at 10,000 so mirrors still
+  # bring the mutagen the plan spends (~1e7 with it, ~1.5e5 with 30,000); a quick run takes 30,000; the
+  # long run takes 30,000 from a run age of 3 days, as the long-run mode's LR-4 does.
+  RUN_MOTHS = {firstRun: 10000, needMutation: 10000, quickRun: 30000}
 
   isOn = (cfg) -> cfg?.ascension == ROUTE
 
@@ -201,6 +209,14 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
       return null
     return {type: 'mutagen', mutagen: snap.mutagen, steps: steps, keep: budget}
 
+  # {moths, stage}: this run's lepidoptera target after nexus 5 (RUN_MOTHS), or null.
+  runMoths = (stage, snap) ->
+    if RUN_MOTHS[stage]?
+      return {moths: RUN_MOTHS[stage], stage: stage}
+    if stage == 'longRun' and (snap.now - snap.restartedAt) / 1000 >= advisor.LR.mothAge
+      return {moths: advisor.LR.moths, stage: stage}
+    return null
+
   nextGoal = (goals, have) ->
     for g in goals when not g.earned
       if have.lessThan g.val
@@ -210,7 +226,7 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
   advise = (snap, cfg) ->
     records = []
     if not isOn cfg
-      return {stage: 'off', records: records, hold: null, plan: null, mutagen: null}
+      return {stage: 'off', records: records, hold: null, plan: null, mutagen: null, moths: null}
     mut = mutagenPlan snap
     goals = snap.goals
     longLeft = (g for g in goals.expansion.concat(goals.endless) when not g.earned)
@@ -259,6 +275,7 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
       records: records
       mutagen: mut
       plan: p
+      moths: runMoths(stage, snap)
       # once saving has started (or the energy is there), the energy line holds instead of spending
       hold: if p?.type in ['saveForAscension', 'ascendNow'] then p else null
     }
@@ -276,6 +293,11 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
       needed = p.toSpend.dividedBy(rec.cost).ceil()
       if needed.lessThan rec.casts
         return _.extend {}, rec, casts: needed, thenSave: true
+    # lepidoptera count as spent energy too (10 each): cut them the same way (ASCENSION.md A.11)
+    if p.type == 'spendForAscension' and p.toSpend? and rec.type == 'buyMoths'
+      needed = p.toSpend.dividedBy(MOTH_ENERGY).ceil()
+      if needed.lessThan rec.count
+        return _.extend {}, rec, count: needed, thenSave: true
     return rec
 
   # ---------------------------------------------------------------------------
@@ -308,7 +330,7 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
       # Below nexus 5 the cap still grows with each nexus, so the save point is not shown yet.
       when 'spendForAscension'
         of20(rec) + ' costs ' + fmt(rec.cost) + ' energy (cap ' + fmt(rec.cap) + '): every ' + fmt(rec.halving) + ' energy spent halves it' +
-          (if rec.nexus >= 5 and rec.toSpend? then ' (House of Mirrors); spend ' + fmt(rec.toSpend) + ' more, then save from ' + fmt(rec.saveAt) else ', mostly House of Mirrors from nexus 5')
+          (if rec.nexus >= 5 and rec.toSpend? then ' (lepidoptera and House of Mirrors); spend ' + fmt(rec.toSpend) + ' more, then save from ' + fmt(rec.saveAt) else ', mostly lepidoptera and House of Mirrors from nexus 5')
       when 'saveForAscension'
         'stop spending energy and save for ' + of20(rec) + ': ' + fmt(rec.energy) + '/' + fmt(rec.cost) +
           (if rec.seconds? then ', ready in ' + time(rec.seconds) else '')
@@ -347,6 +369,8 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
     mutagenPlan: mutagenPlan
     advise: advise
     coupleEnergy: coupleEnergy
+    runMoths: runMoths
+    RUN_MOTHS: RUN_MOTHS
     render: render
     renderStep: renderStep
     # live

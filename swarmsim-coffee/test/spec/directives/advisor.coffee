@@ -285,6 +285,37 @@ describe 'Directive: advisorPanel', ->
     $rootScope.$digest()
     expect(text el.querySelector '.advisor-energy').toBe 'Energy: energy is full (' + bignum(D 10000) + '/' + bignum(D 10000) + '): cast larva rush ×1 so the income isn\'t wasted'
 
+  it "says how the 'save' plan spends energy at nexus 4, and the larvae it keeps", ->
+    D = (x) -> new Decimal x
+    show = (rec, over={}) ->
+      advisor.update.and.returnValue fakeAdvice _.extend({energy: rec}, over)
+      advisor.invalidate()
+      $rootScope.$emit 'tick'
+      $rootScope.$digest()
+      text el.querySelector '.advisor-energy'
+    spyOn(advisor, 'update').and.returnValue fakeAdvice()
+    el = render()
+    # the first 1,000 lepidoptera, then nexus 5 (its larvae kept from the climb)
+    save = {type: 'save', level: 5, missing: [{unit: 'energy', have: D(8000), need: D(36000)}]}
+    early = {type: 'buyMoths', count: D(800), moths: D(0), target: D(1000), early: true, then: save}
+    expect(show early, {nexusLarvae: D(3333333000)}).toBe 'Energy: buy ' + bignum(D 800) + ' lepidoptera (0/' + bignum(D 1000) + ': the first ' + bignum(D 1000) + ', before nexus 5); then save for nexus 5: ' + bignum(D 8000) + '/' + bignum(D 36000) + ' energy (the climb above leaves ' + bignum(D 3333333000) + ' larvae for it)'
+    expect(show {type: 'mothTarget', moths: D(0), target: D(1000), early: true, then: null}).toBe 'Energy: all energy into lepidoptera (0/' + bignum(D 1000) + ': the first ' + bignum(D 1000) + ', before nexus 5)'
+    # just in time: keep part of the price, lepidoptera with the rest
+    keep = {type: 'buyMoths', count: D(200), moths: D(1000), target: D(4000), keep: D(30000), wait: 10000, then: null}
+    expect(show keep).toBe 'Energy: buy ' + bignum(D 200) + ' lepidoptera (' + bignum(D 1000) + '/' + bignum(D 4000) + '); keep ' + bignum(D 30000) + ' energy for nexus 5: income brings the rest before its larvae (2.8 h)'
+    keep.keep = D 0
+    expect(show keep).toBe 'Energy: buy ' + bignum(D 200) + ' lepidoptera (' + bignum(D 1000) + '/' + bignum(D 4000) + '); nothing to keep for nexus 5 yet: income brings it before its larvae (2.8 h)'
+    hold = {type: 'hold', level: 5, energy: D(1000), price: D(36000), ready: false, missing: [{unit: 'larva', have: D(1333333000), need: D(3333333000)}], mothsNext: false, keep: D(16001), wait: 33333.33}
+    expect(show hold).toBe 'Energy: saving for nexus 5: ' + bignum(D 1000) + '/' + bignum(D 36000) + ' energy; also needs ' + bignum(D 3333333000) + ' larvae (have ' + bignum(D 1333333000) + '); only ' + bignum(D 16001) + ' energy needed now: income brings the rest before its larvae (9.3 h)'
+    save.keep = D 25000
+    save.wait = 10000
+    expect(show save).toBe 'Energy: save for nexus 5: ' + bignum(D 8000) + '/' + bignum(D 36000) + ' energy; only ' + bignum(D 25000) + ' energy needed now: income brings the rest before the larvae (2.8 h)'
+    # the route's target for the run
+    run = {type: 'buyMoths', count: D(600), moths: D(4000), target: D(30000), runStage: 'quickRun', setting: 4000, then: null}
+    expect(show run).toBe 'Energy: buy ' + bignum(D 600) + ' lepidoptera (' + bignum(D 4000) + '/' + bignum(D 30000) + ': quick-run target, your setting is ' + bignum(D 4000) + ')'
+    # nothing kept: no note
+    expect(show run, {nexusLarvae: D(0)}).toBe 'Energy: buy ' + bignum(D 600) + ' lepidoptera (' + bignum(D 4000) + '/' + bignum(D 30000) + ': quick-run target, your setting is ' + bignum(D 4000) + ')'
+
   it 'collapses to a one-line summary and remembers that with the save', ->
     spyOn(advisor, 'update').and.returnValue fakeAdvice()
     el = render()
@@ -373,7 +404,8 @@ describe 'Directive: advisorPanel', ->
       $rootScope.$digest()
 
     it 'adds nothing, and leaves the energy line as it was, while the setting is off', ->
-      expect(options.advisorSetting 'ascension').toBe 'off'
+      # on by default (the achievements route): turn it off
+      expect(options.advisorSetting 'ascension', 'off').toBe 'off'
       spyOn(advisor, 'update').and.returnValue fakeAdvice()
       el = render()
       expect(el.querySelectorAll('.advisor-ascension').length).toBe 0
@@ -399,13 +431,22 @@ describe 'Directive: advisorPanel', ->
       tick()
       expect(text el.querySelector '.advisor-energy').toBe 'Energy: cast House of Mirrors ×3'
 
+    it 'cuts lepidoptera short before saving starts, as casts', ->
+      rec = {type: 'buyMoths', count: D(5000), moths: D(4000), target: D(10000), runStage: 'firstRun', setting: 4000, then: null}
+      spyOn(advisor, 'update').and.returnValue fakeAdvice {energy: rec}
+      plan = {type: 'spendForAscension', stage: 'firstRun', cost: D(80000), energy: D(50000), cap: D(58500), halving: 50000, saveAt: D(58500), toSpend: D(22579), nexus: 5, ascension: 1, of: 20}
+      spyOn(advisorAscension, 'update').and.returnValue {stage: 'firstRun', records: [plan], plan: plan, hold: null, mutagen: null, moths: {moths: 10000, stage: 'firstRun'}}
+      el = render()
+      # ceil(22,579 / 10) = 2,258
+      expect(text el.querySelector '.advisor-energy').toBe 'Energy: buy ' + bignum(D 2258) + ' lepidoptera (' + bignum(D 4000) + '/' + bignum(D 10000) + ': first-run target, your setting is ' + bignum(D 4000) + '), then save for the ascension'
+
     it 'cuts a cast short before saving starts', ->
       spyOn(advisor, 'update').and.returnValue fakeAdvice {energy: {type: 'cast', spell: 'clonearmy', label: 'House of Mirrors', cost: 2500, casts: D(20)}}
       plan = {type: 'spendForAscension', stage: 'firstRun', cost: D(80000), energy: D(50000), cap: D(58500), halving: 50000, saveAt: D(58500), toSpend: D(22579), nexus: 5, ascension: 1, of: 20}
       spyOn(advisorAscension, 'update').and.returnValue {stage: 'firstRun', records: [plan], plan: plan, hold: null, mutagen: null}
       el = render()
       expect(text el.querySelector '.advisor-energy').toBe 'Energy: cast House of Mirrors ×10, then save for the ascension'
-      expect(text el.querySelector '.advisor-ascension').toBe 'Ascension: ascension 1 of 20 costs ' + bignum(D 80000) + ' energy (cap ' + bignum(D 58500) + '); every ' + bignum(D 50000) + ' energy spent halves it (House of Mirrors); spend ' + bignum(D 22579) + ' more, then save from ' + bignum(D 58500)
+      expect(text el.querySelector '.advisor-ascension').toBe 'Ascension: ascension 1 of 20 costs ' + bignum(D 80000) + ' energy (cap ' + bignum(D 58500) + '); every ' + bignum(D 50000) + ' energy spent halves it (lepidoptera and House of Mirrors); spend ' + bignum(D 22579) + ' more, then save from ' + bignum(D 58500)
 
     it 'lists the mutagen to spend, each linked, and the stage, on two lines', ->
       spyOn(advisor, 'update').and.returnValue fakeAdvice {energy: null}
@@ -957,44 +998,47 @@ describe 'Directive: advisorOptions', ->
     angular.element(input).triggerHandler {type: 'keydown', keyCode: 13}
     expect(input.blur).toHaveBeenCalled()
 
-  it 'offers the spare-energy choice as two options, saved when picked', ->
+  it 'offers the spare-energy choice as two options, the plan by default, saved when picked', ->
     spyOn(options, 'advisorSetting').and.callThrough()
     el = render()
     radios = el.querySelectorAll 'input[name=advisor-spareEnergy]'
     expect(radios.length).toBe 2
+    expect(radios[0].value).toBe 'save'
     expect(radios[0].checked).toBe true
-    expect(text el).toContain 'Larva rush suits runs of a day or two'
+    expect(text el).toContain 'Planning holds energy for the next nexus and keeps its larvae out of the climb'
+    expect(text el).toContain 'Cast larva rush (as the console script did)'
     radios[1].checked = true
     angular.element(radios[1]).triggerHandler 'click'
     $rootScope.$digest()
-    expect(options.advisorSetting).toHaveBeenCalledWith 'spareEnergy', 'save'
-    expect(options.advisorConfig().spareEnergy).toBe 'save'
+    expect(options.advisorSetting).toHaveBeenCalledWith 'spareEnergy', 'larvarush'
+    expect(options.advisorConfig().spareEnergy).toBe 'larvarush'
     # reset brings the default back, in the control too
     angular.element(el.querySelector '.advisor-options > .well > button').triggerHandler 'click'
     $rootScope.$digest()
-    expect(options.advisorConfig().spareEnergy).toBe 'larvarush'
+    expect(options.advisorConfig().spareEnergy).toBe 'save'
     expect(el.querySelectorAll('input[name=advisor-spareEnergy]')[0].checked).toBe true
 
-  it 'offers the ascension advice as off or the achievements route, off by default', inject (advisorAscension) ->
+  it 'offers the ascension advice as off or the achievements route, the route by default', inject (advisorAscension) ->
     spyOn(options, 'advisorSetting').and.callThrough()
     spyOn(advisorAscension, 'invalidate').and.callThrough()
     el = render()
     radios = el.querySelectorAll 'input[name=advisor-ascension]'
     expect(radios.length).toBe 2
-    expect(radios[0].checked).toBe true
+    expect(radios[1].checked).toBe true
     expect(text el).toContain 'The achievements route is a plan for earning every achievement'
+    expect(text el).toContain '10,000 in a first run, 30,000 in a quick run and from day 3 of the long run'
     expect(el.querySelector('.advisor-options').innerHTML).not.toContain 'http'
-    radios[1].checked = true
-    angular.element(radios[1]).triggerHandler 'click'
+    radios[0].checked = true
+    angular.element(radios[0]).triggerHandler 'click'
     $rootScope.$digest()
-    expect(options.advisorSetting).toHaveBeenCalledWith 'ascension', 'achievements'
-    expect(options.advisorConfig().ascension).toBe 'achievements'
-    expect(options.session.state.options.advisor.ascension).toBe 'achievements'
+    expect(options.advisorSetting).toHaveBeenCalledWith 'ascension', 'off'
+    expect(options.advisorConfig().ascension).toBe 'off'
+    expect(options.session.state.options.advisor.ascension).toBe 'off'
     expect(advisorAscension.invalidate).toHaveBeenCalled()
     angular.element(el.querySelector '.advisor-options > .well > button').triggerHandler 'click'
     $rootScope.$digest()
-    expect(options.advisorConfig().ascension).toBe 'off'
-    expect(el.querySelectorAll('input[name=advisor-ascension]')[0].checked).toBe true
+    expect(options.advisorConfig().ascension).toBe 'achievements'
+    expect(el.querySelectorAll('input[name=advisor-ascension]')[1].checked).toBe true
 
   it 'offers the long-run climb as off or on, off by default', ->
     spyOn(options, 'advisorSetting').and.callThrough()
@@ -1026,5 +1070,5 @@ describe 'Directive: advisorOptions', ->
     el = render()
     angular.element(el.querySelector '.advisor-options button').triggerHandler 'click'
     $rootScope.$digest()
-    expect(options.advisorConfig()).toEqual {ageMultiple: 3, share: 0.5, cooldown: 60, bank: 3, territory: 0.1, moths: 4000, spareEnergy: 'larvarush', ascension: 'off', longRun: 'off'}
+    expect(options.advisorConfig()).toEqual {ageMultiple: 3, share: 0.5, cooldown: 60, bank: 3, territory: 0.1, moths: 4000, spareEnergy: 'save', ascension: 'achievements', longRun: 'off'}
     expect(el.querySelector('#advisor-moths').value).toBe '4000'
