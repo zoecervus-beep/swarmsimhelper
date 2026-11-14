@@ -1,0 +1,145 @@
+{
+ "case": "trough_save_for_ascension",
+ "exercises": "trough phase: test passes, cost at or under the save point: stop casting, save",
+ "save": "trough_save_for_ascension.save.json",
+ "config": {
+  "route": "swarmwarp (advisor/NO-MIRRORS.md, Rules for the advisor)",
+  "ascension_test": [
+   "ratio",
+   1000.0
+  ],
+  "final_log10_mutagen_held": 270.0,
+  "free_unlocks": 3,
+  "unlock_share": 0.3,
+  "unlock_order": [
+   "mutatenexus",
+   "mutateswarmwarp",
+   "mutatebat",
+   "mutatefreq",
+   "mutateeach",
+   "mutatearmy",
+   "mutaterush",
+   "mutateclone",
+   "mutatemeat",
+   "mutatehatchery"
+  ],
+  "fixed_mutants": {
+   "mutantnexus": 1000000.0,
+   "mutantfreq": 1000000.0
+  },
+  "mutant_shares": {
+   "mutantswarmwarp": 0.1,
+   "mutantbat": 0.1,
+   "mutantarmy": 0.3,
+   "mutanteach": 0.01
+  },
+  "guard": null,
+  "free_respec_when_warp_unaffordable": true,
+  "clock": {
+   "timers": "game",
+   "run_age": "game",
+   "one_warp_at_a_time": true
+  },
+  "age_multiple": 5,
+  "long_run_gate_s": 172800,
+  "cooldown_s": 60,
+  "share_per_minute": 0.5,
+  "moths_after_nexus5": 10000,
+  "early_moths_at_nexus4": 1000,
+  "bats": 2000,
+  "territory_share": 0.1,
+  "long_run_climb_mode": "on",
+  "spell": "swarmwarp",
+  "ascensions_goal": 20
+ },
+ "state": {
+  "run_age_s": 2349836.869527798,
+  "ascensions": 1,
+  "nexus": 5,
+  "energy": "1.0448630211512123e+03",
+  "energy_rate": "1.9071856287425151e+00",
+  "cap": "1.0840019960079840e+05",
+  "moths": "10000.0",
+  "bats": "2000.0",
+  "nightbugs": "0",
+  "ascension_cost": "17520.0",
+  "energy_spent": "665125.0",
+  "halving": "7.9940119760479050e+04",
+  "threshold": 115329,
+  "save_at": "1.0840019960079840e+05",
+  "mutagen_held": "2.9556147105392106e+06",
+  "premutagen": "3.0361829191483212e+09",
+  "unlocks": [
+   "mutatenexus",
+   "mutateswarmwarp"
+  ],
+  "unlock_count": 2,
+  "next_unlock_price": "244140625.0",
+  "mutants": {
+   "mutantswarmwarp": "328401.0",
+   "mutantnexus": "1000000.0"
+  },
+  "swarmwarp_power": "1.4045969546608950e+01",
+  "swarmwarp_skip_s": "1.2641372591948055e+04",
+  "expansions": 176,
+  "mirror_casts_this_run": 0,
+  "swarmwarp_casts_this_run": 158,
+  "earned": {
+   "expansion9": false,
+   "overmind6_3": false,
+   "mutation4": false
+  },
+  "stage": "build",
+  "test": {
+   "kind": "ratio",
+   "passes": true,
+   "premutagen": "3.0361829191483212e+09",
+   "held": "2.9556147105392106e+06",
+   "k": "1000.0",
+   "need": "2.9556147105392108e+09",
+   "run_age_s": "2.3498368695277981e+06"
+  },
+  "wants_ascension": true,
+  "larvae": "2.5198026013893148e+13",
+  "larva_rate": "6.6517140024022995e+10",
+  "meat": "5.4584530466511406e+92",
+  "achievement_points": 1060,
+  "clock": {
+   "run_age_wall_s": 352500.0,
+   "skipped_this_run_s": 1997336.869527798,
+   "skipped_total_s": 1997336.869527798,
+   "run_age_game_s": 2349836.869527798,
+   "run_age_game_estimate_s": 2349836.8695277926,
+   "horizon_s": 11749184.34763899,
+   "long_run_gate_active": true
+  }
+ },
+ "decisions": {
+  "energy": {
+   "actions": [],
+   "saving_for_ascension": true,
+   "ascend_now": false,
+   "energy_after": "1.0448630211512123e+03"
+  },
+  "territory": {
+   "cheapest_rung": "devourer",
+   "top_rung": "wasp",
+   "empower_price": "1.3324461715200001e+85",
+   "top_meat_each": "2.9609947654115410e+82",
+   "territory_larvae_cap": "2519802601390.0",
+   "meat_budget": "4.9126077419860265e+92",
+   "wiped_share": 2.793827952826329e-18,
+   "empower_advised": false,
+   "keeps_hatching_territory": true
+  },
+  "mutagen": {
+   "respec_first": false,
+   "respec_refund": "1344025.0",
+   "free_respecs": 4,
+   "steps": [],
+   "held_after": "2.9556147105392106e+06",
+   "again": [],
+   "respec_again": false
+  }
+ }
+}

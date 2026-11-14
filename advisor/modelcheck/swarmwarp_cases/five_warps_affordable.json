@@ -1,0 +1,1398 @@
+{
+ "case": "five_warps_affordable",
+ "exercises": "energy for 5 swarmwarps at one visit: one at a time, the purchases re-taken between them (warp_sequence)",
+ "save": "five_warps_affordable.save.json",
+ "config": {
+  "route": "swarmwarp (advisor/NO-MIRRORS.md, Rules for the advisor)",
+  "ascension_test": [
+   "ratio",
+   1000.0
+  ],
+  "final_log10_mutagen_held": 270.0,
+  "free_unlocks": 3,
+  "unlock_share": 0.3,
+  "unlock_order": [
+   "mutatenexus",
+   "mutateswarmwarp",
+   "mutatebat",
+   "mutatefreq",
+   "mutateeach",
+   "mutatearmy",
+   "mutaterush",
+   "mutateclone",
+   "mutatemeat",
+   "mutatehatchery"
+  ],
+  "fixed_mutants": {
+   "mutantnexus": 1000000.0,
+   "mutantfreq": 1000000.0
+  },
+  "mutant_shares": {
+   "mutantswarmwarp": 0.1,
+   "mutantbat": 0.1,
+   "mutantarmy": 0.3,
+   "mutanteach": 0.01
+  },
+  "guard": null,
+  "free_respec_when_warp_unaffordable": true,
+  "clock": {
+   "timers": "game",
+   "run_age": "game",
+   "one_warp_at_a_time": true
+  },
+  "age_multiple": 5,
+  "long_run_gate_s": 172800,
+  "cooldown_s": 60,
+  "share_per_minute": 0.5,
+  "moths_after_nexus5": 10000,
+  "early_moths_at_nexus4": 1000,
+  "bats": 2000,
+  "territory_share": 0.1,
+  "long_run_climb_mode": "on",
+  "spell": "swarmwarp",
+  "ascensions_goal": 20
+ },
+ "state": {
+  "run_age_s": 186600.0,
+  "ascensions": 10,
+  "nexus": 5,
+  "energy": "10700.0",
+  "energy_rate": "1.9071856287425151e+00",
+  "cap": "1.0840019960079840e+05",
+  "moths": "10000.0",
+  "bats": "2000.0",
+  "nightbugs": "0",
+  "ascension_cost": "752407.0",
+  "energy_spent": "349125.0",
+  "halving": "7.9940119760479050e+04",
+  "threshold": 115329,
+  "save_at": "1.0840019960079840e+05",
+  "mutagen_held": "2.1627779080285675e+32",
+  "premutagen": "3.5682248306159642e+20",
+  "unlocks": [
+   "mutatearmy",
+   "mutatebat",
+   "mutateclone",
+   "mutateeach",
+   "mutatefreq",
+   "mutatenexus",
+   "mutaterush",
+   "mutateswarmwarp"
+  ],
+  "unlock_count": 8,
+  "next_unlock_price": "3.5527136788005011e+33",
+  "mutants": {
+   "mutantbat": "4.4138324653644237e+31",
+   "mutantclone": "1.0",
+   "mutantswarmwarp": "4.4138324653644237e+31",
+   "mutantrush": "1.0",
+   "mutanteach": "4.4138324653644236e+30",
+   "mutantfreq": "1000000.0",
+   "mutantnexus": "1000000.0",
+   "mutantarmy": "1.3241497396093269e+32"
+  },
+  "swarmwarp_power": "2.6723960090253249e+03",
+  "swarmwarp_skip_s": "2.4051564081227924e+06",
+  "expansions": 357,
+  "mirror_casts_this_run": 0,
+  "swarmwarp_casts_this_run": 0,
+  "earned": {
+   "expansion9": false,
+   "overmind6_3": false,
+   "mutation4": false
+  },
+  "stage": "build",
+  "test": {
+   "kind": "ratio",
+   "passes": false,
+   "premutagen": "3.5682248306159642e+20",
+   "held": "2.1627779080285675e+32",
+   "k": "1000.0",
+   "need": "2.1627779080285673e+35",
+   "run_age_s": "186600.0"
+  },
+  "wants_ascension": false,
+  "larvae": "6.5473185427328865e+33",
+  "larva_rate": "2.1627779080300264e+31",
+  "meat": "7.3251455788529520e+191",
+  "achievement_points": 1640,
+  "clock": {
+   "run_age_wall_s": 186600.0,
+   "skipped_this_run_s": 0.0,
+   "skipped_total_s": 1945004221.1840203,
+   "run_age_game_s": 186600.0,
+   "run_age_game_estimate_s": 186600.0,
+   "horizon_s": 933000.0,
+   "long_run_gate_active": true
+  }
+ },
+ "decisions": {
+  "energy": {
+   "actions": [
+    {
+     "type": "cast",
+     "spell": "swarmwarp",
+     "casts": 5
+    }
+   ],
+   "saving_for_ascension": false,
+   "ascend_now": false,
+   "energy_after": "700.0"
+  },
+  "territory": {
+   "cheapest_rung": "roach",
+   "top_rung": "locust",
+   "empower_price": "1.1689968397656682e+162",
+   "top_meat_each": "2.5977776951054255e+159",
+   "territory_larvae_cap": "6.5473185427328873e+32",
+   "meat_budget": "6.5926310209676569e+191",
+   "wiped_share": 2.379505605962136e-16,
+   "empower_advised": false,
+   "keeps_hatching_territory": true
+  },
+  "warp_sequence": [
+   {
+    "skip_s": "2.4051564081227924e+06",
+    "game_clock_before_s": 1949516521.1840203,
+    "game_clock_after_s": 1951921677.592143,
+    "larvae_from_warp": "5.2018191448448255e+37",
+    "bought": {
+     "expansions": 11,
+     "hatcheries": 34,
+     "accomplished_ancestry": 0,
+     "empowers": {
+      "roach": 1
+     },
+     "faster_levels": {
+      "drone": 11,
+      "queen": 9,
+      "nest": 8,
+      "greaterqueen": 8,
+      "hive": 6,
+      "hivequeen": 6,
+      "empress": 4,
+      "prophet": 3,
+      "goddess": 2,
+      "pantheon": 1,
+      "pantheon3": 1
+     },
+     "twin_levels": {},
+     "territory_twins": {}
+    },
+    "climb": [
+     {
+      "tier": 14,
+      "name": "pantheon5",
+      "outcome": "fails"
+     },
+     {
+      "tier": 13,
+      "name": "pantheon4",
+      "outcome": "fails"
+     },
+     {
+      "tier": 12,
+      "name": "pantheon3",
+      "outcome": "fails"
+     },
+     {
+      "tier": 11,
+      "name": "pantheon2",
+      "outcome": "buys",
+      "n_sim": "4.6354690425924698e+37",
+      "test": "plain"
+     },
+     {
+      "tier": 10,
+      "name": "pantheon",
+      "outcome": "bank"
+     },
+     {
+      "tier": 9,
+      "name": "goddess",
+      "outcome": "bank"
+     },
+     {
+      "tier": 8,
+      "name": "prophet",
+      "outcome": "bank"
+     },
+     {
+      "tier": 7,
+      "name": "empress",
+      "outcome": "bank"
+     },
+     {
+      "tier": 6,
+      "name": "hivequeen",
+      "outcome": "bank"
+     },
+     {
+      "tier": 5,
+      "name": "hive",
+      "outcome": "bank"
+     },
+     {
+      "tier": 4,
+      "name": "greaterqueen",
+      "outcome": "bank"
+     },
+     {
+      "tier": 3,
+      "name": "nest",
+      "outcome": "bank"
+     },
+     {
+      "tier": 2,
+      "name": "queen",
+      "outcome": "bank"
+     },
+     {
+      "tier": 1,
+      "name": "drone",
+      "outcome": "bank"
+     }
+    ],
+    "push": [
+     {
+      "tier": 20,
+      "name": "overmind6",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 19,
+      "name": "overmind5",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 18,
+      "name": "overmind4",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 17,
+      "name": "overmind3",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 16,
+      "name": "overmind2",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 15,
+      "name": "overmind",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 14,
+      "name": "pantheon5",
+      "outcome": "under one",
+      "n": "0",
+      "share": 0.5,
+      "below_held": "515146412007.0",
+      "larvae_left": "4.6822919622146163e+35",
+      "meat": "4.5096851963258348e+224",
+      "binding": "share"
+     },
+     {
+      "tier": 13,
+      "name": "pantheon4",
+      "outcome": "hatch",
+      "n": "97433499841.0",
+      "share": 0.5,
+      "below_held": "1.9486699968338655e+27",
+      "larvae_left": "4.6822919622146163e+35",
+      "meat": "4.5096851963258348e+224",
+      "binding": "share"
+     },
+     {
+      "tier": 12,
+      "name": "pantheon3",
+      "outcome": "hatch",
+      "n": "3.8917585501201001e+28",
+      "share": 0.02,
+      "below_held": "1.9458792750600499e+44",
+      "larvae_left": "4.6822919622146163e+35",
+      "meat": "4.5096851963258348e+224",
+      "binding": "share"
+     }
+    ],
+    "tiers_before_climb": {
+     "queen": {
+      "since_last_hatch_game_s": 2586956.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "nest": {
+      "since_last_hatch_game_s": 2586356.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "greaterqueen": {
+      "since_last_hatch_game_s": 2571956.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "hive": {
+      "since_last_hatch_game_s": 2418956.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "hivequeen": {
+      "since_last_hatch_game_s": 2418356.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "empress": {
+      "since_last_hatch_game_s": 2417756.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "prophet": {
+      "since_last_hatch_game_s": 2417156.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "goddess": {
+      "since_last_hatch_game_s": 2415956.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "pantheon": {
+      "since_last_hatch_game_s": 2412356.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "pantheon2": {
+      "since_last_hatch_game_s": 2405456.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "pantheon3": {
+      "since_last_hatch_game_s": 2405456.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 0.009458639469764062
+     },
+     "pantheon4": {
+      "since_last_hatch_game_s": 2405456.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 5.003349328895378e-08
+     },
+     "pantheon5": {
+      "since_last_hatch_game_s": null,
+      "cooldown_released": true,
+      "share_released": null,
+      "stock_release": null
+     }
+    }
+   },
+   {
+    "skip_s": "2.4051564081227924e+06",
+    "game_clock_before_s": 1951921677.592143,
+    "game_clock_after_s": 1954326834.0002658,
+    "larvae_from_warp": "5.2018191448531180e+37",
+    "bought": {
+     "expansions": 16,
+     "hatcheries": 20,
+     "accomplished_ancestry": 0,
+     "empowers": {
+      "giantspider": 1
+     },
+     "faster_levels": {
+      "drone": 6,
+      "queen": 5,
+      "nest": 4,
+      "greaterqueen": 3,
+      "hive": 3,
+      "hivequeen": 2,
+      "empress": 2,
+      "prophet": 2,
+      "goddess": 1,
+      "pantheon": 2,
+      "pantheon2": 1,
+      "pantheon3": 1
+     },
+     "twin_levels": {},
+     "territory_twins": {
+      "giantspider": 1
+     }
+    },
+    "climb": [
+     {
+      "tier": 14,
+      "name": "pantheon5",
+      "outcome": "fails"
+     },
+     {
+      "tier": 13,
+      "name": "pantheon4",
+      "outcome": "fails"
+     },
+     {
+      "tier": 12,
+      "name": "pantheon3",
+      "outcome": "fails"
+     },
+     {
+      "tier": 11,
+      "name": "pantheon2",
+      "outcome": "buys",
+      "n_sim": "4.6811755446372108e+37",
+      "test": "plain"
+     },
+     {
+      "tier": 10,
+      "name": "pantheon",
+      "outcome": "bank"
+     },
+     {
+      "tier": 9,
+      "name": "goddess",
+      "outcome": "bank"
+     },
+     {
+      "tier": 8,
+      "name": "prophet",
+      "outcome": "bank"
+     },
+     {
+      "tier": 7,
+      "name": "empress",
+      "outcome": "bank"
+     },
+     {
+      "tier": 6,
+      "name": "hivequeen",
+      "outcome": "bank"
+     },
+     {
+      "tier": 5,
+      "name": "hive",
+      "outcome": "bank"
+     },
+     {
+      "tier": 4,
+      "name": "greaterqueen",
+      "outcome": "bank"
+     },
+     {
+      "tier": 3,
+      "name": "nest",
+      "outcome": "bank"
+     },
+     {
+      "tier": 2,
+      "name": "queen",
+      "outcome": "bank"
+     },
+     {
+      "tier": 1,
+      "name": "drone",
+      "outcome": "bank"
+     }
+    ],
+    "push": [
+     {
+      "tier": 20,
+      "name": "overmind6",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 19,
+      "name": "overmind5",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 18,
+      "name": "overmind4",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 17,
+      "name": "overmind3",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 16,
+      "name": "overmind2",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 15,
+      "name": "overmind",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 14,
+      "name": "pantheon5",
+      "outcome": "under one",
+      "n": "0",
+      "share": 0.5,
+      "below_held": "612579911848.0",
+      "larvae_left": "4.7284601460981929e+35",
+      "meat": "2.4432382913674976e+245",
+      "binding": "share"
+     },
+     {
+      "tier": 13,
+      "name": "pantheon4",
+      "outcome": "hatch",
+      "n": "67927643772112.0",
+      "share": 0.5,
+      "below_held": "1.3585528754422436e+30",
+      "larvae_left": "4.7284601460981929e+35",
+      "meat": "2.4432382913674976e+245",
+      "binding": "share"
+     },
+     {
+      "tier": 12,
+      "name": "pantheon3",
+      "outcome": "hatch",
+      "n": "7.7377921131813930e+28",
+      "share": 0.02,
+      "below_held": "3.8688960565906960e+44",
+      "larvae_left": "4.7284601460981929e+35",
+      "meat": "2.4432382913674976e+245",
+      "binding": "share"
+     }
+    ],
+    "tiers_before_climb": {
+     "queen": {
+      "since_last_hatch_game_s": 4992112.816245556,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "nest": {
+      "since_last_hatch_game_s": 4991512.816245556,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "greaterqueen": {
+      "since_last_hatch_game_s": 4977112.816245556,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "hive": {
+      "since_last_hatch_game_s": 4824112.816245556,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "hivequeen": {
+      "since_last_hatch_game_s": 4823512.816245556,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "empress": {
+      "since_last_hatch_game_s": 4822912.816245556,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "prophet": {
+      "since_last_hatch_game_s": 4822312.816245556,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "goddess": {
+      "since_last_hatch_game_s": 4821112.816245556,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "pantheon": {
+      "since_last_hatch_game_s": 4817512.816245556,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "pantheon2": {
+      "since_last_hatch_game_s": 2405156.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "pantheon3": {
+      "since_last_hatch_game_s": 2405156.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 0.018914919643528125
+     },
+     "pantheon4": {
+      "since_last_hatch_game_s": 2405156.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 5.002725328895378e-08
+     },
+     "pantheon5": {
+      "since_last_hatch_game_s": null,
+      "cooldown_released": true,
+      "share_released": null,
+      "stock_release": null
+     }
+    }
+   },
+   {
+    "skip_s": "2.4051564081227924e+06",
+    "game_clock_before_s": 1954326834.0002658,
+    "game_clock_after_s": 1956731990.4083886,
+    "larvae_from_warp": "5.2018191449003842e+37",
+    "bought": {
+     "expansions": 3,
+     "hatcheries": 11,
+     "accomplished_ancestry": 0,
+     "empowers": {
+      "centipede": 1
+     },
+     "faster_levels": {
+      "drone": 3,
+      "queen": 3,
+      "nest": 3,
+      "greaterqueen": 2,
+      "hive": 2,
+      "hivequeen": 1,
+      "empress": 1,
+      "pantheon2": 1,
+      "pantheon4": 1
+     },
+     "twin_levels": {},
+     "territory_twins": {}
+    },
+    "climb": [
+     {
+      "tier": 14,
+      "name": "pantheon5",
+      "outcome": "fails"
+     },
+     {
+      "tier": 13,
+      "name": "pantheon4",
+      "outcome": "fails"
+     },
+     {
+      "tier": 12,
+      "name": "pantheon3",
+      "outcome": "fails"
+     },
+     {
+      "tier": 11,
+      "name": "pantheon2",
+      "outcome": "buys",
+      "n_sim": "4.6816326058922004e+37",
+      "test": "plain"
+     },
+     {
+      "tier": 10,
+      "name": "pantheon",
+      "outcome": "bank"
+     },
+     {
+      "tier": 9,
+      "name": "goddess",
+      "outcome": "bank"
+     },
+     {
+      "tier": 8,
+      "name": "prophet",
+      "outcome": "bank"
+     },
+     {
+      "tier": 7,
+      "name": "empress",
+      "outcome": "bank"
+     },
+     {
+      "tier": 6,
+      "name": "hivequeen",
+      "outcome": "bank"
+     },
+     {
+      "tier": 5,
+      "name": "hive",
+      "outcome": "bank"
+     },
+     {
+      "tier": 4,
+      "name": "greaterqueen",
+      "outcome": "bank"
+     },
+     {
+      "tier": 3,
+      "name": "nest",
+      "outcome": "bank"
+     },
+     {
+      "tier": 2,
+      "name": "queen",
+      "outcome": "bank"
+     },
+     {
+      "tier": 1,
+      "name": "drone",
+      "outcome": "bank"
+     }
+    ],
+    "push": [
+     {
+      "tier": 20,
+      "name": "overmind6",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 19,
+      "name": "overmind5",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 18,
+      "name": "overmind4",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 17,
+      "name": "overmind3",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 16,
+      "name": "overmind2",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 15,
+      "name": "overmind",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 14,
+      "name": "pantheon5",
+      "outcome": "under one",
+      "n": "0",
+      "share": 0.5,
+      "below_held": "55555256624984.0",
+      "larvae_left": "4.7289218241335361e+35",
+      "meat": "1.3364948661327505e+256",
+      "binding": "share"
+     },
+     {
+      "tier": 13,
+      "name": "pantheon4",
+      "outcome": "hatch",
+      "n": "281573171222300.0",
+      "share": 0.5,
+      "below_held": "5.6314634244460058e+30",
+      "larvae_left": "4.7289218241335361e+35",
+      "meat": "1.3364948661327505e+256",
+      "binding": "share"
+     },
+     {
+      "tier": 12,
+      "name": "pantheon3",
+      "outcome": "hatch",
+      "n": "8.5474041434615791e+28",
+      "share": 0.02,
+      "below_held": "4.2737020717307898e+44",
+      "larvae_left": "4.7289218241335361e+35",
+      "meat": "1.3364948661327505e+256",
+      "binding": "share"
+     }
+    ],
+    "tiers_before_climb": {
+     "queen": {
+      "since_last_hatch_game_s": 7397269.224368334,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "nest": {
+      "since_last_hatch_game_s": 7396669.224368334,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "greaterqueen": {
+      "since_last_hatch_game_s": 7382269.224368334,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "hive": {
+      "since_last_hatch_game_s": 7229269.224368334,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "hivequeen": {
+      "since_last_hatch_game_s": 7228669.224368334,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "empress": {
+      "since_last_hatch_game_s": 7228069.224368334,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "prophet": {
+      "since_last_hatch_game_s": 7227469.224368334,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "goddess": {
+      "since_last_hatch_game_s": 7226269.224368334,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "pantheon": {
+      "since_last_hatch_game_s": 7222669.224368334,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "pantheon2": {
+      "since_last_hatch_game_s": 2405156.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "pantheon3": {
+      "since_last_hatch_game_s": 2405156.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 0.03782983928705625
+     },
+     "pantheon4": {
+      "since_last_hatch_game_s": 2405156.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 5.002725328895378e-08
+     },
+     "pantheon5": {
+      "since_last_hatch_game_s": null,
+      "cooldown_released": true,
+      "share_released": null,
+      "stock_release": null
+     }
+    }
+   },
+   {
+    "skip_s": "2.4051564081227924e+06",
+    "game_clock_before_s": 1956731990.4083886,
+    "game_clock_after_s": 1959137146.8165114,
+    "larvae_from_warp": "5.2018191449234784e+37",
+    "bought": {
+     "expansions": 6,
+     "hatcheries": 7,
+     "accomplished_ancestry": 0,
+     "empowers": {
+      "wasp": 1
+     },
+     "faster_levels": {
+      "drone": 2,
+      "queen": 2,
+      "nest": 1,
+      "greaterqueen": 1,
+      "prophet": 1,
+      "goddess": 1
+     },
+     "twin_levels": {},
+     "territory_twins": {
+      "wasp": 1
+     }
+    },
+    "climb": [
+     {
+      "tier": 14,
+      "name": "pantheon5",
+      "outcome": "fails"
+     },
+     {
+      "tier": 13,
+      "name": "pantheon4",
+      "outcome": "fails"
+     },
+     {
+      "tier": 12,
+      "name": "pantheon3",
+      "outcome": "fails"
+     },
+     {
+      "tier": 11,
+      "name": "pantheon2",
+      "outcome": "buys",
+      "n_sim": "4.6816371757238119e+37",
+      "test": "plain"
+     },
+     {
+      "tier": 10,
+      "name": "pantheon",
+      "outcome": "bank"
+     },
+     {
+      "tier": 9,
+      "name": "goddess",
+      "outcome": "bank"
+     },
+     {
+      "tier": 8,
+      "name": "prophet",
+      "outcome": "bank"
+     },
+     {
+      "tier": 7,
+      "name": "empress",
+      "outcome": "bank"
+     },
+     {
+      "tier": 6,
+      "name": "hivequeen",
+      "outcome": "bank"
+     },
+     {
+      "tier": 5,
+      "name": "hive",
+      "outcome": "bank"
+     },
+     {
+      "tier": 4,
+      "name": "greaterqueen",
+      "outcome": "bank"
+     },
+     {
+      "tier": 3,
+      "name": "nest",
+      "outcome": "bank"
+     },
+     {
+      "tier": 2,
+      "name": "queen",
+      "outcome": "bank"
+     },
+     {
+      "tier": 1,
+      "name": "drone",
+      "outcome": "bank"
+     }
+    ],
+    "push": [
+     {
+      "tier": 20,
+      "name": "overmind6",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 19,
+      "name": "overmind5",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 18,
+      "name": "overmind4",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 17,
+      "name": "overmind3",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 16,
+      "name": "overmind2",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 15,
+      "name": "overmind",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 14,
+      "name": "pantheon5",
+      "outcome": "under one",
+      "n": "0",
+      "share": 0.5,
+      "below_held": "337128427847284.0",
+      "larvae_left": "4.7289264401250630e+35",
+      "meat": "4.0597608330212067e+262",
+      "binding": "share"
+     },
+     {
+      "tier": 13,
+      "name": "pantheon4",
+      "outcome": "hatch",
+      "n": "414303535067530.0",
+      "share": 0.5,
+      "below_held": "8.2860707013506008e+30",
+      "larvae_left": "4.7289264401250630e+35",
+      "meat": "4.0597608330212067e+262",
+      "binding": "share"
+     },
+     {
+      "tier": 12,
+      "name": "pantheon3",
+      "outcome": "hatch",
+      "n": "1.2313493614522675e+29",
+      "share": 0.02,
+      "below_held": "6.1567468072613369e+44",
+      "larvae_left": "4.7289264401250630e+35",
+      "meat": "4.0597608330212067e+262",
+      "binding": "share"
+     }
+    ],
+    "tiers_before_climb": {
+     "queen": {
+      "since_last_hatch_game_s": 9802425.632491112,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "nest": {
+      "since_last_hatch_game_s": 9801825.632491112,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "greaterqueen": {
+      "since_last_hatch_game_s": 9787425.632491112,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "hive": {
+      "since_last_hatch_game_s": 9634425.632491112,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "hivequeen": {
+      "since_last_hatch_game_s": 9633825.632491112,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "empress": {
+      "since_last_hatch_game_s": 9633225.632491112,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "prophet": {
+      "since_last_hatch_game_s": 9632625.632491112,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "goddess": {
+      "since_last_hatch_game_s": 9631425.632491112,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "pantheon": {
+      "since_last_hatch_game_s": 9627825.632491112,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "pantheon2": {
+      "since_last_hatch_game_s": 2405156.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "pantheon3": {
+      "since_last_hatch_game_s": 2405156.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 0.03782983928705625
+     },
+     "pantheon4": {
+      "since_last_hatch_game_s": 2405156.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0005450657790756e-07
+     },
+     "pantheon5": {
+      "since_last_hatch_game_s": null,
+      "cooldown_released": true,
+      "share_released": null,
+      "stock_release": null
+     }
+    }
+   },
+   {
+    "skip_s": "2.4051564081227924e+06",
+    "game_clock_before_s": 1959137146.8165114,
+    "game_clock_after_s": 1961542303.2246342,
+    "larvae_from_warp": "5.2018191449908675e+37",
+    "bought": {
+     "expansions": 1,
+     "hatcheries": 4,
+     "accomplished_ancestry": 0,
+     "empowers": {
+      "devourer": 1
+     },
+     "faster_levels": {
+      "drone": 1,
+      "hive": 1,
+      "hivequeen": 1,
+      "empress": 1
+     },
+     "twin_levels": {},
+     "territory_twins": {
+      "devourer": 1
+     }
+    },
+    "climb": [
+     {
+      "tier": 14,
+      "name": "pantheon5",
+      "outcome": "fails"
+     },
+     {
+      "tier": 13,
+      "name": "pantheon4",
+      "outcome": "fails"
+     },
+     {
+      "tier": 12,
+      "name": "pantheon3",
+      "outcome": "fails"
+     },
+     {
+      "tier": 11,
+      "name": "pantheon2",
+      "outcome": "buys",
+      "n_sim": "4.6816372177537435e+37",
+      "test": "plain"
+     },
+     {
+      "tier": 10,
+      "name": "pantheon",
+      "outcome": "bank"
+     },
+     {
+      "tier": 9,
+      "name": "goddess",
+      "outcome": "bank"
+     },
+     {
+      "tier": 8,
+      "name": "prophet",
+      "outcome": "bank"
+     },
+     {
+      "tier": 7,
+      "name": "empress",
+      "outcome": "bank"
+     },
+     {
+      "tier": 6,
+      "name": "hivequeen",
+      "outcome": "bank"
+     },
+     {
+      "tier": 5,
+      "name": "hive",
+      "outcome": "bank"
+     },
+     {
+      "tier": 4,
+      "name": "greaterqueen",
+      "outcome": "bank"
+     },
+     {
+      "tier": 3,
+      "name": "nest",
+      "outcome": "bank"
+     },
+     {
+      "tier": 2,
+      "name": "queen",
+      "outcome": "bank"
+     },
+     {
+      "tier": 1,
+      "name": "drone",
+      "outcome": "bank"
+     }
+    ],
+    "push": [
+     {
+      "tier": 20,
+      "name": "overmind6",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 19,
+      "name": "overmind5",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 18,
+      "name": "overmind4",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 17,
+      "name": "overmind3",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 16,
+      "name": "overmind2",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 15,
+      "name": "overmind",
+      "outcome": "nothing below"
+     },
+     {
+      "tier": 14,
+      "name": "pantheon5",
+      "outcome": "under one",
+      "n": "0",
+      "share": 0.5,
+      "below_held": "751431962914814.0",
+      "larvae_left": "4.7289264825795391e+35",
+      "meat": "8.8523667552512180e+265",
+      "binding": "share"
+     },
+     {
+      "tier": 13,
+      "name": "pantheon4",
+      "outcome": "hatch",
+      "n": "601183600790567.0",
+      "share": 0.5,
+      "below_held": "1.2023672015811357e+31",
+      "larvae_left": "4.7289264825795391e+35",
+      "meat": "8.8523667552512180e+265",
+      "binding": "share"
+     },
+     {
+      "tier": 12,
+      "name": "pantheon3",
+      "outcome": "hatch",
+      "n": "1.6008679857957445e+29",
+      "share": 0.02,
+      "below_held": "8.0043399289787217e+44",
+      "larvae_left": "4.7289264825795391e+35",
+      "meat": "8.8523667552512180e+265",
+      "binding": "share"
+     }
+    ],
+    "tiers_before_climb": {
+     "queen": {
+      "since_last_hatch_game_s": 12207582.04061389,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "nest": {
+      "since_last_hatch_game_s": 12206982.04061389,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "greaterqueen": {
+      "since_last_hatch_game_s": 12192582.04061389,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "hive": {
+      "since_last_hatch_game_s": 12039582.04061389,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "hivequeen": {
+      "since_last_hatch_game_s": 12038982.04061389,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "empress": {
+      "since_last_hatch_game_s": 12038382.04061389,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "prophet": {
+      "since_last_hatch_game_s": 12037782.04061389,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "goddess": {
+      "since_last_hatch_game_s": 12036582.04061389,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "pantheon": {
+      "since_last_hatch_game_s": 12032982.04061389,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "pantheon2": {
+      "since_last_hatch_game_s": 2405156.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0
+     },
+     "pantheon3": {
+      "since_last_hatch_game_s": 2405156.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 0.03782983928705625
+     },
+     "pantheon4": {
+      "since_last_hatch_game_s": 2405156.408122778,
+      "cooldown_released": true,
+      "share_released": 1.0,
+      "stock_release": 1.0005450657790756e-07
+     },
+     "pantheon5": {
+      "since_last_hatch_game_s": null,
+      "cooldown_released": true,
+      "share_released": null,
+      "stock_release": null
+     }
+    }
+   }
+  ],
+  "mutagen": {
+   "respec_first": false,
+   "respec_refund": "2.2533284396187545e+32",
+   "free_respecs": 7,
+   "steps": [],
+   "held_after": "2.1627779080285675e+32",
+   "again": [],
+   "respec_again": false
+  }
+ }
+}

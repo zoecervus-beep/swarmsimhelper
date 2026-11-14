@@ -1,0 +1,166 @@
+{
+ "case": "switch_mirrors_long_day30",
+ "exercises": "mirrors long run day 30 (1542 expansions, mirrors cast) under the swarmwarp route: no guard; premutagen is far above 1,000 x held, so the test passes (ascending here finishes sooner than keeping the long run)",
+ "save": "switch_mirrors_long_day30.save.json",
+ "config": {
+  "route": "swarmwarp (advisor/NO-MIRRORS.md, Rules for the advisor)",
+  "ascension_test": [
+   "ratio",
+   1000.0
+  ],
+  "final_log10_mutagen_held": 270.0,
+  "free_unlocks": 3,
+  "unlock_share": 0.3,
+  "unlock_order": [
+   "mutatenexus",
+   "mutateswarmwarp",
+   "mutatebat",
+   "mutatefreq",
+   "mutateeach",
+   "mutatearmy",
+   "mutaterush",
+   "mutateclone",
+   "mutatemeat",
+   "mutatehatchery"
+  ],
+  "fixed_mutants": {
+   "mutantnexus": 1000000.0,
+   "mutantfreq": 1000000.0
+  },
+  "mutant_shares": {
+   "mutantswarmwarp": 0.1,
+   "mutantbat": 0.1,
+   "mutantarmy": 0.3,
+   "mutanteach": 0.01
+  },
+  "guard": null,
+  "free_respec_when_warp_unaffordable": true,
+  "clock": {
+   "timers": "game",
+   "run_age": "game",
+   "one_warp_at_a_time": true
+  },
+  "age_multiple": 5,
+  "long_run_gate_s": 172800,
+  "cooldown_s": 60,
+  "share_per_minute": 0.5,
+  "moths_after_nexus5": 10000,
+  "early_moths_at_nexus4": 1000,
+  "bats": 2000,
+  "territory_share": 0.1,
+  "long_run_climb_mode": "on",
+  "spell": "swarmwarp",
+  "ascensions_goal": 20
+ },
+ "state": {
+  "run_age_s": 2592000.0,
+  "ascensions": 1,
+  "nexus": 5,
+  "energy": "3.6787540109651582e+02",
+  "energy_rate": "1.9657781211770009e+00",
+  "cap": "1.0840019960079840e+05",
+  "moths": "30000.0",
+  "bats": "0",
+  "nightbugs": "0",
+  "ascension_cost": "1.0",
+  "energy_spent": "5046625.0",
+  "halving": "7.9940119760479050e+04",
+  "threshold": 115329,
+  "save_at": "1.0840019960079840e+05",
+  "mutagen_held": "6.4300788904821835e+07",
+  "premutagen": "2.0012539064404657e+76",
+  "unlocks": [
+   "mutatefreq",
+   "mutatenexus"
+  ],
+  "unlock_count": 2,
+  "next_unlock_price": "244140625.0",
+  "mutants": {
+   "mutantfreq": "1.0",
+   "mutantnexus": "1000000.0"
+  },
+  "swarmwarp_power": "1.0",
+  "swarmwarp_skip_s": "900.0",
+  "expansions": 1542,
+  "mirror_casts_this_run": 1879,
+  "swarmwarp_casts_this_run": 0,
+  "earned": {
+   "expansion9": false,
+   "overmind6_3": false,
+   "mutation4": false
+  },
+  "stage": "build",
+  "test": {
+   "kind": "ratio",
+   "passes": true,
+   "premutagen": "2.0012539064404657e+76",
+   "held": "6.4300788904821835e+07",
+   "k": "1000.0",
+   "need": "6.4300788904821838e+10",
+   "run_age_s": "2592000.0"
+  },
+  "wants_ascension": true,
+  "larvae": "1.7123260536916988e+69",
+  "larva_rate": "6.2842418188356293e+68",
+  "meat": "7.7486626056214121e+563",
+  "achievement_points": 1780,
+  "clock": {
+   "run_age_wall_s": 2592000.0,
+   "skipped_this_run_s": 0.0,
+   "skipped_total_s": 0.0,
+   "run_age_game_s": 2592000.0,
+   "run_age_game_estimate_s": 2592000.0,
+   "horizon_s": 12960000.0,
+   "long_run_gate_active": true
+  }
+ },
+ "decisions": {
+  "energy": {
+   "actions": [],
+   "saving_for_ascension": true,
+   "ascend_now": true,
+   "energy_after": "3.6787540109651582e+02"
+  },
+  "territory": {
+   "cheapest_rung": "stinger",
+   "top_rung": "swarmling",
+   "empower_price": "7.9240940832000004e+63",
+   "top_meat_each": "1.7609114988000003e+61",
+   "territory_larvae_cap": "1.7123260536916990e+68",
+   "meat_budget": "6.9737963450592714e+563",
+   "wiped_share": 0.01822519556208917,
+   "empower_advised": false,
+   "keeps_hatching_territory": true
+  },
+  "mutagen": {
+   "respec_first": true,
+   "respec_refund": "1015625.0",
+   "free_respecs": 4,
+   "steps": [
+    {
+     "type": "unlock",
+     "name": "mutatenexus",
+     "price": "1.0"
+    },
+    {
+     "type": "unlock",
+     "name": "mutateswarmwarp",
+     "price": "15625.0"
+    },
+    {
+     "type": "mutants",
+     "name": "mutantnexus",
+     "count": "999999.0"
+    },
+    {
+     "type": "mutants",
+     "name": "mutantswarmwarp",
+     "count": "6430077.0"
+    }
+   ],
+   "held_after": "5.7870711904821835e+07",
+   "again": [],
+   "respec_again": false
+  }
+ }
+}

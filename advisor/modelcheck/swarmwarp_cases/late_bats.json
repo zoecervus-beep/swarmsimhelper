@@ -1,0 +1,162 @@
+{
+ "case": "late_bats",
+ "exercises": "late phase: lepidoptera at the target, bats under 2,000: buy bats before any swarmwarp",
+ "save": "late_bats.save.json",
+ "config": {
+  "route": "swarmwarp (advisor/NO-MIRRORS.md, Rules for the advisor)",
+  "ascension_test": [
+   "ratio",
+   1000.0
+  ],
+  "final_log10_mutagen_held": 270.0,
+  "free_unlocks": 3,
+  "unlock_share": 0.3,
+  "unlock_order": [
+   "mutatenexus",
+   "mutateswarmwarp",
+   "mutatebat",
+   "mutatefreq",
+   "mutateeach",
+   "mutatearmy",
+   "mutaterush",
+   "mutateclone",
+   "mutatemeat",
+   "mutatehatchery"
+  ],
+  "fixed_mutants": {
+   "mutantnexus": 1000000.0,
+   "mutantfreq": 1000000.0
+  },
+  "mutant_shares": {
+   "mutantswarmwarp": 0.1,
+   "mutantbat": 0.1,
+   "mutantarmy": 0.3,
+   "mutanteach": 0.01
+  },
+  "guard": null,
+  "free_respec_when_warp_unaffordable": true,
+  "clock": {
+   "timers": "game",
+   "run_age": "game",
+   "one_warp_at_a_time": true
+  },
+  "age_multiple": 5,
+  "long_run_gate_s": 172800,
+  "cooldown_s": 60,
+  "share_per_minute": 0.5,
+  "moths_after_nexus5": 10000,
+  "early_moths_at_nexus4": 1000,
+  "bats": 2000,
+  "territory_share": 0.1,
+  "long_run_climb_mode": "on",
+  "spell": "swarmwarp",
+  "ascensions_goal": 20
+ },
+ "state": {
+  "run_age_s": 81900.0,
+  "ascensions": 10,
+  "nexus": 5,
+  "energy": "6.0341719679122798e+02",
+  "energy_rate": "1.9071856287425151e+00",
+  "cap": "1.0840019960079840e+05",
+  "moths": "10000.0",
+  "bats": "5.0",
+  "nightbugs": "0",
+  "ascension_cost": "4243345.0",
+  "energy_spent": "149625.0",
+  "halving": "7.9940119760479050e+04",
+  "threshold": 115329,
+  "save_at": "1.0840019960079840e+05",
+  "mutagen_held": "2.1627779080285675e+32",
+  "premutagen": "1.5793328689787490e+13",
+  "unlocks": [
+   "mutatearmy",
+   "mutatebat",
+   "mutateclone",
+   "mutateeach",
+   "mutatefreq",
+   "mutatenexus",
+   "mutaterush",
+   "mutateswarmwarp"
+  ],
+  "unlock_count": 8,
+  "next_unlock_price": "3.5527136788005011e+33",
+  "mutants": {
+   "mutantbat": "4.4138324653644237e+31",
+   "mutantclone": "1.0",
+   "mutantswarmwarp": "4.4138324653644237e+31",
+   "mutantrush": "1.0",
+   "mutanteach": "4.4138324653644236e+30",
+   "mutantfreq": "1000000.0",
+   "mutantnexus": "1000000.0",
+   "mutantarmy": "1.3241497396093269e+32"
+  },
+  "swarmwarp_power": "1.9145523646748595e+03",
+  "swarmwarp_skip_s": "1.7230971282073737e+06",
+  "expansions": 224,
+  "mirror_casts_this_run": 0,
+  "swarmwarp_casts_this_run": 0,
+  "earned": {
+   "expansion9": false,
+   "overmind6_3": false,
+   "mutation4": false
+  },
+  "stage": "build",
+  "test": {
+   "kind": "ratio",
+   "passes": false,
+   "premutagen": "1.5793328689787490e+13",
+   "held": "2.1627779080285675e+32",
+   "k": "1000.0",
+   "need": "2.1627779080285673e+35",
+   "run_age_s": "81900.0"
+  },
+  "wants_ascension": false,
+  "larvae": "6.4883337240857028e+33",
+  "larva_rate": "2.1627779080285676e+31",
+  "meat": "6.5903274201357430e+102",
+  "achievement_points": 1640,
+  "clock": {
+   "run_age_wall_s": 81900.0,
+   "skipped_this_run_s": 0.0,
+   "skipped_total_s": 1945004221.1840203,
+   "run_age_game_s": 81900.0,
+   "run_age_game_estimate_s": 81900.0,
+   "horizon_s": 409500.0,
+   "long_run_gate_active": false
+  }
+ },
+ "decisions": {
+  "energy": {
+   "actions": [
+    {
+     "type": "buyBats",
+     "count": "6.0"
+    }
+   ],
+   "saving_for_ascension": false,
+   "ascend_now": false,
+   "energy_after": "3.4171967912279797e+00"
+  },
+  "territory": {
+   "cheapest_rung": "roach",
+   "top_rung": "locust",
+   "empower_price": "3.2493682907999998e+74",
+   "top_meat_each": "7.2208377147667513e+71",
+   "territory_larvae_cap": "6.4883337240857031e+32",
+   "meat_budget": "5.9312946781221689e+102",
+   "wiped_share": 3.764336337592676e-21,
+   "empower_advised": false,
+   "keeps_hatching_territory": true
+  },
+  "mutagen": {
+   "respec_first": false,
+   "respec_refund": "2.2533284396187545e+32",
+   "free_respecs": 7,
+   "steps": [],
+   "held_after": "2.1627779080285675e+32",
+   "again": [],
+   "respec_again": false
+  }
+ }
+}

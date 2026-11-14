@@ -4,6 +4,21 @@ Nov 14, 2026. The question: can the owner earn every achievement without ever ca
 
 This is analysis only. Nothing in the game or the advisor changed, and the advisor does not follow this route. Every strategy number comes from the simulator (`advisor/sim/sim.py`), started from the owner's 20.1 h save with no crystals, as in ASCENSION.md. The mechanics it leans on were checked against the game's own code (last section). Grades: **solid** (follows from the game's code or arithmetic, or measured in it), **likely** (simulator, robust across the variants tried), **guess**.
 
+> **Pass 2 (later on Nov 14, 2026): the headline moved, and the route is now faster than the mirrors plan.** Sections 1–10 are the first pass and are kept as they were. They simulated swarmwarp the way the advisor would have handled it:
+> - every timer (the 60 s cooldown, the purchase share, the release of the lower tier's stock, the run age behind the climb horizon) measured on the wall clock;
+> - every affordable warp cast back to back, with no purchases between them.
+>
+> A warp skips days to years of production but moves no clock, so that wasted most of each warp. With the advisor counting a warp as the time it skips, and the player buying between warps (sections 11–13), the specified route takes:
+>
+> | Cadence | Swarmwarp route, pass 2 | Mirrors route, same driver | Swarmwarp route, pass 1 |
+> | --- | --- | --- | --- |
+> | ideal | **141** | 174 | 223 |
+> | human | **154–158** | 181 | 245–253 |
+> | busy | **198** | 193 | 366 |
+> | twice a day | **243** | – | never |
+>
+> The trough (mutagen 1e15 → 1e32) shrinks from about 80 days to about 34. The rules for the advisor, route switching and the reference cases are in sections 11–15.
+
 ## 1. The verdict
 
 | Subset | Without mirrors? | Simulator days from the save (once every 5 minutes) | A person's cadence ("human", 2 seeds) | With mirrors (ASCENSION.md) |
@@ -357,3 +372,313 @@ python3 -I advisor/sim/nomirrors.py route --jobs 4              # section 5 only
 | plan keys `unlock_max_share`, `unlock_free` | after the first `unlock_free` unlocks, buy an unlock only while it costs at most this share of the mutagen held |
 
 Everything else (territory empower, spell powers, the mutations, ascension) was already in the simulator and checked.
+
+## 11. Game time: what swarmwarp does to the clocks (measured in the game)
+
+`advisor/modelcheck/swarmwarp_clock.js` runs the game's code. Starting from the 20.1 h save, edited to nexus 5, 2,000 bats and the warp and bat mutations at 1e10, it casts swarmwarp, exports and re-imports the save, casts again and ascends:
+
+| After | `game.now` | `game.skippedMillis` | `session.state.skippedMillis` | `date.restarted` | swarmwarp count | drones | energy |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| loading | 22:18:19.823 | 0 | 0 | 02:11:33 | 0 | 1.38e28 | 58,500 |
+| one swarmwarp (power 239.4, skip 215,460 s) | **unchanged** | 0 | **215,460,000** | unchanged | 1 | **6.70e36** | 56,500 |
+| 60 s of wall time | +60 s | 0 | 215,460,000 | unchanged | 1 | 6.70e36 | +59 |
+| export and re-import | – | 0 | **215,460,000** | unchanged | 1 | same | same |
+| a second swarmwarp | unchanged | 0 | 430,920,000 | unchanged | 2 | 1.07e38 | 54,500 |
+| ascending | – | 0 | **430,920,000 (not reset)** | the ascension | **0** | 0 | 0 |
+
+What follows (**solid**: game code):
+- A swarmwarp moves production forward by its skip but **no clock the advisor reads**. `game.now` and the run's dates stay on the wall clock. `game.skippedMillis` is 0 again after the cast's reify.
+- **`session.state.skippedMillis` is the cumulative time skipped over the whole save.** It survives a reload and is not reset by an ascension.
+- So the **game clock** is: wall now + `session.state.skippedMillis`. It is monotonic, exact, and needs no memory.
+- **The game time of this run** is: wall run age + skipped since the run began. The game does not store the skipped time at the run's start. The port can either:
+  - record `skippedMillis` when it sees an ascension, or
+  - use the stateless estimate: this run's `swarmwarp` upgrade count × the current skip (900 × power). The upgrade count is reset at an ascension.
+
+  The estimate is exact whenever power has not changed during the run since the first cast. On this route the bats are bought before the first warp (rule E3), and the mutations do not change within a run. The reference cases check the estimate against the game.
+
+## 12. Rules for the advisor: the swarmwarp route
+
+A selectable route, beside today's mirrors route ("achievements route", ASCENSION.md part A). Everything below is the reference implementation in `advisor/sim/warp_route.py` (`stage`, `ascension_test`, `wants_ascension`, `mutagen_steps`, `respec_advised`, `policy`). Each rule reads the game state only, so it gives the same advice after a reload or a route switch. Anything not mentioned is today's advisor unchanged.
+
+### 12.1 The time base (all routes)
+
+| Timed quantity | Clock | Why |
+| --- | --- | --- |
+| 60 s cooldown after a hatch (rule 3) | **game** | a warp is elapsed production: the tier below has grown by the whole skip |
+| purchase share 1 − (1 − share)^(minutes since the last hatch) | **game** | same |
+| release of the lower tier's stock, min(1, since / payback) | **game** | payback is measured in production seconds |
+| push cooldown (LR-2), twin "used recently" | **game** | same |
+| territory purse refill (share × larvae gained) | **game** | a warp's larvae are larvae gained |
+| run age behind the climb horizon (age multiple × run age) and the long-run gate (LR-0, 2 days) | **game** (this run's game time; the estimate of section 11 is enough) | the horizon asks whether a tier pays back within the run's production time. Warps are production time. Measured: 206 → 141 days (below) |
+| energy: rate, cap, "ready in" for the ascension, the just-in-time keep for nexus 5 | **wall** | a warp makes no energy (the game takes the skipped energy back) |
+| lepidoptera, bats, nexus | no clock (counts) | – |
+| the mirrors route's day-3 lepidoptera raise (LR-4) | wall | nobody warps on that route |
+
+- **Use the game clock on every route.** On the mirrors route nobody casts swarmwarp, so `skippedMillis` does not move and the change is a no-op. The console-script comparison never casts a warp either.
+- The purchase memory should store hatch times on the game clock. That memory starts afresh on a reload, as now.
+- **No threshold is needed for a warp to "count".** Every warp skips 900 × power ≥ 900 s, more than the 60 s cooldown, so on the game clock every warp releases every cooldown and the full share (1 − 0.5^15 or more).
+
+Measured (days to every achievement, from the save):
+
+| Variant | Ideal | Human | Busy | Twice a day |
+| --- | --- | --- | --- | --- |
+| wall clock, warps back to back (the advisor today, as pass 1 simulated it) | 217 | 231 | 350 | not by day 426 |
+| game clock for the timers, one warp at a time, run age on the wall clock | 206 | 211 | – | – |
+| **game clock for the timers and the run age, one warp at a time (the spec)** | **141** | **158** | **198** | **243** |
+
+### 12.2 Energy
+
+| Rule | Quantity | Test | The player is told |
+| --- | --- | --- | --- |
+| **E1. Below nexus 5** | A.11's plan, unchanged: save for the next nexus; 1,000 lepidoptera first at nexus 4; the just-in-time keep for nexus 5 | as now | as now |
+| **E2. Lepidoptera after nexus 5** | **10,000 in every run** (the setting, if higher, stays). Not the mirrors route's per-stage targets (10,000 / 30,000 / 4,000 → 30,000 from day 3) | as now (`buyMoths`) | "lepidoptera n/10,000 (swarmwarp route)" |
+| **E3. Bats** | **2,000**, after the lepidoptera target and before the first swarmwarp, every run | at nexus 5, lepidoptera ≥ target, bats < 2,000: floor(min(2,000 − bats, spare / 100)) | "buy n bats (n/2,000): swarmwarp power ×1.4" |
+| **E4. Swarmwarp** | every 2,000 energy above what E1–E3 and the ascension plan keep | always, except while saving for the ascension (12.6) | **one at a time**: "cast swarmwarp (k affordable): skips <900 × power>" (12.3) |
+| **E5. Ascension coupling** | today's spend / save / ascend plan (`plan`, `coupleEnergy`), unchanged, when the route wants an ascension (12.6): spend until the cost ≤ min(cap, halving / ln 2), save, ascend | `wants_ascension` | as now: "stop spending energy and save …" |
+| E6. Nightbugs | none | – | – |
+
+Measured (days, ideal / human):
+
+| Variant | Days |
+| --- | --- |
+| E1 A.11 plan below nexus 5 (spec) | 141 / 158 |
+| E1 swarmwarp from nexus 1 instead | 145 / 162 |
+| E2 lepidoptera 4,000 | 138 / 158 |
+| E2 lepidoptera 10,000 (spec) | 141 / 158 |
+| E2 lepidoptera 30,000 | 172 ideal |
+| E3 bats 0 | 138 ideal |
+| E3 bats 1,000 | 137 / 153 |
+| E3 bats 2,000 (spec) | 141 / 158 |
+| E3 bats 4,000 | 167 / 189 |
+
+- **The bat count is flat from 0 to 2,000.** 4,000 is clearly worse, because 400,000 energy is not cast. No state dependence was found worth a rule; 2,000 is kept because the cases are made with it.
+- **Energy lost at the cap:** 0 days per route at the ideal cadence, 1.0–2.1 days at human and busy, 3.9 days twice a day. Nightbugs are not worth a rule.
+
+### 12.3 One warp at a time, and the purchases between warps
+
+- **The rule.** With k ≥ 1 warps affordable, the advisor suggests **one** swarmwarp. After the cast, it re-advises everything with the game clock moved on by the skip, and only then suggests the next.
+- **What is re-taken after each warp** (the simulator runs the whole non-energy part of the visit after each warp):
+  - the climb (rule 3 sizing, now fully released) and the push (LR-2);
+  - faster and twin upgrades;
+  - territory units, territory twins and empower;
+  - expansions, hatcheries and accomplished ancestry.
+
+  Each warp makes days to years of meat, larvae and territory. In the `five_warps_affordable` case, the five warps bought 11, 16, 3, 6 and 1 expansions in between.
+- **What the player is told:** "cast 1 swarmwarp (5 affordable), then follow the lines below; the next warp is suggested after them". **Never "cast ×N"** as for mirrors.
+  - Mirrors double the territory units whatever was bought between casts.
+  - A warp's value is in what is bought after it. Casting a stored-up batch back to back is what made pass 1 lose 70 to 90+ days.
+- **Saving for the ascension:** no warps (E5), as for mirrors today.
+
+### 12.4 Territory
+
+- **Share 0.1 and the balanced unit choice, unchanged, and territory buying never stops on this route.**
+  - The mirrors route's line "House of Mirrors is running: hatch no more territory units", and its "set the territory share to 0", are keyed on House of Mirrors casts this run. They must be off on this route, even when mirrors were cast in the run (a route switch).
+  - When the share is 0 (left from that advice), the route says: "set the territory share to 0.1 (swarmwarp route: expansions come from territory units)".
+- **Empower (confirmation for the owner): the simulations used the advisor's own rule.** `sim.empower_policy` is a port of `empowerAdvice`:
+  - the cheapest rung by **live** meat cost is empowered;
+  - it fires when its price + the top rung's meat cost × max(territory larvae, 1) fits the meat budget (0.9 × meat), and the units it wipes make under 1% of territory income;
+  - one empower per look.
+
+  The ladder and the balanced choice run over the units sorted by live meat cost (`sim.tcosts`), so an empowered swarmling ranks above goons ("wrap-around"), as in `ladder()`.
+  - The one difference: the simulator's territory larvae are its purse, the advisor's are the territory share of the larvae on hand (`cap`).
+  - The cases' `territory.empower_advised` uses the advisor's form.
+  - Empower off: the route never passes 500 expansions (pass 1, section 5). **Empower is required on this route.**
+
+### 12.5 The climb
+
+- **The long-run climb mode on**, as specified in ASCENSION.md A.10.2 (pass 4): advisor sizing, the 1% push reserve, LR-3, banking, age multiple 5. The route was simulated with exactly that (`longrun_rules.SPEC4`, which has `advisor_sizing`, honest larvae and the reserve).
+- The lepidoptera target comes from E2, not LR-4.
+- The route should switch the mode on, or ask the player to.
+- **With the game clock** (12.1) the gate opens at the first strong warp, and the horizon (5 × game run age) grows by years with the warps. Most tiers then pass the plain climb test, and the push matters less. That is the 206 → 141 days.
+
+### 12.6 Ascension: stages and tests
+
+The stage comes from the game state:
+
+| Stage | Test | Advice |
+| --- | --- | --- |
+| **done** | `expansion9` (5,000 expansions), `overmind6_3` (1e62 endless), `mutation4` (10 unlocks) earned, and ascensions ≥ 20 | never ascend: "every achievement of the route earned" |
+| **quick** | those three earned, ascensions < 20 | ascend whenever the energy allows (E5): "ascension n of 20" |
+| **final** | log10 mutagen held ≥ **270**, and `expansion9` not earned | do not ascend: "final run: expansions x/5,000 (do not ascend)"; all energy into swarmwarp |
+| **build** | otherwise | **ascend when premutagen ≥ 1,000 × max(mutagen held, 1)** (E5 then decides spend / save / ascend). Until then: "keep swarmwarping: mutagen (inactive) x / need y" |
+
+- **Why a ratio, not a run length.** The pass-1 schedule (6 / 16 / 0 days by mutagen held) was in wall days. It is wrong for a player whose warps are stronger or weaker than the simulator's at the same point, and it waited 73 wall days after a switch (13). The ratio needs no clock: a run is ended when what it brings dwarfs what it started with.
+
+  | Test (days to all achievements) | Ideal | Human | Busy |
+  | --- | --- | --- | --- |
+  | run age 6 / 16 / 0 days by mutagen held | 177 | 212 | 260 |
+  | premutagen ≥ 10 × held | 165 | 186 | 242 |
+  | premutagen ≥ 100 × held | 150 | 170 | 213 |
+  | **premutagen ≥ 1,000 × held** | **141** | **158** | **198** |
+  | premutagen ≥ 10^4 × held | 143 | 153 | 198 |
+
+  Flat between 1,000 and 10^4, with an edge to 1,000 at the ideal cadence.
+- **The first run:** held is 0, so the need is 1,000. The test passes at the first spawn (hatchery 40 brings ~9,000), and the run behaves like "ascend as soon as affordable".
+- **The final threshold:** 5,000 expansions need a run started from about 1e270 (expansions ≈ 18.5 × log10 M). In the simulated routes a run starting at ~1e265 reached 5,000 before its own test passed, so 1e250–1e300 all gave 141. The threshold is the safety that stops a run near 5,000 from being ended.
+- **No guard for a mirrors long run** (13): ascending out of one under this route's test was faster in every case simulated.
+- Mutation achievements and the 20 ascensions come in the build stage (6 unlocks day 34, 10 unlocks day 58, 20 ascensions day 95).
+
+### 12.7 Mutagen purchases (idempotent, on current holdings)
+
+Shown whenever mutagen is held. Applied twice, the second time buys nothing. In order:
+
+1. **Free respec, when advised.** All of these hold:
+   - the warp mutation is not unlocked;
+   - the next unlock costs more than the mutagen held;
+   - a free respec is left;
+   - held + refund ≥ 15,626 (the lepidoptera and warp unlocks).
+
+   The refund is every unlock price paid (15,625^0 … 15,625^(n−1)) plus every mutant bought, minus the free mutant per unlock. A free respec keeps the energy credit (ASCENSION.md B2.6). This is the state after the mirrors route's first ascension: lepidoptera and frequency unlocked, so warp would be the 3rd unlock at 2.44e8 against ~6e7 held. Measured: 148 days with the respec, 181 without, 173 with a 16-day wall-clock backstop instead.
+
+   Say: "respec (free, n left): the swarmwarp route needs the warp mutation, which you cannot afford as your 3rd unlock".
+2. **Unlocks**, in the order lepidoptera, warp, bat, frequency, meta-mutation, territory, rush, clone, meat, hatchery, skipping those held.
+   - The k-th costs 15,625^(k−1) (read from the game).
+   - The first three unlocks: whenever affordable.
+   - From the 4th: only while the price is at most 30% of the mutagen held. Unlocks 7–10 are only for "unlock 10".
+3. **Lepidoptera and frequency mutations** up to 10^6 each (when unlocked), as far as the mutagen held goes.
+4. **Shares.** Let W = mutagen held + the warp, bat, territory and meta-mutation mutants held (unlocked kinds only). Hold at least **10% of W in warp, 10% in bat, 30% in territory, 1% in meta-mutation**: buy each shortfall, as far as the mutagen held goes.
+5. **The rest stays unspent** (0.1 larva/s each).
+
+From the mirrors route's holdings (1e6 lepidoptera mutants, frequency unlocked) the rule gives: respec, then lepidoptera + warp unlocks, lepidoptera to 1e6, warp 10% of W (`switch_mirrors_purchases_made`). After the mirrors long run (all ten unlocked, 1e246 held): shares only.
+
+### 12.8 Achievements the route collects, and what to say
+
+- **Territory 1e15 bought, each unit (11):** they come by themselves in the first 2–3 weeks (pass 1: days 9–15). Today's territory lines suffice; a line naming any still missing would help.
+- **Unlocks 1 / 3 / 6 / 10:** from 12.7 (days 4 / 8 / 34 / 58).
+- **Endless:** cumulative. 1e62 bought on day 107, before the final run. Today's long-run line ("endless bought x/next") can show in the build stage.
+- **Expansions:** single-run. 1,000 / 2,000 come in build runs (days 74 / 103), 5,000 in the final run (day 141).
+- **20 ascensions:** day 95, in the build stage. There is no separate quick stage unless a player reaches 1e270 with fewer.
+
+### 12.9 What the route changes in the existing advisor
+
+| Behaviour | Mirrors route (today) | Swarmwarp route |
+| --- | --- | --- |
+| timers and run age | wall clock | game clock (12.1), on every route |
+| spell from nexus 5 | House of Mirrors, "cast ×N" | swarmwarp, one at a time (12.3) |
+| lepidoptera target after nexus 5 | 10,000 first run / 30,000 quick runs / 4,000 then 30,000 from day 3 in the long run | 10,000 every run |
+| bats | none | 2,000 before the first warp |
+| stages | firstRun / needMutation / longRun / quickRun / done | build / final / quick / done (12.6) |
+| ascension test | first run, quick runs: as soon as affordable; long run: never | premutagen ≥ 1,000 × held; final: never; quick: as soon as affordable |
+| mutagen line | lepidoptera, 1e6 of it, 1 more unlock, then all from the 2nd ascension | 12.7 (respec, order, 30% rule, shares) |
+| territory once mirrors are cast | hatch none; set the share to 0 | never stops; restore the share to 0.1 |
+| long-run climb mode | the player's setting | on |
+| unchanged | A.11 below nexus 5, the spend / save / ascend plan, empower, the balanced unit choice, banking, push, LR-3 | |
+
+**Conflicts with the advisor as it is:**
+1. **The timers and the run age read `game.now`.** After a warp they say "done, next in 59 s" on a tier whose lower tier has just grown by years. That needs the game clock (12.1).
+2. **`energyAdvice` returns `cast ×N` with N = spare / cost.** This route needs one at a time.
+3. **`advisorAscension` works out its stage from the mirrors plan.** It would call a swarmwarp run with the lepidoptera mutation "longRun: do not ascend", and its mutagen line would unlock frequency second. Both must be route-dependent.
+4. **`runMoths` raises the target to 30,000 in quick and long runs.** That costs this route 30 days (172 against 141).
+5. **The territory service stops on `clonearmy` casts > 0** and advises a share of 0. It must not on this route.
+6. **The long-run mode's LR-0 gate and horizon use wall run age** (12.1).
+
+## 13. Switching routes
+
+`warp_route.py switch`. A switch happens at a visit; from then on the other route's rules apply, and its mutagen line shows at once, since it reads holdings. Days to every achievement (ideal cadence):
+
+| Switch | Days | Alone: mirrors 174, swarmwarp 141 |
+| --- | --- | --- |
+| mirrors → swarmwarp, first run day 1 (no mirror cast) | 141 | no cost |
+| mirrors → swarmwarp, first run after 20 mirror casts | 141 | no cost |
+| same, with a guard that keeps any run with mirror casts and 100+ expansions | **271** | the guard turned the first run into a 192-day long run without the lepidoptera mutation |
+| mirrors → swarmwarp, right after the first ascension (mirrors purchases made), **with the free respec** | **148** | +7 |
+| same, no respec | 181 | warp is the 3rd unlock (2.44e8): the next run took 73 wall days to pass the test |
+| same, no respec, 16-day wall backstop | 173 | |
+| mirrors → swarmwarp in the long run, day 10 (premutagen 1e25: the test passes, ascend) | **118** | faster than either route |
+| day 30 (premutagen 1e76) | **110** | the fastest schedule seen |
+| day 60 (premutagen 1e154, 3,118 expansions) | 140 | |
+| day 90 (premutagen 1e232, 4,695 expansions) | 170 | |
+| days 10 / 30 / 60 / 90, with a guard that keeps the long run (mirrors to 5,000) | 177 | the guard costs 7–67 days |
+| mirrors → swarmwarp in the quick runs (5 ascensions done) | 175 | stage quick: as the mirrors route |
+| swarmwarp → mirrors, first run day 2 | 174 | |
+| swarmwarp → mirrors at 5 ascensions (1e18 held) | 176 | the current run becomes the mirrors long run |
+| swarmwarp → mirrors at 20 ascensions (1e94) | 182 | |
+| swarmwarp → mirrors in the final run, day 2 (1,492 expansions) | 147 | mirrors finish the expansions |
+
+**Guard rules for the port, each from a case above:**
+- **G1. No guard for a mirrors long run.** Do not hold a run because it has mirror casts and many expansions. The route's own test, premutagen ≥ 1,000 × held, ascends at once there, and that was faster in all four cases (by 7 to 67 days). If the owner wants protection anyway, the only safe one is a confirmation ("this run has 3,118 expansions; ascending restarts them"), not a rule that keeps the run.
+- **G2. Never treat a first run (no ascension yet) as a long run** under any route. With that guard the switch cost 130 days.
+- **G3. The free respec of 12.7** when the warp mutation is locked and unaffordable (+7 days instead of +40).
+- **G4. The new route's mutagen line shows at once**, from holdings, not at the next ascension.
+- **G5. Territory share back to 0.1** on the swarmwarp route (12.4).
+- **G6. Swarmwarp → mirrors needs nothing.** It completed from every point tried (147–182 days). The mirrors route's "unlock all from the 2nd ascension" costs mutagen larvae, but nothing it needs.
+
+What is irreversible:
+- **An ascension.** The only one this route advises out of a mirrors run is the case where it pays (G1).
+- **Mutagen spending.** A respec undoes it. There are 4 free respecs to start, plus 1 every 3rd ascension; a paid respec costs 30% of the ascension cost and wipes its discount. The route uses at most one free respec, on the switch.
+
+Neither route advises anything the other route cannot recover from.
+
+**A hybrid worth telling the owner:** mirrors for the first ~30 days of the long run, then this route, took **110 days**, the fastest schedule seen. It was sampled only at switch days 10, 30, 60 and 90 (118 / 110 / 140 / 170). **likely** that something near day 20–30 beats both pure routes; the best day is a **guess**.
+
+## 14. The re-validated headline (advisor sizing, honest arithmetic)
+
+The route as specified in section 12: the advisor's rule-3 sizing, honest push larvae with the 1% reserve, the game clock, and one warp at a time. Days from the 20.1 h save (`warp_route.py validate`, `mirrors`):
+
+| Variant | 6 unlocks | 10 unlocks | 20 asc. | endless 1 | endless 1e62 | exp 1,000 | exp 2,000 | exp 5,000 | **all** |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **spec, ideal** | 34 | 58 | 95 | 102 | 107 | 74 | 103 | 141 | **141** |
+| spec, human seeds 1 / 2 / 3 | 27–29 | 63–66 | 103–106 | 111–114 | 117–120 | 77–83 | 112–116 | 154–158 | **154–158** |
+| spec, glance+ | 38 | 73 | 109 | 123 | 134 | 92 | 149 | 179 | 179 |
+| spec, every 2 h | 39 | 73 | 111 | 131 | 143 | 93 | 170 | 190 | 190 |
+| spec, busy | 46 | 79 | 118 | 139 | 151 | 105 | 160 | 198 | 198 |
+| spec, twice a day | 55 | 106 | 138 | 182 | 190 | 137 | 221 | 243 | 243 |
+| pass 1's route, re-run with the idempotent mutagen rule, ideal / human | | | | | | | | | 239 / 255 |
+| mirrors route (the advisor today, same driver), ideal / human / busy | 100 | 100 | 174 / 181 / 193 | 53 | 66 | 24 | 43 | 100 | **174 / 181 / 193** |
+
+- **Pass 1's 223 / 245–253 hold on pass 1's assumptions** (wall clock, warps back to back): 217 / 231 with this section's ascension test and mutagen rule.
+- **The game clock and one warp at a time take the route to 141 / 154–158.**
+- **The trough:** mutagen 1e15 → 1e32 took days 49–129 in pass 1. With the spec it takes days 16–50 (ideal), 18–56 (human), 32–73 (busy).
+- **Slow cadences gain the most.** Busy: 366 → 198. Twice a day: never → 243. Banked warps are no longer cast in one batch.
+
+## 15. Reference cases, grades, what is not modelled
+
+**Reference cases:** `advisor/modelcheck/swarmwarp_cases/`, 45 cases, made by `advisor/modelcheck/swarmwarp_cases.py` in about 80 s. The README lists each case, every field and how the port must compare it. They cover:
+- each energy situation by phase: lepidoptera, bats, test fails / passes with spend / save / ascend;
+- the clock: a tier in cooldown released by one warp; five warps affordable, one at a time with the purchases between;
+- both sides of the ratio test, the final threshold and the 30% unlock rule;
+- the quick and done stages;
+- the mutagen rule after ascensions 1, 2, 3, 8, 15, 22 and 28;
+- the switch states: the mirrors route's purchases with and without a free respec, and its long run on days 10 and 30.
+
+**Round trip in the real game:** 34–35 numbers per case, worst |sim/game − 1| = 3.7e-7. That figure is the halving amount, which the game measures from its own ceiled costs, as the advisor does. Larvae/s just after an ascension agree to 1.7e-7. Unlocks held and the earned flags are equal in every case. The numbers include:
+- swarmwarp power and skip with bats and the warp mutation;
+- bats, nightbugs, lepidoptera;
+- every mutant, the unlocks held and the next unlock price;
+- the cumulative skipped time and the game-time run age estimate;
+- the ascension cost, energy spent and the cap.
+
+| Finding | Grade |
+| --- | --- |
+| A warp moves no clock the advisor reads; `session.state.skippedMillis` is cumulative, survives reload and ascension | **solid** (game code) |
+| The route needs the game clock: 217 → 141 days (ideal), 350 → 198 (busy); the run age matters most (206 → 141) | **likely** (simulator; one start, cadence seeds) |
+| The swarmwarp route under the spec is faster than the mirrors route at the ideal and human cadences (141 vs 174; 154–158 vs 181) and about equal when busy (198 vs 193) | **likely**; days simulator-only |
+| Ratio test 1,000× (flat to 10^4); lepidoptera 4,000–10,000; bats 0–2,000; A.11 below nexus 5 | **likely** |
+| No guard for a mirrors long run; the free respec after mirrors purchases; G1–G6 | **likely** (one simulated case each) |
+| Mirrors for ~30 days of the long run, then swarmwarp: ~110 days | **likely** faster than either; the best switch day **guess** |
+| The game-clock change is a no-op on the mirrors route | **solid** (no warps, `skippedMillis` constant) |
+
+**Not modelled:**
+- **The player's work.** The route assumes a returning player casts their banked warps one at a time and follows the purchases after each, up to 50 warps per visit. Whether a person will is untested. The advisor should make it a single click per step.
+- **The advisor's own code.** Simulated rules, not the port: the differences in `longrun_cases/README.md` apply (meat cap, territory purse, drones).
+- **The game run age.** The simulator knows it exactly; the port's estimate agrees only when bats come before the first warp.
+- **One start** (the 20.1 h save). Premutagen is the mean roll. Switches were simulated once each, at the ideal cadence.
+- **The hybrid's best switch day.**
+- **The browser** at many warps of years each (the game's own numbers are checked; speed is not).
+
+**Reproduce:**
+
+```sh
+node advisor/modelcheck/swarmwarp_clock.js                      # section 11, the game's clocks
+python3 -I advisor/sim/warp_route.py --jobs 4                   # sections 12-14, about 15 minutes on 4 cores
+python3 -I advisor/modelcheck/swarmwarp_cases.py                # section 15, about 80 s (and the round trip)
+```
+
+New `sim.py` options, all off by default. With them off, `run_example.py` (both saves), `compare.py` (both saves), `ascension_compare.py` and `bignum_check.py` are byte-identical:
+
+| Option | What it does |
+| --- | --- |
+| `game_clock` | the advisor's timers (cooldown, rule-3 memory, push cooldown, twin recency) read wall time + time skipped by swarmwarp (`s.gskip`) |
+| `game_age` | run age (horizon, long-run gate, ascension) adds this run's skipped time (`s.gskip_run`, reset at an ascension) |
+| `warp_visits` | after each swarmwarp, the non-energy part of the visit runs again (purchases between warps) |
+| a callable ascension plan | `sim.ascend(s, p, plan)` with `plan(s)` deciding the mutagen purchases (`warp_route.apply_mutagen`) |

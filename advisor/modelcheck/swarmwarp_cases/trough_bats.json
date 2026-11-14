@@ -1,0 +1,150 @@
+{
+ "case": "trough_bats",
+ "exercises": "trough phase: lepidoptera at the target, bats under 2,000: buy bats before any swarmwarp",
+ "save": "trough_bats.save.json",
+ "config": {
+  "route": "swarmwarp (advisor/NO-MIRRORS.md, Rules for the advisor)",
+  "ascension_test": [
+   "ratio",
+   1000.0
+  ],
+  "final_log10_mutagen_held": 270.0,
+  "free_unlocks": 3,
+  "unlock_share": 0.3,
+  "unlock_order": [
+   "mutatenexus",
+   "mutateswarmwarp",
+   "mutatebat",
+   "mutatefreq",
+   "mutateeach",
+   "mutatearmy",
+   "mutaterush",
+   "mutateclone",
+   "mutatemeat",
+   "mutatehatchery"
+  ],
+  "fixed_mutants": {
+   "mutantnexus": 1000000.0,
+   "mutantfreq": 1000000.0
+  },
+  "mutant_shares": {
+   "mutantswarmwarp": 0.1,
+   "mutantbat": 0.1,
+   "mutantarmy": 0.3,
+   "mutanteach": 0.01
+  },
+  "guard": null,
+  "free_respec_when_warp_unaffordable": true,
+  "clock": {
+   "timers": "game",
+   "run_age": "game",
+   "one_warp_at_a_time": true
+  },
+  "age_multiple": 5,
+  "long_run_gate_s": 172800,
+  "cooldown_s": 60,
+  "share_per_minute": 0.5,
+  "moths_after_nexus5": 10000,
+  "early_moths_at_nexus4": 1000,
+  "bats": 2000,
+  "territory_share": 0.1,
+  "long_run_climb_mode": "on",
+  "spell": "swarmwarp",
+  "ascensions_goal": 20
+ },
+ "state": {
+  "run_age_s": 81900.0,
+  "ascensions": 1,
+  "nexus": 5,
+  "energy": "6.6043188342665633e+02",
+  "energy_rate": "1.9071856287425151e+00",
+  "cap": "1.0840019960079840e+05",
+  "moths": "10000.0",
+  "bats": "3.0",
+  "nightbugs": "0",
+  "ascension_cost": "1532849.0",
+  "energy_spent": "149425.0",
+  "halving": "7.9940119760479050e+04",
+  "threshold": 115329,
+  "save_at": "1.0840019960079840e+05",
+  "mutagen_held": "2.9556147105392106e+06",
+  "premutagen": "8.1105987418485514e+04",
+  "unlocks": [
+   "mutatenexus",
+   "mutateswarmwarp"
+  ],
+  "unlock_count": 2,
+  "next_unlock_price": "244140625.0",
+  "mutants": {
+   "mutantswarmwarp": "328401.0",
+   "mutantnexus": "1000000.0"
+  },
+  "swarmwarp_power": "1.0050840478872434e+01",
+  "swarmwarp_skip_s": "9.0457564309851914e+03",
+  "expansions": 89,
+  "mirror_casts_this_run": 0,
+  "swarmwarp_casts_this_run": 0,
+  "earned": {
+   "expansion9": false,
+   "overmind6_3": false,
+   "mutation4": false
+  },
+  "stage": "build",
+  "test": {
+   "kind": "ratio",
+   "passes": false,
+   "premutagen": "8.1105987418485514e+04",
+   "held": "2.9556147105392106e+06",
+   "k": "1000.0",
+   "need": "2.9556147105392108e+09",
+   "run_age_s": "81900.0"
+  },
+  "wants_ascension": false,
+  "larvae": "1.7829863539923584e+09",
+  "larva_rate": "5.9432878389250571e+06",
+  "meat": "4.5886182474834095e+46",
+  "achievement_points": 910,
+  "clock": {
+   "run_age_wall_s": 81900.0,
+   "skipped_this_run_s": 0.0,
+   "skipped_total_s": 0.0,
+   "run_age_game_s": 81900.0,
+   "run_age_game_estimate_s": 81900.0,
+   "horizon_s": 409500.0,
+   "long_run_gate_active": false
+  }
+ },
+ "decisions": {
+  "energy": {
+   "actions": [
+    {
+     "type": "buyBats",
+     "count": "6.0"
+    }
+   ],
+   "saving_for_ascension": false,
+   "ascend_now": false,
+   "energy_after": "6.0431883426656327e+01"
+  },
+  "territory": {
+   "cheapest_rung": "locust",
+   "top_rung": "mosquito",
+   "empower_price": "4.7124699999999998e+42",
+   "top_meat_each": "1.0472176125000000e+40",
+   "territory_larvae_cap": "178298635.0",
+   "meat_budget": "4.1297564227350685e+46",
+   "wiped_share": 1.1850756990989705e-18,
+   "empower_advised": false,
+   "keeps_hatching_territory": true
+  },
+  "mutagen": {
+   "respec_first": false,
+   "respec_refund": "1344025.0",
+   "free_respecs": 4,
+   "steps": [],
+   "held_after": "2.9556147105392106e+06",
+   "again": [],
+   "respec_again": false
+  }
+ }
+}

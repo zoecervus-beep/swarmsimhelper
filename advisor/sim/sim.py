@@ -308,7 +308,9 @@ def energy_policy(s,p,gained):
             if sp=='clone' and s.larva<p.get('clone_min',0)*lam(s)*1e5*pw*s.spw['clone'] and s.energy<ecap(s)*0.98: break
             s.energy-=cost; s.casts[sp]=s.casts.get(sp,0)+1
             q=pw*s.spw[sp]   # spell power x the mutant power for this spell (exactly pw without mutants)
-            if sp=='warp': advance(s,900*q,True)
+            if sp=='warp':
+                L=advance(s,900*q,True)
+                if p.get('warp_visits'): policy(s,dict(p,energy=False),L)   # option (default off): the purchases are re-taken after each warp
             elif sp=='larvarush': s.larva+=lam(s)*2400*q+1e5*q
             elif sp=='meatrush': s.c[0]+=s.c[1]*P(s,1)*7200*q; s.earned+=s.c[1]*P(s,1)*7200*q
             elif sp=='terrrush': s.terr+=trate(s)*7200*q
@@ -375,6 +377,8 @@ def nexus_wait(s,p):
     return {'keep_l':keep_l,'T_e':T_e,'T_l':T_l}
 def advance(s,dt,skip=False):
     L=lam(s)*dt; s.larva+=L; s.terr+=trate(s)*dt
+    if skip:   # swarmwarp: the game adds the skipped time to session.state.skippedMillis (game clock = wall + skipped)
+        s.gskip=getattr(s,'gskip',0.0)+dt; s.gskip_run=getattr(s,'gskip_run',0.0)+dt
     if not skip:
         s.time+=dt; e=s.energy+erate(s)*dt; c=ecap(s)
         if e>c: s.ewaste=getattr(s,'ewaste',0.0)+(e-c)   # energy lost to the cap (diagnostic only)
@@ -404,7 +408,7 @@ def policy(s,p,gained):
     if TRACE is not None: tr('gate', not (p.get('lr_age') and run_age(s,p)<p['lr_age']), run_age(s,p))
     if p.get('lr_age') and run_age(s,p)<p['lr_age']:   # long-run rules switch on by themselves only from this run age
         p=dict(p,faster_aware=None,push=None)
-    if p.get('theta_age'): p['theta']=p['theta_age']*(p.get('age0',4306)+s.time-s.run_off)   # run age (run_off moves at an ascension)
+    if p.get('theta_age'): p['theta']=p['theta_age']*(p.get('age0',4306)+s.time-s.run_off+(getattr(s,'gskip_run',0.0) if p.get('game_age') else 0.0))   # run age (run_off moves at an ascension); game_age: + warps
     energy_policy(s,p,gained)
     # --- larva multipliers
     while True:
@@ -554,7 +558,7 @@ def _climb_and_push(s,p,avail,top,f):
         if TRACE is not None: tr('climb',k,'buys',n,fa)
         first=False
         if k>=2: s.c[k-1]-=n*UNITC[k]
-        s.c[0]-=n*MEATC[k]; s.c[k]+=n*TWO**s.twin[k]; s.larva-=n; avail-=n; s.spent[k]+=n; s.lastbuy[k]=s.time; s.hatched[k]+=n*TWO**s.twin[k]; buy_stat(s,NAMES[k],n*TWO**s.twin[k])
+        s.c[0]-=n*MEATC[k]; s.c[k]+=n*TWO**s.twin[k]; s.larva-=n; avail-=n; s.spent[k]+=n; s.lastbuy[k]=tnow(s,p); s.hatched[k]+=n*TWO**s.twin[k]; buy_stat(s,NAMES[k],n*TWO**s.twin[k])
         s.firstclimb.setdefault(NAMES[k],s.time)
         if hasattr(s,'stock_at'): s.stock_at[k]=None   # advisor sizing: re-measure the lower tier's stock after a purchase
         if fa:
@@ -580,9 +584,10 @@ def advisor_size(s,p,k,avail):
     with spare = (what the tier below gained since the last hatch + the stock it held then x min(1, since /
     payback)) / cost, the stock being measured at the first look after a hatch (s.stock_at)."""
     if not hasattr(s,'stock_at') or len(s.stock_at)<K+2: s.stock_at=[None]*(K+2)
-    run_start=s.time-run_age(s,p)
+    now=tnow(s,p)
+    run_start=now-run_age(s,p)
     last=s.lastbuy[k] if s.lastbuy[k]>=run_start else run_start-60.0
-    since=s.time-last
+    since=now-last
     if since<p.get('cooldown_s',60): return None
     if s.stock_at[k] is None: s.stock_at[k]=s.c[k-1]
     base=s.stock_at[k]
@@ -593,10 +598,14 @@ def advisor_size(s,p,k,avail):
     afford=s.c[k-1]/UNITC[k]
     frac=1-(1-p.get('share',0.5))**(since/60.0)
     return min(avail,afford*frac,spare)
-def hatch(s,k,n):
+def tnow(s,p):
+    """The clock the advisor's timers read: wall time, or with option `game_clock` (default off) wall time plus the
+    time swarmwarp skipped (the game's session.state.skippedMillis), so a warp counts as elapsed time."""
+    return s.time+getattr(s,'gskip',0.0) if p.get('game_clock') else s.time
+def hatch(s,k,n,now=None):
     """Buy n of meat tier k (n hatch events, n x 2^twin units), with the same bookkeeping as the climb."""
     if k>=2: s.c[k-1]-=n*UNITC[k]
-    s.c[0]-=n*MEATC[k]; s.c[k]+=n*TWO**s.twin[k]; s.larva-=n; s.spent[k]+=n; s.lastbuy[k]=s.time
+    s.c[0]-=n*MEATC[k]; s.c[k]+=n*TWO**s.twin[k]; s.larva-=n; s.spent[k]+=n; s.lastbuy[k]=s.time if now is None else now
     s.hatched[k]+=n*TWO**s.twin[k]; buy_stat(s,NAMES[k],n*TWO**s.twin[k]); s.firstclimb.setdefault(NAMES[k],s.time)
     if hasattr(s,'stock_at'): s.stock_at[k]=None
 def push_frontier(s,p): return max([k for k in range(1,K+1) if s.c[k]>0 and allowed(s,p,k)] + [p['push'].get('from',2)-1])   # push only tiers >= push['from']
@@ -616,7 +625,7 @@ def push_up(s,p,left=None):
     order=range(frontier+1,G+1) if q.get('bottom_up') else range(G,frontier,-1)   # bottom_up: a visit can carry units several tiers up
     if TRACE is not None: tr('frontier',frontier,larva)
     for k in order:
-        if q.get('cooldown') and s.time-s.lastbuy[k]<q['cooldown']:   # cooldown: no push of a unit hatched less than this many s ago
+        if q.get('cooldown') and tnow(s,p)-s.lastbuy[k]<q['cooldown']:   # cooldown: no push of a unit hatched less than this many s ago
             if TRACE is not None: tr('push',k,'cooldown')
             continue
         if s.c[k-1]<=0 or larva<1:
@@ -628,7 +637,7 @@ def push_up(s,p,left=None):
         n=math.floor(min(caps))
         if TRACE is not None: tr('push',k,'hatch' if n>=1 else 'under one',n,sh,s.c[k-1],larva,s.c[0],['share','larvae','meat'][caps.index(min(caps))])
         if n<1: continue
-        hatch(s,k,n); larva-=n
+        hatch(s,k,n,tnow(s,p)); larva-=n
     return larva
 def tshare(sh,p):
     """`time_share` (default off): a share stated per minute, applied over the time since the last visit, as the
@@ -639,7 +648,7 @@ def twin_pass(s,p):
     for k in range(1,K):
         while True:
             cost=twin_cost(s,k)
-            if p.get('twin_used') and s.time-s.lastbuy[k]>p['twin_used']+(p['ci'] if p.get('twin_used_gap') else 0): break   # twin_used_gap: 'recently' counts from the previous visit
+            if p.get('twin_used') and tnow(s,p)-s.lastbuy[k]>p['twin_used']+(p['ci'] if p.get('twin_used_gap') else 0): break   # twin_used_gap: 'recently' counts from the previous visit
             if p.get('twin_r') and s.c[k+1]*P(s,k+1) > p['twin_r']*lam(s)*(1-p['f'])*TWO**s.twin[k]/TWO**s.twin[k+1]: break
             if p.get('twin_flow'):
                 inc=(s.c[k]*P(s,k)/UNITC[k]) if k>=2 else 1e99
@@ -678,7 +687,7 @@ def faster_levels(s,p,k,n):
         if h*(N+Fl)/(N*TWO**L)<=p['theta']: return L
     return 0
 def prod_cost_at(s,k,level): return 66*X666**level
-def run_age(s,p): return p.get('age0',4306)+s.time-s.run_off
+def run_age(s,p): return p.get('age0',4306)+s.time-s.run_off+(getattr(s,'gskip_run',0.0) if p.get('game_age') else 0.0)   # game_age (default off): + this run's warps
 def asc_cfg(s,p):
     """The ascension rule for the current run: p['ascend'] is a list, one entry per future ascension made in
     this simulation (None or a missing entry: never ascend). Entry: {'after': run age in seconds before
@@ -724,8 +733,8 @@ def ascend(s,p,plan=None):
     s.hatched=[0.0]*(K+2); s.hprev=[0.0]*(K+2); s.carry=[0.0]*(K+2); s.reserve=0.0; s.nexres=0.0; s.purse=0.0
     s.casts={}; s.casts0={}; s.respecE=0.0; s.lastbuy=[-1e18]*(K+2); s.firstclimb={}; s.fa_log=[]
     s.spent=[0.0]*(K+1); s.spentT=0.0
-    s.run_off=s.time+p.get('age0',4306); s.want_asc=False; s.saving_asc=False
-    rec['bought']=apply_plan(s,plan or {})
+    s.run_off=s.time+p.get('age0',4306); s.want_asc=False; s.saving_asc=False; s.gskip_run=0.0
+    rec['bought']=plan(s) if callable(plan) else apply_plan(s,plan or {})   # a callable plan (default: none) decides from the state (advisor/NO-MIRRORS.md)
     rec['mutagen_after']=s.mutagen
     s.asc_log.append(rec)
     return rec

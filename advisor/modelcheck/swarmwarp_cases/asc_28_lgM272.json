@@ -1,0 +1,193 @@
+{
+ "case": "asc_28_lgM272",
+ "exercises": "just after ascension 28, nothing bought yet: the mutagen rule (10 unlocks held, 10^272.0 mutagen)",
+ "save": "asc_28_lgM272.save.json",
+ "config": {
+  "route": "swarmwarp (advisor/NO-MIRRORS.md, Rules for the advisor)",
+  "ascension_test": [
+   "ratio",
+   1000.0
+  ],
+  "final_log10_mutagen_held": 270.0,
+  "free_unlocks": 3,
+  "unlock_share": 0.3,
+  "unlock_order": [
+   "mutatenexus",
+   "mutateswarmwarp",
+   "mutatebat",
+   "mutatefreq",
+   "mutateeach",
+   "mutatearmy",
+   "mutaterush",
+   "mutateclone",
+   "mutatemeat",
+   "mutatehatchery"
+  ],
+  "fixed_mutants": {
+   "mutantnexus": 1000000.0,
+   "mutantfreq": 1000000.0
+  },
+  "mutant_shares": {
+   "mutantswarmwarp": 0.1,
+   "mutantbat": 0.1,
+   "mutantarmy": 0.3,
+   "mutanteach": 0.01
+  },
+  "guard": null,
+  "free_respec_when_warp_unaffordable": true,
+  "clock": {
+   "timers": "game",
+   "run_age": "game",
+   "one_warp_at_a_time": true
+  },
+  "age_multiple": 5,
+  "long_run_gate_s": 172800,
+  "cooldown_s": 60,
+  "share_per_minute": 0.5,
+  "moths_after_nexus5": 10000,
+  "early_moths_at_nexus4": 1000,
+  "bats": 2000,
+  "territory_share": 0.1,
+  "long_run_climb_mode": "on",
+  "spell": "swarmwarp",
+  "ascensions_goal": 20
+ },
+ "state": {
+  "run_age_s": 0.0,
+  "ascensions": 28,
+  "nexus": 0,
+  "energy": "0",
+  "energy_rate": "0",
+  "cap": "8500.0",
+  "moths": "0",
+  "bats": "0",
+  "nightbugs": "0",
+  "ascension_cost": "119419333.0",
+  "energy_spent": "0",
+  "halving": "7.9940119760479050e+04",
+  "threshold": 115329,
+  "save_at": "8500.0",
+  "mutagen_held": "1.0139426142367744e+272",
+  "premutagen": "0",
+  "unlocks": [
+   "mutatearmy",
+   "mutatebat",
+   "mutateclone",
+   "mutateeach",
+   "mutatefreq",
+   "mutatehatchery",
+   "mutatemeat",
+   "mutatenexus",
+   "mutaterush",
+   "mutateswarmwarp"
+  ],
+  "unlock_count": 10,
+  "next_unlock_price": "8.6736173798840350e+41",
+  "mutants": {
+   "mutanthatchery": "1.0",
+   "mutantbat": "3.3913419793673803e+247",
+   "mutantclone": "1.0",
+   "mutantswarmwarp": "3.3913419793673803e+247",
+   "mutantrush": "1.0",
+   "mutanteach": "3.3913419793673798e+246",
+   "mutantfreq": "1000000.0",
+   "mutantnexus": "1000000.0",
+   "mutantarmy": "1.0174025938102139e+248",
+   "mutantmeat": "1.0"
+  },
+  "swarmwarp_power": "1.2180097860003744e+05",
+  "swarmwarp_skip_s": "1.0962088074003370e+08",
+  "expansions": 0,
+  "mirror_casts_this_run": 0,
+  "swarmwarp_casts_this_run": 0,
+  "earned": {
+   "expansion9": false,
+   "overmind6_3": true,
+   "mutation4": true
+  },
+  "stage": "final",
+  "test": {
+   "kind": "ratio",
+   "passes": false,
+   "premutagen": "0",
+   "held": "1.0139426142367744e+272",
+   "k": "1000.0",
+   "need": "1.0139426142367744e+275",
+   "run_age_s": "0"
+  },
+  "wants_ascension": false,
+  "larvae": "10.0",
+  "larva_rate": "1.0139426142367746e+271",
+  "meat": "35.0",
+  "achievement_points": 2320,
+  "clock": {
+   "run_age_wall_s": 0.0,
+   "skipped_this_run_s": 0.0,
+   "skipped_total_s": 134938788850.57205,
+   "run_age_game_s": 0.0,
+   "run_age_game_estimate_s": 0.0,
+   "horizon_s": 0.0,
+   "long_run_gate_active": false
+  }
+ },
+ "decisions": {
+  "energy": {
+   "actions": [],
+   "saving_for_ascension": false,
+   "ascend_now": false,
+   "energy_after": "0"
+  },
+  "territory": {
+   "cheapest_rung": "swarmling",
+   "top_rung": "goon",
+   "empower_price": "1.1492100000000000e+32",
+   "top_meat_each": "2.5537971687011715e+29",
+   "territory_larvae_cap": "1.0",
+   "meat_budget": "3.1500000000000000e+01",
+   "wiped_share": 0.0,
+   "empower_advised": false,
+   "keeps_hatching_territory": true
+  },
+  "mutagen": {
+   "respec_first": false,
+   "respec_refund": "1.7295844094773637e+248",
+   "free_respecs": 13,
+   "steps": [
+    {
+     "type": "mutants",
+     "name": "mutantswarmwarp",
+     "count": "1.0139426142367746e+271"
+    },
+    {
+     "type": "mutants",
+     "name": "mutantbat",
+     "count": "1.0139426142367746e+271"
+    },
+    {
+     "type": "mutants",
+     "name": "mutantarmy",
+     "count": "3.0418278427103231e+271"
+    },
+    {
+     "type": "mutants",
+     "name": "mutanteach",
+     "count": "1.0139426142367745e+270"
+    }
+   ],
+   "held_after": "4.9683188097601958e+271",
+   "again": [
+    {
+     "type": "mutants",
+     "name": "mutantarmy",
+     "count": "7.5075168288047002e+255"
+    },
+    {
+     "type": "mutants",
+     "name": "mutanteach",
+     "count": "1.1730495045007344e+254"
+    }
+   ],
+   "respec_again": false
+  }
+ }
+}

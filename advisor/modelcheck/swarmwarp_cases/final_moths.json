@@ -1,0 +1,177 @@
+{
+ "case": "final_moths",
+ "exercises": "final phase: nexus 5, lepidoptera under the target: buy lepidoptera (no bats, no swarmwarp yet)",
+ "save": "final_moths.save.json",
+ "config": {
+  "route": "swarmwarp (advisor/NO-MIRRORS.md, Rules for the advisor)",
+  "ascension_test": [
+   "ratio",
+   1000.0
+  ],
+  "final_log10_mutagen_held": 270.0,
+  "free_unlocks": 3,
+  "unlock_share": 0.3,
+  "unlock_order": [
+   "mutatenexus",
+   "mutateswarmwarp",
+   "mutatebat",
+   "mutatefreq",
+   "mutateeach",
+   "mutatearmy",
+   "mutaterush",
+   "mutateclone",
+   "mutatemeat",
+   "mutatehatchery"
+  ],
+  "fixed_mutants": {
+   "mutantnexus": 1000000.0,
+   "mutantfreq": 1000000.0
+  },
+  "mutant_shares": {
+   "mutantswarmwarp": 0.1,
+   "mutantbat": 0.1,
+   "mutantarmy": 0.3,
+   "mutanteach": 0.01
+  },
+  "guard": null,
+  "free_respec_when_warp_unaffordable": true,
+  "clock": {
+   "timers": "game",
+   "run_age": "game",
+   "one_warp_at_a_time": true
+  },
+  "age_multiple": 5,
+  "long_run_gate_s": 172800,
+  "cooldown_s": 60,
+  "share_per_minute": 0.5,
+  "moths_after_nexus5": 10000,
+  "early_moths_at_nexus4": 1000,
+  "bats": 2000,
+  "territory_share": 0.1,
+  "long_run_climb_mode": "on",
+  "spell": "swarmwarp",
+  "ascensions_goal": 20
+ },
+ "state": {
+  "run_age_s": 38400.0,
+  "ascensions": 28,
+  "nexus": 5,
+  "energy": "5.0750697873962542e+02",
+  "energy_rate": "1.6673181277299753e+00",
+  "cap": "1.0840019960079840e+05",
+  "moths": "2021.0",
+  "bats": "0",
+  "nightbugs": "0",
+  "ascension_cost": "65460645.0",
+  "energy_spent": "69335.0",
+  "halving": "7.9940119760479050e+04",
+  "threshold": 115329,
+  "save_at": "1.0840019960079840e+05",
+  "mutagen_held": "4.9683188097601958e+271",
+  "premutagen": "1.2955984290884762e+62",
+  "unlocks": [
+   "mutatearmy",
+   "mutatebat",
+   "mutateclone",
+   "mutateeach",
+   "mutatefreq",
+   "mutatehatchery",
+   "mutatemeat",
+   "mutatenexus",
+   "mutaterush",
+   "mutateswarmwarp"
+  ],
+  "unlock_count": 10,
+  "next_unlock_price": "8.6736173798840350e+41",
+  "mutants": {
+   "mutanthatchery": "1.0",
+   "mutantbat": "1.0139426142367746e+271",
+   "mutantclone": "1.0",
+   "mutantswarmwarp": "1.0139426142367746e+271",
+   "mutantrush": "1.0",
+   "mutanteach": "1.0139426142367745e+270",
+   "mutantfreq": "1000000.0",
+   "mutantnexus": "1000000.0",
+   "mutantarmy": "3.0418278427103231e+271",
+   "mutantmeat": "1.0"
+  },
+  "swarmwarp_power": "1.4607650053186022e+05",
+  "swarmwarp_skip_s": "1.3146885047867420e+08",
+  "expansions": 1199,
+  "mirror_casts_this_run": 0,
+  "swarmwarp_casts_this_run": 0,
+  "earned": {
+   "expansion9": false,
+   "overmind6_3": true,
+   "mutation4": true
+  },
+  "stage": "final",
+  "test": {
+   "kind": "ratio",
+   "passes": false,
+   "premutagen": "1.2955984290884762e+62",
+   "held": "4.9683188097601958e+271",
+   "k": "1000.0",
+   "need": "4.9683188097601956e+274",
+   "run_age_s": "38400.0"
+  },
+  "wants_ascension": false,
+  "larvae": "1.4904956429280586e+273",
+  "larva_rate": "4.9683188097601957e+270",
+  "meat": "2.1112728452841535e+501",
+  "achievement_points": 2320,
+  "clock": {
+   "run_age_wall_s": 38400.0,
+   "skipped_this_run_s": 0.0,
+   "skipped_total_s": 134938788850.57205,
+   "run_age_game_s": 38400.0,
+   "run_age_game_estimate_s": 38400.0,
+   "horizon_s": 192000.0,
+   "long_run_gate_active": false
+  }
+ },
+ "decisions": {
+  "energy": {
+   "actions": [
+    {
+     "type": "buyMoths",
+     "count": "50.0"
+    }
+   ],
+   "saving_for_ascension": false,
+   "ascend_now": false,
+   "energy_after": "7.5069787396254242e+00"
+  },
+  "territory": {
+   "cheapest_rung": "goon",
+   "top_rung": "devourer",
+   "empower_price": "5.0646924019014493e+233",
+   "top_meat_each": "1.1254878693238259e+231",
+   "territory_larvae_cap": "1.4904956429280587e+272",
+   "meat_budget": "1.9001455607557383e+501",
+   "wiped_share": 6.943175028575048e-16,
+   "empower_advised": false,
+   "keeps_hatching_territory": true
+  },
+  "mutagen": {
+   "respec_first": false,
+   "respec_refund": "5.1711073326075493e+271",
+   "free_respecs": 13,
+   "steps": [
+    {
+     "type": "mutants",
+     "name": "mutantarmy",
+     "count": "7.5075168288047002e+255"
+    },
+    {
+     "type": "mutants",
+     "name": "mutanteach",
+     "count": "1.1730495045007344e+254"
+    }
+   ],
+   "held_after": "4.9683188097601951e+271",
+   "again": [],
+   "respec_again": false
+  }
+ }
+}

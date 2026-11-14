@@ -1,0 +1,157 @@
+{
+ "case": "ratio_just_below",
+ "exercises": "premutagen = 0.999999 x 1000 x mutagen held: the ascension test fails",
+ "save": "ratio_just_below.save.json",
+ "config": {
+  "route": "swarmwarp (advisor/NO-MIRRORS.md, Rules for the advisor)",
+  "ascension_test": [
+   "ratio",
+   1000.0
+  ],
+  "final_log10_mutagen_held": 270.0,
+  "free_unlocks": 3,
+  "unlock_share": 0.3,
+  "unlock_order": [
+   "mutatenexus",
+   "mutateswarmwarp",
+   "mutatebat",
+   "mutatefreq",
+   "mutateeach",
+   "mutatearmy",
+   "mutaterush",
+   "mutateclone",
+   "mutatemeat",
+   "mutatehatchery"
+  ],
+  "fixed_mutants": {
+   "mutantnexus": 1000000.0,
+   "mutantfreq": 1000000.0
+  },
+  "mutant_shares": {
+   "mutantswarmwarp": 0.1,
+   "mutantbat": 0.1,
+   "mutantarmy": 0.3,
+   "mutanteach": 0.01
+  },
+  "guard": null,
+  "free_respec_when_warp_unaffordable": true,
+  "clock": {
+   "timers": "game",
+   "run_age": "game",
+   "one_warp_at_a_time": true
+  },
+  "age_multiple": 5,
+  "long_run_gate_s": 172800,
+  "cooldown_s": 60,
+  "share_per_minute": 0.5,
+  "moths_after_nexus5": 10000,
+  "early_moths_at_nexus4": 1000,
+  "bats": 2000,
+  "territory_share": 0.1,
+  "long_run_climb_mode": "on",
+  "spell": "swarmwarp",
+  "ascensions_goal": 20
+ },
+ "state": {
+  "run_age_s": 186600.0,
+  "ascensions": 10,
+  "nexus": 5,
+  "energy": "7.8575252613254725e+02",
+  "energy_rate": "1.9071856287425151e+00",
+  "cap": "1.0840019960079840e+05",
+  "moths": "10000.0",
+  "bats": "2000.0",
+  "nightbugs": "0",
+  "ascension_cost": "752407.0",
+  "energy_spent": "349125.0",
+  "halving": "7.9940119760479050e+04",
+  "threshold": 115329,
+  "save_at": "1.0840019960079840e+05",
+  "mutagen_held": "2.1627779080285675e+32",
+  "premutagen": "2.1627757452506594e+35",
+  "unlocks": [
+   "mutatearmy",
+   "mutatebat",
+   "mutateclone",
+   "mutateeach",
+   "mutatefreq",
+   "mutatenexus",
+   "mutaterush",
+   "mutateswarmwarp"
+  ],
+  "unlock_count": 8,
+  "next_unlock_price": "3.5527136788005011e+33",
+  "mutants": {
+   "mutantbat": "4.4138324653644237e+31",
+   "mutantclone": "1.0",
+   "mutantswarmwarp": "4.4138324653644237e+31",
+   "mutantrush": "1.0",
+   "mutanteach": "4.4138324653644236e+30",
+   "mutantfreq": "1000000.0",
+   "mutantnexus": "1000000.0",
+   "mutantarmy": "1.3241497396093269e+32"
+  },
+  "swarmwarp_power": "2.6723960090253249e+03",
+  "swarmwarp_skip_s": "2.4051564081227924e+06",
+  "expansions": 357,
+  "mirror_casts_this_run": 0,
+  "swarmwarp_casts_this_run": 0,
+  "earned": {
+   "expansion9": false,
+   "overmind6_3": false,
+   "mutation4": false
+  },
+  "stage": "build",
+  "test": {
+   "kind": "ratio",
+   "passes": false,
+   "premutagen": "2.1627757452506594e+35",
+   "held": "2.1627779080285675e+32",
+   "k": "1000.0",
+   "need": "2.1627779080285673e+35",
+   "run_age_s": "186600.0"
+  },
+  "wants_ascension": false,
+  "larvae": "6.5473185427328865e+33",
+  "larva_rate": "2.1627779080300264e+31",
+  "meat": "7.3251455788529520e+191",
+  "achievement_points": 1640,
+  "clock": {
+   "run_age_wall_s": 186600.0,
+   "skipped_this_run_s": 0.0,
+   "skipped_total_s": 1945004221.1840203,
+   "run_age_game_s": 186600.0,
+   "run_age_game_estimate_s": 186600.0,
+   "horizon_s": 933000.0,
+   "long_run_gate_active": true
+  }
+ },
+ "decisions": {
+  "energy": {
+   "actions": [],
+   "saving_for_ascension": false,
+   "ascend_now": false,
+   "energy_after": "7.8575252613254725e+02"
+  },
+  "territory": {
+   "cheapest_rung": "roach",
+   "top_rung": "locust",
+   "empower_price": "1.1689968397656682e+162",
+   "top_meat_each": "2.5977776951054255e+159",
+   "territory_larvae_cap": "6.5473185427328873e+32",
+   "meat_budget": "6.5926310209676569e+191",
+   "wiped_share": 2.379505605962136e-16,
+   "empower_advised": false,
+   "keeps_hatching_territory": true
+  },
+  "mutagen": {
+   "respec_first": false,
+   "respec_refund": "2.2533284396187545e+32",
+   "free_respecs": 7,
+   "steps": [],
+   "held_after": "2.1627779080285675e+32",
+   "again": [],
+   "respec_again": false
+  }
+ }
+}
