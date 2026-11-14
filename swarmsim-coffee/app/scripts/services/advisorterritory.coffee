@@ -121,6 +121,9 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
     dates = g.session.state.date
     return {
       now: now
+      # the purse refills on the game clock: a swarmwarp's larvae are larvae gained (NO-MIRRORS.md 12.1)
+      gameNow: advisor.gameClock(g, now).gameNow
+      route: advisor.routeFacts g
       restartedAt: new Date(dates.restarted or dates.started).getTime()
       larvae: D g.unit('larva').count()
       larvaRate: D g.unit('larva').velocity()
@@ -415,12 +418,19 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
   # Territory advice for a snapshot, the remembered state and the advisor settings (only `territory`,
   # the larva share, is read). Returns the advice with the updated memory as `memory`; the inputs are
   # not modified.
+  #
+  # The route (`advisor.routeOf`): on the swarmwarp route territory units are never stopped, even in a run with
+  # House of Mirrors casts (a route switch), and a share of 0 is advised back to SW.territory (NO-MIRRORS.md 12.4,
+  # 13 G5). A run the near-complete guard finishes with House of Mirrors follows the mirrors route here too.
   advise = (snap, memory, cfg) ->
     cfg = withDefaults cfg
     share = cfg.territory
-    mirrors = snap.mirrorCasts > 0
-    mem = copyMemory memory, snap.now, snap.restartedAt
-    purse = updatePurse mem, snap, share, seePurchases(mem, snap)
+    route = advisor.routeOf cfg, snap.route
+    warpRoute = route.route == 'swarmwarp'
+    mirrors = snap.mirrorCasts > 0 and not warpRoute
+    clock = snap.gameNow ? snap.now
+    mem = copyMemory memory, clock, snap.restartedAt
+    purse = updatePurse mem, _.extend({}, snap, now: clock), share, seePurchases(mem, snap)
     budget = purse.budget
 
     up = larvaUpgrades snap
@@ -439,6 +449,8 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
         setting = {type: 'setShare', share: share, to: 0}
     else if not (share > 0)
       status = {type: 'idle', reason: 'shareZero'}
+      if warpRoute
+        setting = {type: 'setShare', share: share, to: advisor.SW.territory, route: 'swarmwarp'}
     else
       res = territoryUnits snap, share, budget, meatBudget, purse.cap
       empower = res.empower ? null
@@ -464,6 +476,8 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
       records.push status
     return {
       now: snap.now
+      gameNow: clock
+      route: route
       share: share
       mirrors: mirrors
       larvae: budget
@@ -501,7 +515,8 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
       when 'saveForTwin' then 'save larvae for ' + rec.label + ': ' + fmt(rec.have) + '/' + fmt(rec.larvae)
       when 'hatch' then 'hatch ' + fmt(rec.buys) + ' ' + rec.label + (if rec.twin.greaterThan(1) then ' (x' + fmt(rec.twin) + ' twins)' else '')
       when 'mirrors' then 'House of Mirrors is running: hatch no more territory units'
-      when 'setShare' then 'set the territory share to ' + rec.to + ' (now ' + rec.share + ')'
+      when 'setShare'
+        'set the territory share to ' + rec.to + ' (now ' + rec.share + ')' + (if rec.route == 'swarmwarp' then ': on the swarmwarp route expansions come from territory units' else '')
       when 'idle'
         switch rec.reason
           when 'locked' then 'no territory units yet'
@@ -542,12 +557,14 @@ angular.module('swarmApp').factory 'advisorTerritory', (game, advisor, $rootScop
       cached = null
     # The latest advice, re-running `update()` only when the cached result is at least `maxAgeMs`
     # old. Never throws: returns {at, advice, error}, as `advisor.current()`.
+    # Also afresh at once after a setting change or a swarmwarp cast (`advisor.liveKey`).
     current: (maxAgeMs=1000, wallNow=Date.now()) ->
-      if not cached? or wallNow - cached.at >= maxAgeMs or wallNow < cached.at
+      key = advisor.liveKey()
+      if not cached? or wallNow - cached.at >= maxAgeMs or wallNow < cached.at or cached.key != key
         try
-          cached = {at: wallNow, advice: svc.update(), error: null}
+          cached = {at: wallNow, key: key, advice: svc.update(), error: null}
         catch e
-          cached = {at: wallNow, advice: null, error: e}
+          cached = {at: wallNow, key: key, advice: null, error: e}
       return cached
     invalidate: -> cached = null
   }

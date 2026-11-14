@@ -8,6 +8,8 @@ Tier names: the fork renamed the five upper overmind tiers (display only). They 
 
 ## Part A. The plan for "every achievement, and a bunch of endless"
 
+**A second route (Nov 14, 2026).** The advisor can also follow the swarmwarp route of [NO-MIRRORS.md](NO-MIRRORS.md) section 12 (setting "Achievements: swarmwarp route"). This part A remains the House of Mirrors route and the default. Every timer, and the run age behind A.10's horizon and its 2-day gate, now runs on the game clock (real time plus the time swarmwarp skipped). That changes nothing on this route while no swarmwarp is cast. Route switching and its protections: [README.md](README.md), "Switching routes".
+
 ### A.1 The plan in brief
 
 There are 121 achievements worth 2,410 points; the save has 48 of them (730 points). Every remaining one can be earned except `publictest1`, which is worth 0 points and has no trigger in the code. The full inventory, generated from the game data and checked in code, is in [ACHIEVEMENTS.md](ACHIEVEMENTS.md).

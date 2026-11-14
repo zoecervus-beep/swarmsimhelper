@@ -221,6 +221,29 @@ Result on Nov 12, 2026:
 
 It never ascends. The port deliberately starts a fresh purchase memory after an ascension; the script keeps the last run's stock levels and purchase times.
 
+## The swarmwarp route against its reference cases
+
+`advisor/modelcheck/swarmwarp_check.js` checks the native advisor's swarmwarp route (setting `ascension: 'swarmwarp'`; [NO-MIRRORS.md](NO-MIRRORS.md) sections 11-13) against the 45 reference cases in `swarmwarp_cases/`, field by field as their README says. It loads each case's save in the real game (`lib/game.js`, with `advisorterritory.coffee` and `advisorascension.coffee` loaded too), takes the services' own snapshots, and advises with the owner's stored settings (age multiple 5, spare energy 'save', long-run climb off) and the swarmwarp route.
+
+```sh
+node advisor/modelcheck/swarmwarp_check.js [case ...]     # VERBOSE=1 prints every line; exit 1 on any difference
+```
+
+What it compares:
+- **Exact, from the save alone:** the stage, the ascension test (passes, and need to 1e-12), whether the route wants an ascension, the save point, threshold and ascension cost, swarmwarp's power and skip, this run's age on the game clock (the stateless estimate, and against the exact game age), the horizon and the long-run gate, the energy line up to the first cast (nexus, lepidoptera, bats), saving and ascend now, territory never stopped, the empower test, the mutagen respec and steps, and the steps run again after applying them in the game (nothing).
+- **Exact given the memory:** `cooldown_released_by_warp` and `five_warps_affordable`. The advisor's purchase memory is seeded on the game clock from the case, then warps are **cast in the loaded game** one at a time. Per tier: time since the last hatch on the game clock, cooldown released, share released, stock release, and the climb's outcome per tier, before the warp and after it.
+- **One at a time:** every casting line offers 1 cast; after each warp, the next one waits while the released purchases are open. The check then makes the advisor's purchases in the game, repeating until the warp is offered again, and casts the next.
+- **Printed only:** the simulator's cast count (it casts everything affordable at once), climb counts after a warp (they depend on the simulator's territory purse), and what was bought between warps.
+
+Result on Nov 14, 2026: 45 cases, 0 differences. Three disagreements with the reference were settled against the game:
+- **Ascension cost, `final_nexus4`:** the game's unrounded cost is 99,319,568.047, which it ceils to 99,319,569. The reference says 99,319,568. The port reads the game's own `ascendCost()`, so it is compared exactly with the game, and with the reference to within that ceil.
+- **Mutagen share purchases far past 2^53:** in 7 cases (mutagen 1e32 to 1e270) the reference buys shares of about 1e-15 of W, for example 7.5e255 of 1e270. That is float rounding of shares bought at an earlier ascension. The port counts a share short by less than 1e-9 of its target as held (`SHARE_TOLERANCE`); without that, its own line would never go away after the purchases. Those reference steps are listed as rounding, and the rest are compared exactly.
+- **Empower, `late_nexus4`:** the reference's empower test uses 0.9 × meat. The advisor's full advice takes out the hatchery and expansion levels it advises first. Compared exactly with the reference's inputs (the same snapshot with the larva upgrades hidden), the result matches in all 45 cases; the full advice differs in that one case, which is printed.
+
+Not compared: climb counts and push lines after a warp (the simulator's territory purse is not in the save), and the purchases between warps. Following the panel, the port bought the same expansions and hatcheries as the simulator after the first warp (11 and 34). Later warps differ: the advisor offers one empower per look, so a person following it clicks through 1 to 10 empowers per warp (10, 10, 3, 3, 1 in `five_warps_affordable`) where the simulator made 1. With them it bought 14, 39, 42 and 17 expansions after warps 2 to 5, against 16, 3, 6 and 1.
+
+Also unchanged by the game clock, since none of their saves has a swarmwarp cast: `script_vs_port.js` (seed 11, 100 states × 20 steps, 0 differences), `longrun_check.js` (exit 0) and `early_check.js` (328 states, 0 differences). `longrun_check.js` now seeds the purchase memory on the game clock (`snap.gameNow`), which is the wall clock on those saves.
+
 ## Faster-aware climbing
 
 Nov 13, 2026. The owner asked whether the climb rule should count the "faster" upgrade when deciding to start a new tier. On their 20.1 h save, hive queens cost 10^6 hives and make 6 hives/s. So H = 6 × 46.3 h = 11.6 d against a horizon of 3 × 20.1 h = 2.5 d, and the advisor says "wait 3.0 d". "Faster hive queens" costs only 66 hive queens and would halve H.

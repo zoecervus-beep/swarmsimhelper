@@ -60,12 +60,14 @@ cases.forEach(function (name) {
     cooldown: conf.cooldown_s || conf.push_cooldown_s, share: 0.5, longRun: 'on',
     spareEnergy: 'larvarush'};   // the simulator's reference policy casts spare energy below nexus 5, as the script did
   var snap = adv.snapshot(game);
+  // the advisor's timers are on the game clock (wall + skippedMillis; NO-MIRRORS.md 12.1); these saves never warped
+  var clock = snap.gameNow, start = snap.restartedAt + (clock - snap.now);
   var seed = function () {
-    var mem = adv.createMemory(snap.now, snap.restartedAt);
+    var mem = adv.createMemory(clock, snap.restartedAt);
     st.tiers.forEach(function (t, i) {
       var u = snap.units[i];
       mem.seen[u.name] = u.purchases;
-      mem.boughtAt[u.name] = t.since_last_hatch_s == null ? snap.restartedAt - cfg.cooldown * 1000 : snap.now - t.since_last_hatch_s * 1000;
+      mem.boughtAt[u.name] = t.since_last_hatch_s == null ? start - cfg.cooldown * 1000 : clock - t.since_last_hatch_s * 1000;
       if (t.stock_below_at_last_look != null) mem.stockAt[u.name] = D(t.stock_below_at_last_look);
     });
     return mem;

@@ -14,7 +14,9 @@ angular.module('swarmApp').constant 'ADVISOR_SETTINGS',
     # from the climb, at nexus 4 1,000 lepidoptera first and then only what nexus 5 needs just in time);
     # 'larvarush' casts spare energy as larva rush, as the console script did
     spareEnergy: 'save'
-    ascension: 'achievements' # ascension advice (advisorascension.coffee): 'off', or 'achievements' for ASCENSION.md's route
+    # ascension advice and the route the whole advisor follows (advisorascension.coffee): 'off'; 'achievements', the
+    # House of Mirrors route of ASCENSION.md part A; or 'swarmwarp', the swarmwarp route of NO-MIRRORS.md section 12
+    ascension: 'achievements'
     longRun: 'off'    # long-run climb mode (ASCENSION.md A.10): 'on' adds rules LR-1 to LR-4 from a run age of 2 days
   limits:
     ageMultiple: {min: 0.01, max: 1000}
@@ -24,7 +26,7 @@ angular.module('swarmApp').constant 'ADVISOR_SETTINGS',
     territory: {min: 0, max: 0.95}
     moths: {min: 0, max: 1e12, integer: true}
     spareEnergy: {choices: ['larvarush', 'save']} # a choice, not a number
-    ascension: {choices: ['off', 'achievements']}
+    ascension: {choices: ['off', 'achievements', 'swarmwarp']}
     longRun: {choices: ['off', 'on']}
 
 ###*
@@ -68,6 +70,96 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
   SPELLS =
     larvarush: {spell: 'larvarush', label: 'larva rush', cost: 1600}
     clonearmy: {spell: 'clonearmy', label: 'House of Mirrors', cost: 2500}
+    swarmwarp: {spell: 'swarmwarp', label: 'swarmwarp', cost: 2000} # the cost is read from the game when the snapshot has it
+
+  # The swarmwarp route (advisor/NO-MIRRORS.md section 12), chosen with the `ascension` setting 'swarmwarp'. Every
+  # rule reads the game state only: the route keeps nothing between visits.
+  SW =
+    moths: 10000           # 12.2 E2: lepidoptera after nexus 5, every run (the setting, if higher, stays)
+    bats: 2000             # 12.2 E3: bats after the lepidoptera and before the first swarmwarp, every run
+    territory: 0.1         # 12.4: the territory share the route keeps (advised back from 0)
+    ratio: 1000            # 12.6 build: ascend once premutagen >= this x max(mutagen held, 1)
+    finalLog10: 270        # 12.6 final: from 1e270 mutagen held (5,000 expansions missing), never ascend
+    unlockOrder: ['mutatenexus', 'mutateswarmwarp', 'mutatebat', 'mutatefreq', 'mutateeach', 'mutatearmy', 'mutaterush',
+      'mutateclone', 'mutatemeat', 'mutatehatchery'] # 12.7 step 2
+    freeUnlocks: 3         # 12.7 step 2: the first three unlocks whenever affordable
+    unlockShare: 0.3       # 12.7 step 2: from the 4th, only while its price is at most this share of the mutagen held
+    fixedMutants: [['mutantnexus', 1e6], ['mutantfreq', 1e6]] # 12.7 step 3: hold this many of each (when unlocked)
+    shares: [['mutantswarmwarp', 0.1], ['mutantbat', 0.1], ['mutantarmy', 0.3], ['mutanteach', 0.01]] # 12.7 step 4, of W
+    # 13 G1, first protection: an ascension this route advises out of a run with House of Mirrors casts and at least
+    # this many expansions says that it restarts them
+    restartNote: 1000
+    # The owner's near-complete guard (on top of section 13): a run with House of Mirrors casts, after an ascension,
+    # with at least this many expansions and the 5,000-expansions achievement missing, is finished as the mirrors
+    # route's long run (no ascension, no swarmwarp), then the swarmwarp route resumes. The spec's day-90 switch sample
+    # (4,695 expansions) gained only 7 days by ascending.
+    nearComplete: 4500
+  # The achievement for 5,000 expansions (game data): the near-complete guard and the stages read it.
+  EXPANSION_GOAL = 'expansion9'
+  # Territory hatch lines hold the next swarmwarp only while they hold more than this many seconds of the territory
+  # share's larva income: the purse refills every second, so a smaller line would hold it for ever (12.3).
+  WARP_HOLD_TERRITORY_SECS = 60
+
+  # The route the advisor follows, from the settings and the game state (NO-MIRRORS.md section 13):
+  #   {setting, route: 'mirrors' | 'swarmwarp' | null (ascension advice off), guard}
+  # `facts` is `routeFacts()` (a snapshot's `route`). With the swarmwarp setting, a run caught by the near-complete
+  # guard follows the mirrors route (`guard` says why); never in a first run (13 G2), never without mirror casts.
+  routeOf = (cfg, facts) ->
+    setting = cfg?.ascension ? DEFAULTS.ascension
+    if setting != 'swarmwarp'
+      return {setting: setting, route: (if setting == 'achievements' then 'mirrors' else null), guard: null}
+    guard = nearComplete facts
+    return {setting: setting, route: (if guard? then 'mirrors' else 'swarmwarp'), guard: guard}
+
+  nearComplete = (facts) ->
+    goal = facts?.expansionGoal
+    if not goal? or goal.earned or not (facts.ascensions >= 1) or not (facts.mirrorCasts > 0)
+      return null
+    if facts.expansions < SW.nearComplete
+      return null
+    return {type: 'finishMirrors', expansions: facts.expansions, goal: goal.val, threshold: SW.nearComplete, mirrorCasts: facts.mirrorCasts}
+
+  # What the route reads from the game, for every advisor service's snapshot. Null if the game lacks any of it.
+  routeFacts = (g) ->
+    try
+      ach = g.achievement EXPANSION_GOAL
+      req = ach?.requires?[0]
+      return {
+        ascensions: D(g.unit('ascension').count()).toNumber()
+        mirrorCasts: D(g.upgrade('clonearmy').count()).toNumber() # House of Mirrors casts this run
+        warpCasts: D(g.upgrade('swarmwarp').count()).toNumber()   # swarmwarp casts this run
+        expansions: D(g.upgrade('expansion').count()).toNumber()  # this run
+        expansionGoal: if req? then {name: ach.name, val: D(req.val).toNumber(), earned: ach.isEarned()} else null
+      }
+    catch e
+      return null
+
+  # The game clock (NO-MIRRORS.md 11, 12.1): wall time plus `session.state.skippedMillis`, the time swarmwarp has
+  # skipped over the whole save (exact; kept across reloads and ascensions). This run's skipped time is estimated
+  # without memory: this run's swarmwarp casts x what one cast skips now (exact while the power has not changed
+  # since the first cast; the route buys its bats first). Without a cast both are the wall clock's.
+  gameClock = (g, now) ->
+    skipped = Number(g.session?.state?.skippedMillis ? 0) or 0
+    runSkipped = 0
+    try
+      warp = g.upgrade 'swarmwarp'
+      casts = D(warp.count())
+      if casts.greaterThan 0
+        effect = _.find(warp.effect, (e) -> e.type?.name == 'skipTime') ? warp.effect[0]
+        runSkipped = casts.times(effect.output()).times(1000).toNumber()
+    catch e
+      runSkipped = 0
+    return {gameNow: now + skipped, skipped: skipped, runSkipped: runSkipped}
+
+  # What the live advice depends on besides the game's own counts: the settings and the skipped time. A change in
+  # either (a setting picked, a swarmwarp cast) makes every advisor service work its advice out afresh at once.
+  liveKey = (g=game) ->
+    skipped = g?.session?.state?.skippedMillis ? 0
+    try
+      cfg = JSON.stringify options.advisorConfig()
+    catch e
+      cfg = ''
+    return skipped + '|' + cfg
 
   withDefaults = (cfg={}) ->
     ret = {}
@@ -163,11 +255,26 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
         rate: D g.unit('energy').velocity() # energy per second (the 'save' plan's just-in-time hold)
         moths: D g.unit('moth').count()
         next: next
+      # the swarmwarp route's energy (NO-MIRRORS.md 12.2): bats and swarmwarp, prices and power from the game
+      bat = g.unit 'bat'
+      warpUp = g.upgrade 'swarmwarp'
+      if bat? and warpUp?
+        energy.bats = D bat.count()
+        energy.batPrice = D(_.find(bat.eachCost(), (c) -> c.unit.name == 'energy')?.val ? 100) # energy per bat
+        skipEffect = _.find(warpUp.effect, (e) -> e.type?.name == 'skipTime') ? warpUp.effect[0]
+        energy.warp =
+          cost: D(_.find(warpUp.totalCost(), (c) -> c.unit.name == 'energy')?.val ? SPELLS.swarmwarp.cost)
+          skip: D(skipEffect.output()).toNumber() # seconds one cast skips now (900 x power)
+          power: D(skipEffect.power()).toNumber()
+          casts: D(warpUp.count()).toNumber() # this run
     catch e
       energyError = e
 
+    clock = gameClock g, now
     return {
-      now: now
+      now: now # wall clock: energy, the mirrors route's day 3, memory identity
+      gameNow: clock.gameNow # game clock (NO-MIRRORS.md 12.1): the timers
+      runSkipped: clock.runSkipped # ms skipped by swarmwarp in this run (estimate): run age on the game clock
       restartedAt: new Date(dates.restarted or dates.started).getTime()
       larvae: D larva.count()
       larvaRate: D larva.velocity()
@@ -175,6 +282,7 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
       units: units
       energy: energy
       energyError: energyError
+      route: routeFacts g
     }
 
   # ---------------------------------------------------------------------------
@@ -276,13 +384,29 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
   # `cfg.runMoths` / `cfg.runStage` (not stored settings): the lepidoptera target after nexus 5 that the
   # ascension route's stage asks for (advisorAscension `runMoths`), passed by `update()`. It raises the
   # `moths` setting, never lowers it, and takes the place of LR-4's raise. Without it the setting applies.
+  #
+  # The route (`routeOf`, from the `ascension` setting and the game) is worked out here every time; nothing about it
+  # is remembered. On the swarmwarp route (NO-MIRRORS.md 12.2, 12.5) the long-run climb mode is on whatever the
+  # setting says, the lepidoptera target is SW.moths (the setting, if higher, stays), and spare energy after nexus 5
+  # goes into bats, then swarmwarp, one cast at a time.
+  #
+  # Clocks (NO-MIRRORS.md 12.1): the timers (cooldown, purchase share, stock release, push cooldown) and the run age
+  # behind the horizon and the long-run gate are on the game clock (`snap.gameNow`, `snap.runSkipped`); LR-4's day 3
+  # is on the wall clock. With no swarmwarp cast the two clocks differ by a constant, and the advice is as before.
   advise = (snap, memory, cfg, given) ->
     runMoths = cfg?.runMoths ? null
     runStage = cfg?.runStage ? null
     cfg = withDefaults cfg
-    now = snap.now
+    route = routeOf cfg, snap.route
+    warpRoute = route.route == 'swarmwarp'
+    if warpRoute
+      cfg.longRun = 'on'     # 12.5 (the stored setting is not changed)
+      runMoths = SW.moths    # 12.2 E2
+      runStage = 'swarmwarp'
+    now = snap.gameNow ? snap.now # the game clock
     mem = copyMemory memory, now, snap.restartedAt
-    age = (now - snap.restartedAt) / 1000
+    wallAge = (snap.now - snap.restartedAt) / 1000
+    age = wallAge + (snap.runSkipped ? 0) / 1000 # this run's age on the game clock
     horizon = age * cfg.ageMultiple
     larvae = snap.larvae
     larvaRate = snap.larvaRate
@@ -344,10 +468,15 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
     energyError = snap.energyError ? null
     # LR-4: from a run age of 3 days the mode raises the lepidoptera target to 30,000 (never lowers it).
     # The route's run target, when there is one, decides instead (it asks the same in a long run).
-    raiseMoths = lrOn and age >= LR.mothAge and cfg.moths < LR.moths and not runMoths?
+    raiseMoths = lrOn and wallAge >= LR.mothAge and cfg.moths < LR.moths and not runMoths?
     if not energyError?
       try
-        if runMoths? and runMoths > cfg.moths
+        if warpRoute
+          energy = energyAdvice snap, _.extend({}, cfg, moths: Math.max(cfg.moths, runMoths), route: 'swarmwarp')
+          if energy?.type in ['buyMoths', 'mothTarget'] and not energy.early and runMoths > cfg.moths
+            energy.runStage = runStage
+            energy.setting = cfg.moths
+        else if runMoths? and runMoths > cfg.moths
           energy = energyAdvice snap, _.extend({}, cfg, moths: runMoths)
           if energy?.type in ['buyMoths', 'mothTarget'] and not energy.early
             energy.runStage = runStage
@@ -467,8 +596,10 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
           tips.push {type: 'twinPlan', unit: u.name, payIn: payIn.name, cost: tc, steps: steps, planCost: costInU, payback: twinPayback}
 
     ret = {
-      now: now
+      now: snap.now
+      gameNow: now
       age: age
+      wallAge: wallAge
       horizon: horizon
       larvae: larvae
       larvaRate: larvaRate
@@ -479,6 +610,7 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
       energy: energy
       energyError: energyError
       config: cfg
+      route: route
       memory: mem
     }
     # Only with the 'save' plan, so the result is unchanged with 'larvarush' (the console script).
@@ -606,8 +738,13 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
   # ---------------------------------------------------------------------------
   # Energy: nexus first, lepidoptera up to the target, then every point into House of Mirrors.
   # Returns null below one nexus.
+  # `cfg.route` 'swarmwarp' (not a stored setting; `advise` passes it on that route): after nexus 5, bats and then
+  # swarmwarp, one cast at a time, instead of House of Mirrors (NO-MIRRORS.md 12.2, 12.3).
   energyAdvice = (snap, cfg) ->
+    route = cfg?.route ? null
     cfg = withDefaults cfg
+    if route?
+      cfg.route = route
     rec = energyRecord snap, cfg
     # the 'save' plan also says how many of the next nexus's larvae to keep from the climb, and why
     if rec? and cfg.spareEnergy == 'save' and snap.energy.nexus < 5 and snap.energy.next?
@@ -702,6 +839,8 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
       return saving or {type: 'mothTarget', moths: moths, target: cfg.moths}
     if saving
       return saving
+    if nexus >= 5 and cfg.route == 'swarmwarp'
+      return warpRecord e, spare
     # Setting spareEnergy 'save': below nexus 5, hold spare energy for the next nexus (and, from
     # nexus 4, the lepidoptera) instead of casting larva rush. The one exception is energy at its cap,
     # where further income is wasted: one larva rush brings it back under.
@@ -719,6 +858,54 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
     if casts.greaterThanOrEqualTo 1
       return {type: 'cast', spell: spell.spell, label: spell.label, cost: spell.cost, casts: casts}
     return {type: 'nextCast', spell: spell.spell, label: spell.label, cost: spell.cost, energy: energy}
+
+  # The swarmwarp route after nexus 5, once the lepidoptera are at the target (NO-MIRRORS.md 12.2, 12.3):
+  # E3 bats up to SW.bats, floor(min(SW.bats - bats, spare / energy per bat)); then
+  # E4 swarmwarp, ONE cast at a time: the record says how many are affordable and what one skips. After a cast the
+  # game clock has moved on by the skip, the purchases it released come first, and the next cast after them
+  # (`orderWarp`). Never 'cast xN' on this route.
+  warpRecord = (e, spare) ->
+    bats = e.bats ? ZERO
+    if bats.lessThan SW.bats
+      price = e.batPrice ? D(100)
+      n = Decimal.min(D(SW.bats).minus(bats), spare.dividedBy(price)).floor()
+      if n.greaterThanOrEqualTo 1
+        return {type: 'buyBats', count: n, bats: bats, target: SW.bats, price: price}
+      return {type: 'batTarget', bats: bats, target: SW.bats, price: price, energy: e.energy}
+    cost = e.warp?.cost ? D(SPELLS.swarmwarp.cost)
+    k = spare.dividedBy(cost).floor()
+    if k.greaterThanOrEqualTo 1
+      return {type: 'warp', spell: SPELLS.swarmwarp.spell, label: SPELLS.swarmwarp.label, cost: cost, casts: ONE, affordable: k, skip: e.warp?.skip ? null}
+    return {type: 'nextCast', spell: SPELLS.swarmwarp.spell, label: SPELLS.swarmwarp.label, cost: cost, energy: e.energy}
+
+  # One swarmwarp at a time, with the purchases between (NO-MIRRORS.md 12.3): a 'warp' record waits ('warpAfter')
+  # while the panel's other lines have purchases open, so what one warp released is bought before the next:
+  #   - climb rows to buy or feed upward (each goes into its 60 s cooldown once bought);
+  #   - faster and twin tips (twin plans are steps over time, so they do not hold it);
+  #   - territory: hatchery / expansion / ancestry levels, an empower, a territory twin to buy; and territory units
+  #     to hatch while they are more than WARP_HOLD_TERRITORY_SECS of the territory share's larva income (the purse
+  #     refills every second, so a smaller line would hold the warp for ever).
+  # `meat` is this service's advice, `terr` the territory advice (either may be null). Other records unchanged.
+  orderWarp = (rec, meat, terr) ->
+    if rec?.type != 'warp'
+      return rec
+    pending = {climb: 0, tips: 0, territory: 0}
+    for t in meat?.tiers ? [] when t.kind in ['buy', 'push']
+      pending.climb += 1
+    for t in meat?.tips ? [] when t.type in ['faster', 'twin']
+      pending.tips += 1
+    if terr?
+      for r in terr.records ? []
+        if r.type in ['upgrade', 'empower', 'twin']
+          pending.territory += 1
+      rate = meat?.larvaRate ? null
+      share = terr.share ? 0
+      big = (h) -> not rate? or h.buys.greaterThan rate.times(share).times(WARP_HOLD_TERRITORY_SECS)
+      if _.some(terr.hatch ? [], big)
+        pending.territory += 1
+    if pending.climb + pending.tips + pending.territory == 0
+      return rec
+    return _.extend {}, rec, type: 'warpAfter', pending: pending
 
   # spareEnergy 'save' at nexus 4 (ASCENSION.md A.11), in this order:
   # 1. nexus 5, if everything it costs is in hand;
@@ -825,7 +1012,7 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
       else ''
 
   # Why a lepidoptera target is what it is, when it is not simply the setting.
-  RUN_STAGE = {firstRun: 'first-run target', needMutation: 'first-run target', longRun: 'long-run target', quickRun: 'quick-run target'}
+  RUN_STAGE = {firstRun: 'first-run target', needMutation: 'first-run target', longRun: 'long-run target', quickRun: 'quick-run target', swarmwarp: 'swarmwarp route'}
   mothWhy = (rec, sep) ->
     if rec.early then return sep + 'first ' + formatNumber(rec.target) + ' before nexus 5'
     if rec.runStage? then return sep + (RUN_STAGE[rec.runStage] ? 'run target')
@@ -887,11 +1074,30 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
         'buy ' + formatNumber(rec.count) + ' lepidoptera (' + want + ')' + renderKeep(rec) + (if rec.then then '; then ' + renderSaving(rec.then) else '')
       when 'mothTarget' then 'all energy into lepidoptera ' + formatNumber(rec.moths) + '/' + formatNumber(rec.target) + (if mothWhy(rec, '') then ' (' + mothWhy(rec, '') + ')' else '') + (if rec.then then '; then ' + renderSaving(rec.then) else '')
       when 'cast' then 'cast ' + rec.label + ' x' + formatNumber(rec.casts)
+      # the swarmwarp route (NO-MIRRORS.md 12.2, 12.3)
+      when 'buyBats' then 'buy ' + formatNumber(rec.count) + ' bats (' + formatNumber(rec.bats) + '/' + formatNumber(rec.target) + ', before the first swarmwarp: they raise its power)' + (if rec.thenSave then ', then save for the ascension' else '')
+      when 'batTarget' then 'all energy into bats ' + formatNumber(rec.bats) + '/' + formatNumber(rec.target) + ' (' + formatNumber(rec.price) + ' energy each), then swarmwarp'
+      when 'warp' then renderWarp(rec) + '; then follow the other lines: the next swarmwarp is suggested after them'
+      when 'warpAfter' then 'next: ' + renderWarp(rec) + ', once the purchases on the other lines are made (' + renderPending(rec.pending) + ')'
       when 'nextCast' then 'next ' + rec.label + ' at ' + formatNumber(rec.cost) + ' energy (have ' + formatNumber(rec.energy) + ')'
       when 'hold' then renderHold rec
       when 'energyFull'
         'energy is full (' + formatNumber(rec.energy) + '/' + formatNumber(rec.cap) + '): cast ' + rec.label + ' x1 so the income is not wasted'
       else ''
+
+  # "cast 1 swarmwarp (5 affordable): skips 27.8 d"
+  renderWarp = (rec) ->
+    'cast 1 swarmwarp (' + formatNumber(rec.affordable) + ' affordable' + (if rec.thenSave then ' before saving for the ascension' else '') + ')' +
+      (if rec.skip? then ': skips ' + formatTime(rec.skip) else '')
+
+  # "2 climb rows, 1 upgrade tip, 1 territory line"
+  renderPending = (p) ->
+    parts = []
+    plural = (n, one) -> n + ' ' + one + (if n == 1 then '' else 's')
+    if p.climb then parts.push plural(p.climb, 'climb row')
+    if p.tips then parts.push plural(p.tips, 'upgrade tip')
+    if p.territory then parts.push plural(p.territory, 'territory line')
+    parts.join ', '
 
   renderHeader = (r) ->
     'run ' + formatTime(r.age) + ' | climb if H < ' + formatTime(r.horizon) + ' | larvae ' + formatNumber(r.larvae) + ' (+' + formatNumber(r.larvaRate) + '/s)'
@@ -942,6 +1148,16 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
     larvaPlan: larvaPlan
     renderLarvae: renderLarvae
     pushLine: pushLine
+    # routes and clocks (NO-MIRRORS.md 11-13)
+    SW: SW
+    EXPANSION_GOAL: EXPANSION_GOAL
+    WARP_HOLD_TERRITORY_SECS: WARP_HOLD_TERRITORY_SECS
+    routeOf: routeOf
+    routeFacts: routeFacts
+    gameClock: gameClock
+    liveKey: liveKey
+    orderWarp: orderWarp
+    renderPending: renderPending
     # live
     config: -> options.advisorConfig()
     enabled: -> options.advisorEnabled()
@@ -960,14 +1176,16 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
       cached = null
     suggestionFor: suggestionFor
     # The latest advice, re-running `update()` only when the cached result is at least `maxAgeMs`
-    # old. Never throws: returns {at, advice, error}, with `error` set (and `advice` null) when
-    # `update()` threw. `wallNow` is for tests.
+    # old (wall clock), or at once when a setting changed or a swarmwarp was cast (`liveKey`): a warp releases
+    # every cooldown, so the panel must not show "next in 59 s" for up to a second after it. Never throws:
+    # returns {at, advice, error}, with `error` set (and `advice` null) when `update()` threw. `wallNow` is for tests.
     current: (maxAgeMs=1000, wallNow=Date.now()) ->
-      if not cached? or wallNow - cached.at >= maxAgeMs or wallNow < cached.at
+      key = liveKey()
+      if not cached? or wallNow - cached.at >= maxAgeMs or wallNow < cached.at or cached.key != key
         try
-          cached = {at: wallNow, advice: svc.update(), error: null}
+          cached = {at: wallNow, key: key, advice: svc.update(), error: null}
         catch e
-          cached = {at: wallNow, advice: null, error: e}
+          cached = {at: wallNow, key: key, advice: null, error: e}
       return cached
     invalidate: -> cached = null
   }

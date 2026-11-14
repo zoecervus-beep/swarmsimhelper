@@ -59,6 +59,8 @@ module.exports = (config) ->
       # fixture for test/spec/services/advisorascension.coffee: the 20.1 h save, never ascended, nexus 4
       {pattern: '../advisor/sim/example_save_20h.json', included: false, served: true, watched: false}
       {pattern: '../advisor/sim/example_save_19h.json', included: false, served: true, watched: false}
+      # fixtures for test/spec/services/advisorswarmwarp.coffee: the swarmwarp route's reference states
+      {pattern: '../advisor/modelcheck/swarmwarp_cases/*.save.json', included: false, served: true, watched: false}
     ],
 
     # list of files / patterns to exclude

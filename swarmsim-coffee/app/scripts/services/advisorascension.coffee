@@ -32,6 +32,12 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
   LN2 = Math.log 2
 
   ROUTE = 'achievements'
+  WARP_ROUTE = 'swarmwarp' # NO-MIRRORS.md section 12 (advisor.SW holds its numbers)
+  SW = advisor.SW
+  # 12.7 step 4: a share short by less than this part of its target counts as held. The amounts are past 2^53
+  # (1e32 and up), where Decimal and float arithmetic keep 15-17 digits: without this, the shares bought at the last
+  # ascension come out "short" by rounding (1e16 of 1e32) and the line would never be done.
+  SHARE_TOLERANCE = 1e-9
   # ASCENSION.md A.1 stage 2 / A.5: unlock the lepidoptera ("nexus") mutation first and buy about a
   # million of it (energy x1.998); keep at least that many later.
   NEXUS_UNLOCK = 'mutatenexus'
@@ -43,7 +49,7 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
   PROBE_SPENT = 1e5
   MOTH_ENERGY = 10 # energy per lepidoptera (game data), as advisor.coffee
   # Energy line records that spend energy; while saving for the ascension they give way to the save.
-  SPENDING = ['cast', 'nextCast', 'buyMoths', 'mothTarget', 'energyFull']
+  SPENDING = ['cast', 'nextCast', 'buyMoths', 'mothTarget', 'energyFull', 'warp', 'warpAfter', 'buyBats', 'batTarget']
   # ASCENSION.md A.11: the lepidoptera target after nexus 5 for each kind of run (the advisor's `moths`
   # setting still applies when it is higher). Every lepidoptera counts as energy spent, as a House of
   # Mirrors cast does, and raises the energy rate besides, so a run that is only waiting to ascend wants
@@ -52,7 +58,7 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
   # long run takes 30,000 from a run age of 3 days, as the long-run mode's LR-4 does.
   RUN_MOTHS = {firstRun: 10000, needMutation: 10000, quickRun: 30000}
 
-  isOn = (cfg) -> cfg?.ascension == ROUTE
+  isOn = (cfg) -> cfg?.ascension in [ROUTE, WARP_ROUTE]
 
   # ---------------------------------------------------------------------------
   # Snapshot.
@@ -61,6 +67,7 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
     expansion = []
     endless = []
     ascension = []
+    mutation = []
     for a in g.achievementlist()
       req = a.requires[0]
       # unit and upgrade achievements only (event achievements have no number to reach)
@@ -79,8 +86,10 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
         endless.push goal
       else if req.unit?.name == 'ascension'
         ascension.push goal
+      else if req.upgrade?.name == 'mutatehidden' # unlocks held (the swarmwarp route's stages read the last)
+        mutation.push goal
     byVal = (list) -> list.sort (a, b) -> a.val.comparedTo b.val
-    return {expansion: byVal(expansion), endless: byVal(endless), ascension: byVal(ascension)}
+    return {expansion: byVal(expansion), endless: byVal(endless), ascension: byVal(ascension), mutation: byVal(mutation)}
 
   snapshot = (g=game, now) ->
     now ?= if g.now? then g.now.getTime() else new Date().getTime()
@@ -101,6 +110,8 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
       unlocked: up.count().greaterThanOrEqualTo 1
       price: D price.val
       factor: D price.factor
+      have: if effect?.unit? then D(effect.unit.count()) else ZERO # mutants held
+      mutantPrice: if effect?.unit? then D(effect.unit.eachCost()[0].val) else D(1) # mutagen per mutant
     nexusMutant = g.unit 'mutantnexus'
     top = null
     for name in advisor.CHAIN
@@ -108,8 +119,19 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
         top = name
     stats = g.unit('overmind6').statistics?() ? {}
     dates = g.session.state.date
+    refund = null
+    try
+      # what a respec gives back, as the game works it out (game.coffee _respec)
+      refund = D(g.respecSpent()).times(g.respecRate()).floor()
+    catch e
+      refund = null
     return {
       now: now
+      route: advisor.routeFacts g
+      mirrorCasts: D(g.upgrade('clonearmy').count()).toNumber()
+      unlockCount: D(g.upgrade('mutatehidden').count()).toNumber()
+      freeRespecs: D(g.unit('freeRespec').count()).toNumber()
+      refund: refund
       restartedAt: new Date(dates.restarted or dates.started).getTime()
       ascensions: D(g.unit('ascension').count()).toNumber()
       energy: D energy.count()
@@ -223,18 +245,33 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
         return g
     return null
 
+  # The route (`advisor.routeOf`) is worked out from the settings and the game every time:
+  # - 'achievements': the mirrors route below (ASCENSION.md part A), unchanged;
+  # - 'swarmwarp': `warpAdvise` (NO-MIRRORS.md 12.6, 12.7); a run caught by the near-complete guard is finished as
+  #   the mirrors route's long run (this function, stage forced to longRun), with the swarmwarp route's mutagen line
+  #   (mutagen purchases outlive the run, and the swarmwarp route resumes after it) and a line saying why.
   advise = (snap, cfg) ->
     records = []
     if not isOn cfg
       return {stage: 'off', records: records, hold: null, plan: null, mutagen: null, moths: null}
-    mut = mutagenPlan snap
+    route = advisor.routeOf cfg, snap.route
+    if route.route == 'swarmwarp'
+      return warpAdvise snap, cfg, route
+    if route.guard?
+      return _.extend mirrorsAdvise(snap, cfg, warpMutagen(snap), route.guard), route: route
+    return _.extend mirrorsAdvise(snap, cfg, mutagenPlan(snap), null), route: route
+
+  mirrorsAdvise = (snap, cfg, mut, guard) ->
+    records = []
     goals = snap.goals
     longLeft = (g for g in goals.expansion.concat(goals.endless) when not g.earned)
     target = if goals.ascension.length then _.last(goals.ascension).val.toNumber() else null
     ascLeft = (g for g in goals.ascension when not g.earned)
     nexus = _.find snap.unlocks, name: NEXUS_UNLOCK
     hasNexus = nexus?.unlocked or (mut? and mut.steps[0].name == NEXUS_UNLOCK)
-    if snap.ascensions == 0
+    if guard?
+      stage = 'longRun' # the near-complete guard: never ascend this run (it is never a first run)
+    else if snap.ascensions == 0
       stage = 'firstRun'
     else if longLeft.length and not hasNexus
       stage = 'needMutation'
@@ -269,6 +306,8 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
       line = {type: 'done', ascensions: snap.ascensions}
     if mut?
       records.push mut
+    if guard?
+      records.push _.extend({}, guard, type: 'routeGuard')
     records.push line
     return {
       stage: stage
@@ -277,6 +316,158 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
       plan: p
       moths: runMoths(stage, snap)
       # once saving has started (or the energy is there), the energy line holds instead of spending
+      hold: if p?.type in ['saveForAscension', 'ascendNow'] then p else null
+    }
+
+  # ---------------------------------------------------------------------------
+  # The swarmwarp route (NO-MIRRORS.md 12.6-12.8), from the game state alone.
+
+  lastGoal = (list) -> if list?.length then _.last(list) else null
+
+  # 12.6: done / quick / final / build.
+  warpStage = (snap) ->
+    goals = snap.goals
+    exp = lastGoal goals.expansion
+    longGoals = _.compact [exp, lastGoal(goals.endless), lastGoal(goals.mutation)]
+    target = lastGoal(goals.ascension)?.val.toNumber() ? 0
+    if not _.some(longGoals, (g) -> not g.earned)
+      return if snap.ascensions < target then 'quick' else 'done'
+    if snap.mutagen.greaterThanOrEqualTo(D('1e' + SW.finalLog10)) and not exp?.earned
+      return 'final'
+    return 'build'
+
+  # 12.6 build: premutagen >= SW.ratio x max(mutagen held, 1).
+  warpTest = (snap) ->
+    need = Decimal.max(snap.mutagen, 1).times SW.ratio
+    return {passes: snap.premutagen.greaterThanOrEqualTo(need), premutagen: snap.premutagen, held: snap.mutagen, ratio: SW.ratio, need: need}
+
+  # 12.7 step 1: a free respec, when the warp mutation is not unlocked, the next unlock costs more than the mutagen
+  # held, a free respec is left, and held + what the respec gives back pays for the lepidoptera and warp unlocks.
+  warpRespec = (snap) ->
+    warp = _.find snap.unlocks, name: 'mutateswarmwarp'
+    if not warp? or warp.unlocked or not (snap.freeRespecs >= 1) or not snap.refund?
+      return false
+    locked = (u for u in snap.unlocks when not u.unlocked)
+    if not locked.length or snap.mutagen.greaterThanOrEqualTo locked[0].price
+      return false
+    base = locked[0].price.dividedBy Decimal.pow(locked[0].factor, snap.unlockCount)
+    return snap.mutagen.plus(snap.refund).greaterThanOrEqualTo base.plus(base.times locked[0].factor)
+
+  # 12.7: the purchases on current holdings, in order (idempotent: once they are made, this returns null):
+  # free respec when advised; unlocks in SW.unlockOrder (the first SW.freeUnlocks whenever affordable, later ones only
+  # while the price is at most SW.unlockShare of the mutagen held); lepidoptera and frequency mutations to 1e6; then
+  # W = mutagen held + the warp, bat, territory and meta-mutation mutants held (unlocked kinds): hold SW.shares of W
+  # in each; the rest stays unspent. Prices are the game's. Null when there is nothing to do.
+  warpMutagen = (snap) ->
+    if snap.ascensions < 1
+      return null
+    respec = warpRespec snap
+    held = snap.mutagen
+    count = snap.unlockCount
+    units = for u in snap.unlocks
+      _.extend {}, u
+    steps = []
+    locked = (u for u in units when not u.unlocked)
+    factor = (locked[0] ? units[0])?.factor ? D(15625)
+    base = if locked.length then locked[0].price.dividedBy(Decimal.pow factor, count) else D(1)
+    if respec
+      steps.push {type: 'respec', free: snap.freeRespecs, refund: snap.refund}
+      held = held.plus snap.refund
+      count = 0
+      for u in units
+        u.unlocked = false
+        u.have = ZERO
+    if not held.greaterThan 0
+      return null
+    byName = _.keyBy units, 'name'
+    byUnit = _.keyBy units, 'unit'
+    for name in SW.unlockOrder
+      u = byName[name]
+      if not u? or u.unlocked
+        continue
+      price = base.times Decimal.pow(factor, count)
+      if held.lessThan price
+        break
+      if count >= SW.freeUnlocks and price.greaterThan held.times(SW.unlockShare)
+        break
+      held = held.minus price
+      count += 1
+      u.unlocked = true
+      u.have = u.have.plus 1 # each unlock comes with one mutant
+      steps.push {type: 'unlock', name: u.name, label: u.label, unit: u.unit, price: price, nth: count}
+    buy = (u, want, kind, share) ->
+      short = want.minus u.have
+      if short.lessThanOrEqualTo want.times(SHARE_TOLERANCE)
+        return
+      k = Decimal.min(short, held.dividedBy(u.mutantPrice))
+      if k.lessThan 1
+        return
+      k = k.floor()
+      if k.lessThan 1
+        return
+      steps.push {type: 'mutants', unit: u.unit, count: k, have: u.have, target: want, kind: kind, share: share ? null, price: k.times(u.mutantPrice)}
+      held = held.minus k.times(u.mutantPrice)
+      u.have = u.have.plus k
+    for [mu, want] in SW.fixedMutants
+      u = byUnit[mu]
+      if u?.unlocked
+        buy u, D(want), 'fixed'
+    managed = ([byUnit[mu], sh] for [mu, sh] in SW.shares when byUnit[mu]?.unlocked)
+    W = held
+    for [u, sh] in managed
+      W = W.plus u.have
+    for [u, sh] in managed
+      buy u, W.times(sh), 'share', sh
+    if not steps.length
+      return null
+    return {type: 'mutagen', route: WARP_ROUTE, mutagen: snap.mutagen, steps: steps, keep: held, respec: respec, w: W}
+
+  warpAdvise = (snap, cfg, route) ->
+    records = []
+    goals = snap.goals
+    target = lastGoal(goals.ascension)?.val.toNumber() ? null
+    stage = warpStage snap
+    mut = warpMutagen snap
+    test = null
+    wants = stage == 'quick'
+    if stage == 'build'
+      test = warpTest snap
+      wants = test.passes
+    p = null
+    if wants
+      p = _.extend plan(snap), stage: stage, of: target, route: WARP_ROUTE, test: test
+      # 13 G1: ascending out of a run with House of Mirrors casts and many expansions restarts them; say so
+      if snap.mirrorCasts > 0 and snap.expansion >= SW.restartNote
+        p.restarts = {expansions: snap.expansion, mirrorCasts: snap.mirrorCasts}
+      line = p
+    else if stage == 'done'
+      line = {type: 'done', ascensions: snap.ascensions, route: WARP_ROUTE}
+    else
+      # build (test fails) or final: keep swarmwarping, and what the run is collecting (12.8)
+      line =
+        type: if stage == 'final' then 'warpFinal' else 'warpBuild'
+        test: test
+        expansion: snap.expansion
+        nextExpansion: nextGoal(goals.expansion, D snap.expansion)
+        lastExpansion: lastGoal goals.expansion
+        top: snap.top
+        endlessBought: snap.endlessBought
+        nextEndless: nextGoal(goals.endless, snap.endlessBought)
+        unlocks: snap.unlockCount
+        nextMutation: nextGoal(goals.mutation ? [], D snap.unlockCount)
+        ascensions: snap.ascensions
+        of: target
+    if mut?
+      records.push mut
+    records.push line
+    return {
+      stage: stage
+      route: route
+      records: records
+      mutagen: mut
+      plan: p
+      test: test
+      moths: {moths: SW.moths, stage: WARP_ROUTE} # 12.2 E2
       hold: if p?.type in ['saveForAscension', 'ascendNow'] then p else null
     }
 
@@ -289,6 +480,15 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
     p = asc.plan
     if asc.hold? and rec.type in SPENDING
       return {type: 'ascensionHold', ready: p.type == 'ascendNow', energy: p.energy, cost: p.cost, seconds: p.seconds ? null, replaces: rec.type}
+    # the swarmwarp route: one cast at a time, so only how many are left before saving can be cut
+    if p.type == 'spendForAscension' and p.toSpend? and rec.type == 'warp'
+      needed = p.toSpend.dividedBy(rec.cost).ceil()
+      if needed.lessThan rec.affordable
+        return _.extend {}, rec, affordable: needed, thenSave: true
+    if p.type == 'spendForAscension' and p.toSpend? and rec.type == 'buyBats'
+      needed = p.toSpend.dividedBy(rec.price).ceil()
+      if needed.lessThan rec.count
+        return _.extend {}, rec, count: needed, thenSave: true
     if p.type == 'spendForAscension' and p.toSpend? and rec.type == 'cast'
       needed = p.toSpend.dividedBy(rec.cost).ceil()
       if needed.lessThan rec.casts
@@ -311,7 +511,14 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
   renderStep = (s) ->
     switch s.type
       when 'unlock' then 'unlock ' + s.label + ' (' + fmt(s.price) + ')'
-      when 'mutants' then 'buy ' + fmt(s.count) + ' lepidoptera mutations (' + fmt(s.have) + '/' + fmt(s.target) + ')'
+      when 'mutants'
+        if s.kind == 'share'
+          'buy ' + fmt(s.count) + ' ' + s.unit + ' (to ' + (s.share * 100) + '% of your mutagen: ' + fmt(s.target) + ')'
+        else if s.kind == 'fixed'
+          'buy ' + fmt(s.count) + ' ' + s.unit + ' (' + fmt(s.have) + '/' + fmt(s.target) + ')'
+        else
+          'buy ' + fmt(s.count) + ' lepidoptera mutations (' + fmt(s.have) + '/' + fmt(s.target) + ')'
+      when 'respec' then 'respec (free, ' + s.free + ' left): the swarmwarp route needs the warp mutation, which you cannot afford as your next unlock'
       when 'unlocks'
         if s.any
           'unlock ' + s.count + ' more mutation' + (if s.count == 1 then '' else 's') + ', any (' + fmt(s.price) + ')'
@@ -321,6 +528,23 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
           'unlock ' + s.count + ' more mutation' + (if s.count == 1 then '' else 's') + ' (' + fmt(s.price) + ')'
       else ''
 
+  # 13 G1: "; this run has 3,118 expansions from House of Mirrors: ascending restarts them. The swarmwarp route still
+  # expects ascending to be faster."
+  renderRestarts = (rec) ->
+    if not rec.restarts? then return ''
+    '; this run has ' + fmt(rec.restarts.expansions) + ' expansions from House of Mirrors: ascending restarts them. The swarmwarp route still expects ascending to be faster'
+
+  # what a swarmwarp-route run is collecting (12.8): "; expansions 357/500; endless bought 0/1; unlocks 8/10"
+  renderCollecting = (rec) ->
+    text = ''
+    if rec.nextExpansion?
+      text += '; expansions ' + fmt(rec.expansion) + '/' + fmt(rec.nextExpansion.val)
+    if rec.nextEndless?
+      text += '; endless bought ' + fmt(rec.endlessBought) + '/' + fmt(rec.nextEndless.val) + (if rec.top? then ' (top tier ' + rec.top + ')' else '')
+    if rec.nextMutation?
+      text += '; unlocks ' + rec.unlocks + '/' + fmt(rec.nextMutation.val)
+    text
+
   render = (rec) ->
     if not rec?
       return null
@@ -329,15 +553,22 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
         (renderStep(s) for s in rec.steps).join(', then ') + '; keep the rest (' + fmt(rec.keep) + ') unspent: it makes larvae'
       # Below nexus 5 the cap still grows with each nexus, so the save point is not shown yet.
       when 'spendForAscension'
+        spells = if rec.route == WARP_ROUTE then 'lepidoptera, bats and swarmwarp' else 'lepidoptera and House of Mirrors'
         of20(rec) + ' costs ' + fmt(rec.cost) + ' energy (cap ' + fmt(rec.cap) + '): every ' + fmt(rec.halving) + ' energy spent halves it' +
-          (if rec.nexus >= 5 and rec.toSpend? then ' (lepidoptera and House of Mirrors); spend ' + fmt(rec.toSpend) + ' more, then save from ' + fmt(rec.saveAt) else ', mostly lepidoptera and House of Mirrors from nexus 5')
+          (if rec.nexus >= 5 and rec.toSpend? then ' (' + spells + '); spend ' + fmt(rec.toSpend) + ' more, then save from ' + fmt(rec.saveAt) else ', mostly ' + spells + ' from nexus 5') + renderRestarts(rec)
       when 'saveForAscension'
         'stop spending energy and save for ' + of20(rec) + ': ' + fmt(rec.energy) + '/' + fmt(rec.cost) +
-          (if rec.seconds? then ', ready in ' + time(rec.seconds) else '')
+          (if rec.seconds? then ', ready in ' + time(rec.seconds) else '') + renderRestarts(rec)
       when 'ascendNow'
         if rec.noMutagen
           return 'energy covers ' + of20(rec) + ' (' + fmt(rec.energy) + '/' + fmt(rec.cost) + ') but it would bring no mutagen: wait for mutagen (inactive) from hatcheries and expansions'
-        'ascend now: ' + fmt(rec.energy) + '/' + fmt(rec.cost) + ' energy; brings ' + fmt(rec.premutagen) + ' mutagen, ' + of20(rec)
+        'ascend now: ' + fmt(rec.energy) + '/' + fmt(rec.cost) + ' energy; brings ' + fmt(rec.premutagen) + ' mutagen, ' + of20(rec) + renderRestarts(rec)
+      when 'warpBuild'
+        'keep swarmwarping, do not ascend yet: mutagen (inactive) ' + fmt(rec.test.premutagen) + '/' + fmt(rec.test.need) + ' (' + fmt(rec.test.ratio) + ' x mutagen held)' + renderCollecting(rec)
+      when 'warpFinal'
+        'final run, do not ascend: expansions ' + fmt(rec.expansion) + '/' + fmt(rec.lastExpansion?.val ? 5000) + '; all spare energy into swarmwarp' + renderCollecting(_.omit rec, 'nextExpansion')
+      when 'routeGuard'
+        fmt(rec.expansions) + ' of ' + fmt(rec.goal) + ' expansions: finish this run with House of Mirrors, then the swarmwarp route resumes'
       when 'longRun'
         text = 'long run: do not ascend yet; expansions ' + fmt(rec.expansion)
         if rec.nextExpansion?
@@ -347,7 +578,8 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
         if rec.nextEndless?
           text += '; endless bought ' + fmt(rec.endlessBought) + '/' + fmt(rec.nextEndless.val) + (if rec.top? then ' (top tier ' + rec.top + ')' else '')
         text
-      when 'done' then 'every ascension achievement earned: no further ascension needed'
+      when 'done'
+        if rec.route == WARP_ROUTE then 'every achievement of the swarmwarp route earned: no further ascension needed' else 'every ascension achievement earned: no further ascension needed'
       when 'ascensionHold'
         if rec.ready
           'hold it for the ascension (' + fmt(rec.energy) + '/' + fmt(rec.cost) + ')'
@@ -362,6 +594,11 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
 
   svc = {
     ROUTE: ROUTE
+    WARP_ROUTE: WARP_ROUTE
+    warpStage: warpStage
+    warpTest: warpTest
+    warpRespec: warpRespec
+    warpMutagen: warpMutagen
     NEXUS_MUTANTS: NEXUS_MUTANTS
     # pure
     snapshot: snapshot
@@ -382,12 +619,14 @@ angular.module('swarmApp').factory 'advisorAscension', (game, advisor, options, 
         return advise null, cfg
       return advise snapshot(game, now), cfg
     # The latest advice, as `advisor.current()`. Never throws: {at, advice, error}.
+    # Also afresh at once after a setting change or a swarmwarp cast (`advisor.liveKey`).
     current: (maxAgeMs=1000, wallNow=Date.now()) ->
-      if not cached? or wallNow - cached.at >= maxAgeMs or wallNow < cached.at
+      key = advisor.liveKey()
+      if not cached? or wallNow - cached.at >= maxAgeMs or wallNow < cached.at or cached.key != key
         try
-          cached = {at: wallNow, advice: svc.update(), error: null}
+          cached = {at: wallNow, key: key, advice: svc.update(), error: null}
         catch e
-          cached = {at: wallNow, advice: null, error: e}
+          cached = {at: wallNow, key: key, advice: null, error: e}
       return cached
     invalidate: -> cached = null
   }

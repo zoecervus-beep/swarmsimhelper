@@ -94,7 +94,7 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
 
   # Why a lepidoptera target is not simply the setting, said where it shows: the first ones before
   # nexus 5 ('save' plan), the ascension route's target for this kind of run, or the long-run mode's.
-  RUN_STAGE = {firstRun: 'first-run target', needMutation: 'first-run target', longRun: 'long-run target', quickRun: 'quick-run target'}
+  RUN_STAGE = {firstRun: 'first-run target', needMutation: 'first-run target', longRun: 'long-run target', quickRun: 'quick-run target', swarmwarp: 'swarmwarp route'}
   mothWhy = (rec) ->
     if rec.early then return ': the first ' + bignum(rec.target) + ', before nexus 5'
     if rec.runStage? then return ': ' + (RUN_STAGE[rec.runStage] ? 'run target') + ', your setting is ' + bignum(rec.setting)
@@ -141,6 +141,19 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
           text += ', then save for the ascension'
       when 'nextCast'
         text = 'next ' + rec.label + ' at ' + bignum(rec.cost) + ' energy (have ' + bignum(rec.energy) + ')'
+      # the swarmwarp route (NO-MIRRORS.md 12.2, 12.3): bats, then one swarmwarp at a time
+      when 'buyBats'
+        text = 'buy ' + count(rec.count, 'bat') + ' (' + bignum(rec.bats) + '/' + bignum(rec.target) + ', before the first swarmwarp: they raise its power)'
+        if rec.thenSave
+          text += ', then save for the ascension'
+        link = 'bat'
+      when 'batTarget'
+        text = 'all energy into ' + plural('bat') + ' (' + bignum(rec.bats) + '/' + bignum(rec.target) + ', ' + count(rec.price, 'energy') + ' each), then swarmwarp'
+        link = 'bat'
+      when 'warp'
+        text = warpText(rec) + '; then follow the lines above and below: the next swarmwarp is suggested after them'
+      when 'warpAfter'
+        text = 'next: ' + warpText(rec) + ', once the purchases above and below are made (' + advisor.renderPending(rec.pending) + ')'
       when 'hold'
         # spare energy kept for the next nexus (setting spareEnergy 'save')
         text = 'saving for nexus ' + rec.level + ': '
@@ -169,6 +182,11 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
       else
         text = advisor.renderEnergy _.omit(rec, 'larvae') # the larvae part is added below, with the game's labels
     return {type: rec.type, text: text + larvaeText(rec), href: href(link)}
+
+  # "cast 1 swarmwarp (5 affordable): skips 27.8 d"; never "×N" on the swarmwarp route
+  warpText = (rec) ->
+    'cast 1 swarmwarp (' + bignum(rec.affordable) + ' affordable' + (if rec.thenSave then ' before saving for the ascension' else '') + ')' +
+      (if rec.skip? then ': skips ' + time(rec.skip) else '')
 
   # The 'save' plan (ASCENSION.md A.11.9): how many of the next nexus's larvae the climb leaves for it, and why.
   larvaeText = (rec) ->
@@ -200,17 +218,21 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
     return count.toExponential()
 
   # The energy record as the panel shows it: made to agree with the ascension advice when that is on
-  # (`acur`, from `advisorAscension.current()`). Without it, or if it failed, the record unchanged.
-  coupledEnergy = (rec, acur) ->
-    if not acur?.advice?
-      return rec
+  # (`acur`, from `advisorAscension.current()`); then, on the swarmwarp route, a warp waits while the climb, the tips
+  # and the territory lines (`tcur`) have purchases open (`advisor.orderWarp`). Without them, or if they failed, the
+  # record unchanged.
+  coupledEnergy = (rec, acur, advice, tcur) ->
+    if acur?.advice?
+      try
+        rec = advisorAscension.coupleEnergy rec, acur.advice
+      catch e
     try
-      return advisorAscension.coupleEnergy rec, acur.advice
+      return advisor.orderWarp rec, advice, tcur?.advice
     catch e
       return rec
 
   # From `advisor.current()`'s {advice, error} to the panel's view model. Never throws.
-  panel = (cur, acur) ->
+  panel = (cur, acur, tcur) ->
     if not cur?
       return null
     if cur.error?
@@ -236,18 +258,24 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
         # the empty tiers above the table, up to endless, on one row
         if lr.above.length
           longRun.above = label(lr.above[0]) + (if lr.above.length > 1 then ' to ' + label(_.last lr.above) else '') + ': nothing to feed until you own the tier below'
+      # the swarmwarp route: the long-run climb is on whatever the setting says
+      if r.route?.route == 'swarmwarp' and longRun?
+        longRun.route = 'swarmwarp'
+        longRun.text = longRun.text.replace 'long-run climb', 'long-run climb (swarmwarp route)'
       return {
         longRun: longRun
         error: null
         header:
           age: time r.age
+          # the run age is on the game clock (NO-MIRRORS.md 12.1): with swarmwarp cast this run, the real time too
+          wallAge: if r.wallAge? and r.age - r.wallAge >= 1 then time(r.wallAge) else null
           horizon: time r.horizon
           larvae: bignum r.larvae
           larvaRate: bignum r.larvaRate, 1
         rows: rows
         tips: (tip(t) for t in r.tips)
         # an energy failure costs only this line, as in the console script
-        energy: if r.energyError? then {type: 'error', error: true, text: errorText(r.energyError)} else energy coupledEnergy(r.energy, acur)
+        energy: if r.energyError? then {type: 'error', error: true, text: errorText(r.energyError)} else energy coupledEnergy(r.energy, acur, r, tcur)
         summary: if buys.length then {label: buys[0].label, action: buys[0].action} else null
       }
     catch e
@@ -259,7 +287,7 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
     line = {type: rec.type, unit: rec.unit ? null, href: null, buy: false}
     switch rec.type
       when 'setShare'
-        line.text = 'set the territory share to ' + rec.to + ' in Options (now ' + rec.share + ')'
+        line.text = 'set the territory share to ' + rec.to + ' in Options (now ' + rec.share + ')' + (if rec.route == 'swarmwarp' then ': on the swarmwarp route expansions come from territory units' else '')
         line.href = '#/options'
       when 'mirrors'
         line.text = 'House of Mirrors is running: hatch no more territory units'
@@ -378,12 +406,33 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
 
   of20 = (r) -> 'ascension ' + r.ascension + (if r.of? then ' of ' + r.of else '')
 
+  # 13 G1: an ascension the swarmwarp route advises out of a run with House of Mirrors casts and many expansions
+  restartsText = (rec) ->
+    if not rec.restarts? then return null
+    'this run has ' + bignum(rec.restarts.expansions) + ' expansions from House of Mirrors: ascending restarts them. The swarmwarp route still expects ascending to be faster.'
+
+  # what a swarmwarp-route run is collecting (NO-MIRRORS.md 12.8)
+  collecting = (rec) ->
+    text = ''
+    if rec.nextExpansion?
+      text += '; expansions ' + bignum(rec.expansion) + '/' + bignum(rec.nextExpansion.val)
+    if rec.nextEndless?
+      text += '; endless bought ' + bignum(rec.endlessBought) + '/' + bignum(rec.nextEndless.val) + (if rec.top? then ' (top tier: ' + label(rec.top) + ')' else '')
+    if rec.nextMutation?
+      text += '; unlocks ' + rec.unlocks + '/' + bignum(rec.nextMutation.val)
+    text
+
   mutagenStep = (s) ->
     switch s.type
       when 'unlock'
         {text: 'unlock ' + s.label + ' (' + count(s.price, 'mutagen') + ')', href: upgradeHref(s.name)}
       when 'mutants'
-        {text: 'buy ' + count(s.count, s.unit) + ' (' + bignum(s.have) + '/' + bignum(s.target) + ')', href: href(s.unit)}
+        if s.kind == 'share'
+          {text: 'buy ' + count(s.count, s.unit) + ' (to ' + (s.share * 100) + '% of your mutagen: ' + bignum(s.target) + ')', href: href(s.unit)}
+        else
+          {text: 'buy ' + count(s.count, s.unit) + ' (' + bignum(s.have) + '/' + bignum(s.target) + ')', href: href(s.unit)}
+      when 'respec'
+        {text: 'respec (free, ' + s.free + ' left): the swarmwarp route needs the warp mutation, which you cannot afford as your next unlock', href: href('mutagen')}
       when 'unlocks'
         what = if s.count == 1 then 'mutation' else 'mutations'
         text = if s.any then 'unlock ' + s.count + ' more ' + what + ', any' else if s.all then 'unlock the ' + s.count + ' remaining ' + what else 'unlock ' + s.count + ' more ' + what
@@ -400,8 +449,9 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
         line.strong = true
       when 'spendForAscension'
         # below nexus 5 the cap still grows with each nexus, so no save point yet
+        spells = if rec.route == 'swarmwarp' then 'lepidoptera, bats and swarmwarp' else 'lepidoptera and House of Mirrors'
         line.text = of20(rec) + ' costs ' + count(rec.cost, 'energy') + ' (cap ' + bignum(rec.cap) + '); every ' + bignum(rec.halving) + ' energy spent halves it' +
-          (if rec.nexus >= 5 and rec.toSpend? then ' (lepidoptera and House of Mirrors); spend ' + bignum(rec.toSpend) + ' more, then save from ' + bignum(rec.saveAt) else ', mostly lepidoptera and House of Mirrors from nexus 5')
+          (if rec.nexus >= 5 and rec.toSpend? then ' (' + spells + '); spend ' + bignum(rec.toSpend) + ' more, then save from ' + bignum(rec.saveAt) else ', mostly ' + spells + ' from nexus 5')
         line.href = href 'mutagen'
       when 'saveForAscension'
         line.text = 'stop casting and save for ' + of20(rec) + ': ' + bignum(rec.energy) + '/' + count(rec.cost, 'energy') +
@@ -430,9 +480,25 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
         if rec.climbMode == false
           line.hint = {text: 'turn on long-run climb in Options', href: '#/options'}
       when 'done'
-        line.text = 'every ascension achievement earned: no further ascension needed'
+        line.text = if rec.route == 'swarmwarp' then 'every achievement of the swarmwarp route earned: no further ascension needed' else 'every ascension achievement earned: no further ascension needed'
+      # the swarmwarp route (NO-MIRRORS.md 12.6, 12.8)
+      when 'warpBuild'
+        line.text = 'keep swarmwarping, do not ascend yet: ' + label('premutagen') + ' ' + bignum(rec.test.premutagen) + '/' + bignum(rec.test.need) + ' (' + bignum(rec.test.ratio) + ' × your mutagen) to ascend' + collecting(rec)
+        line.href = href 'premutagen'
+      when 'warpFinal'
+        line.text = 'final run, do not ascend: expansions ' + bignum(rec.expansion) + '/' + bignum(rec.lastExpansion?.val ? 5000) + '; all spare energy into swarmwarp' + collecting(_.omit rec, 'nextExpansion')
+        line.href = upgradeHref 'expansion'
+        line.strong = true
+      # the near-complete guard: this run is finished as the mirrors route's long run
+      when 'routeGuard'
+        line.text = bignum(rec.expansions) + ' of ' + bignum(rec.goal) + ' expansions: finish this run with House of Mirrors, then the swarmwarp route resumes'
+        line.href = upgradeHref 'expansion'
+        line.strong = true
       else
         line.text = advisorAscension.render rec
+    # 13 G1: say plainly what an ascension out of a mirrors run with many expansions loses
+    if rec.restarts? and rec.type in ['spendForAscension', 'saveForAscension', 'ascendNow']
+      line.warning = restartsText rec
     return line
 
   # From `advisorAscension.current()` to the panel's ascension lines. Never throws.
@@ -488,7 +554,7 @@ angular.module('swarmApp').directive 'advisorPanel', ($rootScope, $log, advisor,
   </div>
   <div class="panel-body text-muted" ng-if="!collapsed() && !view">Working it out&hellip;</div>
   <div class="panel-body small advisor-header" ng-if="!collapsed() && view.header">
-    Run {{view.header.age}} &middot; climb if H &lt; {{view.header.horizon}} &middot;
+    Run {{view.header.age}}<span ng-if="view.header.wallAge" class="advisor-gametime" title="Run age on the game clock: swarmwarp's skipped time counts as time passed"> game time ({{view.header.wallAge}} real)</span> &middot; climb if H &lt; {{view.header.horizon}} &middot;
     <span class="text-nowrap">{{view.header.larvae}} larvae (+{{view.header.larvaRate}}/sec)</span>
     <span ng-if="view.longRun" class="text-nowrap advisor-longrun" ng-class="{'text-muted': !view.longRun.active}">&middot; {{view.longRun.text}}</span>
   </div>
@@ -541,7 +607,7 @@ angular.module('swarmApp').directive 'advisorPanel', ($rootScope, $log, advisor,
     <li class="list-group-item advisor-ascension" ng-repeat="line in asc.lines">
       <span class="glyphicon glyphicon-globe" aria-hidden="true"></span> <span ng-if="$first">Ascension:</span>
       <span ng-if="line.parts"><span ng-repeat="part in line.parts"><span ng-if="!$first">, then </span><a ng-if="part.href" ng-href="{{part.href}}"><strong>{{part.text}}</strong></a><strong ng-if="!part.href">{{part.text}}</strong></span><span class="text-muted">; {{line.after}}</span></span>
-      <span ng-if="!line.parts"><a ng-if="line.href" ng-href="{{line.href}}"><strong ng-if="line.strong">{{line.text}}</strong><span ng-if="!line.strong">{{line.text}}</span></a><span ng-if="!line.href"><strong ng-if="line.strong">{{line.text}}</strong><span ng-if="!line.strong">{{line.text}}</span></span></span><span ng-if="line.hint" class="advisor-hint"> &middot; <a ng-href="{{line.hint.href}}">{{line.hint.text}}</a></span>
+      <span ng-if="!line.parts"><a ng-if="line.href" ng-href="{{line.href}}"><strong ng-if="line.strong">{{line.text}}</strong><span ng-if="!line.strong">{{line.text}}</span></a><span ng-if="!line.href"><strong ng-if="line.strong">{{line.text}}</strong><span ng-if="!line.strong">{{line.text}}</span></span></span><span ng-if="line.hint" class="advisor-hint"> &middot; <a ng-href="{{line.hint.href}}">{{line.hint.text}}</a></span><span ng-if="line.warning" class="text-warning advisor-warning"> &middot; {{line.warning}}</span>
     </li>
   </ul>
 </div>
@@ -579,22 +645,27 @@ angular.module('swarmApp').directive 'advisorPanel', ($rootScope, $log, advisor,
         $log.warn 'advisor ascension', e
         acur = null
         scope.asc = {error: String(e?.message ? e), lines: []}
-      try
-        cur = advisor.current ADVISOR_REFRESH_MILLIS
-        if cur != lastAt or ascChanged or not scope.view?
-          lastAt = cur
-          scope.view = advisorView.panel cur, acur
-      catch e
-        $log.warn 'advisor panel', e
-        scope.view = {error: String(e?.message ? e)}
+      # Territory before the meat panel: on the swarmwarp route the energy line waits for its open purchases.
+      tcur = null
+      terrChanged = false
       try
         tcur = advisorTerritory.current ADVISOR_REFRESH_MILLIS
         if tcur != lastTerrAt or not scope.terr?
           lastTerrAt = tcur
+          terrChanged = true
           scope.terr = advisorView.territory tcur
       catch e
         $log.warn 'advisor territory', e
+        tcur = null
         scope.terr = {error: String(e?.message ? e), lines: []}
+      try
+        cur = advisor.current ADVISOR_REFRESH_MILLIS
+        if cur != lastAt or ascChanged or terrChanged or not scope.view?
+          lastAt = cur
+          scope.view = advisorView.panel cur, acur, tcur
+      catch e
+        $log.warn 'advisor panel', e
+        scope.view = {error: String(e?.message ? e)}
       return
     scope.refresh()
     scope.$on '$destroy', $rootScope.$on 'tick', scope.refresh
@@ -812,7 +883,7 @@ angular.module('swarmApp').directive 'advisorSuggest', ($rootScope, $log, $windo
  # @description
  # Climbing advisor settings on the options page.
 ###
-angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, advisorAscension, ADVISOR_SETTINGS) ->
+angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, advisorAscension, advisorTerritory, ADVISOR_SETTINGS) ->
   restrict: 'E'
   scope: {}
   template: """
@@ -828,6 +899,7 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
       <input type="text" inputmode="decimal" class="form-control input-sm advisor-setting" id="advisor-{{field.key}}" style="max-width:10em"
         ng-model="form.values[field.key]" ng-model-options="{updateOn: 'blur'}" ng-change="setValue(field.key)" ng-keydown="enterCommits($event)">
       <p class="help-block">{{field.help}} Default {{defaults[field.key]}}.</p>
+      <p class="help-block advisor-route-note" ng-if="swarmwarp() && field.route">{{field.route}}</p>
       <p class="help-block" ng-if="errors[field.key]">{{errors[field.key]}}</p>
       <p class="help-block" ng-if="!errors[field.key] && notes[field.key]">{{notes[field.key]}}</p>
     </div>
@@ -842,14 +914,17 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
       <label class="control-label">Long-run climb</label>
       <div class="radio"><label><input type="radio" name="advisor-longRun" value="off" ng-model="form.values.longRun" ng-change="setChoice('longRun')"> Off</label></div>
       <div class="radio"><label><input type="radio" name="advisor-longRun" value="on" ng-model="form.values.longRun" ng-change="setChoice('longRun')"> On</label></div>
+      <p class="help-block advisor-route-note" ng-if="swarmwarp()"><strong>On (swarmwarp route)</strong>: the swarmwarp route switches the long-run climb on whatever is picked here; your choice is kept for the House of Mirrors route (and for a run the advisor finishes with House of Mirrors).</p>
       <p class="help-block">For climbing all the way to endless on runs of many days (the achievements goal). It does nothing before a run is 2 days old. From then it feeds the tiers above your climb upward ("feed upward"), keeping 1% of the larvae for that, so climbing uses slightly fewer; it keeps those units from twin upgrades, and from day 3 it raises the lepidoptera target to 30,000. It trades meat income for progress up the chain, so leave it off for short runs. Stay a couple of minutes per visit: the next steps show once the last ones are bought. Default: off.</p>
       <p class="help-block" ng-if="errors.longRun">{{errors.longRun}}</p>
     </div>
     <div class="form-group" ng-class="{'has-error': !!errors.ascension}">
       <label class="control-label">Ascension advice</label>
       <div class="radio"><label><input type="radio" name="advisor-ascension" value="off" ng-model="form.values.ascension" ng-change="setChoice('ascension')"> Off</label></div>
-      <div class="radio"><label><input type="radio" name="advisor-ascension" value="achievements" ng-model="form.values.ascension" ng-change="setChoice('ascension')"> Achievements route</label></div>
-      <p class="help-block">The achievements route is a plan for earning every achievement: ascend once early for the lepidoptera mutation, then one long run to 5,000 expansions and the endless achievements, then quick runs up to 20 ascensions. The advisor says when to spend energy, when to save it and when to ascend, and what to buy with mutagen. It also sets the lepidoptera target for the kind of run it sees: 10,000 in a first run, 30,000 in a quick run and from day 3 of the long run (your setting, if higher). Default: achievements route.</p>
+      <div class="radio"><label><input type="radio" name="advisor-ascension" value="achievements" ng-model="form.values.ascension" ng-change="setChoice('ascension')"> Achievements: House of Mirrors route</label></div>
+      <div class="radio"><label><input type="radio" name="advisor-ascension" value="swarmwarp" ng-model="form.values.ascension" ng-change="setChoice('ascension')"> Achievements: swarmwarp route</label></div>
+      <p class="help-block">The achievements route is a plan for earning every achievement with House of Mirrors: ascend once early for the lepidoptera mutation, then one long run to 5,000 expansions and the endless achievements, then quick runs up to 20 ascensions. The advisor says when to spend energy, when to save it and when to ascend, and what to buy with mutagen. It also sets the lepidoptera target for the kind of run it sees: 10,000 in a first run, 30,000 in a quick run and from day 3 of the long run (your setting, if higher). Default: the House of Mirrors route.</p>
+      <p class="help-block">The swarmwarp route earns the same achievements without House of Mirrors: after nexus 5, 10,000 lepidoptera and 2,000 bats every run, then swarmwarp one cast at a time with the purchases each one releases in between; territory units all along; an ascension whenever this run's mutagen (inactive) reaches 1,000 times the mutagen you hold, until a final run from 1e270 mutagen to 5,000 expansions. It turns the long-run climb on. In the simulator it took about 141 days against 174 (advisor/NO-MIRRORS.md). You can switch at any time: the advisor works the route out from your game, and a run with House of Mirrors casts and 4,500 or more expansions is finished with House of Mirrors first.</p>
       <p class="help-block" ng-if="errors.ascension">{{errors.ascension}}</p>
     </div>
     <button type="button" class="btn btn-default btn-sm" ng-click="reset()">Reset advisor settings to defaults</button>
@@ -863,12 +938,19 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
       {key: 'share', label: 'Share per minute', help: "Fraction of the tier below that may be converted for each minute since you last hatched a unit (0.5 = half)."}
       {key: 'cooldown', label: 'Cooldown (seconds)', help: "After you hatch a unit, wait this many seconds before suggesting it again."}
       {key: 'bank', label: 'Banking threshold', help: "Stop hatching a unit, and save its larvae, once the tier above already makes this many times what larvae could."}
-      {key: 'territory', label: 'Territory share', help: "Fraction of larvae held back for territory units (0.10 = 10%). Set to 0 once House of Mirrors is casting."}
-      {key: 'moths', label: 'Lepidoptera target', help: "How many lepidoptera to buy with energy at nexus 5 before House of Mirrors. With the achievements route on, the advisor raises it for the kind of run (10,000 in a first run, 30,000 in a quick run and from day 3 of the long run). The console script used 4,000."}
+      {key: 'territory', label: 'Territory share', help: "Fraction of larvae held back for territory units (0.10 = 10%). Set to 0 once House of Mirrors is casting.", route: "Swarmwarp route: keep it at 0.1; territory units are never stopped (expansions come from them), and a share of 0 is advised back to 0.1."}
+      {key: 'moths', label: 'Lepidoptera target', help: "How many lepidoptera to buy with energy at nexus 5 before House of Mirrors. With the achievements route on, the advisor raises it for the kind of run (10,000 in a first run, 30,000 in a quick run and from day 3 of the long run). The console script used 4,000.", route: "Swarmwarp route: 10,000 in every run (this setting, if higher, stays), then 2,000 bats."}
     ]
     limits = ADVISOR_SETTINGS.limits
 
     scope.form = {enabled: options.advisorEnabled(), values: {}}
+    # the swarmwarp route overrides some settings while it is the route (never stored); the page says which
+    scope.swarmwarp = -> scope.form.values.ascension == 'swarmwarp'
+    # a changed setting changes every advisor line: work them all out afresh at once
+    invalidateAll = ->
+      advisor.invalidate()
+      advisorAscension.invalidate()
+      advisorTerritory.invalidate()
     scope.errors = {}
     scope.notes = {}
     syncAll = ->
@@ -884,8 +966,7 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
       delete scope.errors[key]
       try
         options.advisorSetting key, scope.form.values[key]
-        advisor.invalidate()
-        advisorAscension.invalidate()
+        invalidateAll()
       catch e
         $log.debug 'advisor setting rejected', key, e
         scope.errors[key] = 'Not a valid choice. Still using ' + options.advisorSetting(key) + '.'
@@ -914,7 +995,7 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
         $log.debug 'advisor setting rejected', key, text, e
         scope.errors[key] = "Enter a number from #{range}. Still using #{options.advisorSetting key}."
         return
-      advisor.invalidate()
+      invalidateAll()
       if stored != Number text
         scope.notes[key] = "Saved as #{stored} (allowed: #{range}#{if limit.integer then ', whole numbers' else ''})."
       scope.form.values[key] = String stored
@@ -928,6 +1009,5 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
 
     scope.reset = ->
       options.resetAdvisorConfig()
-      advisor.invalidate()
-      advisorAscension.invalidate()
+      invalidateAll()
       syncAll()

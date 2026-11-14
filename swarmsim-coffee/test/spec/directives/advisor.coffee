@@ -498,6 +498,112 @@ describe 'Directive: advisorPanel', ->
       el = render()
       expect(text el.querySelector '.advisor-ascension').toContain 'Ascension: ascension 1 of 20 costs'
 
+  # The swarmwarp route (advisor/NO-MIRRORS.md 12.2-12.8, 13), and the game clock.
+  describe 'the swarmwarp route', ->
+    D = (x) -> new Decimal x
+    advisorAscension = null
+    beforeEach inject (_advisorAscension_) ->
+      advisorAscension = _advisorAscension_
+      options.advisorSetting 'ascension', 'swarmwarp'
+    warp = -> {type: 'warp', spell: 'swarmwarp', label: 'swarmwarp', cost: D(2000), casts: D(1), affordable: D(5), skip: 2405156}
+    nothingOpen = (over={}) -> fakeAdvice _.extend {tiers: [], tips: [], energy: warp()}, over
+    quiet = -> {stage: 'build', records: [], plan: null, hold: null, mutagen: null}
+    terrOf = (records=[], hatch=[]) -> {records: records, hatch: hatch, share: 0.1, twin: null, status: null, setting: null}
+
+    it 'offers one swarmwarp, with how many are affordable and what it skips, once nothing else is open', ->
+      spyOn(advisor, 'update').and.returnValue nothingOpen()
+      spyOn(advisorAscension, 'update').and.returnValue quiet()
+      spyOn(advisorTerritory, 'update').and.returnValue terrOf()
+      el = render()
+      expect(text el.querySelector '.advisor-energy').toBe 'Energy: cast 1 swarmwarp (5 affordable): skips 27.8 d; then follow the lines above and below: the next swarmwarp is suggested after them'
+
+    it 'holds the next swarmwarp while the climb, the tips or territory have purchases open', ->
+      spyOn(advisor, 'update').and.returnValue fakeAdvice {energy: warp()}
+      spyOn(advisorAscension, 'update').and.returnValue quiet()
+      # 0.1 x 5 larvae/s x 60 s = 30 larvae: a hatch of 315,778 holds it
+      spyOn(advisorTerritory, 'update').and.returnValue fakeTerritory {share: 0.1}
+      el = render()
+      expect(text el.querySelector '.advisor-energy').toBe 'Energy: next: cast 1 swarmwarp (5 affordable): skips 27.8 d, once the purchases above and below are made (1 climb row, 2 upgrade tips, 1 territory line)'
+      # bought: the line offers the warp at once
+      advisor.update.and.returnValue nothingOpen()
+      advisorTerritory.update.and.returnValue terrOf()
+      advisor.invalidate()
+      advisorTerritory.invalidate()
+      $rootScope.$emit 'tick'
+      $rootScope.$digest()
+      expect(text el.querySelector '.advisor-energy').toMatch /^Energy: cast 1 swarmwarp \(5 affordable\)/
+
+    it 'shows the advice after a swarmwarp at once, not a stale cooldown', ->
+      cool = fakeAdvice {tiers: [_.extend(fakeAdvice().tiers[1], {kind: 'wait', reason: 'cooldown', waitSeconds: 59})], tips: [], energy: warp()}
+      spyOn(advisor, 'update').and.returnValue cool
+      spyOn(advisorAscension, 'update').and.returnValue quiet()
+      spyOn(advisorTerritory, 'update').and.returnValue terrOf()
+      el = render()
+      expect(text el.querySelector 'tbody').toContain 'done, next in 59 s'
+      # the warp: the clock moves on by its skip; within the same second the tick shows the released purchase
+      advisor.update.and.returnValue fakeAdvice {energy: warp()}
+      game.session.state.skippedMillis += 2405156408
+      $rootScope.$emit 'tick'
+      $rootScope.$digest()
+      expect(text el.querySelector 'tbody').not.toContain 'done, next in'
+      expect(text el.querySelector '.advisor-energy').toMatch /^Energy: next: cast 1 swarmwarp/
+
+    it 'says bats come before the first swarmwarp', ->
+      spyOn(advisor, 'update').and.returnValue fakeAdvice {energy: {type: 'buyBats', count: D(500), bats: D(1500), target: 2000, price: D(100)}}
+      spyOn(advisorAscension, 'update').and.returnValue quiet()
+      el = render()
+      expect(text el.querySelector '.advisor-energy').toBe 'Energy: buy 500 bats (' + bignum(D 1500) + '/' + bignum(D 2000) + ', before the first swarmwarp: they raise its power)'
+
+    it 'names the swarmwarp route on the long-run line, and the game time in the header', ->
+      spyOn(advisor, 'update').and.returnValue fakeAdvice {age: 30 * 86400, wallAge: 2 * 86400, route: {route: 'swarmwarp'}, longRun: {active: true, startsIn: 0, above: []}}
+      spyOn(advisorAscension, 'update').and.returnValue quiet()
+      el = render()
+      header = text el.querySelector '.advisor-header'
+      expect(header).toContain 'Run 30.0 d game time (2.0 d real)'
+      expect(header).toContain 'long-run climb (swarmwarp route): 1% of larvae kept for feeding upward'
+      # no warp this run: no game time
+      advisor.update.and.returnValue fakeAdvice {age: 3600, wallAge: 3600}
+      advisor.invalidate()
+      $rootScope.$emit 'tick'
+      $rootScope.$digest()
+      expect(text el.querySelector '.advisor-header').not.toContain 'game time'
+
+    it 'renders the route\'s ascension lines: build, final, the guard, the respec and the shares', ->
+      spyOn(advisor, 'update').and.returnValue fakeAdvice {energy: null}
+      test = {passes: false, premutagen: D(3.57e20), held: D(2.16e32), ratio: 1000, need: D(2.16e35)}
+      build = {type: 'warpBuild', test: test, expansion: 357, nextExpansion: {val: D(500)}, lastExpansion: {val: D(5000)}, top: 'pantheon2', endlessBought: D(0), nextEndless: {val: D(1)}, unlocks: 8, nextMutation: {val: D(10)}}
+      mut = {type: 'mutagen', route: 'swarmwarp', mutagen: D(6.43e7), keep: D(5.79e7), respec: true, steps: [
+        {type: 'respec', free: 4, refund: D(1015625)}
+        {type: 'unlock', name: 'mutateswarmwarp', label: 'mutate swarmwarp', unit: 'mutantswarmwarp', price: D(15625)}
+        {type: 'mutants', unit: 'mutantswarmwarp', count: D(6430077), have: D(1), target: D(6430078.9), kind: 'share', share: 0.1, price: D(6430077)}
+      ]}
+      spyOn(advisorAscension, 'update').and.returnValue {stage: 'build', records: [mut, build], plan: null, hold: null, mutagen: mut}
+      el = render()
+      lines = (text l for l in el.querySelectorAll '.advisor-ascension')
+      expect(lines[0]).toMatch /^Ascension: respec \(free, 4 left\): the swarmwarp route needs the warp mutation, which you cannot afford as your next unlock, then unlock mutate swarmwarp \(/
+      expect(lines[0]).toContain '(to 10% of your mutagen: '
+      expect(lines[1]).toMatch /^keep swarmwarping, do not ascend yet: /
+      expect(lines[1]).toContain '; expansions 357/500; endless bought 0/1 (top tier: '
+      expect(lines[1]).toContain '; unlocks 8/10'
+      final = _.extend {}, build, type: 'warpFinal', expansion: 1584
+      guard = {type: 'routeGuard', expansions: 4695, goal: 5000, threshold: 4500}
+      advisorAscension.update.and.returnValue {stage: 'final', records: [final, guard], plan: null, hold: null, mutagen: null}
+      advisorAscension.invalidate()
+      $rootScope.$emit 'tick'
+      $rootScope.$digest()
+      lines = (text l for l in el.querySelectorAll '.advisor-ascension')
+      expect(lines[0]).toContain 'Ascension: final run, do not ascend: expansions ' + bignum(D 1584) + '/' + bignum(D 5000) + '; all spare energy into swarmwarp'
+      expect(lines[1]).toBe bignum(D 4695) + ' of ' + bignum(D 5000) + ' expansions: finish this run with House of Mirrors, then the swarmwarp route resumes'
+
+    it 'says plainly what an ascension out of a House of Mirrors run restarts (13 G1)', ->
+      spyOn(advisor, 'update').and.returnValue fakeAdvice {energy: null}
+      plan = {type: 'ascendNow', stage: 'build', route: 'swarmwarp', cost: D(6e6), energy: D(6e6), premutagen: D(2e25), mutagen: D(6.4e7), ascension: 2, of: 20, restarts: {expansions: 3118, mirrorCasts: 1879}}
+      spyOn(advisorAscension, 'update').and.returnValue {stage: 'build', records: [plan], plan: plan, hold: plan, mutagen: null}
+      el = render()
+      line = el.querySelector '.advisor-ascension'
+      expect(text line).toContain 'ascend now ('
+      expect(text line.querySelector '.advisor-warning').toBe '· this run has ' + bignum(D 3118) + ' expansions from House of Mirrors: ascending restarts them. The swarmwarp route still expects ascending to be faster.'
+
 describe 'Directive: advisorSuggest', ->
   beforeEach module 'swarmApp', 'mockFlashStorage'
 
@@ -1033,7 +1139,8 @@ describe 'Directive: advisorOptions', ->
     spyOn(advisorAscension, 'invalidate').and.callThrough()
     el = render()
     radios = el.querySelectorAll 'input[name=advisor-ascension]'
-    expect(radios.length).toBe 2
+    # off, the House of Mirrors route, the swarmwarp route (NO-MIRRORS.md section 12; was 2 before the swarmwarp route)
+    expect(radios.length).toBe 3
     expect(radios[1].checked).toBe true
     expect(text el).toContain 'The achievements route is a plan for earning every achievement'
     expect(text el).toContain '10,000 in a first run, 30,000 in a quick run and from day 3 of the long run'
@@ -1064,6 +1171,24 @@ describe 'Directive: advisorOptions', ->
     $rootScope.$digest()
     expect(options.advisorSetting).toHaveBeenCalledWith 'longRun', 'on'
     expect(options.session.state.options.advisor.longRun).toBe 'on'
+
+  it 'offers the swarmwarp route, and says which settings it overrides without storing them', inject (advisor, advisorAscension, advisorTerritory) ->
+    spyOn(svc, 'invalidate').and.callThrough() for svc in [advisor, advisorAscension, advisorTerritory]
+    el = render()
+    expect(text el).not.toContain 'On (swarmwarp route)'
+    radios = el.querySelectorAll 'input[name=advisor-ascension]'
+    expect(text radios[2].parentNode).toBe 'Achievements: swarmwarp route'
+    radios[2].checked = true
+    angular.element(radios[2]).triggerHandler 'click'
+    $rootScope.$digest()
+    expect(options.advisorConfig().ascension).toBe 'swarmwarp'
+    expect(svc.invalidate).toHaveBeenCalled() for svc in [advisor, advisorAscension, advisorTerritory]
+    expect(text el).toContain 'On (swarmwarp route): the swarmwarp route switches the long-run climb on whatever is picked here'
+    expect(text el).toContain 'Swarmwarp route: 10,000 in every run (this setting, if higher, stays), then 2,000 bats.'
+    expect(text el).toContain 'Swarmwarp route: keep it at 0.1; territory units are never stopped'
+    # the stored long-run setting is untouched
+    expect(options.advisorConfig().longRun).toBe 'off'
+    expect(el.querySelectorAll('input[name=advisor-longRun]')[0].checked).toBe true
 
   it 'turns the advisor on and off', ->
     el = render()
