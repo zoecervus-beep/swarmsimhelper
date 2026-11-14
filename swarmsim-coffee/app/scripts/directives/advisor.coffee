@@ -894,38 +894,43 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
   </label>
   <p>Shows a panel beside your unit list saying which meat units to hatch and how many, which upgrades are worth buying, and what to do with energy, plus a "use suggested" button by the hatch box. It only advises: nothing is bought unless you press the game's own buttons.</p>
   <div ng-if="form.enabled" class="well well-sm">
+    <div class="form-group advisor-route" ng-class="{'has-error': !!errors.ascension}">
+      <label class="control-label">Route</label>
+      <div class="radio"><label><input type="radio" name="advisor-ascension" value="off" ng-model="form.values.ascension" ng-change="setChoice('ascension')"> No ascension advice</label></div>
+      <div class="radio"><label><input type="radio" name="advisor-ascension" value="achievements" ng-model="form.values.ascension" ng-change="setChoice('ascension')"> House of Mirrors route</label></div>
+      <div class="radio"><label><input type="radio" name="advisor-ascension" value="swarmwarp" ng-model="form.values.ascension" ng-change="setChoice('ascension')"> Swarmwarp route</label></div>
+      <p class="help-block advisor-help-route">{{routeHelp()}}</p>
+      <p class="help-block advisor-help-switch" ng-if="route() != 'off'">You can switch routes at any time: the advisor works out where you are from your game. A run with House of Mirrors casts and 4,500 or more expansions is finished with House of Mirrors before the swarmwarp route takes over, and an ascension that would restart 1,000 or more expansions from House of Mirrors says so.</p>
+      <p class="help-block" ng-if="errors.ascension">{{errors.ascension}}</p>
+    </div>
     <div class="form-group" ng-repeat="field in fields" ng-class="{'has-error': !!errors[field.key], 'has-warning': !errors[field.key] && !!notes[field.key]}">
       <label class="control-label" for="advisor-{{field.key}}">{{field.label}}</label>
       <input type="text" inputmode="decimal" class="form-control input-sm advisor-setting" id="advisor-{{field.key}}" style="max-width:10em"
         ng-model="form.values[field.key]" ng-model-options="{updateOn: 'blur'}" ng-change="setValue(field.key)" ng-keydown="enterCommits($event)">
-      <p class="help-block">{{field.help}} Default {{defaults[field.key]}}.</p>
-      <p class="help-block advisor-route-note" ng-if="swarmwarp() && field.route">{{field.route}}</p>
+      <p class="help-block advisor-help-{{field.key}}">{{help(field.key)}} Default {{defaults[field.key]}}.</p>
       <p class="help-block" ng-if="errors[field.key]">{{errors[field.key]}}</p>
       <p class="help-block" ng-if="!errors[field.key] && notes[field.key]">{{notes[field.key]}}</p>
     </div>
     <div class="form-group" ng-class="{'has-error': !!errors.spareEnergy}">
-      <label class="control-label">Spare energy before House of Mirrors</label>
+      <label class="control-label">Spare energy before nexus 5</label>
       <div class="radio"><label><input type="radio" name="advisor-spareEnergy" value="save" ng-model="form.values.spareEnergy" ng-change="setChoice('spareEnergy')"> Plan it for the next nexus</label></div>
       <div class="radio"><label><input type="radio" name="advisor-spareEnergy" value="larvarush" ng-model="form.values.spareEnergy" ng-change="setChoice('spareEnergy')"> Cast larva rush (as the console script did)</label></div>
-      <p class="help-block">Planning holds energy for the next nexus and keeps its larvae out of the climb; at nexus 4 it buys 1,000 lepidoptera first, then keeps only the energy nexus 5 will need by the time its larvae are there and puts the rest into lepidoptera. In the simulator that reached nexus 5 and the next ascension 5 to 10 hours sooner than larva rush. Default: plan it.</p>
+      <p class="help-block advisor-help-spareEnergy">Planning holds energy for the next nexus and keeps its larvae out of the climb; at nexus 4 it buys 1,000 lepidoptera first, then keeps only the energy nexus 5 will need by the time its larvae are there and puts the rest into lepidoptera. Larva rush casts spare energy instead. Default: plan it.</p>
       <p class="help-block" ng-if="errors.spareEnergy">{{errors.spareEnergy}}</p>
     </div>
     <div class="form-group" ng-class="{'has-error': !!errors.longRun}">
       <label class="control-label">Long-run climb</label>
-      <div class="radio"><label><input type="radio" name="advisor-longRun" value="off" ng-model="form.values.longRun" ng-change="setChoice('longRun')"> Off</label></div>
-      <div class="radio"><label><input type="radio" name="advisor-longRun" value="on" ng-model="form.values.longRun" ng-change="setChoice('longRun')"> On</label></div>
-      <p class="help-block advisor-route-note" ng-if="swarmwarp()"><strong>On (swarmwarp route)</strong>: the swarmwarp route switches the long-run climb on whatever is picked here; your choice is kept for the House of Mirrors route (and for a run the advisor finishes with House of Mirrors).</p>
-      <p class="help-block">For climbing all the way to endless on runs of many days (the achievements goal). It does nothing before a run is 2 days old. From then it feeds the tiers above your climb upward ("feed upward"), keeping 1% of the larvae for that, so climbing uses slightly fewer; it keeps those units from twin upgrades, and from day 3 it raises the lepidoptera target to 30,000. It trades meat income for progress up the chain, so leave it off for short runs. Stay a couple of minutes per visit: the next steps show once the last ones are bought. Default: off.</p>
+      <div ng-if="route() != 'swarmwarp'">
+        <div class="radio"><label><input type="radio" name="advisor-longRun" value="off" ng-model="form.values.longRun" ng-change="setChoice('longRun')"> Off</label></div>
+        <div class="radio"><label><input type="radio" name="advisor-longRun" value="on" ng-model="form.values.longRun" ng-change="setChoice('longRun')"> On</label></div>
+      </div>
+      <div ng-if="route() == 'swarmwarp'" class="advisor-longrun-forced">
+        <div class="radio disabled"><label><input type="radio" name="advisor-longRun-forced" disabled> Off</label></div>
+        <div class="radio disabled"><label><input type="radio" name="advisor-longRun-forced" checked disabled> On</label></div>
+        <p class="help-block">Always on with the swarmwarp route; your choice here is kept for the House of Mirrors route.</p>
+      </div>
+      <p class="help-block advisor-help-longRun">{{longRunHelp()}}</p>
       <p class="help-block" ng-if="errors.longRun">{{errors.longRun}}</p>
-    </div>
-    <div class="form-group" ng-class="{'has-error': !!errors.ascension}">
-      <label class="control-label">Ascension advice</label>
-      <div class="radio"><label><input type="radio" name="advisor-ascension" value="off" ng-model="form.values.ascension" ng-change="setChoice('ascension')"> Off</label></div>
-      <div class="radio"><label><input type="radio" name="advisor-ascension" value="achievements" ng-model="form.values.ascension" ng-change="setChoice('ascension')"> Achievements: House of Mirrors route</label></div>
-      <div class="radio"><label><input type="radio" name="advisor-ascension" value="swarmwarp" ng-model="form.values.ascension" ng-change="setChoice('ascension')"> Achievements: swarmwarp route</label></div>
-      <p class="help-block">The achievements route is a plan for earning every achievement with House of Mirrors: ascend once early for the lepidoptera mutation, then one long run to 5,000 expansions and the endless achievements, then quick runs up to 20 ascensions. The advisor says when to spend energy, when to save it and when to ascend, and what to buy with mutagen. It also sets the lepidoptera target for the kind of run it sees: 10,000 in a first run, 30,000 in a quick run and from day 3 of the long run (your setting, if higher). Default: the House of Mirrors route.</p>
-      <p class="help-block">The swarmwarp route earns the same achievements without House of Mirrors: after nexus 5, 10,000 lepidoptera and 2,000 bats every run, then swarmwarp one cast at a time with the purchases each one releases in between; territory units all along; an ascension whenever this run's mutagen (inactive) reaches 1,000 times the mutagen you hold, until a final run from 1e270 mutagen to 5,000 expansions. It turns the long-run climb on. In the simulator it took about 141 days against 174 (advisor/NO-MIRRORS.md). You can switch at any time: the advisor works the route out from your game, and a run with House of Mirrors casts and 4,500 or more expansions is finished with House of Mirrors first.</p>
-      <p class="help-block" ng-if="errors.ascension">{{errors.ascension}}</p>
     </div>
     <button type="button" class="btn btn-default btn-sm" ng-click="reset()">Reset advisor settings to defaults</button>
   </div>
@@ -934,18 +939,59 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
   link: (scope, element, attrs) ->
     scope.defaults = ADVISOR_SETTINGS.defaults
     scope.fields = [
-      {key: 'ageMultiple', label: 'Climb multiple', help: "Start hatching a tier once its break-even time (H) is under this many times the age of your run. 3 suits runs of a day or so; 5 suits runs lasting several days (two days or more)."}
-      {key: 'share', label: 'Share per minute', help: "Fraction of the tier below that may be converted for each minute since you last hatched a unit (0.5 = half)."}
-      {key: 'cooldown', label: 'Cooldown (seconds)', help: "After you hatch a unit, wait this many seconds before suggesting it again."}
-      {key: 'bank', label: 'Banking threshold', help: "Stop hatching a unit, and save its larvae, once the tier above already makes this many times what larvae could."}
-      {key: 'territory', label: 'Territory share', help: "Fraction of larvae held back for territory units (0.10 = 10%). Set to 0 once House of Mirrors is casting.", route: "Swarmwarp route: keep it at 0.1; territory units are never stopped (expansions come from them), and a share of 0 is advised back to 0.1."}
-      {key: 'moths', label: 'Lepidoptera target', help: "How many lepidoptera to buy with energy at nexus 5 before House of Mirrors. With the achievements route on, the advisor raises it for the kind of run (10,000 in a first run, 30,000 in a quick run and from day 3 of the long run). The console script used 4,000.", route: "Swarmwarp route: 10,000 in every run (this setting, if higher, stays), then 2,000 bats."}
+      {key: 'ageMultiple', label: 'Climb multiple'}
+      {key: 'share', label: 'Share per minute'}
+      {key: 'cooldown', label: 'Cooldown (seconds)'}
+      {key: 'bank', label: 'Banking threshold'}
+      {key: 'territory', label: 'Territory share'}
+      {key: 'moths', label: 'Lepidoptera target'}
     ]
+    # Every help text says what is true for the route picked (the `ascension` setting), live as it changes.
+    scope.route = ->
+      switch scope.form.values.ascension
+        when 'swarmwarp' then 'swarmwarp'
+        when 'off' then 'off'
+        else 'mirrors'
+    ROUTE_HELP =
+      off: "No ascension advice: the advisor climbs and spends energy within the run (House of Mirrors from nexus 5), and never says when to ascend or what to buy with mutagen."
+      mirrors: "Every achievement with House of Mirrors: one early ascension for the lepidoptera mutation, one long run to 5,000 expansions and the endless achievements, then quick runs up to 20 ascensions. The advisor says when to spend energy, save it and ascend, and what to buy with mutagen. This is the default."
+      swarmwarp: "Every achievement without House of Mirrors: after nexus 5, lepidoptera and 2,000 bats, then swarmwarp one cast at a time with the purchases each cast releases in between; an ascension whenever this run's mutagen (inactive) reaches 1,000 times the mutagen you hold, until a final run from 1e270 mutagen to 5,000 expansions. In the simulator it reached every achievement in about 141 days, against 174 for the House of Mirrors route (simulator figures, not measured in play)."
+    scope.routeHelp = -> ROUTE_HELP[scope.route()]
+    fmt = advisor.formatNumber
+    setting = (key) ->
+      v = Number scope.form.values[key]
+      if _.isFinite(v) then v else Number(options.advisorSetting key)
+    scope.help = (key) ->
+      route = scope.route()
+      switch key
+        when 'ageMultiple'
+          "Hatch a tier once its break-even time (H) is under this many times the run's age, in game time (real time plus what swarmwarp skipped). " +
+            (if route == 'swarmwarp' then "This route was simulated with 5; each swarmwarp adds its skip to the age, so the limit jumps with every cast." else "3 suits runs of a day or so; 5 suits runs lasting several days.")
+        when 'share' then "Share of the tier below offered for each minute of game time since you last hatched a unit (0.5 = half). Any swarmwarp releases all of it."
+        when 'cooldown' then "After you hatch a unit, wait this many seconds of game time before suggesting it again. Any swarmwarp ends the wait."
+        when 'bank' then "Stop hatching a unit, and save its larvae, once the tier above already makes this many times what larvae could."
+        when 'territory'
+          switch route
+            when 'swarmwarp' then "Share of larvae kept for territory units. Keep it at 0.1: territory units are never stopped on this route (expansions come from them), and the advisor asks for 0.1 back if it is 0."
+            when 'mirrors' then "Share of larvae kept for territory units. Set to 0 once House of Mirrors is casting (the advisor tells you when)."
+            else "Share of larvae kept for territory units (0.1 = 10%)."
+        when 'moths'
+          v = setting 'moths'
+          switch route
+            when 'swarmwarp' then "Lepidoptera bought with energy after nexus 5. With this setting the swarmwarp route buys " + fmt(Math.max v, 10000) + " in every run (this setting when higher), then 2,000 bats, then swarmwarp."
+            when 'mirrors'
+              if v < 10000
+                "Lepidoptera bought with energy, before House of Mirrors from nexus 5. With this setting the route buys 10,000 in a first run, 30,000 in a quick run and from day 3 of the long run, and " + fmt(v) + " in the long run before that (this setting when higher)."
+              else
+                "Lepidoptera bought with energy, before House of Mirrors from nexus 5. With this setting the route buys " + fmt(v) + " in a first run and early in the long run, and " + fmt(Math.max v, 30000) + " in a quick run and from day 3 of the long run."
+            else "Lepidoptera bought with energy, before House of Mirrors from nexus 5: " + fmt(v) + "."
+    scope.longRunHelp = ->
+      if scope.route() == 'swarmwarp'
+        return "From a run age of 2 days of game time it feeds the tiers above your climb upward (\"feed upward\"), keeping 1% of the larvae for that, and keeps those units from twin upgrades. Stay a couple of minutes per visit: the next steps show once the last ones are bought."
+      "For climbing to endless on runs of many days. It does nothing before a run is 2 days old in game time. From then it feeds the tiers above your climb upward (\"feed upward\"), keeping 1% of the larvae for that, keeps those units from twin upgrades, and from day 3 raises the lepidoptera target to 30,000. It trades meat income for progress up the chain, so leave it off for short runs. Default: off."
     limits = ADVISOR_SETTINGS.limits
 
     scope.form = {enabled: options.advisorEnabled(), values: {}}
-    # the swarmwarp route overrides some settings while it is the route (never stored); the page says which
-    scope.swarmwarp = -> scope.form.values.ascension == 'swarmwarp'
     # a changed setting changes every advisor line: work them all out afresh at once
     invalidateAll = ->
       advisor.invalidate()

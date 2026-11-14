@@ -1142,7 +1142,8 @@ describe 'Directive: advisorOptions', ->
     # off, the House of Mirrors route, the swarmwarp route (NO-MIRRORS.md section 12; was 2 before the swarmwarp route)
     expect(radios.length).toBe 3
     expect(radios[1].checked).toBe true
-    expect(text el).toContain 'The achievements route is a plan for earning every achievement'
+    # (was 'The achievements route is a plan for earning every achievement': both routes earn every achievement)
+    expect(text el).toContain 'Every achievement with House of Mirrors'
     expect(text el).toContain '10,000 in a first run, 30,000 in a quick run and from day 3 of the long run'
     expect(el.querySelector('.advisor-options').innerHTML).not.toContain 'http'
     radios[0].checked = true
@@ -1172,23 +1173,77 @@ describe 'Directive: advisorOptions', ->
     expect(options.advisorSetting).toHaveBeenCalledWith 'longRun', 'on'
     expect(options.session.state.options.advisor.longRun).toBe 'on'
 
-  it 'offers the swarmwarp route, and says which settings it overrides without storing them', inject (advisor, advisorAscension, advisorTerritory) ->
+  # The help texts say what is true for the route picked, and change with it without a reload.
+  helpOf = (el, key) -> text el.querySelector '.advisor-help-' + key
+  pick = (el, value) ->
+    radio = el.querySelector 'input[name=advisor-ascension][value=' + value + ']'
+    radio.checked = true
+    angular.element(radio).triggerHandler 'click'
+    $rootScope.$digest()
+
+  it 'puts the route first, with only the picked route described', ->
+    el = render()
+    groups = el.querySelectorAll '.advisor-options .well > .form-group'
+    expect(text groups[0].querySelector 'label.control-label').toBe 'Route'
+    labels = (text r.parentNode for r in el.querySelectorAll 'input[name=advisor-ascension]')
+    expect(labels).toEqual ['No ascension advice', 'House of Mirrors route', 'Swarmwarp route']
+    expect(helpOf el, 'route').toMatch /^Every achievement with House of Mirrors/
+    expect(text el).not.toContain 'Every achievement without House of Mirrors'
+    expect(text el).not.toContain 'achievements route'
+    expect(text el.querySelector '.advisor-help-switch').toContain 'You can switch routes at any time'
+    pick el, 'swarmwarp'
+    expect(helpOf el, 'route').toMatch /^Every achievement without House of Mirrors/
+    expect(helpOf el, 'route').toContain 'about 141 days, against 174 for the House of Mirrors route (simulator figures'
+    expect(text el).not.toContain 'Every achievement with House of Mirrors'
+    pick el, 'off'
+    expect(helpOf el, 'route').toMatch /^No ascension advice/
+    expect(el.querySelector '.advisor-help-switch').toBe null
+
+  it 'shows each setting\'s help for the picked route, switching live', inject (advisor, advisorAscension, advisorTerritory) ->
     spyOn(svc, 'invalidate').and.callThrough() for svc in [advisor, advisorAscension, advisorTerritory]
     el = render()
-    expect(text el).not.toContain 'On (swarmwarp route)'
-    radios = el.querySelectorAll 'input[name=advisor-ascension]'
-    expect(text radios[2].parentNode).toBe 'Achievements: swarmwarp route'
-    radios[2].checked = true
-    angular.element(radios[2]).triggerHandler 'click'
-    $rootScope.$digest()
+    routeText = (el) -> (helpOf(el, k) for k in ['territory', 'moths', 'longRun']).join ' | '
+    # the House of Mirrors route (default)
+    expect(routeText el).not.toMatch /swarmwarp/i
+    expect(helpOf el, 'territory').toContain 'Set to 0 once House of Mirrors is casting (the advisor tells you when)'
+    expect(helpOf el, 'moths').toContain '10,000 in a first run, 30,000 in a quick run and from day 3 of the long run, and 4,000 in the long run before that'
+    expect(helpOf el, 'longRun').toContain 'from day 3 raises the lepidoptera target to 30,000'
+    expect(helpOf el, 'longRun').toContain '2 days old in game time'
+    expect(helpOf el, 'ageMultiple').toContain '3 suits runs of a day or so'
+    expect(el.querySelectorAll('input[name=advisor-longRun]').length).toBe 2
+    # the swarmwarp route
+    pick el, 'swarmwarp'
     expect(options.advisorConfig().ascension).toBe 'swarmwarp'
     expect(svc.invalidate).toHaveBeenCalled() for svc in [advisor, advisorAscension, advisorTerritory]
-    expect(text el).toContain 'On (swarmwarp route): the swarmwarp route switches the long-run climb on whatever is picked here'
-    expect(text el).toContain 'Swarmwarp route: 10,000 in every run (this setting, if higher, stays), then 2,000 bats.'
-    expect(text el).toContain 'Swarmwarp route: keep it at 0.1; territory units are never stopped'
-    # the stored long-run setting is untouched
+    expect(routeText el).not.toContain 'House of Mirrors'
+    expect(helpOf el, 'territory').toContain 'Keep it at 0.1: territory units are never stopped on this route'
+    expect(helpOf el, 'moths').toBe 'Lepidoptera bought with energy after nexus 5. With this setting the swarmwarp route buys 10,000 in every run (this setting when higher), then 2,000 bats, then swarmwarp. Default 4000.'
+    expect(helpOf el, 'longRun').toContain '2 days of game time'
+    expect(helpOf el, 'longRun').not.toContain 'day 3'
+    expect(helpOf el, 'ageMultiple').toContain 'This route was simulated with 5'
+    # the long-run control: shown on and disabled; the one sentence naming the other route; the stored value untouched
+    forced = el.querySelector '.advisor-longrun-forced'
+    expect(text forced).toBe 'Off On Always on with the swarmwarp route; your choice here is kept for the House of Mirrors route.'
+    expect((r.disabled for r in forced.querySelectorAll 'input')).toEqual [true, true]
+    expect(forced.querySelectorAll('input')[1].checked).toBe true
+    expect(el.querySelectorAll('input[name=advisor-longRun]').length).toBe 0
     expect(options.advisorConfig().longRun).toBe 'off'
-    expect(el.querySelectorAll('input[name=advisor-longRun]')[0].checked).toBe true
+    # a higher setting shows in the text
+    options.advisorSetting 'moths', 20000
+    type el, 'moths', '20000'
+    expect(helpOf el, 'moths').toContain 'buys 20,000 in every run'
+    # no ascension advice
+    pick el, 'off'
+    expect(routeText el).not.toMatch /swarmwarp/i
+    expect(helpOf el, 'territory').toBe 'Share of larvae kept for territory units (0.1 = 10%). Default 0.1.'
+    expect(helpOf el, 'moths').toBe 'Lepidoptera bought with energy, before House of Mirrors from nexus 5: 20,000. Default 4000.'
+    # every route: the timers are game time, and the spare-energy choice is route-neutral
+    for r in ['off', 'achievements', 'swarmwarp']
+      pick el, r
+      expect(helpOf el, 'cooldown').toContain 'seconds of game time'
+      expect(helpOf el, 'share').toContain 'Any swarmwarp releases all of it'
+      expect(helpOf el, 'spareEnergy').not.toMatch /House of Mirrors|swarmwarp/
+      expect(text el).toContain 'Spare energy before nexus 5'
 
   it 'turns the advisor on and off', ->
     el = render()

@@ -27,7 +27,7 @@ The climbing advisor is a panel in this fork of Swarm Simulator. It suggests wha
     Every other larva goes to the climb as usual.
   - At nexus 4, the first 1,000 lepidoptera come first ("the first 1,000, before nexus 5").
   - Then it keeps only the energy nexus 5 will need by the time its larvae are there: its price less what your energy income brings while the larvae come in. The rest goes into lepidoptera. While nexus 5's meat is missing, the whole price is kept. The line says how much is kept and when the larvae will be there.
-  - After nexus 5, lepidoptera up to the target, then House of Mirrors. With the achievements route on, the target depends on the kind of run (see Ascension below).
+  - After nexus 5, lepidoptera up to the target, then House of Mirrors. On the House of Mirrors route the target depends on the kind of run (see Ascension below).
   - On the swarmwarp route (see "The swarmwarp route" below), after nexus 5: 10,000 lepidoptera, then 2,000 bats ("buy 500 bats (1,500/2,000, before the first swarmwarp: they raise its power)"), then swarmwarp, one cast at a time.
   - With "cast larva rush" in the settings, it works as the console script did: spare energy below nexus 5 goes to larva rush, and lepidoptera are bought up to the target at nexus 4.
 - **Territory**: which territory units to hatch and how many, territory twins to buy or save for, and hatchery, expansion and accomplished ancestry levels to buy. Once House of Mirrors is running, it says to stop hatching territory units and to set the territory share to 0. On the swarmwarp route it never says that, even in a run where House of Mirrors was cast before you switched; with a share of 0 it says to set it back to 0.1.
@@ -40,7 +40,7 @@ The climbing advisor is a panel in this fork of Swarm Simulator. It suggests wha
   - From day 3 the lepidoptera target is 30,000 if your setting is lower; the energy line says so. This day 3 is on the real clock. On the swarmwarp route there is no such raise: its target is 10,000.
   - Tiers above the table up to endless are summed up in one row while there is nothing to feed there.
   - Stay a couple of minutes per visit: the next steps show once the last ones are bought.
-- **Ascension** (only with "Ascension advice" on one of the two routes). On the House of Mirrors route, one or two lines for the plan in [ASCENSION.md](ASCENSION.md), part A. The advisor works out where you are from your game, you never tell it:
+- **Ascension** (only with Route set to one of the two routes). On the House of Mirrors route, one or two lines for the plan in [ASCENSION.md](ASCENSION.md), part A. The advisor works out where you are from your game, you never tell it:
   - **First run** (you have never ascended): the ascension cost against your energy cap, and how much spent energy halves it (50,000 without the lepidoptera mutation, up to 80,000 with it; read from the game's own cost). From nexus 5 it says how much more to spend on lepidoptera and House of Mirrors (lepidoptera count as spent energy too). Once the cost is at or under the lower of your energy cap and that halving amount divided by ln 2 (72,134 without the mutation), it says to stop casting and save, with your energy against the cost and the time to it at your current energy rate. When the energy covers the cost: ascend now, and how much mutagen that brings.
   - **After an ascension, with mutagen unspent**: what to buy, each only while still to do and affordable: unlock the lepidoptera mutation, buy lepidoptera mutations up to 1 million, then one more unlock of any kind (after the first ascension) or all remaining unlocks (from the second). The rest is kept unspent, because unspent mutagen makes larvae.
   - **The long run** (lepidoptera mutation bought, but the expansion or endless achievements not all earned): do not ascend; your expansions against the next expansion achievement and 5,000, and endless bought against the next endless achievement. While the long-run climb is off, the line links to Options to turn it on.
@@ -63,11 +63,11 @@ Swarmwarp moves production forward by the time it skips, but no clock the game s
 
 ## The swarmwarp route
 
-Pick "Achievements: swarmwarp route" under Ascension advice. It earns the same achievements without House of Mirrors ([NO-MIRRORS.md](NO-MIRRORS.md) section 12). Everything is worked out from your game each time; the advisor stores nothing for it, and your other settings are not changed.
+Pick "Swarmwarp route" under Route, the first of the advisor's settings in Options. It earns the same achievements without House of Mirrors ([NO-MIRRORS.md](NO-MIRRORS.md) section 12). Everything is worked out from your game each time; the advisor stores nothing for it, and your other settings are not changed.
 
 - **Energy**: below nexus 5, the same plan as the House of Mirrors route. After nexus 5: 10,000 lepidoptera every run ("lepidoptera 4,000/10,000, swarmwarp route"; a higher setting stays), then 2,000 bats, then swarmwarp **one cast at a time**: "cast 1 swarmwarp (5 affordable): skips 27.8 d; then follow the lines above and below: the next swarmwarp is suggested after them". It never says "×5" on this route.
 - **The purchases between warps**: a cast releases days or years of production. While the panel has purchases open (a climb row to buy or feed upward, a faster or twin upgrade, a hatchery, expansion or ancestry level, an empower or a territory twin, or territory units worth more than a minute of the territory share's larvae), the energy line holds the next cast: "next: cast 1 swarmwarp (4 affordable): skips 27.8 d, once the purchases above and below are made (3 climb rows, 11 upgrade tips, 4 territory lines)". Once they are bought (the climb rows go into their 60 s wait), it offers the cast again. You can always cast anyway. Empowers are offered one per look, as everywhere in the advisor, and the hold follows that rule to the end. So after a large warp you may empower several units in a row (up to 10 in the reference cases) before the next cast is offered. The simulator's 141 days for this route were measured with one empower per visit.
-- **Climbing**: the long-run climb is on whatever the Long-run climb setting says; Options shows "On (swarmwarp route)" beside that setting.
+- **Climbing**: the long-run climb is on whatever the Long-run climb setting says; Options shows that setting as on and greyed out, with your own choice kept for the House of Mirrors route.
 - **Territory**: never stopped; a share of 0 is advised back to 0.1. Empowering as on the other route.
 - **When to ascend** (stages from your game):
   - **build**: ascend once this run's mutagen (inactive) is at least 1,000 times the mutagen you hold. Until then: "keep swarmwarping, do not ascend yet: mutagen (inactive) 3.57e20/2.16e35 (1,000 × your mutagen) to ascend", with expansions, endless and unlocks toward their next achievement. Once it passes, the usual spend, save and ascend lines, and while saving no swarmwarp or bats.
@@ -94,10 +94,10 @@ You can switch at any time; the next refresh follows the new route, and its muta
 | Cooldown | 60 s | After you hatch a unit, how long before it is suggested again. |
 | Banking threshold | 3 | Stop hatching a unit once the tier above already makes this many times what larvae could. |
 | Territory share | 0.1 | Share of larvae kept for territory units. Set it to 0 once House of Mirrors is casting. |
-| Lepidoptera target | 4000 | Lepidoptera to buy at nexus 5 before House of Mirrors. With the achievements route on, the advisor raises it for the kind of run (10,000 first run, 30,000 quick runs and from day 3 of the long run). |
+| Lepidoptera target | 4000 | Lepidoptera to buy with energy. The House of Mirrors route raises it for the kind of run (10,000 first run, 30,000 quick runs and from day 3 of the long run); the swarmwarp route uses 10,000 every run, then 2,000 bats. A higher setting stays. Options shows the target for the route picked. |
 | Long-run climb | off | "On" adds the long-run rules above from a run age of 2 days, keeping 1% of the larvae for feeding upward. It trades meat income for progress up the chain, so it is for the achievements goal, not for short runs. |
-| Ascension advice | achievements: House of Mirrors route | Adds the ascension lines above, makes the energy line save for the ascension when it is time, and sets the lepidoptera target for the kind of run. "Achievements: swarmwarp route" follows the swarmwarp route instead (above). Off leaves the panel exactly as without it. (Default "off" before Nov 14, 2026.) |
-| Spare energy before House of Mirrors | plan it for the next nexus | Holds energy and larvae for the next nexus; at nexus 4, 1,000 lepidoptera first, then only the energy nexus 5 needs by the time its larvae are there, the rest into lepidoptera. In the simulator that reached the next ascension 7 to 13 hours sooner. "Cast larva rush" is the console script's rule. No effect from nexus 5. (Default "cast larva rush" before Nov 14, 2026.) |
+| Route (stored as `ascension`) | House of Mirrors route | First in Options. "House of Mirrors route" or "Swarmwarp route": the ascension lines above, energy saved for the ascension when it is time, and the lepidoptera target for the kind of run. "No ascension advice" leaves the panel exactly as without them. Every other setting's help text in Options describes the route picked. (Default "off" before Nov 14, 2026.) |
+| Spare energy before nexus 5 | plan it for the next nexus | Holds energy and larvae for the next nexus; at nexus 4, 1,000 lepidoptera first, then only the energy nexus 5 needs by the time its larvae are there, the rest into lepidoptera. In the simulator that reached the next ascension 7 to 13 hours sooner. "Cast larva rush" is the console script's rule. No effect from nexus 5. (Default "cast larva rush" before Nov 14, 2026.) |
 
 **To get the console script's behaviour**: spare energy "cast larva rush", ascension advice off, climb multiple 3, share 0.5, cooldown 60, banking 3, territory 0.1, lepidoptera 4,000, long-run climb off.
 
@@ -108,7 +108,7 @@ A number setting is saved when you leave its box or press Enter; the spare-energ
 ## What it does not do
 
 - It never buys, casts or changes settings for you.
-- It never ascends, unlocks mutations or casts spells for you. Ascension advice follows one of the two achievements routes; turn it off in the settings if you are on neither.
+- It never ascends, unlocks mutations or casts spells for you. Ascension advice follows one of the two routes; pick "No ascension advice" if you are on neither.
 - It doesn't know how long you plan to play this run. "Climb multiple" is the only stand-in for that.
 - It notices purchases from the game's statistics, about once a second, while the game is open.
 
@@ -116,7 +116,7 @@ A number setting is saved when you leave its box or press Enter; the spare-energ
 
 - [HANDOFF.md](HANDOFF.md): what the rules are and the evidence behind them.
 - [MODEL-CHECK.md](MODEL-CHECK.md): how the simulator and the advisor were checked against the game's code.
-- [ASCENSION.md](ASCENSION.md): the plan for earning every achievement (ascensions, the long run to endless), ascension and mutagen mechanics, and the simulator checks. The "achievements route" setting follows its part A.
+- [ASCENSION.md](ASCENSION.md): the plan for earning every achievement (ascensions, the long run to endless), ascension and mutagen mechanics, and the simulator checks. The "House of Mirrors route" setting follows its part A.
 - [NO-MIRRORS.md](NO-MIRRORS.md): whether every achievement can be earned without ever casting House of Mirrors (yes, with swarmwarp instead), and the swarmwarp route as rules for the advisor: with swarmwarp counted as elapsed time it takes about 141 simulator days (154-158 at a person's cadence) against 174 for the mirrors route; route switching and reference cases. The "swarmwarp route" setting follows its section 12.
 - [ACHIEVEMENTS.md](ACHIEVEMENTS.md): every achievement, how the game evaluates it, and which are earned in the example save (generated).
 - [BUILDING.md](BUILDING.md): building, testing and running the game.
