@@ -4,7 +4,9 @@
 # `options` stores them with the save; the advisor reads them through `options`.
 angular.module('swarmApp').constant 'ADVISOR_SETTINGS',
   defaults:
-    ageMultiple: 3    # climb tiers whose break-even H is under this many x run age
+    # climb tiers whose break-even H is under this many x run age (game time). 5: what every route was simulated with
+    # (policy.json, ASCENSION.md, NO-MIRRORS.md); 3 before Nov 16, 2026 (MODEL-CHECK.md, "Faster-aware climbing")
+    ageMultiple: 5
     share: 0.5        # fraction of the lower tier to convert per minute waited
     cooldown: 60      # seconds after hatching a unit before it is suggested again
     bank: 3           # stop hatching a unit once the tier above makes this many x what larvae could

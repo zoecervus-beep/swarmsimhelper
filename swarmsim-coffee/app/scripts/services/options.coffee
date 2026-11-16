@@ -207,7 +207,7 @@ angular.module('swarmApp').factory 'Options', ($log, util, env, game, $location,
       @set 'advisorCollapsed', !!collapsed
     return !!@get 'advisorCollapsed'
 
-  # Climbing advisor settings are stored together, as options.advisor = {ageMultiple:3, ...}.
+  # Climbing advisor settings are stored together, as options.advisor = {ageMultiple:5, ...}.
   # Missing, unparseable or out-of-range stored values read as the default or are clamped, so old
   # and hand-edited saves load cleanly.
   _advisorParse: (key, val) ->

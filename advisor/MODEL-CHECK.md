@@ -187,7 +187,7 @@ Every game fact the advisor depends on was checked and holds:
 
 Two points that are not false facts but are worth knowing:
 
-- `ADVISOR_SETTINGS.defaults.ageMultiple` is 3, while `policy.json` and the handoff's multi-day advice use 5. See the table above.
+- `ADVISOR_SETTINGS.defaults.ageMultiple` is 3, while `policy.json` and the handoff's multi-day advice use 5. See the table above. (Nov 16, 2026: the default is now 5; see "Faster-aware climbing".)
 - The energy line always recommends House of Mirrors at nexus 5 and has no notion of run length. That matches the evidence for runs of 4 days or more.
 
 `swarmsim-coffee/test/spec/services/advisorfacts.coffee` pins four of these facts in the style of the neighbouring specs:
@@ -342,6 +342,8 @@ The ×10 cells are where both arms start hive queens within an hour or two of th
 - This is the same trade the earlier sensitivity sweep found for larger age multiples. The handoff's "starting hive queens as soon as possible costs 10^10 at 24 hours" (from the 11.9 h save) is a much earlier start than these, and was not re-run.
 
 **How sure.** The equivalence to "double the age multiple" is measured in all 15 start × multiple cells, and it has a simple mechanical reason (N ≫ F at the moment of starting), so I am confident in it. That earlier starts help at ×3 is measured from two real saves and three dependent states. It agrees in direction everywhere, with magnitudes that depend on the mark.
+
+**Carried out (Nov 16, 2026):** the default age multiple is now 5. No faster-aware rule was added. Example: the owner's save at 58 h (`advisor/sim/example_save_58h.json`, run age 2.4 d, stored settings without an age multiple). There, hive queens (H 11.6 d) were "wait 34.5 h" at the old default of 3 (horizon 7.3 d), and are a buy at 5 (horizon 12.1 d). The owner had noticed the same by buying hive queens and their faster upgrade. Pinned in `test/spec/services/advisor.coffee`.
 
 ### If the owner still wants it in the advisor
 

@@ -1051,20 +1051,20 @@ describe 'Directive: advisorOptions', ->
   group = (input) -> input.parentNode
 
   it 'lists every setting with its current value', ->
-    options.advisorSetting 'ageMultiple', 5
+    options.advisorSetting 'ageMultiple', 7 # not the default (5)
     el = render()
     expect(el.querySelectorAll('input.advisor-setting').length).toBe 6
-    expect(el.querySelector('#advisor-ageMultiple').value).toBe '5'
+    expect(el.querySelector('#advisor-ageMultiple').value).toBe '7'
     expect(el.querySelector('#advisor-territory').value).toBe '0.1'
     expect(text el).toContain 'Set to 0 once House of Mirrors is casting'
-    expect(text el).toContain '5 suits runs lasting several days'
+    expect(text el).toContain 'Higher starts new tiers earlier'
 
   it 'saves valid input through the option setter', ->
     spyOn(options, 'advisorSetting').and.callThrough()
     el = render()
-    input = type el, 'ageMultiple', '5'
-    expect(options.advisorSetting).toHaveBeenCalledWith 'ageMultiple', '5'
-    expect(options.advisorConfig().ageMultiple).toBe 5
+    input = type el, 'ageMultiple', '7'
+    expect(options.advisorSetting).toHaveBeenCalledWith 'ageMultiple', '7'
+    expect(options.advisorConfig().ageMultiple).toBe 7
     expect(group(input).className).not.toContain 'has-error'
 
   it 'rejects bad input without throwing and keeps the stored value', ->
@@ -1209,7 +1209,7 @@ describe 'Directive: advisorOptions', ->
     expect(helpOf el, 'moths').toContain '10,000 in a first run, 30,000 in a quick run and from day 3 of the long run, and 4,000 in the long run before that'
     expect(helpOf el, 'longRun').toContain 'from day 3 raises the lepidoptera target to 30,000'
     expect(helpOf el, 'longRun').toContain '2 days old in game time'
-    expect(helpOf el, 'ageMultiple').toContain '3 suits runs of a day or so'
+    expect(helpOf el, 'ageMultiple').toBe 'Hatch a tier once its break-even time (H) is under this many times the run\'s age, in game time (real time plus what swarmwarp skipped). Higher starts new tiers earlier; counting a tier\'s first faster upgrade does the same as doubling this number. Default 5.'
     expect(el.querySelectorAll('input[name=advisor-longRun]').length).toBe 2
     # the swarmwarp route
     pick el, 'swarmwarp'
@@ -1256,9 +1256,9 @@ describe 'Directive: advisorOptions', ->
     expect(el.querySelector 'input.advisor-setting').toBe null
 
   it 'resets the settings to their defaults', ->
-    options.advisorConfig {ageMultiple: 5, moths: 10}
+    options.advisorConfig {ageMultiple: 7, moths: 10}
     el = render()
     angular.element(el.querySelector '.advisor-options button').triggerHandler 'click'
     $rootScope.$digest()
-    expect(options.advisorConfig()).toEqual {ageMultiple: 3, share: 0.5, cooldown: 60, bank: 3, territory: 0.1, moths: 4000, spareEnergy: 'save', ascension: 'achievements', longRun: 'off'}
+    expect(options.advisorConfig()).toEqual {ageMultiple: 5, share: 0.5, cooldown: 60, bank: 3, territory: 0.1, moths: 4000, spareEnergy: 'save', ascension: 'achievements', longRun: 'off'}
     expect(el.querySelector('#advisor-moths').value).toBe '4000'

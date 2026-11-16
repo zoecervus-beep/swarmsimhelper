@@ -89,7 +89,7 @@ You can switch at any time; the next refresh follows the new route, and its muta
 
 | Setting | Default | Meaning |
 | --- | --- | --- |
-| Climb multiple | 3 | Climb a tier once its H is under this many times the run's age. 3 suits runs of a day or so; 5 suits runs lasting several days. |
+| Climb multiple | 5 | Climb a tier once its H is under this many times the run's age (game time). Higher starts new tiers earlier; counting a tier's first faster upgrade does the same as doubling this number. Every route was simulated with 5. (Default 3 before Nov 16, 2026.) |
 | Share per minute | 0.5 | How much of the tier below may be converted for each minute since you last hatched a unit. |
 | Cooldown | 60 s | After you hatch a unit, how long before it is suggested again. |
 | Banking threshold | 3 | Stop hatching a unit once the tier above already makes this many times what larvae could. |
@@ -99,7 +99,7 @@ You can switch at any time; the next refresh follows the new route, and its muta
 | Route (stored as `ascension`) | House of Mirrors route | First in Options. "House of Mirrors route" or "Swarmwarp route": the ascension lines above, energy saved for the ascension when it is time, and the lepidoptera target for the kind of run. "No ascension advice" leaves the panel exactly as without them. Every other setting's help text in Options describes the route picked. (Default "off" before Nov 14, 2026.) |
 | Spare energy before nexus 5 | plan it for the next nexus | Holds energy and larvae for the next nexus; at nexus 4, 1,000 lepidoptera first, then only the energy nexus 5 needs by the time its larvae are there, the rest into lepidoptera. In the simulator that reached the next ascension 7 to 13 hours sooner. "Cast larva rush" is the console script's rule. No effect from nexus 5. (Default "cast larva rush" before Nov 14, 2026.) |
 
-**To get the console script's behaviour**: spare energy "cast larva rush", ascension advice off, climb multiple 3, share 0.5, cooldown 60, banking 3, territory 0.1, lepidoptera 4,000, long-run climb off.
+**To get the console script's behaviour**: spare energy "cast larva rush", Route "No ascension advice", climb multiple 3, share 0.5, cooldown 60, banking 3, territory 0.1, lepidoptera 4,000, long-run climb off.
 
 **Changed defaults (Nov 14, 2026).** Settings you have saved keep their values; the ones you never set follow the new defaults. So with untouched settings the energy line now plans for the next nexus and the ascension lines appear, with the lepidoptera target set by the kind of run. Pick "cast larva rush" and "off" to go back.
 

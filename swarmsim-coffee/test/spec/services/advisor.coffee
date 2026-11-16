@@ -62,10 +62,13 @@ describe 'Service: advisor', ->
 
   describe 'when a tier may be climbed', ->
     # nest: payback = 1000 / (1 twin x 1 prod) = 1000 s, H = 3 x 1000 = 3000 s
+    # The boundaries are worked with the console script's climb multiple, 3 (the advisor's default is 5 since
+    # Nov 16, 2026), passed explicitly.
+    M3 = {ageMultiple: 3}
     units = drone: {count: 1e12}, queen: {count: 1e6}, nest: {cost: 1000, prodEach: 1}
 
     it 'climbs exactly when H = horizon', ->
-      r = advisor.advise mksnap(now: 1000e3, units: units, larvae: 1e6, larvaRate: 10), null, {}
+      r = advisor.advise mksnap(now: 1000e3, units: units, larvae: 1e6, larvaRate: 10), null, M3
       expect(r.age).toBe 1000
       expect(r.horizon).toBe 3000
       nest = tier r, 'nest'
@@ -79,7 +82,7 @@ describe 'Service: advisor', ->
       expect(advisor.renderAction nest).toBe 'BUY 60'
 
     it 'waits just below the boundary', ->
-      r = advisor.advise mksnap(now: 1000e3 - 1, units: units, larvae: 1e6, larvaRate: 10), null, {}
+      r = advisor.advise mksnap(now: 1000e3 - 1, units: units, larvae: 1e6, larvaRate: 10), null, M3
       nest = tier r, 'nest'
       expect(nest.passes).toBe false
       expect(nest.kind).toBe 'wait'
@@ -90,7 +93,7 @@ describe 'Service: advisor', ->
       expect(advisor.renderAction nest).toBe 'wait 0 s'
 
     it 'reports the wait time and honours ageMultiple', ->
-      r = advisor.advise mksnap(now: 500e3, units: units, larvae: 1e6, larvaRate: 10), null, {}
+      r = advisor.advise mksnap(now: 500e3, units: units, larvae: 1e6, larvaRate: 10), null, M3
       expect(tier(r, 'nest').waitSeconds).toBe 500 # 3000/3 - 500
       expect(advisor.renderAction tier r, 'nest').toBe 'wait 8 min'
       r = advisor.advise mksnap(now: 500e3, units: units, larvae: 1e6, larvaRate: 10), null, {ageMultiple: 6}
@@ -332,8 +335,8 @@ describe 'Service: advisor', ->
       expect(advisor.advise(mk(1.2e7 - 1, 4), null, {}).tips).toEqual []
 
     it 'needs the plan to pay back within the horizon', ->
-      # horizon 1.8e5 < 2e5
-      expect(advisor.advise(mk(1.2e7, 4, 6e7), null, {}).tips).toEqual []
+      # horizon 1.8e5 < 2e5 (with the console script's climb multiple, 3)
+      expect(advisor.advise(mk(1.2e7, 4, 6e7), null, {ageMultiple: 3}).tips).toEqual []
 
     it 'chains through more than one tier in a late-game state', ->
       # Made-up late game. Arch-minds (pantheon5) are climbed with 9e4 larvae/s; their twin costs
@@ -924,7 +927,8 @@ describe 'Service: advisor on a real save', ->
 
   it 'gives sane advice', ->
     game = loadGame()
-    r = advisor.advise advisor.snapshot(game), null, {}
+    # with the console script's climb multiple, 3 (the advisor's default is 5 since Nov 16, 2026)
+    r = advisor.advise advisor.snapshot(game), null, {ageMultiple: 3}
     expect(r.age).toBeCloseTo 52124.103, 6
     expect(r.top).toBe 'hive'
     expect(_.map r.tiers, 'name').toEqual ['queen', 'nest', 'greaterqueen', 'hive', 'hivequeen', 'empress']
@@ -956,7 +960,7 @@ describe 'Service: advisor on a real save', ->
     expect(advisor.renderEnergy r.energy).toBe 'saving energy for nexus 5: 104/36,000 energy; still need 3.33e9 larva (have 3.34e6)'
     expect(r.nexusLarvae.toNumber()).toBe 0
     # the console script: 104.8 energy at nexus 4 with 2416 lepidoptera; nexus 5's 3.3e9 larvae are too far off to save for
-    script = advisor.advise advisor.snapshot(game), null, {spareEnergy: 'larvarush'}
+    script = advisor.advise advisor.snapshot(game), null, {spareEnergy: 'larvarush', ageMultiple: 3}
     expect(advisor.renderEnergy script.energy).toBe 'buy 10 lepidoptera (lepidoptera 2,416/4,000)'
     expect(script.nexusLarvae).toBeUndefined()
     expect((advisor.renderAction t for t in script.tiers)).toEqual (advisor.renderAction t for t in r.tiers)
@@ -1033,3 +1037,47 @@ describe 'Service: advisor on a real save', ->
     expect(r.energyError).toBeTruthy()
     expect(r.energy).toBe null
     expect(r.tiers.length).toBe 6
+
+# The owner's save at a run age of 58 h (advisor/sim/example_save_58h.json; stored advisor settings only
+# {spareEnergy: 'save', territory: 0}). Hive queens have H 11.6 d: over 3 x 2.4 d, under 5 x 2.4 d. The default
+# climb multiple is 5 since Nov 16, 2026 (MODEL-CHECK.md, "Faster-aware climbing").
+describe 'Service: advisor, the default climb multiple on the owner\'s 58 h save', ->
+
+  beforeEach module 'swarmApp'
+
+  advisor = Game = session = null
+  beforeEach inject (_advisor_, _Game_, _session_) ->
+    advisor = _advisor_
+    Game = _Game_
+    session = _session_
+
+  loadGame = ->
+    files = window.__karma__?.files ? {}
+    url = _.find _.keys(files), (f) -> /advisor\/sim\/example_save_58h\.json$/.test f
+    if not url?
+      throw new Error 'advisor/sim/example_save_58h.json is not served by karma; add it to the karma files list'
+    xhr = new XMLHttpRequest()
+    xhr.open 'GET', url, false
+    xhr.send()
+    state = session._loads session._saves JSON.parse(xhr.responseText), false
+    shift = (new Date().getTime() - 3600e3) - state.date.reified.getTime()
+    for key, date of state.date
+      state.date[key] = new Date date.getTime() + shift
+    game = new Game {state: state, save: ->}
+    game.now = new Date state.date.reified.getTime()
+    game.cache.onUpdate()
+    return game
+  OWNER = {spareEnergy: 'save', territory: 0}
+
+  it 'climbs hive queens with the default, and waits on them with the old default of 3', ->
+    expect(advisor.DEFAULTS.ageMultiple).toBe 5
+    snap = advisor.snapshot loadGame()
+    r = advisor.advise snap, null, OWNER
+    expect(r.age / 86400).toBeCloseTo 2.42, 2
+    hq = _.find r.tiers, name: 'hivequeen'
+    expect(hq.H.toNumber() / 86400).toBeCloseTo 11.6, 1
+    expect(hq.kind).toBe 'buy'
+    expect(hq.buys.toNumber()).toBeGreaterThan 0
+    old = _.find advisor.advise(snap, null, _.extend({ageMultiple: 3}, OWNER)).tiers, name: 'hivequeen'
+    expect(old.reason).toBe 'tooSlow'
+    expect(advisor.renderAction old).toMatch /^wait /

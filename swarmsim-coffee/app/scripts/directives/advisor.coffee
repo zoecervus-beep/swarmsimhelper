@@ -966,7 +966,7 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
       switch key
         when 'ageMultiple'
           "Hatch a tier once its break-even time (H) is under this many times the run's age, in game time (real time plus what swarmwarp skipped). " +
-            (if route == 'swarmwarp' then "This route was simulated with 5; each swarmwarp adds its skip to the age, so the limit jumps with every cast." else "3 suits runs of a day or so; 5 suits runs lasting several days.")
+            "Higher starts new tiers earlier; counting a tier's first faster upgrade does the same as doubling this number." + (if route == 'swarmwarp' then " This route was simulated with 5; each swarmwarp adds its skip to the age, so the limit jumps with every cast." else "")
         when 'share' then "Share of the tier below offered for each minute of game time since you last hatched a unit (0.5 = half). Any swarmwarp releases all of it."
         when 'cooldown' then "After you hatch a unit, wait this many seconds of game time before suggesting it again. Any swarmwarp ends the wait."
         when 'bank' then "Stop hatching a unit, and save its larvae, once the tier above already makes this many times what larvae could."
