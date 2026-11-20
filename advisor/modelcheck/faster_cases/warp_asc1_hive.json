@@ -1,0 +1,169 @@
+{
+ "case": "warp_asc1_hive",
+ "exercises": "swarmwarp route: the visit where rule FA first starts hive",
+ "save": "warp_asc1_hive.save.json",
+ "config": {
+  "age_multiple": 5,
+  "max_faster_levels": 12,
+  "faster_price": "66 x 666^level of the tier itself",
+  "long_run_mode": "on",
+  "territory_share": 0.1
+ },
+ "state": {
+  "run_age_s": 16800.0,
+  "horizon_s": 84000.0,
+  "top_owned": "greaterqueen",
+  "larvae": "3.3926507746508512e+09",
+  "larvae_for_climb": "5.9317773510014534e+07",
+  "meat": "2.9746185878785515e+30"
+ },
+ "rule_FA": [
+  {
+   "tier": 5,
+   "name": "hive",
+   "H_s": "100000.0",
+   "horizon_s": 84000.0,
+   "passes_plain": false,
+   "held": "0",
+   "twin": "1.0",
+   "faster_level": 0,
+   "below_held": "608140049.0",
+   "cost_below": 100000.0,
+   "meat": "2.9746185878785515e+30",
+   "meat_cost": 590490000,
+   "larvae_for_climb": "5.9317773510014534e+07",
+   "n_affordable": "6081.0",
+   "got": "6081.0",
+   "levels": [
+    {
+     "L": 1,
+     "price_total": "66.0",
+     "N_kept": "6015.0",
+     "H_eff_s": "5.0548628428927681e+04",
+     "passes": true
+    },
+    {
+     "L": 2,
+     "price_total": "44022.0",
+     "N_kept": "-37941.0",
+     "H_eff_s": null,
+     "passes": false
+    },
+    {
+     "L": 3,
+     "price_total": "29318718.0",
+     "N_kept": "-29312637.0",
+     "H_eff_s": null,
+     "passes": false
+    },
+    {
+     "L": 4,
+     "price_total": "19526266254.0",
+     "N_kept": "-19526260173.0",
+     "H_eff_s": null,
+     "passes": false
+    },
+    {
+     "L": 5,
+     "price_total": "13004493325230.0",
+     "N_kept": "-13004493319149.0",
+     "H_eff_s": null,
+     "passes": false
+    },
+    {
+     "L": 6,
+     "price_total": "8660992554603246.0",
+     "N_kept": "-8660992554597165.0",
+     "H_eff_s": null,
+     "passes": false
+    },
+    {
+     "L": 7,
+     "price_total": "5.7682210413657620e+18",
+     "N_kept": "-5.7682210413657559e+18",
+     "H_eff_s": null,
+     "passes": false
+    },
+    {
+     "L": 8,
+     "price_total": "3.8416352135495974e+21",
+     "N_kept": "-3.8416352135495974e+21",
+     "H_eff_s": null,
+     "passes": false
+    },
+    {
+     "L": 9,
+     "price_total": "2.5585290522240319e+24",
+     "N_kept": "-2.5585290522240319e+24",
+     "H_eff_s": null,
+     "passes": false
+    },
+    {
+     "L": 10,
+     "price_total": "1.7039803487812050e+27",
+     "N_kept": "-1.7039803487812050e+27",
+     "H_eff_s": null,
+     "passes": false
+    },
+    {
+     "L": 11,
+     "price_total": "1.1348509122882826e+30",
+     "N_kept": "-1.1348509122882826e+30",
+     "H_eff_s": null,
+     "passes": false
+    },
+    {
+     "L": 12,
+     "price_total": "7.5581070758399634e+32",
+     "N_kept": "-7.5581070758399634e+32",
+     "H_eff_s": null,
+     "passes": false
+    }
+   ],
+   "decision": {
+    "type": "start",
+    "hatch": "6081.0",
+    "faster_levels": 1,
+    "faster_price_total": "66.0"
+   }
+  }
+ ],
+ "plain_passes": [
+  "queen",
+  "nest",
+  "greaterqueen"
+ ],
+ "simulator": {
+  "climb": [
+   {
+    "tier": 5,
+    "name": "hive",
+    "outcome": "fails"
+   },
+   {
+    "tier": 4,
+    "name": "greaterqueen",
+    "outcome": "buys",
+    "n_sim": "59317773.0",
+    "test": "plain"
+   },
+   {
+    "tier": 3,
+    "name": "nest",
+    "outcome": "bank"
+   },
+   {
+    "tier": 2,
+    "name": "queen",
+    "outcome": "bank"
+   },
+   {
+    "tier": 1,
+    "name": "drone",
+    "outcome": "bank"
+   }
+  ],
+  "faster_after_climb": [],
+  "push": []
+ }
+}

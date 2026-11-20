@@ -394,7 +394,10 @@ def advance(s,dt,skip=False):
     s.earned=getattr(s,'earned',0.0)+new[0]-s.c[0]
     s.c=new
     return L
-def H(s,k): return UNITC[k]/TWO**(s.prod[k]+s.twin[k])   # meat break-even horizon of tier k (s) = k x cost/(twin x prodEach)
+H_MUT=False   # option (default off): H counts the meat mutation's production factor, as the advisor's H does (MODEL-CHECK.md)
+def H(s,k):   # meat break-even horizon of tier k (s) = k x cost/(twin x prodEach)
+    h=UNITC[k]/TWO**(s.prod[k]+s.twin[k])
+    return h/s.mm[k] if H_MUT else h
 def allowed(s,p,k):
     if k<2: return True
     ts=p.get('tier_start')
@@ -407,7 +410,7 @@ def allowed(s,p,k):
 def policy(s,p,gained):
     if TRACE is not None: tr('gate', not (p.get('lr_age') and run_age(s,p)<p['lr_age']), run_age(s,p))
     if p.get('lr_age') and run_age(s,p)<p['lr_age']:   # long-run rules switch on by themselves only from this run age
-        p=dict(p,faster_aware=None,push=None)
+        p=dict(p,faster_aware=(p.get('faster_aware') if p.get('fa_ungated') else None),push=None)   # fa_ungated (default off): the faster-aware test is not part of the mode
     if p.get('theta_age'): p['theta']=p['theta_age']*(p.get('age0',4306)+s.time-s.run_off+(getattr(s,'gskip_run',0.0) if p.get('game_age') else 0.0))   # run age (run_off moves at an ascension); game_age: + warps
     energy_policy(s,p,gained)
     # --- larva multipliers

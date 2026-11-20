@@ -1,0 +1,21 @@
+{
+ "cases": [
+  "run2_save",
+  "mirrors58_save",
+  "mirrors58_save_x3",
+  "mirrors20_asc0_hivequeen",
+  "mirrors20_asc0_empress",
+  "mirrors20_asc1_hive",
+  "run2_asc1_empress",
+  "run2_asc1_prophet",
+  "run2_asc1_goddess",
+  "run2_asc1_pantheon2",
+  "warp_asc0_hivequeen",
+  "warp_asc1_hive",
+  "warp_asc1_hivequeen",
+  "warp_asc1_empress",
+  "line_just_above",
+  "line_just_below"
+ ],
+ "generated_in_s": 21
+}

@@ -353,6 +353,187 @@ As a display hint only. It changes no buy decision, because it is equivalent to 
 - If N ≥ 1 and H × (N + F)/(2N) ≤ horizon, show the plan "hatch n hive queens > buy faster hive queens (66)". After the hatch, show the faster tip at 1× its price for that level, not 2×.
 - If N < 1, keep "wait …" and add "(with faster: wait X)", where X = (H/2)/ageMultiple − age. Leave it out when X ≥ the plain wait.
 
+## Faster-aware climbing, pass 2 (Nov 20, 2026)
+
+The owner asked again, with two saves:
+- **The 58 h first run** (`advisor/sim/example_save_58h.json`): hive queens H 11.6 d.
+- **Save (2)** (`advisor/sim/example_save_run2_45h.json`): run 2 of the mirrors route at 45.2 h, long-run mode on, territory share 0.
+  - It holds 1.04e14 hive queens, 2 empresses and 1.04e7 affordable.
+  - Empress H is 67.1 d against a horizon of 9.4 d, so the advisor says "wait 11.5 d" and offers no faster tip (the tip needs 2× its price held).
+  - "I can buy millions of hive empress but it still doesn't recommend the 66 faster upgrade."
+
+Pass 1 (above) used the simulator's old income-share sizing, no long-run mode, no game clock, and early first-run saves only. This pass measures the advisor as it is today:
+- its own rule-3 sizing (`advisor_sizing`) and honest larva arithmetic;
+- age multiple 5 and the A.11 early-game plan;
+- each route's own settings: long-run mode off in first and quick runs, on in the mirrors long run and on the swarmwarp route, territory share 0 once mirrors are cast;
+- the game clock on the swarmwarp route;
+- H as the advisor computes it, including the meat mutation (save (2) holds 1e6 meat mutants; the simulator's H leaves them out unless `sim.H_MUT`).
+
+### Answer
+
+**No measurable difference in the time to every achievement, on any route, from any start, at any cadence.**
+
+| Grade | Finding |
+| --- | --- |
+| **likely** | Mirrors route: identical days for all variants |
+| **likely** | Swarmwarp route: differences of −5 to +2 days, inside the seed spread |
+| **guess** | (c2) has a small edge on the swarmwarp route |
+| **solid** | Why the owner's empresses are not started: arithmetic below |
+
+- **The rule fires**: about once or twice a run for one level, about 7 times a run for many levels. It changes the meat curve in the first days of a run. It does not change achievement days, because:
+  - on the mirrors route they are set by energy (mirror casts, ascension cost), not by meat;
+  - in the long run the push (LR-2) reaches the upper tiers anyway.
+- **Recommendation: adopt variant (c2)** (below) **together with an explanation on the "wait" line.** The rule is harmless and slightly positive where measurable, and it matches what the owner expects. It is the explanation that answers the owner's save (2):
+  - with the rule, empresses are started about an hour after that save (3 faster levels);
+  - at the save itself they still wait, because 3 faster levels (2.93e7 empresses) plus the units to keep (2.7e8 in all) are more than the 1.04e7 affordable.
+- **Do not raise the default multiple** to 10: no difference on the mirrors route, −4 / −5 / +2 days ideal / human / busy on the swarmwarp route (noise).
+
+### Variants
+
+For a tier that fails the plain test, H > 5 × run age:
+
+| Variant | Test | Simulator option |
+| --- | --- | --- |
+| (a) plain | the advisor today | – |
+| (b) one level | passes when H × (N + F) / (2N) ≤ horizon, with N = held + n × twin − F, n = rule 3's count, F = 66 × 666^level | `faster_aware=True` |
+| (c) multi | any number L of the tier's own faster levels paid out of the purchase: H × (N + F_L) / (N × 2^L) | `faster_aware='multi'` |
+| (c2) multi, affordable | as (c), with n = all that can be afforded now | `fa_n='afford'` |
+| (d) plain at age multiple 10 | – | `theta_age=10` |
+
+When (b), (c) or (c2) start a tier, the levels are bought at once at 1× price. The faster-aware test also acts before the long-run gate (new option `fa_ungated`, off by default).
+
+### Days to every achievement (days from the save)
+
+`python3 -I advisor/sim/faster_study.py`, about 15 minutes on 4 cores. "Spread" is the spread of (a) over the three human seeds.
+
+| Start | Variant | Ideal | Human seeds 1 / 2 / 3 | Busy | Human: mean difference from (a) | Spread |
+| --- | --- | --- | --- | --- | --- | --- |
+| mirrors route, 20.1 h save | a | 174 | 181 / 181 / 181 | 193 | – | 0 |
+| | b, c, c2, d | 174 | 181 / 181 / 181 | 193 | 0 | |
+| mirrors route, 58 h save | a | 173 | 180 / 181 / 180 | 192 | – | 1 |
+| | b, c, c2 | 173 | 180 / 181 / 180 | 192 | 0 | |
+| | d | 173 | 181 / 181 / 180 | 192 | +0.3 | |
+| mirrors route, save (2) | a | 168 | 173 / 173 / 174 | 181 | – | 1 |
+| | b, c, c2, d | 168 | 173 / 173 / 174 | 181 | 0 | |
+| swarmwarp route, 20.1 h save | a | 141 | 158 / 155 / 154 | 198 / 200 / 201 | – | 4 (busy 3) |
+| | b | 141 | 153 / 153 / 156 | 204 / 200 / 201 | −2.0 | |
+| | c | 140 | 155 / 153 / 154 | 204 / 200 / 198 | −1.8 | |
+| | c2 | 139 | 155 / 155 / 154 | 198 / 192 / 194 | −1.2 (busy −5) | |
+| | d | 137 | 146 / 157 / 151 | 201 / 200 / 205 | −4.6 | |
+
+The milestones agree to within a day across variants on the mirrors route:
+- from the 20.1 h save: first endless 53 / 54 (ideal / human), 1e62 endless 66 / 67, 5,000 expansions 100 / 101, first ascension 3.9 days with 10^7.8 premutagen, nexus 5 in run 1 at 9.9 h;
+- from save (2): first endless 47 / 48, 1e62 endless 60 / 61, 5,000 expansions 94.
+
+On the swarmwarp route every milestone moves by 0–2 days for (b)–(c2) and 3–5 days earlier for (d).
+
+**Meat, where the rule does show** (log10 meat/s, ideal):
+- From the 20.1 h save, day 7 (run 2's third day):
+  - (a): 59.5, top tier neuroprophet;
+  - (b), (c), (c2): 77.0, top tier hive neuron.
+
+  So starting tiers earlier is worth about 10^17 meat/s at the start of a run.
+- Day 20: equal, except (c2) at 259.0 against 237.6.
+- Day 60: equal.
+
+None of this reaches an achievement day.
+
+**How often the rule fires** (`faster_fires.py`, every tier start it causes over the whole route, ideal):
+
+| Variant | Starts per route | Typical starts |
+| --- | --- | --- |
+| (b) | 36–58 (about 1–2 per run) | hives at run age 0.1 d, hive queens at 0.6–1.2 d (1 level) |
+| (c) | 198–221 (about 7 per run) | up to 19 levels on low tiers, 0.05–0.1 d into a run with huge mutagen |
+| (c2) | 213–225 | as (c), plus upper tiers in the long run: neural cluster to arch-mind, 1 level, days 9–20 |
+
+### Save (2) as it stands
+
+The long-run gate opens 2.8 h after the save.
+
+| Variant | Empresses bought before the gate | Faster empress levels | Day 3 log10 meat/s | Day 7 | Day 20 | Expansions day 20 |
+| --- | --- | --- | --- | --- | --- | --- |
+| a | 1.1e8 in the first visit (twin seeking: paid out at once for hive queen twins, none kept) | 0 | 88.7 | 133.7 | 370.7 | 1,114 |
+| b | as a | 0 | 88.7 | 133.7 | 370.7 | 1,114 |
+| c | as a, then 2.4e8 at 1.0 h with 3 levels | 3 | 88.7 | 133.7 | 370.7 | 1,114 |
+| c2 | as c | 3 | 88.7 | 133.8 | 369.4 | 1,114 |
+| d | as a | 0 | 88.7 | 133.7 | 369.5 | 1,114 |
+
+(Ideal cadence. At the human cadence the first visit after the save is hours later, and nothing differs.)
+
+- **It does not matter by day 3, 7 or 20.** The push at 2.8 h makes empresses anyway, and the long run is set by mirrors.
+- **The arithmetic** (solid). Empress H is 67.1 d; the horizon is 9.4 d; so 2^L ≥ 7.13, i.e. **3 levels**.
+  - One level (66 empresses) gives H 33.6 d; two levels (44,022) give 16.8 d. Both fail.
+  - Three levels cost 66 + 43,956 + 29,274,696 = **2.93e7 empresses**.
+  - To pass with them, the empresses kept must be N ≥ H × F / (8 × horizon − H) = 2.4e8, so 2.7e8 bought in all, against **1.04e7 affordable at the save**.
+  - The hive queens are growing fast, so the test passes about an hour later. "66 + faster" alone would never have been enough here.
+- **The 58 h save:** at multiple 5 hive queens pass the plain test (H 11.6 d, horizon 12.1 d), so the rule is not involved. At multiple 3 (horizon 7.3 d) it starts them with 1 level: buy 10,014 hive queens, then faster hive queens (66). That is the owner's first observation.
+
+### Rule FA, if adopted (variant c2)
+
+For every meat tier k ≥ 2 the climb table considers that **fails rule 1** (H > ageMultiple × run age, with the advisor's own H and the game-clock run age) and is **not banked** (rule 4) and **not in its cooldown** (rule 3's earmark comes first):
+
+1. **Inputs read from the game**:
+   - H;
+   - the horizon;
+   - the units of tier k held and its twin multiplier;
+   - the tier below held and the unit's cost in it;
+   - meat and the unit's meat cost;
+   - the faster upgrade's level and price (66 × 666^level; read the price and its factor from the game);
+   - A = the larvae the climb may use at this tier: after the higher tiers' suggestions this visit, after the long-run reserve and the nexus hold, as rule 3 sees them.
+2. **The test:**
+   - n = floor(min(A, below held / cost, meat / meat cost));
+   - got = held + n × twin;
+   - for L = 1, 2, … 12: F_L = the price of the next L faster levels, N_L = got − F_L;
+   - the tier passes with the smallest L for which N_L ≥ 1 and H × (N_L + F_L) / (N_L × 2^L) ≤ horizon.
+3. **If it passes:**
+   - The line says: "buy n empresses and 3 faster levels (2.93e7 empresses): with them empresses pay back inside the horizon (H with them ≤ 9.4 d)".
+   - The hatch takes n larvae out of A before lower tiers, as the climb does.
+   - After the hatch, the faster tip for those L levels is shown at 1× its price, instead of rule 5's 2×.
+   - Next visit the tier usually passes rule 1 on its own (H has fallen 2^L-fold), and rule 3 sizes it as usual.
+4. **If it fails**, keep "wait X" and add the reason:
+   - L* = ceil(log2(H / horizon)), and F* = the price of L* levels;
+   - the units needed are U = H × F* / (2^L* × horizon − H) + F*;
+   - the line reads: "with 3 faster levels (2.93e7) empresses would pay back once 2.7e8 are bought; you can afford 1.04e7".
+
+   This is the line that would have answered the owner's question in save (2).
+5. **Interactions:**
+   - **Banking** (rule 4) comes first: a banked tier is never started by FA.
+   - **Twin plans** (rule 7) and the twin tips are unchanged. The FA hatch consumes the tier below like any climb purchase.
+   - **The long-run push** (LR-2): its frontier stays defined by the plain test, as specified. A tier FA starts this visit is not "the frontier" until it passes rule 1. The push runs on what the climb, FA included, leaves.
+   - **LR-3** is unchanged.
+   - **The swarmwarp route:** FA is re-taken between warps like every purchase, on the game-clock horizon.
+   - **The gate:** FA does not wait for the long-run gate (as simulated).
+6. **The hatch size** is all that is affordable, as simulated. That is larger than rule 3 would give a passing tier on its first look; it is what makes the honest N + F accounting work.
+
+**Reference cases:** `advisor/modelcheck/faster_cases/`, 16 cases, made by `faster_cases.py` (about 20 s). Every save round-trips in the game to within 1.6e-6 (the known pantheon3 meat-price rounding). The README gives the fields and what must match. They cover:
+- save (2) as it stands (empresses wait, 3 levels needed);
+- the 58 h save at multiples 5 and 3;
+- the first start by the rule on each route: hive queens with 1–2 levels; empresses with 3 levels in the first run and in run 2; prophet, hive neuron and hive network with 1 level; the swarmwarp route's runs 1 and 2;
+- both sides of the line (1 ± 1e-6) for hive networks with 1 level.
+
+### What was not modelled
+
+- **The native port itself.** The simulator's rules ran, with the long-run cases' known differences: the meat cap at half the meat, the territory purse, drones.
+- **The hatch.** FA's hatch here is "all affordable", capped by the simulator at half the meat. A port that sized the FA hatch by rule 3 instead would fire far less (pass 4 of A.10 found that for LR-1) and was not simulated.
+- **Starts and seeds.** Three starts for the mirrors route, one for the swarmwarp route; three human seeds; busy with one seed except on the swarmwarp route (three).
+- **The display line** for "wait" is arithmetic, not simulated (it changes no purchase).
+- **The meat mutation in H** (`sim.H_MUT`) is on for this study only. Earlier studies' H leaves it out, which matters only for saves with meat mutants.
+
+**Reproduce:**
+
+```sh
+python3 -I advisor/sim/faster_study.py --jobs 4      # the tables above, ~15 min (save2 alone: ~15 s)
+python3 -I advisor/sim/faster_fires.py               # how often the rule fires, ~5 min
+python3 -I advisor/modelcheck/faster_cases.py        # the reference cases + round trip, ~20 s
+```
+
+New `sim.py` options, all off by default. With them off, `run_example.py` (both saves), `compare.py` (both saves), `ascension_compare.py` and `bignum_check.py` are byte-identical:
+
+| Option | What it does |
+| --- | --- |
+| policy key `fa_ungated` | the faster-aware test is not switched off with the long-run mode before its gate |
+| `sim.H_MUT` | H includes the meat mutation's production factor, as the advisor's H does |
+
 ## What remains unverified
 
 - **The browser build and Karma.** Everything here ran the game's services in Node with a stand-in injector. The Angular wiring, the UI and the statistics service, which the advisor uses to detect purchases, were not exercised.
