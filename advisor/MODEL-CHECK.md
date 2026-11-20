@@ -523,7 +523,8 @@ Rule FA is in the advisor (`advisor.coffee`: `fasterTest`, `fasterWait`, and `fa
 `advisor/modelcheck/faster_check.js` runs the 16 reference cases through the advisor with the rule on. Result: 16 cases, 0 differences.
 - **Exact given the reference's n and horizon:** every level 1–12 (price, units kept, H with them, passes) and the decision with its wait clause.
 - **n:** exact given the reference's larvae for the climb.
-- **The port's own advice:** where its n equals the reference's, the same decision (22 tiers); 7 printed (no n: the clause is omitted past 12 levels, or the push fed the tier).
+- **The port's own advice:** where its n equals the reference's, the same decision (17 tiers); 3 printed (the push fed the tier, or past 12 levels).
+- **No clause where none is affordable** (Nov 20 polish): the wait clause shows only where at least one of the tier can be bought now. In 9 waiting tiers (one per case in 9 cases) nothing is, and the row is the plain "wait".
 - **Horizon:** to 1 ms of run age. On the swarmwarp route the game skips whole milliseconds per cast; the estimate uses the unrounded skip.
 - **Followed in the game, all 13 starts:** hatch n; the levels' tip at 1×; the L levels bought; the tier passes the plain test; 61 s later it is still climbing.
 - **One disagreement**, settled for the game's arithmetic: `run2_asc1_prophet` L = 2, units kept −8,585,974,175,440,812.188. The reference's float drops the fraction near 2^53, so this field is compared at 1e-12 relative.

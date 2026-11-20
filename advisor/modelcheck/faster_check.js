@@ -4,6 +4,7 @@
 // snapshot() is taken; advise() runs with rule FA on and the case's age multiple, territory share and long-run mode.
 // Field classes:
 //   exact                plain passes, H (1e-12), the horizon
+//   no clause            a waiting tier with none affordable shows the plain "wait" (no rule-FA clause)
 //   exact given n        (and the reference's horizon) every level L = 1..12 (price of L levels, units kept, H with them, passes) and the decision
 //                        (start with L, or wait with the levels needed, their price, the units and hatch needed), from
 //                        the port's pure functions given the reference's n
@@ -85,7 +86,9 @@ cases.forEach(function (name) {
         ref.name + ': port L ' + res.pass + ', ref L ' + d.faster_levels);
     } else {
       var w = adv.fasterWait(Object.assign({held: t.count, twin: t.twin, n: D(d.affordable)}, io));
-      if (d.levels_needed > adv.FA_MAX_LEVELS) say('decision given n: wait, no clause past 12 levels', res.pass === null && w === null, ref.name);
+      // the clause shows only where at least one is affordable now (Nov 20 polish): where none is, the row must have none
+      if (D(d.affordable).lessThan(1)) say('no clause where none is affordable', !(t.faster && t.faster.type === 'wait'), ref.name + ': row ' + adv.renderAction(t));
+      else if (d.levels_needed > adv.FA_MAX_LEVELS) say('decision given n: wait, no clause past 12 levels', res.pass === null && w === null, ref.name);
       else say('decision given n: wait and its clause', res.pass === null && !!w && w.levels === d.levels_needed && same(w.price, d.their_price) &&
         rel(w.units, d.units_needed_after_hatch) <= 1e-12 && same(w.hatch, D(d.hatch_needed).ceil()),
         ref.name + ': port ' + (w ? w.levels + ' levels, ' + w.price.toString() + ', units ' + w.units.toExponential(8) + ', hatch ' + w.hatch.toString() : 'none') +
@@ -96,7 +99,8 @@ cases.forEach(function (name) {
     var ownN = t.reason === 'fasterStart' ? t.buys : t.faster && t.faster.affordable;
     var refD = d.type === 'start' ? 'start L' + d.faster_levels : 'wait';
     var nSame = ownN !== undefined && ownN !== null && same(ownN, ref.n_affordable);
-    if (nSame) say('own advice (n equal)', own === refD, ref.name + ': port ' + own + ', ref ' + refD);
+    if (d.type === 'wait' && D(d.affordable).lessThan(1)) { /* compared above: no clause */ }
+    else if (nSame) say('own advice (n equal)', own === refD, ref.name + ': port ' + own + ', ref ' + refD);
     else say('own advice (port A differs)', null, ref.name + ': port ' + own + ' n ' + (ownN ? ownN.toString() : '-') + ', ref ' + refD + ' n ' + ref.n_affordable + ' | row: ' + adv.renderAction(t));
     var sc = (c.simulator.climb || []).filter(function (q) { return q.name === ref.name; })[0];
     if (sc) say('simulator (printed)', null, ref.name + ': ' + sc.outcome + (sc.faster_level_L ? ' L' + sc.faster_level_L : '') + (sc.n_sim ? ' n ' + sc.n_sim : ''));

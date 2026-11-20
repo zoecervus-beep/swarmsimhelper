@@ -718,7 +718,7 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
   #   affordable now. (The simulator caps the meat at half; the advisor uses the meat left after this visit's
   #   climb purchases above, as rule 3 has no meat share.) If the test passes with n, the tier is a buy of n
   #   ('fasterStart') with the levels' tip at 1x; else the "wait" line gets `fasterWait`'s clause, when some
-  #   L <= FA_MAX_LEVELS could ever pass and the tier below is held.
+  #   L <= FA_MAX_LEVELS could ever pass and n >= 1 (at least one affordable now).
   fasterStart = (x, u, up, mem, now, cfg, horizon, left, meatLeft, faTips, banksFor) ->
     if not u.prodCost? or not u.prodFactor? or banksFor(x, up)
       return left
@@ -744,7 +744,8 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
         x.faster = {type: 'start', levels: res.pass, price: lv.price, H: lv.H, n: n}
         faTips.push {type: 'faster', unit: x.name, cost: u.prodCost, levels: res.pass, total: lv.price, fasterStart: true}
         return left.minus n
-    if x.belowCount.greaterThan 0
+    # the clause only where the player can buy at least one now; for a tier they cannot buy it is clutter
+    if n.greaterThanOrEqualTo 1
       w = fasterWait _.extend({held: x.count, twin: x.twin, n: n}, io)
       if w?
         x.faster = _.extend {type: 'wait'}, w

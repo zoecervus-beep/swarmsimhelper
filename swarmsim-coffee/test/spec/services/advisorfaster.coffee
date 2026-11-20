@@ -63,6 +63,12 @@ describe 'Service: advisor, rule FA (faster levels in the climb test)', ->
       expect(advisorView.action e).toMatch /^wait 11\.5 d — with 3 levels of .* they would pay back once .* are bought; you can afford /
       # no levels' tip: they would not pay off on what is held
       expect(_.some r.tips, unit: 'empress').toBe false
+      # neuroprophets: none affordable (2 empresses / 1e8 each), so the plain "wait", no clause
+      p = row r, 'prophet'
+      expect(p.reason).toBe 'tooSlow'
+      expect(p.faster).toBeUndefined()
+      expect(advisor.renderAction p).toBe 'wait 141.4 d'
+      expect(advisorView.action p).toBe 'wait 141.4 d'
 
     it 'the 58 h save: hive queens a plain buy at multiple 5, a start with 1 faster level at 3', ->
       game = loadSave 'example_save_58h'
