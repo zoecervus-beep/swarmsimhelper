@@ -928,7 +928,8 @@ describe 'Service: advisor on a real save', ->
   it 'gives sane advice', ->
     game = loadGame()
     # with the console script's climb multiple, 3 (the advisor's default is 5 since Nov 16, 2026)
-    r = advisor.advise advisor.snapshot(game), null, {ageMultiple: 3}
+    # rule FA off too: the console script has none (with it, hive queens would show why they wait; advisorfaster.coffee)
+    r = advisor.advise advisor.snapshot(game), null, {ageMultiple: 3, fasterStart: 'off'}
     expect(r.age).toBeCloseTo 52124.103, 6
     expect(r.top).toBe 'hive'
     expect(_.map r.tiers, 'name').toEqual ['queen', 'nest', 'greaterqueen', 'hive', 'hivequeen', 'empress']
@@ -960,7 +961,7 @@ describe 'Service: advisor on a real save', ->
     expect(advisor.renderEnergy r.energy).toBe 'saving energy for nexus 5: 104/36,000 energy; still need 3.33e9 larva (have 3.34e6)'
     expect(r.nexusLarvae.toNumber()).toBe 0
     # the console script: 104.8 energy at nexus 4 with 2416 lepidoptera; nexus 5's 3.3e9 larvae are too far off to save for
-    script = advisor.advise advisor.snapshot(game), null, {spareEnergy: 'larvarush', ageMultiple: 3}
+    script = advisor.advise advisor.snapshot(game), null, {spareEnergy: 'larvarush', ageMultiple: 3, fasterStart: 'off'}
     expect(advisor.renderEnergy script.energy).toBe 'buy 10 lepidoptera (lepidoptera 2,416/4,000)'
     expect(script.nexusLarvae).toBeUndefined()
     expect((advisor.renderAction t for t in script.tiers)).toEqual (advisor.renderAction t for t in r.tiers)
@@ -1078,6 +1079,7 @@ describe 'Service: advisor, the default climb multiple on the owner\'s 58 h save
     expect(hq.H.toNumber() / 86400).toBeCloseTo 11.6, 1
     expect(hq.kind).toBe 'buy'
     expect(hq.buys.toNumber()).toBeGreaterThan 0
-    old = _.find advisor.advise(snap, null, _.extend({ageMultiple: 3}, OWNER)).tiers, name: 'hivequeen'
+    # the old default without rule FA (with it, hive queens are started with 1 faster level: advisorfaster.coffee)
+    old = _.find advisor.advise(snap, null, _.extend({ageMultiple: 3, fasterStart: 'off'}, OWNER)).tiers, name: 'hivequeen'
     expect(old.reason).toBe 'tooSlow'
     expect(advisor.renderAction old).toMatch /^wait /

@@ -318,7 +318,8 @@ describe 'Service: advisor, long-run climb mode on a real save', ->
     game = loadGame 2 * 86400e3
     game.tick new Date(game.now.getTime() + 1.2 * 86400e3)
     snap = advisor.snapshot game
-    rOn = advisor.advise snap, null, ON
+    # LR-2's push without rule FA (with it, hive queens are started by FA and the push leaves them; advisorfaster.coffee)
+    rOn = advisor.advise snap, null, _.extend({fasterStart: 'off'}, ON)
     expect(rOn.age).toBeGreaterThan 2 * 86400
     expect(rOn.longRun.active).toBe true
     # hives pass and are bought; hive queens (H 11.6 d against a horizon of 6.1 d) do not, and LR-1 finds
@@ -333,5 +334,5 @@ describe 'Service: advisor, long-run climb mode on a real save', ->
     expected = hives.times(0.02).dividedBy(hq.cost).floor()
     expect(expected.toNumber()).toBeGreaterThan 0
     expect(([p.unit, p.buys.toString()] for p in rOn.longRun.pushes)).toEqual [['hivequeen', expected.toString()]]
-    rOff = advisor.advise snap, null, {}
+    rOff = advisor.advise snap, null, {fasterStart: 'off'}
     expect(_.find(rOff.tiers, name: 'hivequeen').reason).toBe 'tooSlow'

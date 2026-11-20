@@ -58,7 +58,8 @@ cases.forEach(function (name) {
   var conf = c.config, st = c.state, dec = c.decisions || {};
   var cfg = {ageMultiple: conf.age_multiple, territory: conf.territory_share, bank: conf.bank, moths: conf.moth_target,
     cooldown: conf.cooldown_s || conf.push_cooldown_s, share: 0.5, longRun: 'on',
-    spareEnergy: 'larvarush'};   // the simulator's reference policy casts spare energy below nexus 5, as the script did
+    spareEnergy: 'larvarush',   // the simulator's reference policy casts spare energy below nexus 5, as the script did
+    fasterStart: 'off'};        // these cases were made without rule FA (with it: hive queens start in 6 cases; MODEL-CHECK.md)
   var snap = adv.snapshot(game);
   // the advisor's timers are on the game clock (wall + skippedMillis; NO-MIRRORS.md 12.1); these saves never warped
   var clock = snap.gameNow, start = snap.restartedAt + (clock - snap.now);

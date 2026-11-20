@@ -33,7 +33,8 @@ var rel = function (a, b) { a = D(a); b = D(b); if (a.equals(b)) return 0; if (b
 var sameCount = function (a, b) { a = D(a); b = D(b); return b.abs().lessThan(Math.pow(2, 53)) ? a.equals(b) : rel(a, b) <= 1e-12; };
 // The owner's stored settings (ASCENSION.md, README: ageMultiple 5, spareEnergy 'save', longRun 'off'), with the
 // route set to swarmwarp. The route switches the long-run climb on and sets lepidoptera 10,000 itself.
-var CFG = {ascension: 'swarmwarp', ageMultiple: 5, spareEnergy: 'save', longRun: 'off', territory: 0.1};
+// Rule FA off: these cases were made without it (with it on the check also passed, 0 differences; MODEL-CHECK.md).
+var CFG = {ascension: 'swarmwarp', ageMultiple: 5, spareEnergy: 'save', longRun: 'off', territory: 0.1, fasterStart: 'off'};
 
 var cases = process.argv.slice(2);
 if (!cases.length) cases = JSON.parse(fs.readFileSync(path.join(DIR, 'index.json'), 'utf8')).cases;

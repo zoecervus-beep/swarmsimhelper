@@ -49,9 +49,25 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
     catch e
       return fallback
 
+  # rule FA (MODEL-CHECK.md, "Faster-aware climbing, pass 2"): the levels of the tier's own faster upgrade
+  fasterLevels = (name, f) -> f.levels + ' level' + (if f.levels == 1 then '' else 's') + ' of ' + upgradeLabel(name + 'prod', 'faster ' + plural(name))
+  fasterWhy = (t) ->
+    f = t.faster
+    if not f? then return ''
+    if f.type == 'held'
+      return ' — buy ' + fasterLevels(t.name, f) + ' (' + count(f.price, t.name) + ', see the tip) and they pay back inside the horizon'
+    if f.type == 'wait'
+      return ' — with ' + fasterLevels(t.name, f) + ' (' + count(f.price, t.name) + ') they would pay back once ' + bignum(f.hatch) + ' are bought; you can afford ' + bignum(f.affordable)
+    return ''
+
   action = (t) ->
     switch t.reason
-      when 'tooSlow' then 'wait ' + time(t.waitSeconds)
+      when 'tooSlow' then 'wait ' + time(t.waitSeconds) + fasterWhy(t)
+      when 'fasterStart'
+        ret = 'buy ' + bignum(t.buys)
+        if t.twin.greaterThan 1
+          ret += ' (×' + bignum(t.twin) + ' twins)'
+        ret + ' and ' + fasterLevels(t.name, t.faster) + ' (' + count(t.faster.price, t.name) + '): with them ' + plural(t.name) + ' pay back inside the horizon'
       when 'needBelow' then 'need more ' + plural(t.below)
       when 'bank' then 'skip: bank larvae for ' + plural(t.bankFor)
       when 'cooldown' then 'done, next in ' + time(t.waitSeconds)
@@ -82,7 +98,10 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
   tip = (t) ->
     text = switch t.type
       when 'faster'
-        'buy ' + upgradeLabel(t.unit + 'prod', 'faster ' + plural(t.unit)) + ' (' + count(t.cost, t.unit) + ')'
+        if t.levels? and t.levels > 1
+          'buy ' + upgradeLabel(t.unit + 'prod', 'faster ' + plural(t.unit)) + ' ×' + t.levels + ' (' + count(t.total, t.unit) + ')'
+        else
+          'buy ' + upgradeLabel(t.unit + 'prod', 'faster ' + plural(t.unit)) + ' (' + count(t.cost, t.unit) + ')'
       when 'twin'
         'buy ' + upgradeLabel(t.unit + 'twin', 'twin ' + plural(t.unit)) + ' (' + count(t.cost, t.payIn) + ')'
       when 'twinPlan'
@@ -966,7 +985,7 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
       switch key
         when 'ageMultiple'
           "Hatch a tier once its break-even time (H) is under this many times the run's age, in game time (real time plus what swarmwarp skipped). " +
-            "Higher starts new tiers earlier; counting a tier's first faster upgrade does the same as doubling this number." + (if route == 'swarmwarp' then " This route was simulated with 5; each swarmwarp adds its skip to the age, so the limit jumps with every cast." else "")
+            "Higher starts new tiers earlier. The advisor also starts a tier early when buying it with a few of its own faster upgrades makes it pay back within this limit." + (if route == 'swarmwarp' then " This route was simulated with 5; each swarmwarp adds its skip to the age, so the limit jumps with every cast." else "")
         when 'share' then "Share of the tier below offered for each minute of game time since you last hatched a unit (0.5 = half). Any swarmwarp releases all of it."
         when 'cooldown' then "After you hatch a unit, wait this many seconds of game time before suggesting it again. Any swarmwarp ends the wait."
         when 'bank' then "Stop hatching a unit, and save its larvae, once the tier above already makes this many times what larvae could."

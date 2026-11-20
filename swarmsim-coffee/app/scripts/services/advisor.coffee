@@ -20,6 +20,10 @@ angular.module('swarmApp').constant 'ADVISOR_SETTINGS',
     # House of Mirrors route of ASCENSION.md part A; or 'swarmwarp', the swarmwarp route of NO-MIRRORS.md section 12
     ascension: 'achievements'
     longRun: 'off'    # long-run climb mode (ASCENSION.md A.10): 'on' adds rules LR-1 to LR-4 from a run age of 2 days
+    # rule FA (MODEL-CHECK.md, "Faster-aware climbing, pass 2"): a tier that fails the climb test is started when
+    # buying it together with some of its own faster levels pays back inside the horizon. Not shown in Options; 'off'
+    # is the console script's climb (advisor/modelcheck/script_vs_port.js) and the older reference cases'
+    fasterStart: 'on'
   limits:
     ageMultiple: {min: 0.01, max: 1000}
     share: {min: 0.01, max: 1}
@@ -30,6 +34,7 @@ angular.module('swarmApp').constant 'ADVISOR_SETTINGS',
     spareEnergy: {choices: ['larvarush', 'save']} # a choice, not a number
     ascension: {choices: ['off', 'achievements', 'swarmwarp']}
     longRun: {choices: ['off', 'on']}
+    fasterStart: {choices: ['off', 'on']}
 
 ###*
  # @ngdoc service
@@ -238,6 +243,7 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
       prodCost: if prodUp then D(prodUp.totalCost()[0].val) else null # faster upgrade price, in this unit
       prodLevel: if prodUp then prodUp.count().toNumber() else 0 # faster levels bought
       prodFactor: if prodUp then D(prodUp.totalCost()[0].factor) else null # price growth per faster level
+      prodMult: if prodUp then D(_.find(prodUp.effect, (e) -> e.type?.name == 'multStat' and e.stat == 'prod')?.val ? 2) else null # production x per faster level
       meatCost: if unit.costByName.meat? then D(unit.costByName.meat.val) else null # meat per purchase
       purchases: String(if stats[name] then stats[name].num else 0)
 
@@ -517,14 +523,20 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
         A = R.plus given.climbLarvae
       reserve = {available: A, nexus: nexus, reserve: R, forClimb: A.minus(R)}
       left = A.minus R
+    # rule FA: the meat the climb's purchases above have used this visit (the hatch's meat cap)
+    faOn = cfg.fasterStart != 'off'
+    meatLeft = snap.meat
+    faTips = []
     for j in [tiers.length - 1..0] by -1
       x = tiers[j]
       x.buys = ZERO
-      # LR-1: a tier that fails the climb test but is affordable may still pass with faster levels.
+      u = snap.units[j + 1]
       if not x.passes
         x.kind = 'wait'
         x.reason = 'tooSlow'
         x.waitSeconds = x.waitFor.toNumber()
+        if faOn
+          left = fasterStart x, u, all[j + 1], mem, now, cfg, horizon, left, meatLeft, faTips, banksFor
       else if x.affordable.lessThan 1
         x.kind = 'wait'
         x.reason = 'needBelow'
@@ -552,12 +564,21 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
           x.reason = 'buy'
           x.buys = buys
           left = left.minus buys
+          if faOn and u.meatCost?
+            meatLeft = meatLeft.minus buys.times(u.meatCost)
         else if left.lessThan 1
           x.kind = 'skip'
           x.reason = 'larvaeUsedAbove'
         else
           x.kind = 'wait'
           x.reason = 'buildUp'
+
+    # rule FA: the faster levels a tier needs show as a tip at 1x their price (rule 5 asks 2x held), replacing the
+    # plain tip for that unit
+    if faTips.length
+      fa = _.keyBy faTips, 'unit'
+      tips = (t for t in tips when not (t.type == 'faster' and fa[t.unit]?))
+      Array::push.apply tips, faTips
 
     # LR-2: feed the tiers above the frontier, with the larvae the climbing tiers and the next nexus leave.
     lr = null
@@ -640,7 +661,94 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
     return ret
 
   # ---------------------------------------------------------------------------
+  # Rule FA (advisor/MODEL-CHECK.md, "Faster-aware climbing, pass 2", "Rule FA, if adopted (variant c2)").
+  # Pure. A tier failing rule 1 (H > horizon) with `got` units after a hatch: buying its next L faster levels costs
+  # F_L units of the tier itself (the game's price and price factor), leaves N_L = got - F_L, and multiplies its
+  # production by mult^L (the game's faster effect, x2), so it pays back by H_L = H x (N_L + F_L) / (N_L x mult^L).
+  # Returns every L in 1..FA_MAX_LEVELS and the smallest L with N_L >= 1 and H_L <= horizon (`pass`, or null).
+  FA_MAX_LEVELS = 12
+  fasterTest = (o) ->
+    H = D o.H
+    horizon = D o.horizon
+    got = D o.got
+    mult = D(o.mult ? 2)
+    price = D o.price
+    F = ZERO
+    levels = []
+    pass = null
+    for L in [1..FA_MAX_LEVELS]
+      F = F.plus price
+      price = price.times o.factor
+      N = got.minus F
+      Heff = if N.greaterThanOrEqualTo(1) then H.times(N.plus F).dividedBy(N.times Decimal.pow(mult, L)) else null
+      ok = Heff? and Heff.lessThanOrEqualTo(horizon)
+      levels.push {L: L, price: F, kept: N, H: Heff, passes: ok}
+      if ok and not pass?
+        pass = L
+    return {levels: levels, pass: pass}
+
+  # Why a tier that fails rule 1 is not started (the "wait" line's clause), or null: the fewest levels L* that could
+  # ever make it pass (mult^L* x horizon > H), their price F*, and the units that would have to be held for them:
+  # U = H x F* / (mult^L* x horizon - H) + F*, as purchases (U - held) / twin. Null when no L <= FA_MAX_LEVELS can.
+  fasterWait = (o) ->
+    H = D o.H
+    horizon = D o.horizon
+    mult = D(o.mult ? 2)
+    price = D o.price
+    F = ZERO
+    for L in [1..FA_MAX_LEVELS]
+      F = F.plus price
+      price = price.times o.factor
+      room = Decimal.pow(mult, L).times(horizon).minus(H)
+      if room.greaterThan 0
+        U = H.times(F).dividedBy(room).plus(F)
+        need = Decimal.max(U.minus(o.held), 0).dividedBy(o.twin).ceil()
+        return {levels: L, price: F, units: U, hatch: need, affordable: D(o.n)}
+    return null
+
+  # ---------------------------------------------------------------------------
   # Long-run climb mode helpers (ASCENSION.md A.10.2). Each mutates `mem` and the tier records passed.
+
+  # Rule FA on one tier `x` that failed rule 1 (unit record `u`, tier above `up`). Mutates `x`, `mem` and `faTips`;
+  # returns the larvae left. In order:
+  # - a banked tier (rule 4) is left alone;
+  # - the units held already pay for the levels (after an FA hatch, say): the levels' tip at 1x, and the row says so;
+  # - in its cooldown (rule 3's earmark comes first): no hatch;
+  # - n = floor(min(larvae left for the climb, tier below held / cost, meat left / meat price)): all that is
+  #   affordable now. (The simulator caps the meat at half; the advisor uses the meat left after this visit's
+  #   climb purchases above, as rule 3 has no meat share.) If the test passes with n, the tier is a buy of n
+  #   ('fasterStart') with the levels' tip at 1x; else the "wait" line gets `fasterWait`'s clause, when some
+  #   L <= FA_MAX_LEVELS could ever pass and the tier below is held.
+  fasterStart = (x, u, up, mem, now, cfg, horizon, left, meatLeft, faTips, banksFor) ->
+    if not u.prodCost? or not u.prodFactor? or banksFor(x, up)
+      return left
+    io = {H: x.H, horizon: horizon, mult: u.prodMult ? 2, price: u.prodCost, factor: u.prodFactor}
+    held = fasterTest _.extend({got: x.count}, io)
+    if held.pass?
+      lv = held.levels[held.pass - 1]
+      x.faster = {type: 'held', levels: held.pass, price: lv.price, H: lv.H}
+      faTips.push {type: 'faster', unit: x.name, cost: u.prodCost, levels: held.pass, total: lv.price, fasterStart: true}
+      return left
+    n = Decimal.min(left, x.affordable)
+    if u.meatCost?
+      n = Decimal.min n, Decimal.max(meatLeft, 0).dividedBy(u.meatCost)
+    n = Decimal.max(n, 0).floor()
+    since = (now - lastBuyTime(mem, x.name, u.purchases, now, cfg.cooldown)) / 1000
+    if since >= cfg.cooldown and n.greaterThanOrEqualTo 1
+      res = fasterTest _.extend({got: x.count.plus n.times(x.twin)}, io)
+      if res.pass?
+        lv = res.levels[res.pass - 1]
+        x.kind = 'buy'
+        x.reason = 'fasterStart'
+        x.buys = n
+        x.faster = {type: 'start', levels: res.pass, price: lv.price, H: lv.H, n: n}
+        faTips.push {type: 'faster', unit: x.name, cost: u.prodCost, levels: res.pass, total: lv.price, fasterStart: true}
+        return left.minus n
+    if x.belowCount.greaterThan 0
+      w = fasterWait _.extend({held: x.count, twin: x.twin, n: n}, io)
+      if w?
+        x.faster = _.extend {type: 'wait'}, w
+    return left
 
   # The frontier on the state as it is, before this visit's purchases (LR-3): the highest tier held
   # that passes the plain climb test; drone (index 0) at least.
@@ -701,6 +809,10 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
       x = all[k - 1]
       line = {unit: u.name, below: b.name}
       lines.push line
+      # started by rule FA this visit: the push leaves it to the climb
+      if x.reason == 'fasterStart'
+        line.outcome = 'fasterStart'
+        continue
       since = (now - lastBuyTime(mem, u.name, u.purchases, now, cfg.cooldown)) / 1000
       if since < cfg.cooldown
         line.outcome = 'cooldown'
@@ -984,7 +1096,10 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
 
   renderAction = (t) ->
     switch t.reason
-      when 'tooSlow' then 'wait ' + formatTime(t.waitSeconds)
+      when 'tooSlow' then 'wait ' + formatTime(t.waitSeconds) + renderFasterWhy(t)
+      when 'fasterStart'
+        'BUY ' + formatNumber(t.buys) + (if t.twin.greaterThan(1) then ' (x' + formatNumber(t.twin) + ' twins)' else '') +
+          ' and ' + t.faster.levels + ' faster ' + t.name + ' level' + (if t.faster.levels == 1 then '' else 's') + ' (' + formatNumber(t.faster.price) + '): with them ' + t.name + 's pay back inside the horizon'
       when 'needBelow' then 'need more ' + t.below + 's'
       when 'bank' then 'skip: bank larvae for ' + t.bankFor + 's'
       when 'cooldown' then 'done, next in ' + formatTime(t.waitSeconds)
@@ -994,6 +1109,18 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
       # long-run mode
       when 'push' then 'feed upward: ' + renderPush(t.push)
       else ''
+
+  # rule FA's clause on a "wait" line: " - with 3 faster levels (2.93e7 empresss) they would pay back once 2.69e8 are
+  # bought; you can afford 1.04e7", or the levels to buy when the units held already pay for them
+  renderFasterWhy = (t) ->
+    f = t.faster
+    if not f? then return ''
+    levels = f.levels + ' faster level' + (if f.levels == 1 then '' else 's')
+    if f.type == 'held'
+      return ' - buy ' + levels + ' (' + formatNumber(f.price) + ' ' + t.name + 's) and they pay back inside the horizon'
+    if f.type == 'wait'
+      return ' - with ' + levels + ' (' + formatNumber(f.price) + ' ' + t.name + 's) they would pay back once ' + formatNumber(f.hatch) + ' are bought; you can afford ' + formatNumber(f.affordable)
+    return ''
 
   # "hatch 3.20e15 overmind5s (half your overmind4s)"
   renderPush = (rec) ->
@@ -1010,7 +1137,11 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
 
   renderTip = (tip) ->
     switch tip.type
-      when 'faster' then 'faster ' + tip.unit + 's (' + formatNumber(tip.cost) + ')'
+      when 'faster'
+        if tip.levels? and tip.levels > 1
+          'faster ' + tip.unit + 's x' + tip.levels + ' (' + formatNumber(tip.total) + ')'
+        else
+          'faster ' + tip.unit + 's (' + formatNumber(tip.cost) + ')'
       when 'twin' then 'twin ' + tip.unit + 's (' + formatNumber(tip.cost) + ' ' + tip.payIn + 's)'
       when 'twinPlan'
         (renderStep(s) for s in tip.steps).join(' > ') + ' > twin ' + tip.unit + 's (pays back in ' + formatTime(tip.payback) + ')'
@@ -1153,6 +1284,9 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
     larvaPlan: larvaPlan
     renderLarvae: renderLarvae
     pushLine: pushLine
+    fasterTest: fasterTest
+    fasterWait: fasterWait
+    FA_MAX_LEVELS: FA_MAX_LEVELS
     # routes and clocks (NO-MIRRORS.md 11-13)
     SW: SW
     EXPANSION_GOAL: EXPANSION_GOAL

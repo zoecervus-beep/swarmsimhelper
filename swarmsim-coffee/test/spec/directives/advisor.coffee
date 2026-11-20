@@ -1209,7 +1209,7 @@ describe 'Directive: advisorOptions', ->
     expect(helpOf el, 'moths').toContain '10,000 in a first run, 30,000 in a quick run and from day 3 of the long run, and 4,000 in the long run before that'
     expect(helpOf el, 'longRun').toContain 'from day 3 raises the lepidoptera target to 30,000'
     expect(helpOf el, 'longRun').toContain '2 days old in game time'
-    expect(helpOf el, 'ageMultiple').toBe 'Hatch a tier once its break-even time (H) is under this many times the run\'s age, in game time (real time plus what swarmwarp skipped). Higher starts new tiers earlier; counting a tier\'s first faster upgrade does the same as doubling this number. Default 5.'
+    expect(helpOf el, 'ageMultiple').toBe 'Hatch a tier once its break-even time (H) is under this many times the run\'s age, in game time (real time plus what swarmwarp skipped). Higher starts new tiers earlier. The advisor also starts a tier early when buying it with a few of its own faster upgrades makes it pay back within this limit. Default 5.'
     expect(el.querySelectorAll('input[name=advisor-longRun]').length).toBe 2
     # the swarmwarp route
     pick el, 'swarmwarp'
@@ -1260,5 +1260,5 @@ describe 'Directive: advisorOptions', ->
     el = render()
     angular.element(el.querySelector '.advisor-options button').triggerHandler 'click'
     $rootScope.$digest()
-    expect(options.advisorConfig()).toEqual {ageMultiple: 5, share: 0.5, cooldown: 60, bank: 3, territory: 0.1, moths: 4000, spareEnergy: 'save', ascension: 'achievements', longRun: 'off'}
+    expect(options.advisorConfig()).toEqual {ageMultiple: 5, share: 0.5, cooldown: 60, bank: 3, territory: 0.1, moths: 4000, spareEnergy: 'save', ascension: 'achievements', longRun: 'off', fasterStart: 'on'}
     expect(el.querySelector('#advisor-moths').value).toBe '4000'

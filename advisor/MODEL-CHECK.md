@@ -511,6 +511,31 @@ For every meat tier k ≥ 2 the climb table considers that **fails rule 1** (H >
 - the first start by the rule on each route: hive queens with 1–2 levels; empresses with 3 levels in the first run and in run 2; prophet, hive neuron and hive network with 1 level; the swarmwarp route's runs 1 and 2;
 - both sides of the line (1 ± 1e-6) for hive networks with 1 level.
 
+### The port (Nov 20, 2026)
+
+Rule FA is in the advisor (`advisor.coffee`: `fasterTest`, `fasterWait`, and `fasterStart` in the climb), on by default, as the spec above, with these choices:
+- **n** is floor(min(larvae left for the climb at that tier, tier below / cost, meat left after this visit's climb purchases above / meat price)). The simulator caps the meat at half; the advisor has no meat share in rule 3, so none here.
+- **The levels' tip** shows at 1× price whenever the units already held pay for the levels (after the hatch, for instance), so it is stateless.
+- **The push (LR-2)** leaves a tier FA starts this visit. It may still feed a tier whose FA test failed (`line_just_below`), as before.
+- **The faster multiplier** (×2 per level) is read from the game's effect, and the prices from the upgrade's price and factor.
+- **Config key `fasterStart`** ('on' by default, not shown in Options): 'off' gives the advice without the rule.
+
+`advisor/modelcheck/faster_check.js` runs the 16 reference cases through the advisor with the rule on. Result: 16 cases, 0 differences.
+- **Exact given the reference's n and horizon:** every level 1–12 (price, units kept, H with them, passes) and the decision with its wait clause.
+- **n:** exact given the reference's larvae for the climb.
+- **The port's own advice:** where its n equals the reference's, the same decision (22 tiers); 7 printed (no n: the clause is omitted past 12 levels, or the push fed the tier).
+- **Horizon:** to 1 ms of run age. On the swarmwarp route the game skips whole milliseconds per cast; the estimate uses the unrounded skip.
+- **Followed in the game, all 13 starts:** hatch n; the levels' tip at 1×; the L levels bought; the tier passes the plain test; 61 s later it is still climbing.
+- **One disagreement**, settled for the game's arithmetic: `run2_asc1_prophet` L = 2, units kept −8,585,974,175,440,812.188. The reference's float drops the fraction near 2^53, so this field is compared at 1e-12 relative.
+
+**Checks run with the rule off**, because their reference cases or the console script were made without it:
+- `script_vs_port.js`: the script has no FA.
+- `longrun_check.js`: with the rule on, hive queens are started in 6 cases (11 differences: climb outcome, counts, one earmark).
+- `swarmwarp_check.js`: with the rule on it also passed, 0 differences.
+- `early_check.js`: it calls only the energy advice, which the rule never touches.
+
+The reference outputs were not changed.
+
 ### What was not modelled
 
 - **The native port itself.** The simulator's rules ran, with the long-run cases' known differences: the meat cap at half the meat, the territory purse, drones.
