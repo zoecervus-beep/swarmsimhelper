@@ -1,0 +1,177 @@
+{
+ "case": "run2b_save",
+ "exercises": "the owner's run 2 at 3.0 d (4.4e18 empresses, 1 neuroprophet)",
+ "save": "run2b_save.save.json",
+ "config": {
+  "seed_share": 0.01,
+  "cooldown_s": 60,
+  "age_multiple": 5,
+  "meat_share": 0.5,
+  "gate": null,
+  "reserve": null
+ },
+ "rule_SEED": {
+  "run_age_s": 262176.498,
+  "horizon_s": 1310882.4900000002,
+  "frontier": "empress",
+  "larvae_for_climb": "7.3060453336068695e+10",
+  "lines": [
+   {
+    "tier": 20,
+    "name": "overmind6",
+    "H_s": "9.1949635504923779e+57",
+    "below_held": "0",
+    "outcome": "nothing below"
+   },
+   {
+    "tier": 19,
+    "name": "overmind5",
+    "H_s": "9.0661648475401104e+48",
+    "below_held": "0",
+    "outcome": "nothing below"
+   },
+   {
+    "tier": 18,
+    "name": "overmind4",
+    "H_s": "8.9191816937453782e+40",
+    "below_held": "0",
+    "outcome": "nothing below"
+   },
+   {
+    "tier": 17,
+    "name": "overmind3",
+    "H_s": "8.7522477595826322e+33",
+    "below_held": "0",
+    "outcome": "nothing below"
+   },
+   {
+    "tier": 16,
+    "name": "overmind2",
+    "H_s": "8.5636826843252590e+27",
+    "below_held": "0",
+    "outcome": "nothing below"
+   },
+   {
+    "tier": 15,
+    "name": "overmind",
+    "H_s": "8.3519867459774406e+22",
+    "below_held": "0",
+    "outcome": "nothing below"
+   },
+   {
+    "tier": 14,
+    "name": "pantheon5",
+    "H_s": "8.1159538143067515e+18",
+    "below_held": "0",
+    "outcome": "nothing below"
+   },
+   {
+    "tier": 13,
+    "name": "pantheon4",
+    "H_s": "7854798465523651.0",
+    "below_held": "0",
+    "outcome": "nothing below"
+   },
+   {
+    "tier": 12,
+    "name": "pantheon3",
+    "H_s": "7.5682895307131547e+13",
+    "below_held": "0",
+    "outcome": "nothing below"
+   },
+   {
+    "tier": 11,
+    "name": "pantheon2",
+    "H_s": "7.2568784603014832e+11",
+    "below_held": "0",
+    "outcome": "nothing below"
+   },
+   {
+    "tier": 10,
+    "name": "pantheon",
+    "H_s": "6.9218074189288864e+09",
+    "below_held": "0",
+    "outcome": "nothing below"
+   },
+   {
+    "tier": 9,
+    "name": "goddess",
+    "H_s": "6.5651799782950437e+08",
+    "below_held": "0",
+    "outcome": "nothing below"
+   },
+   {
+    "tier": 8,
+    "name": "prophet",
+    "H_s": "3.0949888754195370e+07",
+    "below_held": "3.3987640707599606e+18",
+    "n": "339876407.0",
+    "binding": "share of the tier below",
+    "caps": {
+     "share of the tier below": "3.3987640707599610e+08",
+     "share of the larvae": "7.3060453336068702e+08",
+     "half the meat": "2.1430363200754778e+57",
+     "larvae left": "7.3060453336068695e+10"
+    },
+    "outcome": "hatch"
+   }
+  ],
+  "larvae_left_for_climb": "7.2720576929068695e+10"
+ },
+ "simulator": {
+  "seed": [
+   {
+    "tier": 8,
+    "name": "prophet",
+    "n": "339876407.0",
+    "f": 0.01
+   }
+  ],
+  "climb": [
+   {
+    "tier": 8,
+    "name": "prophet",
+    "outcome": "cooldown",
+    "earmarked": "16823882150.0"
+   },
+   {
+    "tier": 7,
+    "name": "empress",
+    "outcome": "buys",
+    "n_sim": "55896694779.0",
+    "test": "plain"
+   },
+   {
+    "tier": 6,
+    "name": "hivequeen",
+    "outcome": "bank"
+   },
+   {
+    "tier": 5,
+    "name": "hive",
+    "outcome": "bank"
+   },
+   {
+    "tier": 4,
+    "name": "greaterqueen",
+    "outcome": "bank"
+   },
+   {
+    "tier": 3,
+    "name": "nest",
+    "outcome": "bank"
+   },
+   {
+    "tier": 2,
+    "name": "queen",
+    "outcome": "bank"
+   },
+   {
+    "tier": 1,
+    "name": "drone",
+    "outcome": "bank"
+   }
+  ],
+  "twin_prefix": []
+ }
+}

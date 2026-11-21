@@ -1,0 +1,18 @@
+{
+ "cases": [
+  "run2_save",
+  "run2b_save",
+  "mirrors20_day0.5",
+  "mirrors20_day2",
+  "mirrors20_day3.5",
+  "mirrors20_day6",
+  "mirrors20_day20",
+  "mirrors20_day45",
+  "warp_day2",
+  "warp_day10",
+  "warp_day30",
+  "cooldown",
+  "few_larvae"
+ ],
+ "generated_in_s": 26
+}

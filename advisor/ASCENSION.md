@@ -521,6 +521,170 @@ The policy option `empower` follows the native advisor's `empowerAdvice` rule: e
 - **Quick-run behaviour with the mode left on.** LR-4's lepidoptera count as spent energy, so ascension timing should not move, but this was not simulated.
 - **A person's real check-in log.** The cadence profiles are guesses; the owner's actual pattern would replace them.
 
+#### A.10.9 Pass 5 (Nov 21, 2026): cut, keep or replace the mode?
+
+The owner turned the long-run mode off and asked for it to be cut or reworked. It had to be switchable on the swarmwarp route too.
+
+Since pass 4, rule FA (MODEL-CHECK.md, faster-aware pass 2, variant c2) is native and always on, the advisor has the game clock, and the default multiple is 5. Measured with all of that:
+- the advisor's sizing, honest larvae, the advisor's H;
+- FA on in every variant;
+- each route's settings (NO-MIRRORS.md 12; the mirrors route with the mode only in its long run).
+
+**Starts:**
+- **run2:** the owner's run 2 at 45 h (`example_save_run2_45h.json`, mode on);
+- **run2b:** the same run at 3.0 d (`example_save_run2_72h.json`, mode off, 4.4e18 empresses, 1 neuroprophet);
+- **mirrors20:** the mirrors route from the 20.1 h save: first run, long run, quick runs;
+- **warp:** the swarmwarp route from the 20.1 h save.
+
+**Cadences:** ideal, human (3 seeds), busy, twice a day. Scripts: `advisor/sim/lr_cut.py` (about 55 minutes on 4 cores) and `lr_cut_sweep.py` (about 13 minutes).
+
+**Verdict: replace (likely).** The mode can go, but not without a replacement:
+- **Mode off costs ~78 days on the mirrors route**, from every start: no endless until the quick runs.
+- **On the swarmwarp route, mode off never finishes within 500 days.**
+- **Rule SEED is one always-on rule with no gate, no mode and one share** (1%; any value from 1e-4 to 0.1 does the same):
+  - the same total days as the mode on the mirrors route, with endless 2–5 days sooner;
+  - on the swarmwarp route **84 days instead of 139** (ideal), 97–98 instead of 154–155 (human), 135 instead of 198 (busy), 211 instead of 244 (twice a day);
+  - **no harm in first or quick runs.**
+- **LR-4** (30,000 lepidoptera from day 3 of the long run) is worth 7 days on the mirrors route. It is a lepidoptera target, not a climb rule: keep it as the route's long-run target (`runMoths` already does this), independent of any mode.
+
+##### Mode off: where it stalls (days from the save; ideal, then human seeds 1 / 2 / 3, busy, twice a day)
+
+| Start | Mode on | Mode off | Mode off: first endless | Mode off: top tier on day 20 / 60 |
+| --- | --- | --- | --- | --- |
+| run2 | 168; 173 / 173 / 174; 181; 189 | 247; 252 / 251 / 251; 261; – | day 173 (in the quick runs) | hive network / arch-mind |
+| run2b | 167; 171 / 171 / 171; 180; 187 | 245; 250 / 251 / 251; 261; 270 | day 171 | hive network / arch-mind |
+| mirrors20 | 174; 181 / 181 / 181; 193; 205 | 253; 259 / 260 / 260; 273; – | day 178 | neural cluster / arch-mind |
+| warp | 139; 155 / 155 / 154; 198; 244 | **not finished by day 500** (1,000 expansions on day 229, never 2,000) | never | empress / hive network |
+
+- **The mirrors route with the mode off:**
+  - expansions are unaffected (1,000 / 2,000 / 5,000 on days 18 / 37 / 94 from run2), because mirrors make them;
+  - but the long run never climbs past arch-mind, so every endless achievement waits for the quick runs' enormous mutagen (day ~172);
+  - FA alone does not climb it.
+- **The swarmwarp route with the mode off:** the build runs never climb high enough to compound, so the route does not finish at all. **"Mode off on the swarmwarp route" must not be offered without a replacement.**
+
+##### Which parts carry it (ideal / human seed 1, days to every achievement)
+
+| Variant | run2 | mirrors20 | warp | Note |
+| --- | --- | --- | --- | --- |
+| mode on | 168 / 173 | 174 / 181 | 139 / 155 | |
+| without LR-0 (no 2-day gate) | 168 / 173 | 174 / 181 | 139 / 156 | **dead weight** |
+| without LR-2's 1% reserve (honest, no reserve) | 247 / 252 | 253 / 259 | not finished | **this is the whole result** |
+| without LR-3 (no twin guard) | 168 / 173 | 174 / 181 | **84 / 103** | **the guard now costs ~55 days** on the swarmwarp route; first endless 3 days sooner on the mirrors route |
+| without LR-4 (no day-3 lepidoptera raise) | 175 / 181 | 181 / 188 | 139 / 155 | worth 7 days via expansions (5,000 on day 101 instead of 94): a lepidoptera rule, keep it in the route |
+| LR-2 alone (no gate, no guard, no LR-4) | 175 / 181 | 181 / 188 | 84 / 98 | |
+| mode on + twin prefix | 168 / 173 | 174 / 181 | 139 / 155 | the prefix changes nothing |
+
+##### Candidates for one always-on rule (FA on in all)
+
+| Candidate | run2 | run2b | mirrors20 | warp: ideal; human 1 / 2 / 3; busy; twice |
+| --- | --- | --- | --- | --- |
+| (c) FA + the twin planner's prefix detour | as mode off | as mode off | as mode off | not finished |
+| (a) horizon = max(5 × age, the run's expected remaining time) | as mode off | as mode off | as mode off | not finished |
+| (b) seeding, f = horizon / H per tier | 168 | 167 | 174 | 92; 108 / 115 / 108; 157; 246 |
+| (b) seeding, f = min(1%, horizon / H) | – | 167 | 174 | 88; 103 (seed 1) |
+| **(b) seeding, f = 1% (rule SEED)** | **168** | **167** | **174** | **84; 98 / 97 / 97; 135; 211** |
+| (b) seeding, f = 1e-4 / 1e-3 / 0.1 | – / 168 / – | 167 / 167 / 167 | 174 / 174 / 174 | 87 / 84 / 83 ideal; 103 / 98 / 103 human (seed 1) |
+| seeding 1% + the mode on | – | 167 | 174 | 103 / 119 (the guard again) |
+
+Endless with rule SEED (ideal / human seed 1):
+- run2: first endless 45 / 45 against 47 / 48 with the mode; 1e62 on 56 / 57 against 60 / 60.
+- run2b: 44 / 44 against 46 / 47; 55 / 55 against 59 / 59.
+- mirrors20: 50 / 52 against 53 / 54; 61 / 64 against 66 / 67.
+- warp: 52 / 57 against 101 / 111; 56 / 61 against 107 / 117.
+
+Expansions are the same as with the mode on the mirrors route. On the swarmwarp route 5,000 expansions come on day 82 / 98 instead of 139 / 155.
+
+What this shows:
+- **(a) and (c) do nothing.** Remaining run time is 90+ days in the long run, but the upper tiers' H is centuries, so no horizon short of that passes them. The prefix detour does not move any milestone. The simulator's twin seeking has the same limitation as the port's `acquire` (paid only from tier-j units already held); with the prefix option it changed nothing measurable.
+- **What carries the result is a small, steady flow of larvae and units to the tiers above the frontier**, taken before the climb can spend them. That was LR-2 with its reserve, without needing its gate, its 50% / 2% shares or its guard.
+- **There is no principled f from payback.** f = horizon / H starves the top tiers (their H is 10^10 times the horizon) and over-feeds the tier just above the frontier, which costs early meat (swarmwarp run 2: nexus 5 at 14.8 h instead of 10.6, day-3 meat 10^8 lower). The flat result over f = 1e-4 … 0.1 is the same scale-free behaviour pass 4 found for the reserve. 1% is a round, visible share.
+
+##### No harm in first and quick runs (rule SEED against the mode on; ideal)
+
+| Measure | Mode on | Rule SEED (1%) |
+| --- | --- | --- |
+| mirrors20: first ascension (day), log10 premutagen | 3.9, 7.8 | 3.9, 7.8 |
+| mirrors20: nexus 5 in run 1 | 9.9 h | 9.9 h |
+| mirrors20: quick-run length (mean) | 3.91 d | 3.91 d |
+| mirrors20: log10 meat/s on days 1 / 3 / 7 | 45.3 / 61.0 / 77.0 | 45.5 / 61.1 / 77.7 |
+| warp: first ascension, log10 premutagen | 3.9, 6.6 | 3.9, 6.7 |
+| warp: nexus 5 in runs 1 / 2 | 9.9 / 10.6 h | 9.9 / 10.6 h |
+
+The rule acts in first runs from the start (no gate), and that costs nothing measurable. The gate existed because the pass-2 push fed 50% of each tier; 1% does not starve the climb.
+
+##### Rule SEED (spec for the port; replaces LR-0 to LR-3)
+
+Always on, every route, every stage, at every look (between swarmwarps too).
+
+1. **Inputs from the game:**
+   - every meat tier's count, H (the advisor's: tier × cost / (twin × prodEach)), cost in the tier below and meat cost;
+   - meat;
+   - the horizon (age multiple × game-clock run age);
+   - the purchase memory's last hatch time (game clock).
+2. **A** = the larvae the climb may use: larvae × (1 − territory share), floored, minus the larvae held for the next nexus. It is taken at the start of the climb, before rule 3 or FA spend any.
+3. **The frontier** = the highest owned tier that passes the plain test (H ≤ horizon); drones count as passing. FA passes do not count.
+4. **For each tier k from endless down to frontier + 1** (top down):
+   - **Skip** when none of tier k − 1 is held, or when it was hatched less than 60 s ago on the game clock.
+   - **Otherwise** n = floor(min(1% × held(k − 1) / cost_k, 1% × A, ½ meat / meatCost_k, larvae left)).
+   - If n ≥ 1, the line says: **"seed upward: hatch 3.4e8 neuroprophets (1% of what your hive empresses buy)"**. It takes its larvae, units and meat before the next line.
+5. **The climb** (rule 3, FA, banking) then works with A less the seeded larvae, exactly as now.
+6. **Interactions:**
+   - Banking is unchanged: seeding never looks at banked tiers, which are below the frontier.
+   - FA is unchanged; a tier FA starts this visit is above the frontier and may also get a seed line.
+   - **Twin plans and tips: drop the LR-3 guard.** A twin paid in a seeded tier may be suggested as today.
+   - Swarmwarp: re-taken between warps like every purchase.
+   - **Stages:** the same rule everywhere; there is nothing to switch on or off. The mirrors route keeps its lepidoptera targets (10,000 first run, 30,000 from day 3 of the long run, 30,000 in quick runs), and the swarmwarp route keeps 10,000.
+7. **Remove** the long-run setting, LR-0, LR-2's 50% / 2% shares and its reserve, and LR-3. LR-4 is already the route's lepidoptera target.
+
+**Reference cases:** `advisor/modelcheck/seed_cases/`, 13 cases from `seed_cases.py` (about 30 s), with a README of fields and what must match. In every case the rule's lines equal the simulator's seed lines, and every save round-trips in the game to within 1.6e-6. They cover:
+- both owner saves;
+- the first run at 12 h (nothing to seed), days 2 and 3.5;
+- long-run days 2, 16 and 41 (seed lines up to universal cortex);
+- the swarmwarp route on days 2, 10 and 30 (game-clock horizon);
+- a cooldown;
+- a state with too few larvae (under one hatch).
+
+##### The owner's run from the 3.0 d save
+
+| Option | Every achievement (ideal / human, days from that save) | First endless | 1e62 endless | 5,000 expansions | First look |
+| --- | --- | --- | --- | --- | --- |
+| as now (mode off) | 245 / 250–251 | 171 (in the quick runs) | 171 | 93 | nothing above empresses; the climb sits at hive network on day 20 |
+| mode back on | 167 / 171 | 46 / 47 | 59 | 93 | feed-upward lines |
+| **rule SEED** | **167 / 171** | **44 / 44** | **55** | 93 | "seed upward: hatch 3.4e8 neuroprophets" |
+| FA + twin prefix, or the remaining-time horizon | 245 / 250–251 | 171 | 171 | 93 | as now |
+
+**Grades:**
+
+| Finding | Grade |
+| --- | --- |
+| Mode off costs ~78 days on the mirrors route and never finishes the swarmwarp route | **likely** (four starts, six cadences, consistent) |
+| LR-2's reserve carries the mode; LR-0 is dead weight; LR-3 now costs the swarmwarp route ~55 days; LR-4 is worth 7 days and is a lepidoptera rule | **likely** |
+| Rule SEED equals the mode on the mirrors route and is ~40–55 days faster on the swarmwarp route, with no harm in first and quick runs | **likely**; days simulator-only |
+| f is flat from 1e-4 to 0.1; payback-tied f is worse | **likely** (two cadences, three starts) |
+| (a) and (c) alone do nothing | **likely** |
+
+**Not modelled:**
+- **The port's own twin planner.** The simulator's twin seeking with the prefix stands in for the port's fixed `acquire`; the two are not the same code.
+- **Sizing.** Rule-3 sizing as before, with the usual meat-cap, territory-purse and drone differences.
+- **Starts and seeds.** One swarmwarp start; human seeds 1–3 only in the main table; ablations and the sweep at ideal and human seed 1.
+- **The panel wording**, which is a proposal.
+
+**Reproduce:**
+
+```sh
+python3 -I advisor/sim/lr_cut.py --jobs 4            # A.10.9's tables (main ~36 min, ablate ~18 min)
+python3 -I advisor/sim/lr_cut_sweep.py               # the f sweep, ~13 min
+python3 -I advisor/modelcheck/seed_cases.py          # rule SEED's reference cases + round trip, ~30 s
+```
+
+New `sim.py` options, all off by default. With them off, `run_example.py` (both saves), `compare.py` (both saves), `ascension_compare.py` and `bignum_check.py` are byte-identical:
+
+| Option | What it does |
+| --- | --- |
+| `twin_prefix` | twin seeking may first hatch the tier-k units that pay for the detour (when the tier below could hatch twice that) |
+| `seed` | rule SEED: `{'f': share}`, or `{'f': 'payback', 'cap': c}` |
+| `horizon_fn` | a function raising the horizon (candidate (a)) |
+
 ### A.11 Early game: the fastest path to the first mirror cast
 
 Nov 14, 2026. The objective here is narrower than in A.1–A.10: **the real time from the start of a run to (a) nexus 5 and the first House of Mirrors cast, and (b) the ascension becoming affordable** under the save rule of A.5. Every one of the ~20 runs of the route starts from scratch, and the 18 quick runs are almost nothing but this stretch, so an hour saved here is paid back about twenty times. Meat, tiers and mutagen count only where they gate those two times.

@@ -1,0 +1,200 @@
+{
+ "case": "mirrors20_day20",
+ "exercises": "mirrors route from the 20.1 h save, day 20 (stage longRun, ascensions 1)",
+ "save": "mirrors20_day20.save.json",
+ "config": {
+  "seed_share": 0.01,
+  "cooldown_s": 60,
+  "age_multiple": 5,
+  "meat_share": 0.5,
+  "gate": null,
+  "reserve": null
+ },
+ "rule_SEED": {
+  "run_age_s": 1393800.0,
+  "horizon_s": 6969000.0,
+  "frontier": "pantheon4",
+  "larvae_for_climb": "4.3508094610672040e+40",
+  "lines": [
+   {
+    "tier": 20,
+    "name": "overmind6",
+    "H_s": "9.9999999999999994e+57",
+    "below_held": "0",
+    "outcome": "nothing below"
+   },
+   {
+    "tier": 19,
+    "name": "overmind5",
+    "H_s": "9.9999999999999995e+48",
+    "below_held": "0",
+    "outcome": "nothing below"
+   },
+   {
+    "tier": 18,
+    "name": "overmind4",
+    "H_s": "1.0000000000000000e+41",
+    "below_held": "0",
+    "outcome": "nothing below"
+   },
+   {
+    "tier": 17,
+    "name": "overmind3",
+    "H_s": "9.9999999999999995e+33",
+    "below_held": "0",
+    "outcome": "nothing below"
+   },
+   {
+    "tier": 16,
+    "name": "overmind2",
+    "H_s": "9.9999999999999996e+27",
+    "below_held": "277688361125391.0",
+    "n": "0",
+    "binding": "share of the tier below",
+    "caps": {
+     "share of the tier below": "2.7768836112539102e-16",
+     "share of the larvae": "4.3508094610672041e+38",
+     "half the meat": "3.3150473510677700e+282",
+     "larvae left": "4.3508094610672040e+40"
+    },
+    "outcome": "under one"
+   },
+   {
+    "tier": 15,
+    "name": "overmind",
+    "H_s": "3.1249999999999997e+21",
+    "below_held": "2.0449063819988213e+38",
+    "n": "20449063819988.0",
+    "binding": "share of the tier below",
+    "caps": {
+     "share of the tier below": "2.0449063819988215e+13",
+     "share of the larvae": "4.3508094610672041e+38",
+     "half the meat": "2.9835442260592252e+284",
+     "larvae left": "4.3508094610672040e+40"
+    },
+    "outcome": "hatch"
+   },
+   {
+    "tier": 14,
+    "name": "pantheon5",
+    "H_s": "3.7252902984619141e+10",
+    "below_held": "7.4723324226759409e+53",
+    "n": "7.4723324226759413e+32",
+    "binding": "share of the tier below",
+    "caps": {
+     "share of the tier below": "7.4723324226759413e+32",
+     "share of the larvae": "4.3508094610672041e+38",
+     "half the meat": "2.6851871950952924e+286",
+     "larvae left": "4.3508094610672040e+40"
+    },
+    "outcome": "hatch"
+   }
+  ],
+  "larvae_left_for_climb": "4.3508093863438796e+40"
+ },
+ "simulator": {
+  "seed": [
+   {
+    "tier": 15,
+    "name": "overmind",
+    "n": "20449063819988.0",
+    "f": 0.01
+   },
+   {
+    "tier": 14,
+    "name": "pantheon5",
+    "n": "7.4723324226759413e+32",
+    "f": 0.01
+   }
+  ],
+  "climb": [
+   {
+    "tier": 16,
+    "name": "overmind2",
+    "outcome": "fa_fails",
+    "n_sim": "0",
+    "faster_level_L": 0
+   },
+   {
+    "tier": 15,
+    "name": "overmind",
+    "outcome": "cooldown",
+    "earmarked": "1134655353502539.0"
+   },
+   {
+    "tier": 14,
+    "name": "pantheon5",
+    "outcome": "cooldown",
+    "earmarked": "3.6988045492245906e+34"
+   },
+   {
+    "tier": 13,
+    "name": "pantheon4",
+    "outcome": "buys",
+    "n_sim": "4.3508056875393303e+40",
+    "test": "plain"
+   },
+   {
+    "tier": 12,
+    "name": "pantheon3",
+    "outcome": "bank"
+   },
+   {
+    "tier": 11,
+    "name": "pantheon2",
+    "outcome": "bank"
+   },
+   {
+    "tier": 10,
+    "name": "pantheon",
+    "outcome": "bank"
+   },
+   {
+    "tier": 9,
+    "name": "goddess",
+    "outcome": "bank"
+   },
+   {
+    "tier": 8,
+    "name": "prophet",
+    "outcome": "bank"
+   },
+   {
+    "tier": 7,
+    "name": "empress",
+    "outcome": "bank"
+   },
+   {
+    "tier": 6,
+    "name": "hivequeen",
+    "outcome": "bank"
+   },
+   {
+    "tier": 5,
+    "name": "hive",
+    "outcome": "bank"
+   },
+   {
+    "tier": 4,
+    "name": "greaterqueen",
+    "outcome": "bank"
+   },
+   {
+    "tier": 3,
+    "name": "nest",
+    "outcome": "bank"
+   },
+   {
+    "tier": 2,
+    "name": "queen",
+    "outcome": "bank"
+   },
+   {
+    "tier": 1,
+    "name": "drone",
+    "outcome": "bank"
+   }
+  ],
+  "twin_prefix": []
+ }
+}

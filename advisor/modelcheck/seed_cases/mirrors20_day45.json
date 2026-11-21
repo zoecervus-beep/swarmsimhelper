@@ -1,0 +1,192 @@
+{
+ "case": "mirrors20_day45",
+ "exercises": "mirrors route from the 20.1 h save, day 45 (stage longRun, ascensions 1)",
+ "save": "mirrors20_day45.save.json",
+ "config": {
+  "seed_share": 0.01,
+  "cooldown_s": 60,
+  "age_multiple": 5,
+  "meat_share": 0.5,
+  "gate": null,
+  "reserve": null
+ },
+ "rule_SEED": {
+  "run_age_s": 3553800.0,
+  "horizon_s": 17769000.0,
+  "frontier": "overmind3",
+  "larvae_for_climb": "3.1774817508900949e+97",
+  "lines": [
+   {
+    "tier": 20,
+    "name": "overmind6",
+    "H_s": "9.9999999999999994e+57",
+    "below_held": "228288987423898.0",
+    "n": "0",
+    "binding": "share of the tier below",
+    "caps": {
+     "share of the tier below": "2.2828898742389800e-46",
+     "share of the larvae": "3.1774817508900950e+95",
+     "half the meat": "1.0926428620454426e+769",
+     "larvae left": "3.1774817508900949e+97"
+    },
+    "outcome": "under one"
+   },
+   {
+    "tier": 19,
+    "name": "overmind5",
+    "H_s": "3.1249999999999998e+47",
+    "below_held": "4.4363700492978448e+63",
+    "n": "4436370049297.0",
+    "binding": "share of the tier below",
+    "caps": {
+     "share of the tier below": "4.4363700492978457e+12",
+     "share of the larvae": "3.1774817508900950e+95",
+     "half the meat": "9.8338262011991564e+770",
+     "larvae left": "3.1774817508900949e+97"
+    },
+    "outcome": "hatch"
+   },
+   {
+    "tier": 18,
+    "name": "overmind4",
+    "H_s": "2.9103830456733704e+30",
+    "below_held": "6.5532770474838390e+100",
+    "n": "6.5532770474838396e+57",
+    "binding": "share of the tier below",
+    "caps": {
+     "share of the tier below": "6.5532770474838396e+57",
+     "share of the larvae": "3.1774817508900950e+95",
+     "half the meat": "8.8504108224057295e+772",
+     "larvae left": "3.1774817508900949e+97"
+    },
+    "outcome": "hatch"
+   }
+  ],
+  "larvae_left_for_climb": "3.1774817508900949e+97"
+ },
+ "simulator": {
+  "seed": [
+   {
+    "tier": 19,
+    "name": "overmind5",
+    "n": "4436370049297.0",
+    "f": 0.01
+   },
+   {
+    "tier": 18,
+    "name": "overmind4",
+    "n": "6.5532770474838396e+57",
+    "f": 0.01
+   }
+  ],
+  "climb": [
+   {
+    "tier": 20,
+    "name": "overmind6",
+    "outcome": "fa_fails",
+    "n_sim": "0",
+    "faster_level_L": 0
+   },
+   {
+    "tier": 19,
+    "name": "overmind5",
+    "outcome": "cooldown",
+    "earmarked": "222284539718893.0"
+   },
+   {
+    "tier": 18,
+    "name": "overmind4",
+    "outcome": "cooldown",
+    "earmarked": "3.2438721385045005e+59"
+   },
+   {
+    "tier": 17,
+    "name": "overmind3",
+    "outcome": "buys",
+    "n_sim": "3.1931834981959037e+82",
+    "test": "plain"
+   },
+   {
+    "tier": 16,
+    "name": "overmind2",
+    "outcome": "bank"
+   },
+   {
+    "tier": 15,
+    "name": "overmind",
+    "outcome": "bank"
+   },
+   {
+    "tier": 14,
+    "name": "pantheon5",
+    "outcome": "bank"
+   },
+   {
+    "tier": 13,
+    "name": "pantheon4",
+    "outcome": "bank"
+   },
+   {
+    "tier": 12,
+    "name": "pantheon3",
+    "outcome": "bank"
+   },
+   {
+    "tier": 11,
+    "name": "pantheon2",
+    "outcome": "bank"
+   },
+   {
+    "tier": 10,
+    "name": "pantheon",
+    "outcome": "bank"
+   },
+   {
+    "tier": 9,
+    "name": "goddess",
+    "outcome": "bank"
+   },
+   {
+    "tier": 8,
+    "name": "prophet",
+    "outcome": "bank"
+   },
+   {
+    "tier": 7,
+    "name": "empress",
+    "outcome": "bank"
+   },
+   {
+    "tier": 6,
+    "name": "hivequeen",
+    "outcome": "bank"
+   },
+   {
+    "tier": 5,
+    "name": "hive",
+    "outcome": "bank"
+   },
+   {
+    "tier": 4,
+    "name": "greaterqueen",
+    "outcome": "bank"
+   },
+   {
+    "tier": 3,
+    "name": "nest",
+    "outcome": "bank"
+   },
+   {
+    "tier": 2,
+    "name": "queen",
+    "outcome": "bank"
+   },
+   {
+    "tier": 1,
+    "name": "drone",
+    "outcome": "bank"
+   }
+  ],
+  "twin_prefix": []
+ }
+}

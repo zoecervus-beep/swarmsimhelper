@@ -412,6 +412,7 @@ def policy(s,p,gained):
     if p.get('lr_age') and run_age(s,p)<p['lr_age']:   # long-run rules switch on by themselves only from this run age
         p=dict(p,faster_aware=(p.get('faster_aware') if p.get('fa_ungated') else None),push=None)   # fa_ungated (default off): the faster-aware test is not part of the mode
     if p.get('theta_age'): p['theta']=p['theta_age']*(p.get('age0',4306)+s.time-s.run_off+(getattr(s,'gskip_run',0.0) if p.get('game_age') else 0.0))   # run age (run_off moves at an ascension); game_age: + warps
+    if p.get('horizon_fn'): p['theta']=max(p['theta'],p['horizon_fn'](s,p))   # option (default off): e.g. the run's expected remaining time
     energy_policy(s,p,gained)
     # --- larva multipliers
     while True:
@@ -440,8 +441,11 @@ def policy(s,p,gained):
         for k in range(1,K):
             if allowed(s,p,k+1): continue
             need=twin_cost(s,k)-s.c[k+1]
-            if need<=0 or s.c[k]<=0: continue
+            if need<=0 or (s.c[k]<=0 and not p.get('twin_prefix')): continue
             nb=math.ceil(need/TWO**s.twin[k+1]); costk=nb*UNITC[k+1]
+            if p.get('twin_prefix') and k>=2 and s.c[k]<costk*p.get('seek_mult',1):
+                twin_prefix(s,p,k,costk*p.get('seek_mult',1)-s.c[k],nb)   # option (default off): hatch part of tier k first to pay for the detour
+                if s.c[k]<=0: continue
             inc=(s.c[k]*P(s,k)/UNITC[k]) if k>=2 else 1e99
             R=TWO**s.twin[k]*min(lam(s)*(1-p['f']),inc)
             if R<=0: continue
@@ -488,6 +492,37 @@ def policy(s,p,gained):
         tr('before_climb',avail,top)
         if CAPTURE is not None: CAPTURE.append(copy.deepcopy(s))   # the state the climb and push rules see (longrun_cases.py)
     _climb_and_push(s,p,avail,top,f)
+def twin_prefix(s,p,k,short,nb):
+    """Option `twin_prefix` (default off; ASCENSION.md A.10 pass 5): the twin of tier k is paid in tier k+1 units, which
+    cost tier k units. When the tier-k units held do not pay for that detour but the tier below could hatch at least twice
+    what it takes (so most of the hatch still benefits from the twin), hatch the missing tier-k units first (the prefix)."""
+    if R_FAIL(s,p,k): return
+    n=math.ceil(short/TWO**s.twin[k])
+    larvae=s.larva-s.reserve-s.nexres
+    if s.c[k-1]<2*n*UNITC[k] or larvae<n+nb or s.c[0]<n*MEATC[k]+nb*MEATC[k+1]: return
+    hatch(s,k,n,tnow(s,p))
+    if TRACE is not None: tr('twin_prefix',k,n)
+def R_FAIL(s,p,k):
+    """The prefix is only for a tier the climb is buying in bulk: tier k must pass the climb test (plain or faster-aware)."""
+    return not allowed(s,p,k)
+def seed_up(s,p,A):
+    """Option `seed` (default off; ASCENSION.md A.10 pass 5): before the climb, every tier above the frontier (the highest
+    tier passing the plain test) with some of the tier below held is hatched with n = floor(min(f x below / cost,
+    f x A, meat / 2 / meat cost)), top down, out of the climb's larvae A. f is a number, or 'payback': f_k = min(1,
+    horizon / H_k), so a tier is fed in proportion to how near it is to paying back. Returns the larvae left."""
+    sd=p['seed']; left=A
+    fr=max([k for k in range(1,K+1) if s.c[k]>0 and allowed(s,p,k)]+[1])
+    now=tnow(s,p)
+    for k in range(K,fr,-1):
+        if s.c[k-1]<=0 or left<1: continue
+        if now-s.lastbuy[k]<sd.get('cooldown',60): continue
+        f=sd['f'] if sd['f']!='payback' else min(sd.get('cap',1.0),p['theta']/H(s,k))
+        caps=(f*s.c[k-1]/UNITC[k], f*A, s.c[0]*0.5/MEATC[k], left)
+        n=math.floor(min(caps))
+        if n<1: continue
+        hatch(s,k,n,now); left-=n
+        if TRACE is not None: tr('seed',k,n,f)
+    return left
 def _climb_and_push(s,p,avail,top,f):
     """The climb (top down), twins after it, the push, achievements: the end of policy(), run on the state as the
     climb starts (also called on its own by advisor/modelcheck/longrun_cases.py)."""
@@ -499,6 +534,7 @@ def _climb_and_push(s,p,avail,top,f):
         held=math.floor(avail*q['reserve'])
         if TRACE is not None: tr('reserve',held,avail)
         avail=avail-held
+    if p.get('seed') and avail>=1: avail=seed_up(s,p,avail)   # option (default off)
     for k in range(min(top+1,K),0,-1):
         fa=False   # tier passes only on the faster-aware test (see faster_aware below)
         if not allowed(s,p,k):

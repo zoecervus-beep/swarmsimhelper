@@ -1,0 +1,198 @@
+{
+ "case": "warp_day30",
+ "exercises": "swarmwarp route from the 20.1 h save, day 30 (stage build, ascensions 7)",
+ "save": "warp_day30.save.json",
+ "config": {
+  "seed_share": 0.01,
+  "cooldown_s": 60,
+  "age_multiple": 5,
+  "meat_share": 0.5,
+  "gate": null,
+  "reserve": null
+ },
+ "rule_SEED": {
+  "run_age_s": 344295484.65868235,
+  "horizon_s": 1721477423.2934117,
+  "frontier": "pantheon5",
+  "larvae_for_climb": "1.0174587344665171e+43",
+  "lines": [
+   {
+    "tier": 20,
+    "name": "overmind6",
+    "H_s": "9.9990542386043747e+57",
+    "below_held": "0",
+    "outcome": "nothing below"
+   },
+   {
+    "tier": 19,
+    "name": "overmind5",
+    "H_s": "9.9988873581042701e+48",
+    "below_held": "0",
+    "outcome": "nothing below"
+   },
+   {
+    "tier": 18,
+    "name": "overmind4",
+    "H_s": "9.9986910352361275e+40",
+    "below_held": "0",
+    "outcome": "nothing below"
+   },
+   {
+    "tier": 17,
+    "name": "overmind3",
+    "H_s": "9.9984600770254552e+33",
+    "below_held": "312909915446.0",
+    "n": "0",
+    "binding": "share of the tier below",
+    "caps": {
+     "share of the tier below": "3.1290991544600002e-25",
+     "share of the larvae": "1.0174587344665171e+41",
+     "half the meat": "2.2989318667133356e+447",
+     "larvae left": "1.0174587344665171e+43"
+    },
+    "outcome": "under one"
+   },
+   {
+    "tier": 16,
+    "name": "overmind2",
+    "H_s": "6.2488677344644858e+26",
+    "below_held": "7.3159242420057210e+39",
+    "n": "7315924242.0",
+    "binding": "share of the tier below",
+    "caps": {
+     "share of the tier below": "7.3159242420057220e+09",
+     "share of the larvae": "1.0174587344665171e+41",
+     "half the meat": "2.0690411613232260e+449",
+     "larvae left": "1.0174587344665171e+43"
+    },
+    "outcome": "hatch"
+   },
+   {
+    "tier": 15,
+    "name": "overmind",
+    "H_s": "2.9795970752165385e+15",
+    "below_held": "5.1808576675836091e+59",
+    "n": "5.1808576675836097e+34",
+    "binding": "share of the tier below",
+    "caps": {
+     "share of the tier below": "5.1808576675836097e+34",
+     "share of the larvae": "1.0174587344665171e+41",
+     "half the meat": "1.8621380501115466e+451",
+     "larvae left": "1.0174587344665171e+43"
+    },
+    "outcome": "hatch"
+   }
+  ],
+  "larvae_left_for_climb": "1.0174587292856594e+43"
+ },
+ "simulator": {
+  "seed": [
+   {
+    "tier": 16,
+    "name": "overmind2",
+    "n": "7315924242.0",
+    "f": 0.01
+   },
+   {
+    "tier": 15,
+    "name": "overmind",
+    "n": "5.1808576675836097e+34",
+    "f": 0.01
+   }
+  ],
+  "climb": [
+   {
+    "tier": 17,
+    "name": "overmind3",
+    "outcome": "fa_fails",
+    "n_sim": "0",
+    "faster_level_L": 0
+   },
+   {
+    "tier": 16,
+    "name": "overmind2",
+    "outcome": "cooldown",
+    "earmarked": "367443448230.0"
+   },
+   {
+    "tier": 15,
+    "name": "overmind",
+    "outcome": "cooldown",
+    "earmarked": "2.5645245454538866e+36"
+   },
+   {
+    "tier": 14,
+    "name": "pantheon5",
+    "outcome": "buys",
+    "n_sim": "1.0174584728332049e+43",
+    "test": "plain"
+   },
+   {
+    "tier": 13,
+    "name": "pantheon4",
+    "outcome": "bank"
+   },
+   {
+    "tier": 12,
+    "name": "pantheon3",
+    "outcome": "bank"
+   },
+   {
+    "tier": 11,
+    "name": "pantheon2",
+    "outcome": "bank"
+   },
+   {
+    "tier": 10,
+    "name": "pantheon",
+    "outcome": "bank"
+   },
+   {
+    "tier": 9,
+    "name": "goddess",
+    "outcome": "bank"
+   },
+   {
+    "tier": 8,
+    "name": "prophet",
+    "outcome": "bank"
+   },
+   {
+    "tier": 7,
+    "name": "empress",
+    "outcome": "bank"
+   },
+   {
+    "tier": 6,
+    "name": "hivequeen",
+    "outcome": "bank"
+   },
+   {
+    "tier": 5,
+    "name": "hive",
+    "outcome": "bank"
+   },
+   {
+    "tier": 4,
+    "name": "greaterqueen",
+    "outcome": "bank"
+   },
+   {
+    "tier": 3,
+    "name": "nest",
+    "outcome": "bank"
+   },
+   {
+    "tier": 2,
+    "name": "queen",
+    "outcome": "bank"
+   },
+   {
+    "tier": 1,
+    "name": "drone",
+    "outcome": "bank"
+   }
+  ],
+  "twin_prefix": []
+ }
+}
