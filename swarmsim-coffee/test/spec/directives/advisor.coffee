@@ -339,63 +339,38 @@ describe 'Directive: advisorPanel', ->
     expect(options.advisorCollapsed()).toBe false
     expect(el.querySelectorAll('tbody tr').length).toBe 3
 
-  describe 'long-run climb mode', ->
+  # Rule SEED (ASCENSION.md A.10.9); it replaced the long-run climb mode (Nov 21, 2026).
+  describe 'seed lines', ->
     D = (x) -> new Decimal x
-    # hand-built advice with the mode's fields, in the shape `advisor.update()` returns
-    lrAdvice = (over={}) ->
-      advice = fakeAdvice over
-      push = {type: 'push', unit: 'greaterqueen', below: 'nest', buys: D(50), twin: D(2), units: D(100), share: 0.5, limitedBy: 'share', belowCount: D(1e4)}
-      advice.tiers[2] = _.extend advice.tiers[2], {kind: 'push', reason: 'push', buys: D(50), twin: D(2), push: push}
-      advice.longRun = {active: true, startsIn: 0, mothsRaised: false, frontier: 'nest', pushes: [push], suppressed: [], above: ['hive', 'hivequeen', 'overmind6']}
+    seeded = (binding='below') ->
+      advice = fakeAdvice()
+      advice.tiers[2] = _.extend advice.tiers[2], {kind: 'seed', reason: 'seed', buys: D(50), twin: D(2), seed: {n: D(50), binding: binding, below: 'nest', since: 120}}
+      advice.seed = {frontier: 'nest', larvae: D(1e4), lines: [], left: D(9950)}
       return advice
 
-    it 'shows push rows and the empty tiers above on one row', ->
-      spyOn(advisor, 'update').and.returnValue lrAdvice()
+    it 'shows a seed row, highlighted, with what bound it', ->
+      spyOn(advisor, 'update').and.returnValue seeded()
       el = render()
       rows = el.querySelectorAll 'tbody tr'
-      expect(rows.length).toBe 4
-      expect(text rows[0]).toBe 'hive to endless: nothing to feed until you own the tier below'
-      expect(rows[1].className).toContain 'info'
-      expect(text rows[1].querySelector 'strong').toBe 'feed upward: hatch 50 (×2 twins) (half your nests)'
-      expect(text rows[2].querySelector 'strong').toBe 'buy 12 (×2 twins)'
-      expect(text el.querySelector '.advisor-header').toContain '· long-run climb: 1% of larvae kept for feeding upward'
-      # the summary when collapsed counts a push as something to do
+      expect(rows.length).toBe 3
+      expect(rows[0].className).toContain 'info'
+      expect(text rows[0].querySelector 'strong').toBe 'seed upward: hatch 50 greater queens (×2 twins) (1% of what your nests buy)'
+      # the summary when collapsed counts a seed as something to do
       options.advisorCollapsed true
       $rootScope.$digest()
-      expect(text el.querySelector '.advisor-summary').toBe '— greater queen: feed upward: hatch 50 (×2 twins) (half your nests)'
+      expect(text el.querySelector '.advisor-summary').toBe '— greater queen: seed upward: hatch 50 greater queens (×2 twins) (1% of what your nests buy)'
 
-    it 'says when the mode starts, while the run is younger than 2 days', ->
-      advice = fakeAdvice()
-      advice.longRun = {active: false, startsIn: 3600 * 27.6, mothsRaised: false, frontier: null, pushes: [], suppressed: [], above: []}
-      spyOn(advisor, 'update').and.returnValue advice
-      el = render()
-      expect(text el.querySelector '.advisor-longrun').toBe '· long-run climb from run age 2 d (in 27.6 h)'
-      expect(el.querySelectorAll('.advisor-above').length).toBe 0
+    it 'names the other limits', inject (advisorView) ->
+      for [binding, why] in [['larvae', "1% of the climb's larvae"], ['meat', 'half your meat'], ['left', 'all the larvae left']]
+        expect(advisorView.action seeded(binding).tiers[2]).toBe 'seed upward: hatch 50 greater queens (×2 twins) (' + why + ')'
 
-    it 'shows nothing of it with the mode off', ->
-      spyOn(advisor, 'update').and.returnValue fakeAdvice()
+    it 'has no long-run header, empty-tiers row or Options hint any more', inject (advisorAscension) ->
+      spyOn(advisor, 'update').and.returnValue seeded()
+      long = {type: 'longRun', expansion: 0, nextExpansion: {val: D(100)}, lastExpansion: {val: D(5000)}, top: null, endlessBought: D(0), nextEndless: {val: D(1)}, ascensions: 1, of: 20}
+      spyOn(advisorAscension, 'update').and.returnValue {stage: 'longRun', records: [long], plan: null, hold: null, mutagen: null}
       el = render()
       expect(el.querySelector '.advisor-longrun').toBe null
       expect(el.querySelector '.advisor-above').toBe null
-
-    it 'says where the lepidoptera target comes from when the mode raised it', ->
-      moths = {type: 'buyMoths', count: D(10000), moths: D(4000), target: 30000, then: null, longRun: true, setting: 4000}
-      spyOn(advisor, 'update').and.returnValue fakeAdvice {energy: moths}
-      el = render()
-      expect(text el.querySelector '.advisor-energy').toBe 'Energy: buy ' + bignum(D 10000) + ' lepidoptera (' + bignum(D 4000) + '/' + bignum(D 30000) + ': long-run target, your setting is ' + bignum(D 4000) + ')'
-
-    it 'hints at the mode on the ascension long-run line while it is off', inject (advisorAscension) ->
-      spyOn(advisor, 'update').and.returnValue fakeAdvice()
-      long = {type: 'longRun', expansion: 0, nextExpansion: {val: D(100)}, lastExpansion: {val: D(5000)}, top: null, endlessBought: D(0), nextEndless: {val: D(1)}, ascensions: 1, of: 20, climbMode: false}
-      spyOn(advisorAscension, 'update').and.returnValue {stage: 'longRun', records: [long], plan: null, hold: null, mutagen: null}
-      el = render()
-      hint = el.querySelector '.advisor-hint a'
-      expect(text hint).toBe 'turn on long-run climb in Options'
-      expect(hint.getAttribute 'href').toBe '#/options'
-      long.climbMode = true
-      advisorAscension.invalidate()
-      $rootScope.$emit 'tick'
-      $rootScope.$digest()
       expect(el.querySelector '.advisor-hint').toBe null
 
   describe 'ascension advice', ->
@@ -554,13 +529,12 @@ describe 'Directive: advisorPanel', ->
       el = render()
       expect(text el.querySelector '.advisor-energy').toBe 'Energy: buy 500 bats (' + bignum(D 1500) + '/' + bignum(D 2000) + ', before the first swarmwarp: they raise its power)'
 
-    it 'names the swarmwarp route on the long-run line, and the game time in the header', ->
-      spyOn(advisor, 'update').and.returnValue fakeAdvice {age: 30 * 86400, wallAge: 2 * 86400, route: {route: 'swarmwarp'}, longRun: {active: true, startsIn: 0, above: []}}
+    it 'shows the game time in the header', ->
+      spyOn(advisor, 'update').and.returnValue fakeAdvice {age: 30 * 86400, wallAge: 2 * 86400, route: {route: 'swarmwarp'}}
       spyOn(advisorAscension, 'update').and.returnValue quiet()
       el = render()
       header = text el.querySelector '.advisor-header'
       expect(header).toContain 'Run 30.0 d game time (2.0 d real)'
-      expect(header).toContain 'long-run climb (swarmwarp route): 1% of larvae kept for feeding upward'
       # no warp this run: no game time
       advisor.update.and.returnValue fakeAdvice {age: 3600, wallAge: 3600}
       advisor.invalidate()
@@ -643,10 +617,9 @@ describe 'Directive: advisorSuggest', ->
     expect(scope.form.buyCount).toBe '12'
     expect(parseNumber(scope.form.buyCount, scope.unit).equals 12).toBe true
 
-  it 'fills the box for a push', ->
+  it 'fills the box for a seed line', ->
     advice = fakeAdvice()
-    push = {type: 'push', unit: 'greaterqueen', below: 'nest', buys: new Decimal(50), twin: new Decimal(2), share: 0.5, limitedBy: 'share'}
-    advice.tiers[2] = _.extend advice.tiers[2], {kind: 'push', reason: 'push', buys: new Decimal(50), twin: new Decimal(2), push: push}
+    advice.tiers[2] = _.extend advice.tiers[2], {kind: 'seed', reason: 'seed', buys: new Decimal(50), twin: new Decimal(2), seed: {n: new Decimal(50), binding: 'below', below: 'nest', since: 120}}
     spyOn(advisor, 'update').and.returnValue advice
     el = render 'greaterqueen'
     button = el.querySelector 'button'
@@ -1158,20 +1131,22 @@ describe 'Directive: advisorOptions', ->
     expect(options.advisorConfig().ascension).toBe 'achievements'
     expect(el.querySelectorAll('input[name=advisor-ascension]')[1].checked).toBe true
 
-  it 'offers the long-run climb as off or on, off by default', ->
+  it 'offers seeding the upper tiers as on or off, on by default; the long-run climb is gone', ->
     spyOn(options, 'advisorSetting').and.callThrough()
     el = render()
-    radios = el.querySelectorAll 'input[name=advisor-longRun]'
+    expect(el.querySelectorAll('input[name=advisor-longRun]').length).toBe 0
+    expect(text el).not.toContain 'Long-run climb'
+    radios = el.querySelectorAll 'input[name=advisor-seed]'
     expect(radios.length).toBe 2
+    expect(radios[0].value).toBe 'on'
     expect(radios[0].checked).toBe true
-    expect(text el).toContain 'It does nothing before a run is 2 days old'
-    expect(text el).toContain 'It trades meat income for progress up the chain'
-    expect(text el).toContain 'keeping 1% of the larvae for that'
+    expect(text el).toContain 'Seed upper tiers'
+    expect(text el.querySelector '.advisor-help-seed').toBe 'At every look, 1% of each tier and of the climb\'s larvae go into every tier above your climb ("seed upward"). Off, in the simulator, every endless achievement came about 78 days later on the House of Mirrors route, and the swarmwarp route did not finish. Default: on.'
     radios[1].checked = true
     angular.element(radios[1]).triggerHandler 'click'
     $rootScope.$digest()
-    expect(options.advisorSetting).toHaveBeenCalledWith 'longRun', 'on'
-    expect(options.session.state.options.advisor.longRun).toBe 'on'
+    expect(options.advisorSetting).toHaveBeenCalledWith 'seed', 'off'
+    expect(options.session.state.options.advisor.seed).toBe 'off'
 
   # The help texts say what is true for the route picked, and change with it without a reload.
   helpOf = (el, key) -> text el.querySelector '.advisor-help-' + key
@@ -1202,15 +1177,13 @@ describe 'Directive: advisorOptions', ->
   it 'shows each setting\'s help for the picked route, switching live', inject (advisor, advisorAscension, advisorTerritory) ->
     spyOn(svc, 'invalidate').and.callThrough() for svc in [advisor, advisorAscension, advisorTerritory]
     el = render()
-    routeText = (el) -> (helpOf(el, k) for k in ['territory', 'moths', 'longRun']).join ' | '
+    routeText = (el) -> (helpOf(el, k) for k in ['territory', 'moths']).join ' | '
+    seedHelp = helpOf el, 'seed'
     # the House of Mirrors route (default)
     expect(routeText el).not.toMatch /swarmwarp/i
     expect(helpOf el, 'territory').toContain 'Set to 0 once House of Mirrors is casting (the advisor tells you when)'
     expect(helpOf el, 'moths').toContain '10,000 in a first run, 30,000 in a quick run and from day 3 of the long run, and 4,000 in the long run before that'
-    expect(helpOf el, 'longRun').toContain 'from day 3 raises the lepidoptera target to 30,000'
-    expect(helpOf el, 'longRun').toContain '2 days old in game time'
     expect(helpOf el, 'ageMultiple').toBe 'Hatch a tier once its break-even time (H) is under this many times the run\'s age, in game time (real time plus what swarmwarp skipped). Higher starts new tiers earlier. The advisor also starts a tier early when buying it with a few of its own faster upgrades makes it pay back within this limit. Default 5.'
-    expect(el.querySelectorAll('input[name=advisor-longRun]').length).toBe 2
     # the swarmwarp route
     pick el, 'swarmwarp'
     expect(options.advisorConfig().ascension).toBe 'swarmwarp'
@@ -1218,23 +1191,9 @@ describe 'Directive: advisorOptions', ->
     expect(routeText el).not.toContain 'House of Mirrors'
     expect(helpOf el, 'territory').toContain 'Keep it at 0.1: territory units are never stopped on this route'
     expect(helpOf el, 'moths').toBe 'Lepidoptera bought with energy after nexus 5. With this setting the swarmwarp route buys 10,000 in every run (this setting when higher), then 2,000 bats, then swarmwarp. Default 4000.'
-    expect(helpOf el, 'longRun').toContain '2 days of game time'
-    expect(helpOf el, 'longRun').not.toContain 'day 3'
     expect(helpOf el, 'ageMultiple').toContain 'This route was simulated with 5'
-    # the long-run control: the owner's choice on this route too (Nov 21, 2026; it used to be forced on), with the
-    # one sentence on what the route's figure assumed
-    expect(el.querySelector '.advisor-longrun-forced').toBe null
-    radios = el.querySelectorAll 'input[name=advisor-longRun]'
-    expect((r.disabled for r in radios)).toEqual [false, false]
-    expect(radios[0].checked).toBe true
-    expect(helpOf el, 'longRun').toContain 'This route\'s simulator figure (141 days) was measured with it on; off is not measured yet.'
-    expect(text el).not.toContain 'Always on with the swarmwarp route'
-    expect(options.advisorConfig().longRun).toBe 'off'
-    radios[1].checked = true
-    angular.element(radios[1]).triggerHandler 'click'
-    $rootScope.$digest()
-    expect(options.advisorConfig().longRun).toBe 'on'
-    options.advisorSetting 'longRun', 'off'
+    # the seed choice: the same text on every route
+    expect(helpOf el, 'seed').toBe seedHelp
     # a higher setting shows in the text
     options.advisorSetting 'moths', 20000
     type el, 'moths', '20000'
@@ -1251,6 +1210,7 @@ describe 'Directive: advisorOptions', ->
       expect(helpOf el, 'share').toContain 'Any swarmwarp releases all of it'
       expect(helpOf el, 'spareEnergy').not.toMatch /House of Mirrors|swarmwarp/
       expect(text el).toContain 'Spare energy before nexus 5'
+      expect(helpOf el, 'seed').toBe seedHelp
 
   it 'turns the advisor on and off', ->
     el = render()
@@ -1267,5 +1227,5 @@ describe 'Directive: advisorOptions', ->
     el = render()
     angular.element(el.querySelector '.advisor-options button').triggerHandler 'click'
     $rootScope.$digest()
-    expect(options.advisorConfig()).toEqual {ageMultiple: 5, share: 0.5, cooldown: 60, bank: 3, territory: 0.1, moths: 4000, spareEnergy: 'save', ascension: 'achievements', longRun: 'off', fasterStart: 'on', twinDetour: 'on'}
+    expect(options.advisorConfig()).toEqual {ageMultiple: 5, share: 0.5, cooldown: 60, bank: 3, territory: 0.1, moths: 4000, spareEnergy: 'save', ascension: 'achievements', seed: 'on', fasterStart: 'on', twinDetour: 'on'}
     expect(el.querySelector('#advisor-moths').value).toBe '4000'

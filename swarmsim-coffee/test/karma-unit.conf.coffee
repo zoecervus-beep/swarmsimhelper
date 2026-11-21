@@ -63,6 +63,8 @@ module.exports = (config) ->
       {pattern: '../advisor/sim/example_save_58h.json', included: false, served: true, watched: false}
       # fixtures for test/spec/services/advisorfaster.coffee: the owner's run-2 save at 45 h and rule FA's reference states
       {pattern: '../advisor/sim/example_save_run2_45h.json', included: false, served: true, watched: false}
+      # fixture for test/spec/services/advisorseed.coffee: the same run at 3.0 d
+      {pattern: '../advisor/sim/example_save_run2_72h.json', included: false, served: true, watched: false}
       # fixture for test/spec/services/advisortwinplan.coffee: the owner's run-2 save at 3.0 d (the empress twin plan)
       {pattern: '../advisor/sim/example_save_twin_3d.json', included: false, served: true, watched: false}
       {pattern: '../advisor/modelcheck/faster_cases/*.save.json', included: false, served: true, watched: false}

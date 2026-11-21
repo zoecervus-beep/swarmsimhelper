@@ -38,7 +38,9 @@ function tally(field, ok) {
 cases.forEach(function (name) {
   var c = JSON.parse(fs.readFileSync(path.join(DIR, name + '.json'), 'utf8'));
   var L = G.loadSave(path.join(DIR, c.save)), game = L.game, adv = L.get('advisor');
-  var cfg = {ageMultiple: c.config.age_multiple, territory: c.config.territory_share, longRun: c.config.long_run_mode,
+  // Rule SEED off: the cases were made without it (with it on, n given A comes out ~1% lower in 20 tiers: the seed
+  // takes 1% of the tier below first; every other field matched). Their long_run_mode is the retired mode's.
+  var cfg = {ageMultiple: c.config.age_multiple, territory: c.config.territory_share, seed: 'off',
     spareEnergy: 'save', ascension: 'off', fasterStart: 'on',
     twinDetour: 'off'};   // made with the old twin planner (on: no field moves)
   var out = [];

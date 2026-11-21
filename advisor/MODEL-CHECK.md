@@ -221,6 +221,34 @@ Result on Nov 12, 2026:
 
 It never ascends. The port deliberately starts a fresh purchase memory after an ascension; the script keeps the last run's stock levels and purchase times.
 
+## Rule SEED in the advisor; the long-run check retired (Nov 21, 2026)
+
+Rule SEED ([ASCENSION.md](ASCENSION.md) A.10.9) replaced the long-run climb mode in `advisor.coffee` (`seedUpward`), on by default, setting `seed` in Options. The mode's code, its setting and `longrun_check.js` with the 30 cases in `longrun_cases/` (and their round trip) are deleted; `longrun_cases/README.md` stays as the record-format reference the other cases cite. `longrun_cases.py` and `longrun_roundtrip.js` stay: the seed, faster and swarmwarp case generators import their trace and round-trip helpers.
+
+`advisor/modelcheck/seed_check.js` runs the 13 cases of `seed_cases/` through the advisor:
+
+```sh
+node advisor/modelcheck/seed_check.js [case ...]     # VERBOSE=1 prints every line; exit 1 on any difference
+```
+
+- **Exact:** the frontier (13); "nothing below" (126) and "cooldown" (1, the purchase memory seeded on the game clock).
+- **Exact given A** (the reference's larvae for the climb passed in): each line's outcome, n and binding cap (25 lines), and the larvae left for the climb (13).
+- **The port's own A** (territory share and the nexus hold, not the simulator's purse): printed.
+
+Result: 13 cases, 0 differences.
+
+The port's choices where the spec leaves room:
+- **Cooldown:** the climb's `cooldown` setting (60 s by default, game clock).
+- **A seeded tier the climb also buys:** a tier above the frontier that passes the plain test but is not owned, or that rule FA starts. The row is one purchase: the seed's n plus the climb's or FA's.
+- **FA's test counts the units seeded this look.** A seed row keeps FA's clause (why the tier is not started outright).
+- **Warp hold:** a seed row holds the next swarmwarp only when its tier was last hatched 900 s or more ago on the game clock (a warp skips at least that much). A seed refilled after its 60 s wait does not hold it.
+
+**Other checks:**
+- `script_vs_port.js` pins `seed: 'off'`, since the console script has no SEED.
+- `faster_check.js`, run once with SEED on: 20 differences, all in "n given A" (the seed takes 1% of the tier below first, so FA's n is about 1% lower); every other field matched. Pinned 'off'.
+- `early_check.js`: it calls only the energy advice. Unchanged; pinned 'off'.
+- `swarmwarp_check.js` runs with SEED on against the cases made with the long-run mode, until they are regenerated with SEED. Result: 45 cases, 0 differences. The 26 climb outcomes after a warp still match (the port's seed rows read as "fails", as the push rows did). Printed as not comparable: the push lines (2) and the retired 2-day gate (45). It compares seed lines wherever a case carries them.
+
 ## The twin planner: detours that hatch part of the tier first (Nov 21, 2026)
 
 The owner's save (`advisor/sim/example_save_twin_3d.json`, run 2 at 3.0 d):
@@ -252,7 +280,7 @@ The plan's total cost is what the tip's affordability (2× held) and payback use
 
 **Checks:**
 - `script_vs_port.js` pins `twinDetour: 'off'`, because the console script has the old planner. With it on: 2 differences in 1,969 comparisons, both the twin-plan tip.
-- `longrun_check.js`, `early_check.js`, `swarmwarp_check.js` and `faster_check.js`: no field moved with it on. Their references predate it, so they pin 'off' too.
+- `longrun_check.js` (retired since), `early_check.js`, `swarmwarp_check.js` and `faster_check.js`: no field moved with it on. Their references predate it, so they pin 'off' too.
 
 ## The swarmwarp route against its reference cases
 

@@ -225,6 +225,8 @@ The push and multi-faster rules should be ported from `sim.py` and checked with 
 
 ### A.10 Long-run climb rules (spec for the advisor's opt-in long-run mode)
 
+**Port status (Nov 21, 2026).** The advisor no longer has this mode: rule SEED (A.10.9) replaced LR-0 to LR-3, and the setting is gone. LR-4 lives on as the House of Mirrors route's long-run lepidoptera target. A.10.1 to A.10.8 are the record of how the mode was found and measured.
+
 **Pass 4 correction.** The pass-3 evidence in this section ran on a floating-point artefact, and A.10.2 now carries the fix.
 
 - **The artefact.** Whenever the climb took every larva it was offered, the push recomputed its larvae as `larvae − purse − reserves`. That left a rounding remainder of about one float ULP, which at 1e100 larvae is ~1e84 larvae. In exact arithmetic, as in the game, the remainder is 0.
@@ -894,7 +896,7 @@ python3 -I advisor/sim/early_game.py energy        # just the energy model (A.11
 python3 -I advisor/modelcheck/early_cases.py       # the 328 reference states for early_check.js, about 30 s
 node advisor/modelcheck/early_check.js             # the advisor's energy rules against them
 node advisor/modelcheck/script_vs_port.js 1 300 20 # console script vs port (spareEnergy 'larvarush')
-node advisor/modelcheck/longrun_check.js           # the long-run mode's 30 reference cases
+node advisor/modelcheck/seed_check.js              # rule SEED's 13 reference cases (the long-run mode's check is retired)
 ```
 
 New `sim.py` policy options, all off by default (the earlier results and `run_example.py` output are unchanged):

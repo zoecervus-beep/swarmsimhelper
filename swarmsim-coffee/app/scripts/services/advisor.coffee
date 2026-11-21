@@ -19,7 +19,9 @@ angular.module('swarmApp').constant 'ADVISOR_SETTINGS',
     # ascension advice and the route the whole advisor follows (advisorascension.coffee): 'off'; 'achievements', the
     # House of Mirrors route of ASCENSION.md part A; or 'swarmwarp', the swarmwarp route of NO-MIRRORS.md section 12
     ascension: 'achievements'
-    longRun: 'off'    # long-run climb mode (ASCENSION.md A.10): 'on' adds rules LR-1 to LR-4 from a run age of 2 days
+    # rule SEED (ASCENSION.md A.10.9): 1% of each tier and of the climb's larvae into every tier above the climb, at
+    # every look. Shown in Options; 'off' is the console script's climb and the older reference cases'
+    seed: 'on'
     # rule FA (MODEL-CHECK.md, "Faster-aware climbing, pass 2"): a tier that fails the climb test is started when
     # buying it together with some of its own faster levels pays back inside the horizon. Not shown in Options; 'off'
     # is the console script's climb (advisor/modelcheck/script_vs_port.js) and the older reference cases'
@@ -36,7 +38,7 @@ angular.module('swarmApp').constant 'ADVISOR_SETTINGS',
     moths: {min: 0, max: 1e12, integer: true}
     spareEnergy: {choices: ['larvarush', 'save']} # a choice, not a number
     ascension: {choices: ['off', 'achievements', 'swarmwarp']}
-    longRun: {choices: ['off', 'on']}
+    seed: {choices: ['off', 'on']}
     fasterStart: {choices: ['off', 'on']}
     twinDetour: {choices: ['off', 'on']}
 
@@ -68,16 +70,18 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
   # spareEnergy 'save' at nexus 4 (ASCENSION.md A.11): this many lepidoptera are bought first, before
   # saving for nexus 5. Nexus 5 alone would want ~600 and the ascension ~2,000; both are flat around 1,000.
   EARLY_MOTHS = 1000
-  # Long-run climb mode (ASCENSION.md A.10.2), all of it gated on the setting and the run age.
+  # The House of Mirrors route's long-run lepidoptera target (once LR-4 of the retired long-run mode; ASCENSION.md
+  # A.10.9: a lepidoptera rule, kept as the route's run target by advisorAscension `runMoths`).
   LR =
-    age: 2 * 86400        # LR-0: the mode acts from this run age (s)
-    mothAge: 3 * 86400    # LR-4: the raised lepidoptera target from this run age (s)
-    moths: 30000          # LR-4: the raised target (the setting, if higher, stays)
-    reserve: 0.01         # LR-2: share of the climb's larvae set aside for the push, before the climb
-    share: 0.5            # LR-2: share of the tier below, tiers frontier + 2 and up
-    frontierShare: 0.02   # LR-2: share of the tier below for the tier just above the frontier
-    meatShare: 0.5        # LR-2: at most this share of the meat left
-    twinGuard: 1e6        # LR-3: a twin paid in a pushed tier needs this many times its price held
+    mothAge: 3 * 86400    # from this run age (s, wall clock)
+    moths: 30000          # the target (the setting, if higher, stays)
+  # Rule SEED (ASCENSION.md A.10.9, "Rule SEED (spec for the port; replaces LR-0 to LR-3)").
+  SEED =
+    share: 0.01           # 1% of the tier below (in purchases) and 1% of the climb's larvae A, per tier and look
+    meatShare: 0.5        # at most half the meat left
+  # A seed line holds the next swarmwarp only when its tier was last hatched at least this long ago on the game clock:
+  # a warp skips at least 900 s, so after one the seeds are new; a 60 s refill of a 1% line does not hold it.
+  WARP_HOLD_SEED_SECS = 900
   SPELLS =
     larvarush: {spell: 'larvarush', label: 'larva rush', cost: 1600}
     clonearmy: {spell: 'clonearmy', label: 'House of Mirrors', cost: 2500}
@@ -404,29 +408,27 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
 
   # The script's compute(), on a snapshot. Returns plain data plus the updated memory; the input
   # snapshot and memory are not modified.
-  # `given` is for the long-run reference-case check only (advisor/modelcheck/longrun_check.js): with
-  # the mode acting, {reserve, climbLarvae} replace the R and A - R worked out here, so the climb and the
-  # push can be compared with the simulator's given the same larvae. The app never passes it.
+  # `given` is for the rule SEED reference-case check only (advisor/modelcheck/seed_check.js): {larvae} replaces
+  # A, the larvae the climb may use, so the seed lines can be compared with the simulator's given the same
+  # larvae. The app never passes it.
   #
   # `cfg.runMoths` / `cfg.runStage` (not stored settings): the lepidoptera target after nexus 5 that the
   # ascension route's stage asks for (advisorAscension `runMoths`), passed by `update()`. It raises the
-  # `moths` setting, never lowers it, and takes the place of LR-4's raise. Without it the setting applies.
+  # `moths` setting, never lowers it. Without it the setting applies.
   #
   # The route (`routeOf`, from the `ascension` setting and the game) is worked out here every time; nothing about it
   # is remembered. On the swarmwarp route (NO-MIRRORS.md 12.2) the lepidoptera target is SW.moths (the setting, if
-  # higher, stays), and spare energy after nexus 5 goes into bats, then swarmwarp, one cast at a time. The long-run
-  # climb mode follows its setting there too (12.5, the owner's choice).
+  # higher, stays), and spare energy after nexus 5 goes into bats, then swarmwarp, one cast at a time.
   #
-  # Clocks (NO-MIRRORS.md 12.1): the timers (cooldown, purchase share, stock release, push cooldown) and the run age
-  # behind the horizon and the long-run gate are on the game clock (`snap.gameNow`, `snap.runSkipped`); LR-4's day 3
-  # is on the wall clock. With no swarmwarp cast the two clocks differ by a constant, and the advice is as before.
+  # Clocks (NO-MIRRORS.md 12.1): the timers (cooldown, purchase share, stock release, the seed's cooldown) and the
+  # run age behind the horizon are on the game clock (`snap.gameNow`, `snap.runSkipped`). With no swarmwarp cast the
+  # two clocks differ by a constant.
   advise = (snap, memory, cfg, given) ->
     runMoths = cfg?.runMoths ? null
     runStage = cfg?.runStage ? null
     cfg = withDefaults cfg
     route = routeOf cfg, snap.route
     warpRoute = route.route == 'swarmwarp'
-    # the long-run climb mode follows its setting on every route (the owner's choice, Nov 21, 2026; NO-MIRRORS.md 12.5)
     if warpRoute
       runMoths = SW.moths    # 12.2 E2
       runStage = 'swarmwarp'
@@ -437,10 +439,6 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
     horizon = age * cfg.ageMultiple
     larvae = snap.larvae
     larvaRate = snap.larvaRate
-    # Long-run climb mode (ASCENSION.md A.10.2): on by the setting, acting from a run age of 2 days (LR-0).
-    # Everything it adds is behind `lrActive`; with it false, this function is exactly the console port.
-    lrOn = cfg.longRun == 'on'
-    lrActive = lrOn and age >= LR.age
 
     top = 0
     for u, i in snap.units
@@ -493,9 +491,6 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
 
     energy = null
     energyError = snap.energyError ? null
-    # LR-4: from a run age of 3 days the mode raises the lepidoptera target to 30,000 (never lowers it).
-    # The route's run target, when there is one, decides instead (it asks the same in a long run).
-    raiseMoths = lrOn and wallAge >= LR.mothAge and cfg.moths < LR.moths and not runMoths?
     if not energyError?
       try
         if warpRoute
@@ -508,11 +503,6 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
           if energy?.type in ['buyMoths', 'mothTarget'] and not energy.early
             energy.runStage = runStage
             energy.setting = cfg.moths
-        else if raiseMoths
-          energy = energyAdvice snap, _.extend({}, cfg, moths: LR.moths)
-          if energy?.type in ['buyMoths', 'mothTarget']
-            energy.longRun = true
-            energy.setting = cfg.moths
         else
           energy = energyAdvice snap, cfg
       catch e
@@ -521,28 +511,24 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
     # Larvae go to the highest tier that passes first; lower tiers get what is left.
     left = larvae.times(1 - cfg.territory).floor()
     # spareEnergy 'save' (ASCENSION.md A.11): the larvae the next nexus needs are kept from the climb while
-    # the energy line says to buy it or save for it (the long-run mode below does the same in its own way).
+    # the energy line says to buy it or save for it.
     # Without this, a player who follows every suggestion never gathers nexus 5's 3.33e9 larvae.
     nexusHeld = null
-    if cfg.spareEnergy == 'save' and not lrActive
+    if cfg.spareEnergy == 'save'
       nexusHeld = Decimal.min nexusLarvae(energy, snap, cfg), left
       left = left.minus nexusHeld
-    # LR-2 reserve: in the mode, the larvae for the next nexus come out first, then R = floor(1%) of
-    # what is left is set aside for the push; the climb (purchases, earmarks, banking) uses the rest.
-    reserve = null
-    if lrActive
-      nexus = nexusLarvae energy, snap, cfg
-      A = Decimal.max left.minus(nexus), 0
-      R = A.times(LR.reserve).floor()
-      if given?
-        R = D given.reserve
-        A = R.plus given.climbLarvae
-      reserve = {available: A, nexus: nexus, reserve: R, forClimb: A.minus(R)}
-      left = A.minus R
     # rule FA: the meat the climb's purchases above have used this visit (the hatch's meat cap)
     faOn = cfg.fasterStart != 'off'
     meatLeft = snap.meat
     faTips = []
+    # rule SEED: A = the larvae the climb may use, before rule 3 or FA spend any; the seed lines take theirs first
+    seed = null
+    if cfg.seed != 'off'
+      if given?.larvae?
+        left = D given.larvae
+      seed = seedUpward snap, all, mem, now, cfg, left, meatLeft
+      left = seed.left
+      meatLeft = seed.meat
     for j in [tiers.length - 1..0] by -1
       x = tiers[j]
       x.buys = ZERO
@@ -553,7 +539,14 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
         x.waitSeconds = x.waitFor.toNumber()
         if faOn
           left = fasterStart x, u, all[j + 1], mem, now, cfg, horizon, left, meatLeft, faTips, banksFor
+        if x.seed?
+          if x.reason == 'fasterStart'
+            x.buys = x.buys.plus x.seed.n # the seed line and FA's hatch, in one purchase
+          else
+            seedRow x
       else if x.affordable.lessThan 1
+        x.kind = 'wait'
+        x.reason = 'needBelow'
         x.kind = 'wait'
         x.reason = 'needBelow'
       else if banksFor x, all[j + 1]
@@ -582,6 +575,10 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
           left = left.minus buys
           if faOn and u.meatCost?
             meatLeft = meatLeft.minus buys.times(u.meatCost)
+          if x.seed?
+            x.buys = x.buys.plus x.seed.n # the seed line and the climb's purchase, in one
+        else if x.seed?
+          seedRow x
         else if left.lessThan 1
           x.kind = 'skip'
           x.reason = 'larvaeUsedAbove'
@@ -595,15 +592,6 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
       fa = _.keyBy faTips, 'unit'
       tips = (t for t in tips when not (t.type == 'faster' and fa[t.unit]?))
       Array::push.apply tips, faTips
-
-    # LR-2: feed the tiers above the frontier, with the larvae the climbing tiers and the next nexus leave.
-    lr = null
-    if lrActive
-      reserve.climbLeft = left
-      reserve.forPush = reserve.reserve.plus left
-      lr = pushUp snap, all, tiers, mem, now, cfg, reserve.forPush
-      lr.frontierBefore = frontierBefore all
-      left = lr.left
 
     # Twin upgrades only matter for a unit being hatched with larvae.
     # all[k] is that unit; all[k + 1] is the unit its twin upgrade is paid in.
@@ -619,11 +607,7 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
         aboveMakes = payIn.count.times payIn.prodEach
         larvaeMake = spendable.times(u.twin).dividedBy(payIn.twin)
         if uRate.greaterThanOrEqualTo(sacrificed) and not (payIn.passes and aboveMakes.greaterThan(larvaeMake))
-          # LR-3: units of a pushed tier (above the frontier) are kept for climbing, unless plentiful
-          if lr? and k + 2 > lr.frontierBefore and payIn.count.lessThan(tc.times LR.twinGuard)
-            lr.suppressed.push {type: 'twin', unit: u.name, payIn: payIn.name, cost: tc, need: tc.times(LR.twinGuard), have: payIn.count}
-          else
-            tips.push {type: 'twin', unit: u.name, payIn: payIn.name, cost: tc}
+          tips.push {type: 'twin', unit: u.name, payIn: payIn.name, cost: tc}
       else if not payIn.passes and payIn.count.lessThan(tc)
         st = ({name: o.name, have: o.count, twin: o.twin, cost: o.cost, twinCost: o.twinCost, twinFactor: o.twinFactor} for o in all)
         steps = []
@@ -658,23 +642,72 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
     # Only with the 'save' plan, so the result is unchanged with 'larvarush' (the console script).
     if nexusHeld?
       ret.nexusLarvae = nexusHeld # larvae the climb leaves for the next nexus (0 while not saving for it)
-    # Only with the setting on, so the result is unchanged with it off.
-    if lrOn
-      ret.longRun =
-        active: lrActive
-        startsIn: if lrActive then 0 else LR.age - age # seconds until the mode acts
-        mothsRaised: raiseMoths
-        frontier: if lr? then CHAIN[lr.frontierIndex] else null # after this visit's climb suggestions
-        frontierBefore: if lr? then CHAIN[lr.frontierBefore] else null # on the state as it is (LR-3)
-        # the larvae: what the climb could use (A, after the next nexus's), the push reserve R, what the
-        # climb then had (A - R) and left, and what the push started with (R + that)
-        larvae: reserve
-        lines: if lr? then lr.lines else [] # every tier the push looked at, with its outcome
-        pushes: if lr? then lr.pushes else []
-        suppressed: if lr? then lr.suppressed else []
-        # tiers above the listed ones, up to endless: nothing can be fed there (LR-2 needs the tier below)
-        above: if lrActive then CHAIN.slice(shown + 1) else []
+    # Only with rule SEED on, so the result is unchanged with it off.
+    if seed?
+      ret.seed = {frontier: CHAIN[seed.frontier], larvae: seed.A, lines: seed.lines, left: seed.left}
     return ret
+
+  # ---------------------------------------------------------------------------
+  # Rule SEED (ASCENSION.md A.10.9, "Rule SEED (spec for the port; replaces LR-0 to LR-3)"). At every look, before
+  # the climb: the frontier is the highest owned tier that passes the plain test (H <= horizon; drones count as
+  # passing; FA does not count). For each tier from endless down to frontier + 1:
+  # - none of the tier below held: no line ('nothing below');
+  # - hatched less than `cooldown` s ago on the game clock: no line ('cooldown');
+  # - else n = floor(min(1% x tier below held / cost, 1% x A, half the meat left / meat price, larvae left)), a line
+  #   when n >= 1, taking its larvae, its units of the tier below and its meat before the next line.
+  # `A` = the larvae the climb may use (territory share and the next nexus's hold already out). Mutates `mem` (first
+  # sightings, as the climb) and the tier records it seeds (`x.seed`; `x.affordable` less the units it takes).
+  # Returns {frontier (unit index), A, lines, left, meat}.
+  seedUpward = (snap, all, mem, now, cfg, A, meat) ->
+    frontier = 0 # drone
+    for u, i in snap.units when i > 0 and u.count.greaterThan(0) and all[i - 1].passes
+      frontier = i
+    below = (u.count for u in snap.units)
+    left = A
+    lines = []
+    for k in [CHAIN.length - 1...frontier] by -1
+      u = snap.units[k]
+      b = snap.units[k - 1]
+      x = all[k - 1]
+      line = {unit: u.name, below: b.name, belowHeld: below[k - 1]}
+      lines.push line
+      if not below[k - 1].greaterThan 0
+        line.outcome = 'nothing below'
+        continue
+      since = (now - lastBuyTime(mem, u.name, u.purchases, now, cfg.cooldown)) / 1000
+      line.since = since
+      if since < cfg.cooldown
+        line.outcome = 'cooldown'
+        continue
+      if left.lessThan 1
+        line.outcome = 'no larvae'
+        continue
+      caps = [['below', below[k - 1].times(SEED.share).dividedBy(u.cost)], ['larvae', D(A).times(SEED.share)]]
+      if u.meatCost?
+        caps.push ['meat', Decimal.max(meat, 0).times(SEED.meatShare).dividedBy(u.meatCost)]
+      caps.push ['left', left]
+      bind = caps[0]
+      for c in caps when c[1].lessThan bind[1]
+        bind = c
+      n = bind[1].floor()
+      _.extend line, {n: n, binding: bind[0], caps: _.fromPairs(caps)}
+      if n.lessThan 1
+        line.outcome = 'under one'
+        continue
+      line.outcome = 'hatch'
+      x.seed = {n: n, binding: bind[0], below: b.name, since: since}
+      below[k - 1] = below[k - 1].minus n.times(u.cost)
+      x.affordable = Decimal.max(x.affordable.minus(n), 0)
+      if u.meatCost?
+        meat = meat.minus n.times(u.meatCost)
+      left = left.minus n
+    return {frontier: frontier, A: D(A), lines: lines, left: left, meat: meat}
+
+  # A tier whose action this look is its seed line.
+  seedRow = (x) ->
+    x.kind = 'seed'
+    x.reason = 'seed'
+    x.buys = x.seed.n
 
   # ---------------------------------------------------------------------------
   # Rule FA (advisor/MODEL-CHECK.md, "Faster-aware climbing, pass 2", "Rule FA, if adopted (variant c2)").
@@ -739,7 +772,8 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
     if not u.prodCost? or not u.prodFactor? or banksFor(x, up)
       return left
     io = {H: x.H, horizon: horizon, mult: u.prodMult ? 2, price: u.prodCost, factor: u.prodFactor}
-    held = fasterTest _.extend({got: x.count}, io)
+    count = if x.seed? then x.count.plus(x.seed.n.times x.twin) else x.count # with this look's seed line
+    held = fasterTest _.extend({got: count}, io)
     if held.pass?
       lv = held.levels[held.pass - 1]
       x.faster = {type: 'held', levels: held.pass, price: lv.price, H: lv.H}
@@ -751,7 +785,7 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
     n = Decimal.max(n, 0).floor()
     since = (now - lastBuyTime(mem, x.name, u.purchases, now, cfg.cooldown)) / 1000
     if since >= cfg.cooldown and n.greaterThanOrEqualTo 1
-      res = fasterTest _.extend({got: x.count.plus n.times(x.twin)}, io)
+      res = fasterTest _.extend({got: count.plus n.times(x.twin)}, io)
       if res.pass?
         lv = res.levels[res.pass - 1]
         x.kind = 'buy'
@@ -762,112 +796,15 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
         return left.minus n
     # the clause only where the player can buy at least one now; for a tier they cannot buy it is clutter
     if n.greaterThanOrEqualTo 1
-      w = fasterWait _.extend({held: x.count, twin: x.twin, n: n}, io)
+      w = fasterWait _.extend({held: count, twin: x.twin, n: n}, io)
       if w?
         x.faster = _.extend {type: 'wait'}, w
     return left
 
-  # The frontier on the state as it is, before this visit's purchases (LR-3): the highest tier held
-  # that passes the plain climb test; drone (index 0) at least.
-  frontierBefore = (all) ->
-    f = 0
-    for x, j in all
-      if x.passes and x.count.greaterThan(0)
-        f = j + 1
-    return f
-
-  # Larvae held for the next nexus, the native equivalent of the simulator's nexus saving: the next
-  # nexus's whole larva price while the energy line says to buy that nexus or to save for it (the
-  # 'save' record: its meat is in hand and its larvae are under 20,000 s away).
-  # Under spareEnergy 'save' (ASCENSION.md A.11.9) it is the record's just-in-time keep (`larvae.keep`, 0 while
-  # the record has none: no larva price, its meat missing or its larvae far).
+  # Larvae held for the next nexus under spareEnergy 'save' (ASCENSION.md A.11.9): the energy record's just-in-time
+  # keep (`larvae.keep`, 0 while the record has none: no larva price, its meat missing or its larvae far).
   nexusLarvae = (energy, snap, cfg) ->
-    if cfg?.spareEnergy == 'save'
-      return energy?.larvae?.keep ? ZERO
-    rec = if energy?.type in ['buyMoths', 'mothTarget'] then energy.then else energy
-    if rec?.type in ['save', 'buyNexus']
-      for c in snap.energy?.next?.costs ? [] when c.unit == 'larva'
-        return c.val
-    return ZERO
-
-  # One push line from its inputs (exported for the reference-case check): n = floor(min(share x
-  # below / cost, larvae left, meat / 2 / meat price)), and which term binds (the first of share,
-  # larvae, meat on a tie, as the simulator).
-  pushLine = (share, below, cost, larvae, meat, meatCost) ->
-    terms = [D(below).times(share).dividedBy(cost), D(larvae)]
-    if meatCost?
-      terms.push D(meat).times(LR.meatShare).dividedBy(meatCost)
-    min = 0
-    for t, i in terms when t.lessThan terms[min]
-      min = i
-    return {n: terms[min].floor(), binding: ['share', 'larvae', 'meat'][min]}
-
-  # LR-2 "feed upward". The frontier is the highest tier that passes the plain climb test and is held
-  # once this visit's climbing suggestions are bought (a tier the climb starts counts). From endless
-  # down to frontier + 1: no line for a tier hatched less than `cooldown` s ago (by the climb or a
-  # push), none with nothing below held or under 1 larva left; else `pushLine` with share 0.5 (0.02 for
-  # frontier + 1). `left` is what the push starts with: the reserve plus what the climb left. Each line
-  # takes its larvae and meat before the next. Returns {frontierIndex, lines, pushes, suppressed, left}.
-  pushUp = (snap, all, tiers, mem, now, cfg, left) ->
-    frontier = 0 # drone
-    meatLeft = snap.meat
-    for x, j in tiers
-      held = x.count.greaterThan(0) or x.kind == 'buy'
-      if held and x.passes
-        frontier = j + 1
-      if x.kind == 'buy' and snap.units[j + 1].meatCost?
-        meatLeft = meatLeft.minus x.buys.times(snap.units[j + 1].meatCost)
-    meatLeft = Decimal.max meatLeft, 0
-    lines = []
-    pushes = []
-    for k in [CHAIN.length - 1...frontier] by -1
-      u = snap.units[k]
-      b = snap.units[k - 1]
-      x = all[k - 1]
-      line = {unit: u.name, below: b.name}
-      lines.push line
-      # started by rule FA this visit: the push leaves it to the climb
-      if x.reason == 'fasterStart'
-        line.outcome = 'fasterStart'
-        continue
-      since = (now - lastBuyTime(mem, u.name, u.purchases, now, cfg.cooldown)) / 1000
-      if since < cfg.cooldown
-        line.outcome = 'cooldown'
-        x.pushed = true
-        x.kind = 'wait'
-        x.reason = 'cooldown'
-        x.waitSeconds = cfg.cooldown - since
-        x.buys = ZERO
-        continue
-      # the tier below as it will be once this visit's climb suggestion for it is bought
-      belowCount = b.count
-      xb = all[k - 2]
-      if xb?.kind == 'buy'
-        belowCount = belowCount.plus xb.buys.times(xb.twin)
-      if not belowCount.greaterThan 0
-        line.outcome = 'nothing below'
-        continue
-      if left.lessThan 1
-        line.outcome = 'no larvae'
-        continue
-      share = if k >= frontier + 2 then LR.share else LR.frontierShare
-      res = pushLine share, belowCount, u.cost, left, meatLeft, u.meatCost
-      _.extend line, {share: share, belowCount: belowCount, larvaeLeft: left, meat: meatLeft, n: res.n, binding: res.binding}
-      if res.n.lessThan 1
-        line.outcome = 'under one'
-        continue
-      line.outcome = 'hatch'
-      rec = {type: 'push', unit: u.name, below: b.name, buys: res.n, twin: u.twin, units: res.n.times(u.twin), share: share, limitedBy: res.binding, belowCount: belowCount}
-      pushes.push rec
-      x.pushed = true
-      x.kind = 'push'
-      x.reason = 'push'
-      x.buys = res.n
-      x.push = rec
-      left = left.minus res.n
-      if u.meatCost?
-        meatLeft = meatLeft.minus res.n.times(u.meatCost)
-    return {frontierIndex: frontier, lines: lines, pushes: pushes, suppressed: [], left: left}
+    return energy?.larvae?.keep ? ZERO
 
   # ---------------------------------------------------------------------------
   # Energy: nexus first, lepidoptera up to the target, then every point into House of Mirrors.
@@ -1014,7 +951,9 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
 
   # One swarmwarp at a time, with the purchases between (NO-MIRRORS.md 12.3): a 'warp' record waits ('warpAfter')
   # while the panel's other lines have purchases open, so what one warp released is bought before the next:
-  #   - climb rows to buy or feed upward (each goes into its 60 s cooldown once bought);
+  #   - climb rows to buy (each goes into its 60 s cooldown once bought);
+  #   - seed lines whose tier was last hatched WARP_HOLD_SEED_SECS or more ago on the game clock (new since a warp
+  #     or an absence; a 1% line refilled after 60 s does not hold it);
   #   - faster and twin tips (twin plans are steps over time, so they do not hold it);
   #   - territory: hatchery / expansion / ancestry levels, an empower, a territory twin to buy; and territory units
   #     to hatch while they are more than WARP_HOLD_TERRITORY_SECS of the territory share's larva income (the purse
@@ -1024,7 +963,7 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
     if rec?.type != 'warp'
       return rec
     pending = {climb: 0, tips: 0, territory: 0}
-    for t in meat?.tiers ? [] when t.kind in ['buy', 'push']
+    for t in meat?.tiers ? [] when t.kind == 'buy' or (t.kind == 'seed' and t.seed.since >= WARP_HOLD_SEED_SECS)
       pending.climb += 1
     for t in meat?.tips ? [] when t.type in ['faster', 'twin']
       pending.tips += 1
@@ -1123,8 +1062,8 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
       when 'buy' then 'BUY ' + formatNumber(t.buys) + (if t.twin.greaterThan(1) then ' (x' + formatNumber(t.twin) + ' twins)' else '')
       when 'larvaeUsedAbove' then 'skip: larvae used above'
       when 'buildUp' then 'let ' + t.below + 's build up'
-      # long-run mode
-      when 'push' then 'feed upward: ' + renderPush(t.push)
+      # rule SEED
+      when 'seed' then 'seed upward: ' + renderSeed(t) + renderFasterWhy(t)
       else ''
 
   # rule FA's clause on a "wait" line: " - with 3 faster levels (2.93e7 empresss) they would pay back once 2.69e8 are
@@ -1139,13 +1078,15 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
       return ' - with ' + levels + ' (' + formatNumber(f.price) + ' ' + t.name + 's) they would pay back once ' + formatNumber(f.hatch) + ' are bought; you can afford ' + formatNumber(f.affordable)
     return ''
 
-  # "hatch 3.20e15 overmind5s (half your overmind4s)"
-  renderPush = (rec) ->
-    why = switch rec.limitedBy
-      when 'larvae' then 'all larvae left'
+  # "hatch 3.40e8 prophets (1% of what your empresss buy)": what bound the count
+  renderSeed = (t) ->
+    why = switch t.seed.binding
+      when 'larvae' then "1% of the climb's larvae"
       when 'meat' then 'half your meat'
-      else (if rec.share == 0.5 then 'half' else (rec.share * 100) + '% of') + ' your ' + rec.below + 's'
-    'hatch ' + formatNumber(rec.buys) + ' ' + rec.unit + (if rec.buys.equals(1) then '' else 's') + (if rec.twin.greaterThan(1) then ' (x' + formatNumber(rec.twin) + ' twins)' else '') + ' (' + why + ')'
+      when 'left' then 'all the larvae left'
+      else '1% of what your ' + t.seed.below + 's buy'
+    'hatch ' + formatNumber(t.buys) + ' ' + t.name + (if t.buys.equals(1) then '' else 's') + (if t.twin.greaterThan(1) then ' (x' + formatNumber(t.twin) + ' twins)' else '') + ' (' + why + ')'
+
 
   renderStep = (step) ->
     if step.type == 'twin'
@@ -1169,7 +1110,6 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
   mothWhy = (rec, sep) ->
     if rec.early then return sep + 'first ' + formatNumber(rec.target) + ' before nexus 5'
     if rec.runStage? then return sep + (RUN_STAGE[rec.runStage] ? 'run target')
-    if rec.longRun then return sep + 'long-run target'
     return ''
 
   # "; keeping 12,000 energy for nexus 5 (its larvae in 9.6 h)"
@@ -1295,12 +1235,13 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
     renderStep: renderStep
     renderEnergy: renderEnergy
     renderHeader: renderHeader
-    renderPush: renderPush
+    renderSeed: renderSeed
     LR: LR
     EARLY_MOTHS: EARLY_MOTHS
     larvaPlan: larvaPlan
     renderLarvae: renderLarvae
-    pushLine: pushLine
+    SEED: SEED
+    WARP_HOLD_SEED_SECS: WARP_HOLD_SEED_SECS
     fasterTest: fasterTest
     fasterWait: fasterWait
     FA_MAX_LEVELS: FA_MAX_LEVELS

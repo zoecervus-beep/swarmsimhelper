@@ -9,6 +9,10 @@ describe 'Service: advisor', ->
   advisor = {}
   beforeEach inject (_advisor_) ->
     advisor = _advisor_
+    # These specs work the console port's rules out by hand (the climb, sizing, energy); rule SEED, which takes 1%
+    # first at every look, has its own spec (advisorseed.coffee). Off unless a spec asks for it.
+    advise = advisor.advise
+    advisor.advise = (snap, memory, cfg, given) -> advise snap, memory, _.extend({seed: 'off'}, cfg), given
 
   D = (x) -> new Decimal x
 
@@ -753,15 +757,14 @@ describe 'Service: advisor', ->
         expect(r.energy.target).toBe 50000
         expect(r.energy.runStage).toBeUndefined()
 
-      it "decides instead of the long-run mode's raise", ->
-        # run age 4 d: LR-4 would raise to 30,000, but a first run's target is 10,000
-        r = advisor.advise at5(4000, 4 * 86400e3), null, {longRun: 'on', runMoths: 10000, runStage: 'firstRun'}
+      it 'is the only raise: without a route target the setting applies at any run age', ->
+        # run age 4 d: a first run's target is 10,000
+        r = advisor.advise at5(4000, 4 * 86400e3), null, {runMoths: 10000, runStage: 'firstRun'}
         expect(r.energy.target).toBe 10000
-        expect(r.longRun.mothsRaised).toBe false
-        # without a route target the mode raises it, as before
+        # the retired long-run mode raised it to 30,000 from day 3 without a route; a stored longRun is ignored
         r = advisor.advise at5(4000, 4 * 86400e3), null, {longRun: 'on'}
-        expect(r.energy.target).toBe 30000
-        expect(r.longRun.mothsRaised).toBe true
+        expect(r.energy.type).toBe 'cast'
+        expect(r.longRun).toBeUndefined()
 
   describe 'live wiring', ->
     it 'keeps the live advice current on the game tick, with no view on screen', inject ($rootScope, options) ->
@@ -856,6 +859,9 @@ describe 'Service: advisor on a real save', ->
   session = {}
   beforeEach inject (_advisor_, _Game_, _session_) ->
     advisor = _advisor_
+    # by hand with the console port's rules, as above: rule SEED off unless a spec asks for it
+    advise = advisor.advise
+    advisor.advise = (snap, memory, cfg, given) -> advise snap, memory, _.extend({seed: 'off'}, cfg), given
     Game = _Game_
     session = _session_
 
@@ -1079,7 +1085,7 @@ describe 'Service: advisor, the default climb multiple on the owner\'s 58 h save
     expect(hq.H.toNumber() / 86400).toBeCloseTo 11.6, 1
     expect(hq.kind).toBe 'buy'
     expect(hq.buys.toNumber()).toBeGreaterThan 0
-    # the old default without rule FA (with it, hive queens are started with 1 faster level: advisorfaster.coffee)
-    old = _.find advisor.advise(snap, null, _.extend({ageMultiple: 3, fasterStart: 'off'}, OWNER)).tiers, name: 'hivequeen'
+    # the old default without rule FA or SEED (with them, hive queens are started or seeded: advisorfaster/advisorseed)
+    old = _.find advisor.advise(snap, null, _.extend({ageMultiple: 3, fasterStart: 'off', seed: 'off'}, OWNER)).tiers, name: 'hivequeen'
     expect(old.reason).toBe 'tooSlow'
     expect(advisor.renderAction old).toMatch /^wait /

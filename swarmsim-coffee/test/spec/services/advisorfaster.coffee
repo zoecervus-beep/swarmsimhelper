@@ -38,15 +38,17 @@ describe 'Service: advisor, rule FA (faster levels in the climb test)', ->
   loadSave = (name) -> load fetchJson new RegExp('advisor/sim/' + name + '\\.json$')
   row = (r, name) -> _.find r.tiers, name: name
   texts = (r) -> (advisor.renderAction t for t in r.tiers).concat (advisor.renderTip t for t in r.tips)
-  # the cases' settings (faster_cases/<case>.json `config`): multiple 5; run 2 and the swarmwarp route have the
-  # long-run mode on and territory share 0.1
-  CASE = {ageMultiple: 5, territory: 0.1, longRun: 'off', spareEnergy: 'save', ascension: 'off'}
-  RUN2 = _.extend {}, CASE, longRun: 'on'
+  # the cases' settings (faster_cases/<case>.json `config`): multiple 5, territory share 0.1. They were made
+  # without rule SEED (and run 2 with the retired long-run mode): seed off
+  CASE = {ageMultiple: 5, territory: 0.1, spareEnergy: 'save', ascension: 'off', seed: 'off'}
+  RUN2 = CASE
 
   describe 'on the owner\'s saves', ->
     it 'save (2), run 2 at 45 h: empresses wait, and the line says why (3 levels, 2.93e7; 2.69e8 against 1.04e7)', ->
       json = fetchJson /advisor\/sim\/example_save_run2_45h\.json$/
-      cfg = json.options.advisor # the owner's stored settings: multiple 5, long-run mode on, territory 0
+      # the owner's stored settings (multiple 5, territory 0), with rule SEED off: this is rule FA's reference; with SEED
+      # the row is the seed line and keeps the same clause (advisorseed.coffee)
+      cfg = _.extend {}, json.options.advisor, seed: 'off'
       r = advisor.advise advisor.snapshot(load json), null, cfg
       e = row r, 'empress'
       expect(e.reason).toBe 'tooSlow'
@@ -73,7 +75,7 @@ describe 'Service: advisor, rule FA (faster levels in the climb test)', ->
     it 'the 58 h save: hive queens a plain buy at multiple 5, a start with 1 faster level at 3', ->
       game = loadSave 'example_save_58h'
       snap = advisor.snapshot game
-      OWNER = {spareEnergy: 'save', territory: 0}
+      OWNER = {spareEnergy: 'save', territory: 0, seed: 'off'}
       hq = row advisor.advise(snap, null, OWNER), 'hivequeen'
       expect(hq.reason).toBe 'buy'
       expect(hq.faster).toBeUndefined()
@@ -139,7 +141,7 @@ describe 'Service: advisor, rule FA (faster levels in the climb test)', ->
         meatCost: null, purchases: String(u.purchases ? 0)
       {now: 3600e3, restartedAt: 0, larvae: D(1e12), larvaRate: D(o.larvaRate ? 1), meat: D(1e100), units: units, energy: null}
     nests = (extra={}) -> _.extend {queen: {count: 1e12}, nest: {cost: 1000, prodEach: 0.1, prodCost: 66}}, extra
-    FA = {ageMultiple: 5, territory: 0.1}
+    FA = {ageMultiple: 5, territory: 0.1, seed: 'off'} # rule FA alone (with SEED on, the seed takes 1% first)
 
     it 'starts a failing tier with all that is affordable, and FA off is the advice without it', ->
       r = advisor.advise mksnap(units: nests()), null, FA

@@ -1,5 +1,7 @@
 # Long-run mode reference cases
 
+**Retired (Nov 21, 2026).** The long-run climb mode these cases tested is gone from the advisor (rule SEED replaced it, `advisor/ASCENSION.md` A.10.9), and the cases and `longrun_check.js` were deleted. This file stays because the seed, faster and swarmwarp cases use its record format and its list of what the export cannot carry. `longrun_cases.py` still regenerates the cases.
+
 **Pass 4.** Regenerated with the corrected rules (ASCENSION.md A.10): honest larva arithmetic, a **1% push reserve**, the advisor's own **rule-3 sizing** for the climbing tiers, and **no faster-level rule (LR-1)**. The pass-3 cases (28) ran the push on a float rounding remainder in three of them, and their LR-1 fields are gone.
 
 Fixtures for checking the native advisor's long-run mode (`advisor/ASCENSION.md` A.10) against the simulator's rule functions. Each case is a simulator state exported as a save the real game loads, plus the simulator's decisions at that instant.

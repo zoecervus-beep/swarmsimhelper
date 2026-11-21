@@ -19,7 +19,7 @@ cases.forEach(function (c, i) {
   var snap = {now: 0, restartedAt: 0, larvae: D(c.larvae), larvaRate: D(c.larva_rate), units: [],
     energy: {nexus: 4, energy: D(c.energy), rate: D(c.rate), cap: D(c.cap), moths: D(c.moths), next: {name: 'nexus5', level: 5, costs: costs}}};
   // energyAdvice only: rule FA (the climb) never runs here; pinned off as the cases were made without it
-  var rec = adv.energyAdvice(snap, {spareEnergy: 'save', moths: c.target, territory: c.territory, fasterStart: 'off', twinDetour: 'off'});
+  var rec = adv.energyAdvice(snap, {spareEnergy: 'save', moths: c.target, territory: c.territory, fasterStart: 'off', twinDetour: 'off', seed: 'off'});
   var sim = c.sim, what, ok;
   if (sim.nexus5) { what = 'nexus 5 bought'; ok = rec.type === 'buyNexus'; }
   else if (sim.moths) { what = 'lepidoptera bought'; ok = rec.type === 'buyMoths' && rec.count.equals(sim.moths); }

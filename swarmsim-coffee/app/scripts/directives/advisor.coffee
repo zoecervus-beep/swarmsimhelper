@@ -78,17 +78,18 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
         ret
       when 'larvaeUsedAbove' then 'skip: larvae used above'
       when 'buildUp' then 'let ' + plural(t.below) + ' build up'
-      # long-run mode
-      when 'push' then 'feed upward: ' + pushText(t.push)
+      # rule SEED (ASCENSION.md A.10.9)
+      when 'seed' then 'seed upward: ' + seedText(t) + fasterWhy(t) # rule FA's clause still says why it waits
       else advisor.renderAction t
 
-  # "hatch 3.20e15 (half your galactic clusters)", in the row of the unit hatched
-  pushText = (rec) ->
-    why = switch rec.limitedBy
-      when 'larvae' then 'all the larvae left'
+  # "hatch 3.40e8 neuroprophets (1% of what your hive empresses buy)", in the row of the unit hatched
+  seedText = (t) ->
+    why = switch t.seed.binding
+      when 'larvae' then "1% of the climb's larvae"
       when 'meat' then 'half your meat'
-      else (if rec.share == 0.5 then 'half' else (rec.share * 100) + '% of') + ' your ' + plural(rec.below)
-    'hatch ' + bignum(rec.buys) + (if rec.twin.greaterThan(1) then ' (×' + bignum(rec.twin) + ' twins)' else '') + ' (' + why + ')'
+      when 'left' then 'all the larvae left'
+      else '1% of what your ' + plural(t.seed.below) + ' buy'
+    'hatch ' + count(t.buys, t.name) + (if t.twin.greaterThan(1) then ' (×' + bignum(t.twin) + ' twins)' else '') + ' (' + why + ')'
 
   step = (s) ->
     if s.type == 'twin'
@@ -117,7 +118,6 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
   mothWhy = (rec) ->
     if rec.early then return ': the first ' + bignum(rec.target) + ', before nexus 5'
     if rec.runStage? then return ': ' + (RUN_STAGE[rec.runStage] ? 'run target') + ', your setting is ' + bignum(rec.setting)
-    if rec.longRun then return ': long-run target, your setting is ' + bignum(rec.setting)
     return ''
   # the 'save' plan at nexus 4 keeps only part of nexus 5's energy price while its larvae are hours away
   keepText = (rec) ->
@@ -267,22 +267,8 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
         kind: t.kind
         reason: t.reason
         action: action t
-      buys = _.filter rows, (row) -> row.kind == 'buy' or row.kind == 'push'
-      lr = r.longRun
-      longRun = null
-      if lr?
-        longRun =
-          active: lr.active
-          text: if lr.active then 'long-run climb: 1% of larvae kept for feeding upward' else 'long-run climb from run age 2 d (in ' + time(lr.startsIn) + ')'
-        # the empty tiers above the table, up to endless, on one row
-        if lr.above.length
-          longRun.above = label(lr.above[0]) + (if lr.above.length > 1 then ' to ' + label(_.last lr.above) else '') + ': nothing to feed until you own the tier below'
-      # the swarmwarp route: the long-run climb is on whatever the setting says
-      if r.route?.route == 'swarmwarp' and longRun?
-        longRun.route = 'swarmwarp'
-        longRun.text = longRun.text.replace 'long-run climb', 'long-run climb (swarmwarp route)'
+      buys = _.filter rows, (row) -> row.kind == 'buy' or row.kind == 'seed'
       return {
-        longRun: longRun
         error: null
         header:
           age: time r.age
@@ -399,7 +385,7 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
     t = advisor.suggestionFor cur?.advice, unitName
     if not t?
       return null
-    if (t.kind == 'buy' or t.kind == 'push') and t.buys.greaterThanOrEqualTo 1
+    if (t.kind == 'buy' or t.kind == 'seed') and t.buys.greaterThanOrEqualTo 1
       return buyView t.buys, unitName
     return {buys: null, reason: action t}
 
@@ -495,9 +481,6 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
           text += '; endless bought ' + bignum(rec.endlessBought) + '/' + bignum(rec.nextEndless.val) + (if rec.top? then ' (top tier: ' + label(rec.top) + ')' else '')
         line.text = text
         line.href = upgradeHref 'expansion'
-        # the long-run climb mode is what climbs to endless; a hint only, never switched on here
-        if rec.climbMode == false
-          line.hint = {text: 'turn on long-run climb in Options', href: '#/options'}
       when 'done'
         line.text = if rec.route == 'swarmwarp' then 'every achievement of the swarmwarp route earned: no further ascension needed' else 'every ascension achievement earned: no further ascension needed'
       # the swarmwarp route (NO-MIRRORS.md 12.6, 12.8)
@@ -575,7 +558,6 @@ angular.module('swarmApp').directive 'advisorPanel', ($rootScope, $log, advisor,
   <div class="panel-body small advisor-header" ng-if="!collapsed() && view.header">
     Run {{view.header.age}}<span ng-if="view.header.wallAge" class="advisor-gametime" title="Run age on the game clock: swarmwarp's skipped time counts as time passed"> game time ({{view.header.wallAge}} real)</span> &middot; climb if H &lt; {{view.header.horizon}} &middot;
     <span class="text-nowrap">{{view.header.larvae}} larvae (+{{view.header.larvaRate}}/sec)</span>
-    <span ng-if="view.longRun" class="text-nowrap advisor-longrun" ng-class="{'text-muted': !view.longRun.active}">&middot; {{view.longRun.text}}</span>
   </div>
   <div class="table-responsive advisor-body" ng-if="!collapsed() && view.rows">
     <table class="table table-condensed advisor-table">
@@ -586,12 +568,11 @@ angular.module('swarmApp').directive 'advisorPanel', ($rootScope, $log, advisor,
         <th>Now</th>
       </tr></thead>
       <tbody>
-        <tr ng-if="view.longRun.above" class="advisor-above"><td colspan="4" class="text-muted small">{{view.longRun.above}}</td></tr>
-        <tr ng-repeat="row in view.rows track by row.name" ng-class="{success: row.kind == 'buy', info: row.kind == 'push', 'advisor-current': row.name == currentUnit}" class="advisor-row advisor-{{row.kind}}">
+        <tr ng-repeat="row in view.rows track by row.name" ng-class="{success: row.kind == 'buy', info: row.kind == 'seed', 'advisor-current': row.name == currentUnit}" class="advisor-row advisor-{{row.kind}}">
           <td class="titlecase text-nowrap"><span ng-if="row.name == currentUnit" class="glyphicon glyphicon-map-marker advisor-here" title="The unit on this page"></span><span ng-if="row.name == currentUnit" class="sr-only">(this page) </span><a ng-if="row.href" ng-href="{{row.href}}">{{row.label}}</a><span ng-if="!row.href">{{row.label}}</span></td>
           <td class="text-right text-nowrap">{{row.count|bignum:0}}</td>
           <td class="text-right text-nowrap">{{row.H}}</td>
-          <td class="advisor-action" ng-class="{'text-muted': row.kind != 'buy' && row.kind != 'push'}"><strong ng-if="row.kind == 'buy' || row.kind == 'push'">{{row.action}}</strong><span ng-if="row.kind != 'buy' && row.kind != 'push'">{{row.action}}</span></td>
+          <td class="advisor-action" ng-class="{'text-muted': row.kind != 'buy' && row.kind != 'seed'}"><strong ng-if="row.kind == 'buy' || row.kind == 'seed'">{{row.action}}</strong><span ng-if="row.kind != 'buy' && row.kind != 'seed'">{{row.action}}</span></td>
         </tr>
       </tbody>
     </table>
@@ -937,12 +918,12 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
       <p class="help-block advisor-help-spareEnergy">Planning holds energy for the next nexus and keeps its larvae out of the climb; at nexus 4 it buys 1,000 lepidoptera first, then keeps only the energy nexus 5 will need by the time its larvae are there and puts the rest into lepidoptera. Larva rush casts spare energy instead. Default: plan it.</p>
       <p class="help-block" ng-if="errors.spareEnergy">{{errors.spareEnergy}}</p>
     </div>
-    <div class="form-group" ng-class="{'has-error': !!errors.longRun}">
-      <label class="control-label">Long-run climb</label>
-      <div class="radio"><label><input type="radio" name="advisor-longRun" value="off" ng-model="form.values.longRun" ng-change="setChoice('longRun')"> Off</label></div>
-      <div class="radio"><label><input type="radio" name="advisor-longRun" value="on" ng-model="form.values.longRun" ng-change="setChoice('longRun')"> On</label></div>
-      <p class="help-block advisor-help-longRun">{{longRunHelp()}}</p>
-      <p class="help-block" ng-if="errors.longRun">{{errors.longRun}}</p>
+    <div class="form-group" ng-class="{'has-error': !!errors.seed}">
+      <label class="control-label">Seed upper tiers</label>
+      <div class="radio"><label><input type="radio" name="advisor-seed" value="on" ng-model="form.values.seed" ng-change="setChoice('seed')"> On</label></div>
+      <div class="radio"><label><input type="radio" name="advisor-seed" value="off" ng-model="form.values.seed" ng-change="setChoice('seed')"> Off</label></div>
+      <p class="help-block advisor-help-seed">At every look, 1% of each tier and of the climb's larvae go into every tier above your climb ("seed upward"). Off, in the simulator, every endless achievement came about 78 days later on the House of Mirrors route, and the swarmwarp route did not finish. Default: on.</p>
+      <p class="help-block" ng-if="errors.seed">{{errors.seed}}</p>
     </div>
     <button type="button" class="btn btn-default btn-sm" ng-click="reset()">Reset advisor settings to defaults</button>
   </div>
@@ -997,10 +978,6 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
               else
                 "Lepidoptera bought with energy, before House of Mirrors from nexus 5. With this setting the route buys " + fmt(v) + " in a first run and early in the long run, and " + fmt(Math.max v, 30000) + " in a quick run and from day 3 of the long run."
             else "Lepidoptera bought with energy, before House of Mirrors from nexus 5: " + fmt(v) + "."
-    scope.longRunHelp = ->
-      if scope.route() == 'swarmwarp'
-        return "From a run age of 2 days of game time it feeds the tiers above your climb upward (\"feed upward\"), keeping 1% of the larvae for that, and keeps those units from twin upgrades. This route's simulator figure (141 days) was measured with it on; off is not measured yet. Default: off."
-      "For climbing to endless on runs of many days. It does nothing before a run is 2 days old in game time. From then it feeds the tiers above your climb upward (\"feed upward\"), keeping 1% of the larvae for that, keeps those units from twin upgrades, and from day 3 raises the lepidoptera target to 30,000. It trades meat income for progress up the chain, so leave it off for short runs. Default: off."
     limits = ADVISOR_SETTINGS.limits
 
     scope.form = {enabled: options.advisorEnabled(), values: {}}

@@ -18,7 +18,7 @@ describe 'Service: advisor, the game clock and the swarmwarp route', ->
   MIRRORS = {ascension: 'achievements'}
   OFF = {ascension: 'off'}
 
-  # A hand-built meat snapshot, as in advisorlongrun.coffee's spec (count 0, cost 100 of the tier below, production
+  # A hand-built meat snapshot (as the retired advisorlongrun.coffee spec had it) (count 0, cost 100 of the tier below, production
   # = tier number, twin 1, upgrades out of reach), plus the clocks: wall `age` (s), `skipped` (s, this run, on top of
   # a cumulative 1e9 s skipped before this run) and the route facts.
   mksnap = (opts={}) ->
@@ -98,27 +98,15 @@ describe 'Service: advisor, the game clock and the swarmwarp route', ->
         expect(r2.age).toBe r1.age
         expect(r2.horizon).toBe r1.horizon
 
-    it 'ages the run by its swarmwarps: the horizon and the long-run gate (2 days) on the game clock', ->
-      cfg = {longRun: 'on', ageMultiple: 5}
+    it 'ages the run by its swarmwarps: the horizon on the game clock', ->
+      cfg = {ageMultiple: 5}
       r = advisor.advise mksnap(age: DAY), null, cfg
-      expect(r.longRun.active).toBe false
       expect(r.horizon).toBe 5 * DAY
-      # 1 wall day + 1 day skipped: the gate opens
+      # 1 wall day + 1 day skipped
       r = advisor.advise mksnap(age: DAY, skipped: DAY), null, cfg
       expect(r.age).toBe 2 * DAY
       expect(r.wallAge).toBe DAY
       expect(r.horizon).toBe 10 * DAY
-      expect(r.longRun.active).toBe true
-      # one second short of it
-      expect(advisor.advise(mksnap(age: DAY, skipped: DAY - 1), null, cfg).longRun.active).toBe false
-
-    it 'keeps the mirrors route\'s day-3 lepidoptera raise (LR-4) on the wall clock', ->
-      cfg = {longRun: 'on', ascension: 'off'}
-      r = advisor.advise mksnap(age: DAY, skipped: 5 * DAY, energy: energy5(50000, 4000, 0)), null, cfg
-      expect(r.longRun.mothsRaised).toBe false
-      expect(r.energy.type).toBe 'cast'
-      r = advisor.advise mksnap(age: 3 * DAY, energy: energy5(50000, 4000, 0)), null, cfg
-      expect(r.longRun.mothsRaised).toBe true
 
     it 'works every service\'s advice out afresh at once after a swarmwarp (the skipped time changes)', inject (game) ->
       a = (svc.current(1000, 5000) for svc in [advisor, terr, asc])
@@ -138,8 +126,8 @@ describe 'Service: advisor, the game clock and the swarmwarp route', ->
       expect(b[0].advice.route.route).toBe 'swarmwarp'
       expect(b[2].advice.route.route).toBe 'swarmwarp'
       # the stored settings are not changed by the route
-      expect(options.advisorConfig().longRun).toBe 'off'
-      expect(b[0].advice.config.longRun).toBe 'off' # the route does not force it (Nov 21, 2026)
+      expect(options.advisorConfig().seed).toBe 'on'
+      expect(b[0].advice.config.seed).toBe 'on'
 
   describe 'the route setting', ->
     it 'is the ascension setting, the House of Mirrors route by default; the swarmwarp route is a choice', inject (options) ->
@@ -153,19 +141,8 @@ describe 'Service: advisor, the game clock and the swarmwarp route', ->
       cfg = {ascension: 'achievements', ageMultiple: 5, spareEnergy: 'save', longRun: 'off'}
       expect(advisor.routeOf(cfg, null).route).toBe 'mirrors'
       r = advisor.advise mksnap(energy: energy5(50000, 10000, 0)), null, cfg
-      expect(r.config.longRun).toBe 'off'
+      expect(r.config.longRun).toBeUndefined() # a stored longRun (the retired mode) is ignored
       expect(advisor.renderEnergy r.energy).toBe 'cast House of Mirrors x20'
-
-    it 'the swarmwarp route follows the long-run setting (the owner\'s choice, Nov 21, 2026)', ->
-      # (it used to switch the mode on whatever the setting said)
-      r = advisor.advise mksnap(age: 3 * DAY), null, {ascension: 'swarmwarp', longRun: 'off'}
-      expect(r.config.longRun).toBe 'off'
-      expect(r.longRun).toBeUndefined()
-      r = advisor.advise mksnap(age: 3 * DAY), null, {ascension: 'swarmwarp', longRun: 'on'}
-      expect(r.config.longRun).toBe 'on'
-      expect(r.longRun.active).toBe true
-      # and no LR-4 raise: the route's own lepidoptera target (E2)
-      expect(r.longRun.mothsRaised).toBe false
 
   describe 'energy on the swarmwarp route (12.2, 12.3)', ->
     it 'below nexus 5: the A.11 plan, unchanged', ->
@@ -754,7 +731,6 @@ describe 'Service: advisor, switching routes on real states', ->
     expect(w.texts.energy).toContain 'House of Mirrors'
     expect(w.texts.tiers).toEqual m.texts.tiers
     expect(w.texts.territory).toEqual m.texts.territory
-    expect(w.r.config.longRun).toBe 'off'
 
   # quick_stage was edited from the final run of a 28-ascension route to 15 ascensions; its save still has the
   # 20-ascension achievement, which the mirrors route reads (the swarmwarp route counts ascensions, 12.6)

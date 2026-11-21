@@ -34,9 +34,12 @@ var sameCount = function (a, b) { a = D(a); b = D(b); return b.abs().lessThan(Ma
 // The owner's stored settings (ASCENSION.md, README: ageMultiple 5, spareEnergy 'save'), with the route set to
 // swarmwarp (it sets lepidoptera 10,000 itself).
 // Rule FA off: these cases were made without it (with it on the check also passed, 0 differences; MODEL-CHECK.md).
-// The long-run climb mode on: the cases were made with it (the route forced it until Nov 21, 2026; it now follows the
-// setting). The old twin planner: the cases predate the prefix detour (with it: no field moves).
-var CFG = {ascension: 'swarmwarp', ageMultiple: 5, spareEnergy: 'save', longRun: 'on', territory: 0.1, fasterStart: 'off', twinDetour: 'off'};
+// Rule SEED on (it replaced the long-run climb mode, ASCENSION.md A.10.9). The cases in swarmwarp_cases/ were made
+// with the long-run mode; until they are regenerated with SEED, the climb and push outcomes after a warp differ as
+// expected (listed by the check as "made with the long-run mode"). The check compares seed lines wherever a case
+// carries them (`seed` in a warp-sequence entry or in `decisions`, as seed_cases/README.md describes them).
+// The old twin planner: the cases predate the prefix detour (with it: no field moves).
+var CFG = {ascension: 'swarmwarp', ageMultiple: 5, spareEnergy: 'save', seed: 'on', territory: 0.1, fasterStart: 'off', twinDetour: 'off'};
 
 var cases = process.argv.slice(2);
 if (!cases.length) cases = JSON.parse(fs.readFileSync(path.join(DIR, 'index.json'), 'utf8')).cases;
@@ -58,6 +61,22 @@ function energyLine(S, game, mem, tmem) {
   var t = S.terr.advise(tsnap, tmem, CFG);
   var rec = S.asc.coupleEnergy(r.energy, a);
   return {snap: snap, asnap: asnap, a: a, r: r, t: t, coupled: rec, ordered: S.adv.orderWarp(rec, r, t)};
+}
+
+// Rule SEED's lines against a case's (seed_cases/README.md format: [{tier, name, n}]): the same tiers, and n exact
+// where the 1% of the tier below bound it (the 1% of A and the larvae left depend on the territory purse, which the
+// port keeps as a share: printed).
+var tally2 = null;
+function compareSeeds(field, r, ref) {
+  var port = (r.seed ? r.seed.lines : []).filter(function (l) { return l.outcome === 'hatch'; });
+  var names = function (l) { return l.map(function (q) { return q.name || q.unit; }).join(','); };
+  tally2(field + ': tiers', names(port) === names(ref), 'port ' + names(port) + ', ref ' + names(ref));
+  ref.forEach(function (q) {
+    var p = port.filter(function (l) { return l.unit === q.name; })[0];
+    if (!p) return;
+    if (p.binding === 'below') tally2(field + ': n (1% of the tier below binds)', sameCount(p.n, q.n), q.name + ': port ' + p.n.toString() + ', ref ' + q.n);
+    else tally2(field + ': n (' + p.binding + ' binds; A differs)', null, q.name + ': port ' + p.n.toString() + ', ref ' + q.n);
+  });
 }
 
 // The climb outcome per tier in the simulator's words.
@@ -98,7 +117,7 @@ function follow(S, game, x) {
     for (var i = 0; i < levels; i++) { try { up.buy(1); n++; } catch (e) { break; } }
     return n;
   };
-  x.r.tiers.forEach(function (t) { if ((t.kind === 'buy' || t.kind === 'push') && t.buys.greaterThanOrEqualTo(1) && hatch(t.name, t.buys)) done.climb++; });
+  x.r.tiers.forEach(function (t) { if ((t.kind === 'buy' || t.kind === 'seed') && t.buys.greaterThanOrEqualTo(1) && hatch(t.name, t.buys)) done.climb++; });
   x.r.tips.forEach(function (t) {
     if (t.type === 'faster') { var up = game.upgrade(t.unit + 'prod'); try { up.buyMax(); done.tips++; } catch (e) {} }
     if (t.type === 'twin') { if (upgrade(t.unit + 'twin', 1)) done.tips++; }
@@ -123,7 +142,7 @@ cases.forEach(function (name) {
   var L = G.loadSave(path.join(DIR, c.save));
   var game = L.game, S = services(L);
   var st = c.state, dec = c.decisions || {}, out = [];
-  var say = function (field, ok, text) {
+  var say = tally2 = function (field, ok, text) {
     tally(field, ok);
     if (ok === false || process.env.VERBOSE) out.push((ok === null ? '  info ' : ok ? '  ok   ' : '  DIFF ') + field + ': ' + text);
   };
@@ -170,7 +189,10 @@ cases.forEach(function (name) {
     'port ' + x.r.age + ', ref ' + ck.run_age_game_s + ' (skipped this run ' + ck.skipped_this_run_s + ' s)');
   say('skipped total (game)', Math.abs(game.session.state.skippedMillis / 1000 - ck.skipped_total_s) <= 1e-3, 'game ' + game.session.state.skippedMillis / 1000 + ', ref ' + ck.skipped_total_s);
   say('horizon', Math.abs(x.r.horizon - ck.horizon_s) <= 5e-3 + 1e-12 * ck.horizon_s, 'port ' + x.r.horizon + ', ref ' + ck.horizon_s);
-  say('long-run gate', x.r.longRun.active === ck.long_run_gate_active, 'port ' + x.r.longRun.active + ', ref ' + ck.long_run_gate_active);
+  // the retired long-run mode's 2-day gate: the port has none (rule SEED acts at every look)
+  if (ck.long_run_gate_active !== undefined) say('long-run gate (retired: no port counterpart)', null, 'ref ' + ck.long_run_gate_active);
+  // rule SEED's lines at the visit (SEED-made cases only)
+  if (dec.seed) compareSeeds('seed lines at the visit', x.r, dec.seed);
 
   // --- the energy line up to the first cast; saving; ascend now
   var e = dec.energy, rec = x.coupled, acts = e.actions;
@@ -265,8 +287,8 @@ cases.forEach(function (name) {
         if (cl.tier === 1) return;
         var row = before.r.tiers.filter(function (q) { return q.name === cl.name; })[0];
         var got = outcome(row);
-        // a pushed tier's row shows its push; its climb verdict is that it failed the plain test (as longrun_check)
-        if (row && row.kind === 'push' && cl.outcome === 'fails' && !row.passes) got = 'fails';
+        // a seeded tier's row shows its seed; its climb verdict is that it failed the plain test
+        if (row && row.kind === 'seed' && cl.outcome === 'fails' && !row.passes) got = 'fails';
         say('climb without the warp (given memory)', got === cl.outcome, cl.name + ': port ' + got + ', ref ' + cl.outcome);
       });
       mem = before.r.memory; tmem = before.t.memory;
@@ -330,12 +352,16 @@ cases.forEach(function (name) {
           if (stock !== null) say('stock release (1e-9)', Math.abs(stock - ref.stock_release) <= 1e-9 * Math.max(1e-300, ref.stock_release) || stock === ref.stock_release,
             n + ': port ' + stock + ', ref ' + ref.stock_release);
         });
+        if (sq.seed) compareSeeds('seed lines after the warp', post.r, sq.seed);
+        else if (sq.push) say('push lines (case made with the long-run mode: not comparable)', null, sq.push.filter(function (q) { return q.outcome === 'hatch'; }).map(function (q) { return q.name; }).join(','));
         sq.climb.forEach(function (cl) {
           if (cl.tier === 1) return;
           var row = post.r.tiers.filter(function (q) { return q.name === cl.name; })[0];
           var got = outcome(row);
-          if (row && row.kind === 'push' && cl.outcome === 'fails' && !row.passes) got = 'fails';
-          say('climb after the warp: outcome (given memory)', got === cl.outcome, cl.name + ': port ' + got + ', ref ' + cl.outcome);
+          if (row && row.kind === 'seed' && cl.outcome === 'fails' && !row.passes) got = 'fails';
+          // cases made with the long-run mode: its push decided some of these rows; the port seeds instead
+          if (!sq.seed && sq.push) say('climb after the warp: outcome (case made with the long-run mode)', got === cl.outcome ? true : null, cl.name + ': port ' + got + ', ref ' + cl.outcome);
+          else say('climb after the warp: outcome (given memory)', got === cl.outcome, cl.name + ': port ' + got + ', ref ' + cl.outcome);
           if (cl.outcome === 'buys') say('climb after the warp: count (territory purse differs)', null, cl.name + ': port ' + (row ? row.buys.toExponential(6) : '-') + ', sim ' + cl.n_sim);
         });
       }
