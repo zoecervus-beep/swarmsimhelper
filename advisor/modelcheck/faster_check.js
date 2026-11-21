@@ -39,7 +39,8 @@ cases.forEach(function (name) {
   var c = JSON.parse(fs.readFileSync(path.join(DIR, name + '.json'), 'utf8'));
   var L = G.loadSave(path.join(DIR, c.save)), game = L.game, adv = L.get('advisor');
   var cfg = {ageMultiple: c.config.age_multiple, territory: c.config.territory_share, longRun: c.config.long_run_mode,
-    spareEnergy: 'save', ascension: 'off', fasterStart: 'on'};
+    spareEnergy: 'save', ascension: 'off', fasterStart: 'on',
+    twinDetour: 'off'};   // made with the old twin planner (on: no field moves)
   var out = [];
   var say = function (field, ok, text) {
     tally(field, ok);

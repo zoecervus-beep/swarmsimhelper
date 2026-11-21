@@ -139,7 +139,7 @@ describe 'Service: advisor, the game clock and the swarmwarp route', ->
       expect(b[2].advice.route.route).toBe 'swarmwarp'
       # the stored settings are not changed by the route
       expect(options.advisorConfig().longRun).toBe 'off'
-      expect(b[0].advice.config.longRun).toBe 'on'
+      expect(b[0].advice.config.longRun).toBe 'off' # the route does not force it (Nov 21, 2026)
 
   describe 'the route setting', ->
     it 'is the ascension setting, the House of Mirrors route by default; the swarmwarp route is a choice', inject (options) ->
@@ -156,8 +156,12 @@ describe 'Service: advisor, the game clock and the swarmwarp route', ->
       expect(r.config.longRun).toBe 'off'
       expect(advisor.renderEnergy r.energy).toBe 'cast House of Mirrors x20'
 
-    it 'the swarmwarp route switches the long-run climb on, without storing it', ->
+    it 'the swarmwarp route follows the long-run setting (the owner\'s choice, Nov 21, 2026)', ->
+      # (it used to switch the mode on whatever the setting said)
       r = advisor.advise mksnap(age: 3 * DAY), null, {ascension: 'swarmwarp', longRun: 'off'}
+      expect(r.config.longRun).toBe 'off'
+      expect(r.longRun).toBeUndefined()
+      r = advisor.advise mksnap(age: 3 * DAY), null, {ascension: 'swarmwarp', longRun: 'on'}
       expect(r.config.longRun).toBe 'on'
       expect(r.longRun.active).toBe true
       # and no LR-4 raise: the route's own lepidoptera target (E2)

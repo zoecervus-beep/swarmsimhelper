@@ -81,7 +81,9 @@ for (var n = 0; n < N; n++) {
     // never had; the other settings at their defaults (ascension, long-run mode) do not reach advise().
     spareEnergy: 'larvarush',
     // rule FA (the climb counting a new tier's faster levels) is the port's own; the console script has none
-    fasterStart: 'off'};
+    fasterStart: 'off',
+    // the twin planner's prefix detour (Nov 21, 2026) is the port's own; the script has the old planner
+    twinDetour: 'off'};
   var g;
   try { g = G.loadSave(SAVE, mutate); } catch (e) { console.log('state', n, 'does not load:', e.message); differences++; continue; }
   var game = g.game, script = scriptFor(game, cfg), port = g.get('advisor'), memory = null;

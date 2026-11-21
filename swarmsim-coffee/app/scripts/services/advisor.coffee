@@ -24,6 +24,9 @@ angular.module('swarmApp').constant 'ADVISOR_SETTINGS',
     # buying it together with some of its own faster levels pays back inside the horizon. Not shown in Options; 'off'
     # is the console script's climb (advisor/modelcheck/script_vs_port.js) and the older reference cases'
     fasterStart: 'on'
+    # twin plans (`acquire`): 'on' also takes a detour that needs some of the tier hatched first; 'off' is the
+    # console script's planner (advisor/modelcheck/script_vs_port.js). Not shown in Options
+    twinDetour: 'on'
   limits:
     ageMultiple: {min: 0.01, max: 1000}
     share: {min: 0.01, max: 1}
@@ -35,6 +38,7 @@ angular.module('swarmApp').constant 'ADVISOR_SETTINGS',
     ascension: {choices: ['off', 'achievements', 'swarmwarp']}
     longRun: {choices: ['off', 'on']}
     fasterStart: {choices: ['off', 'on']}
+    twinDetour: {choices: ['off', 'on']}
 
 ###*
  # @ngdoc service
@@ -352,35 +356,47 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
   # Cheapest way to end up holding N of tier j, allowing detours through higher tiers:
   # "hatch some of tier j+1, buy twin j, then hatch tier j at half price", nested as deep as it pays.
   # st[j].have is spent along the way (st is mutated). Steps are appended to `steps` as
-  # {type:'hatch', unit, count} or {type:'twin', unit}. Returns the final cost in units of the tier
-  # below j, or null.
-  acquire = (st, j, N, steps, depth) ->
+  # {type:'hatch', unit, count} or {type:'twin', unit}, in the order the player makes them. Returns the
+  # cost in units of the tier below j (every hatch of tier j in the plan), or null.
+  #
+  # `prefix` (setting twinDetour 'on', the default): when the tier-j units held do not cover the detour,
+  # hatch the missing ones first, at the current twin, and count them in the cost (the owner's empress
+  # twin, Nov 21, 2026: 1e9 prophets, 1 goddess, twin prophets, 5e9 prophets: 6e17 empresses against
+  # 1e18 direct). 'off' is the console script's planner: the detour only when the units held cover it.
+  acquire = (st, j, N, steps, depth, prefix=true) ->
+    spent = ZERO # cost of the hatches already planned (the prefixes)
     for guard in [0...80]
       t = st[j]
       need = N.minus t.have
       if need.lessThanOrEqualTo 0
-        return ZERO
+        return spent
       hatches = need.dividedBy(t.twin).ceil()
       direct = hatches.times t.cost
       if st[j + 1] and t.twinCost and depth < 8
         trial = (cloneEntry o for o in st)
         tsteps = []
-        sub = acquire trial, j + 1, trial[j].twinCost, tsteps, depth + 1 # in tier j units
-        if sub isnt null and trial[j].have.greaterThanOrEqualTo(sub)
-          trial[j].have = trial[j].have.minus sub
+        sub = acquire trial, j + 1, trial[j].twinCost, tsteps, depth + 1, prefix # in tier j units
+        if sub isnt null and (prefix or trial[j].have.greaterThanOrEqualTo(sub))
+          # hatch first what the detour needs beyond the units held (none when they cover it)
+          pre = Decimal.max(sub.minus(trial[j].have), 0).dividedBy(trial[j].twin).ceil()
+          preCost = pre.times trial[j].cost
+          trial[j].have = trial[j].have.plus(pre.times trial[j].twin).minus sub
           trial[j + 1].have = trial[j + 1].have.minus trial[j].twinCost
           tsteps.push {type: 'twin', unit: t.name}
           trial[j].twin = trial[j].twin.times 2
           trial[j].twinCost = trial[j].twinCost.times trial[j].twinFactor
-          via = N.minus(trial[j].have).dividedBy(trial[j].twin).ceil().times(trial[j].cost)
+          via = preCost.plus Decimal.max(N.minus(trial[j].have), 0).dividedBy(trial[j].twin).ceil().times(trial[j].cost)
           if via.lessThan direct
             for q in [0...st.length]
               st[q] = trial[q]
+            if pre.greaterThan 0
+              steps.push {type: 'hatch', unit: t.name, count: pre}
             Array::push.apply steps, tsteps
+            spent = spent.plus preCost
             continue
       steps.push {type: 'hatch', unit: t.name, count: hatches}
       t.have = N
-      return direct
+      return spent.plus direct
     return null
 
   # ---------------------------------------------------------------------------
@@ -397,9 +413,9 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
   # `moths` setting, never lowers it, and takes the place of LR-4's raise. Without it the setting applies.
   #
   # The route (`routeOf`, from the `ascension` setting and the game) is worked out here every time; nothing about it
-  # is remembered. On the swarmwarp route (NO-MIRRORS.md 12.2, 12.5) the long-run climb mode is on whatever the
-  # setting says, the lepidoptera target is SW.moths (the setting, if higher, stays), and spare energy after nexus 5
-  # goes into bats, then swarmwarp, one cast at a time.
+  # is remembered. On the swarmwarp route (NO-MIRRORS.md 12.2) the lepidoptera target is SW.moths (the setting, if
+  # higher, stays), and spare energy after nexus 5 goes into bats, then swarmwarp, one cast at a time. The long-run
+  # climb mode follows its setting there too (12.5, the owner's choice).
   #
   # Clocks (NO-MIRRORS.md 12.1): the timers (cooldown, purchase share, stock release, push cooldown) and the run age
   # behind the horizon and the long-run gate are on the game clock (`snap.gameNow`, `snap.runSkipped`); LR-4's day 3
@@ -410,8 +426,8 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
     cfg = withDefaults cfg
     route = routeOf cfg, snap.route
     warpRoute = route.route == 'swarmwarp'
+    # the long-run climb mode follows its setting on every route (the owner's choice, Nov 21, 2026; NO-MIRRORS.md 12.5)
     if warpRoute
-      cfg.longRun = 'on'     # 12.5 (the stored setting is not changed)
       runMoths = SW.moths    # 12.2 E2
       runStage = 'swarmwarp'
     now = snap.gameNow ? snap.now # the game clock
@@ -611,7 +627,7 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
       else if not payIn.passes and payIn.count.lessThan(tc)
         st = ({name: o.name, have: o.count, twin: o.twin, cost: o.cost, twinCost: o.twinCost, twinFactor: o.twinFactor} for o in all)
         steps = []
-        costInU = acquire st, k + 1, tc, steps, 0
+        costInU = acquire st, k + 1, tc, steps, 0, cfg.twinDetour != 'off'
         if costInU is null
           continue
         hatchRate = uRate

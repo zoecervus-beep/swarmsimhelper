@@ -31,10 +31,12 @@ var D = function (x) { return new Decimal(x); };
 var rel = function (a, b) { a = D(a); b = D(b); if (a.equals(b)) return 0; if (b.isZero()) return Infinity; return a.minus(b).abs().dividedBy(b.abs()).toNumber(); };
 // counts: exact below 2^53, else 1e-12 relative
 var sameCount = function (a, b) { a = D(a); b = D(b); return b.abs().lessThan(Math.pow(2, 53)) ? a.equals(b) : rel(a, b) <= 1e-12; };
-// The owner's stored settings (ASCENSION.md, README: ageMultiple 5, spareEnergy 'save', longRun 'off'), with the
-// route set to swarmwarp. The route switches the long-run climb on and sets lepidoptera 10,000 itself.
+// The owner's stored settings (ASCENSION.md, README: ageMultiple 5, spareEnergy 'save'), with the route set to
+// swarmwarp (it sets lepidoptera 10,000 itself).
 // Rule FA off: these cases were made without it (with it on the check also passed, 0 differences; MODEL-CHECK.md).
-var CFG = {ascension: 'swarmwarp', ageMultiple: 5, spareEnergy: 'save', longRun: 'off', territory: 0.1, fasterStart: 'off'};
+// The long-run climb mode on: the cases were made with it (the route forced it until Nov 21, 2026; it now follows the
+// setting). The old twin planner: the cases predate the prefix detour (with it: no field moves).
+var CFG = {ascension: 'swarmwarp', ageMultiple: 5, spareEnergy: 'save', longRun: 'on', territory: 0.1, fasterStart: 'off', twinDetour: 'off'};
 
 var cases = process.argv.slice(2);
 if (!cases.length) cases = JSON.parse(fs.readFileSync(path.join(DIR, 'index.json'), 'utf8')).cases;

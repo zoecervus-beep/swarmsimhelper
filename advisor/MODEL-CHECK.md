@@ -221,9 +221,42 @@ Result on Nov 12, 2026:
 
 It never ascends. The port deliberately starts a fresh purchase memory after an ascension; the script keeps the last run's stock levels and purchase times.
 
+## The twin planner: detours that hatch part of the tier first (Nov 21, 2026)
+
+The owner's save (`advisor/sim/example_save_twin_3d.json`, run 2 at 3.0 d):
+- the tip said "hatch 1.00e10 neuroprophets › twin hive empresses" for 1e18 empresses;
+- the cheaper plan hatches 1e9 neuroprophets, 1 hive neuron with them, buys the neuroprophet twin, and hatches the other 1e10 at half price: 6e17.
+
+`acquire` (rule 7) took the detour through the tier above only when the units already held paid for it. With setting `twinDetour` 'on' (the default, not shown in Options):
+- it also takes a detour whose price is partly hatched first;
+- the prefix is counted in the plan's cost, and its steps come first;
+- it repeats level by level and nests, as before.
+
+The plan's total cost is what the tip's affordability (2× held) and payback use, as before. The tip logic has no larva or meat test. Here the plan needs about 6e9 larvae (the save holds 8.3e10) against 1e10 before. LR-3 applies to plain twin tips, not to plans, so it is unchanged.
+
+**How close to the cheapest plan.** An exhaustive search (Dijkstra over single hatches and twin purchases, three tiers above the currency, small integers) compared with `acquire` in Node, 3,000 ladders per class:
+
+| Twin price growth per level | New planner at the minimum | Old planner |
+| --- | --- | --- |
+| 100× | 3,000 / 3,000 (twice, and with units held) | 2,307 |
+| 10× (the game's, every tier) | 2,999 / 3,000 (seeds 7, 11, 12, 13: 0–1 above) | 2,331 |
+| 4× / 5× / 6× | 2,969 / 2,974 / 2,992 | – |
+| random 2–5× | 2,911–2,927 | 2,101–2,133 |
+
+- The new planner was never dearer than the old one, and its plans always replayed as affordable.
+- Where it misses, the minimum interleaves several twin levels of both tiers and uses their leftovers (example: 44 against 40, pinned in the spec). That is past a one-level lookahead, and it is **not** claimed to be optimal.
+- Karma (`advisortwinplan.coffee`) runs the search on 350 ladders:
+  - at 100× every one at the minimum;
+  - at 10× and random growth: never dearer than the old planner, every plan replayed, at least 191 of 200 at the minimum (197 measured);
+  - the owner's save followed in the game step by step: each step affordable when reached, the empress twin bought, 5.999999999e17 empresses spent (the neuroprophet held counts), the neuroprophet twin kept.
+
+**Checks:**
+- `script_vs_port.js` pins `twinDetour: 'off'`, because the console script has the old planner. With it on: 2 differences in 1,969 comparisons, both the twin-plan tip.
+- `longrun_check.js`, `early_check.js`, `swarmwarp_check.js` and `faster_check.js`: no field moved with it on. Their references predate it, so they pin 'off' too.
+
 ## The swarmwarp route against its reference cases
 
-`advisor/modelcheck/swarmwarp_check.js` checks the native advisor's swarmwarp route (setting `ascension: 'swarmwarp'`; [NO-MIRRORS.md](NO-MIRRORS.md) sections 11-13) against the 45 reference cases in `swarmwarp_cases/`, field by field as their README says. It loads each case's save in the real game (`lib/game.js`, with `advisorterritory.coffee` and `advisorascension.coffee` loaded too), takes the services' own snapshots, and advises with the owner's stored settings (age multiple 5, spare energy 'save', long-run climb off) and the swarmwarp route.
+`advisor/modelcheck/swarmwarp_check.js` checks the native advisor's swarmwarp route (setting `ascension: 'swarmwarp'`; [NO-MIRRORS.md](NO-MIRRORS.md) sections 11-13) against the 45 reference cases in `swarmwarp_cases/`, field by field as their README says. It loads each case's save in the real game (`lib/game.js`, with `advisorterritory.coffee` and `advisorascension.coffee` loaded too), takes the services' own snapshots, and advises with age multiple 5, spare energy 'save' and the swarmwarp route, and the long-run climb on (the cases were made with it; since Nov 21, 2026 the route no longer forces it, so the check passes it explicitly).
 
 ```sh
 node advisor/modelcheck/swarmwarp_check.js [case ...]     # VERBOSE=1 prints every line; exit 1 on any difference

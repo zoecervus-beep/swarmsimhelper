@@ -939,15 +939,8 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
     </div>
     <div class="form-group" ng-class="{'has-error': !!errors.longRun}">
       <label class="control-label">Long-run climb</label>
-      <div ng-if="route() != 'swarmwarp'">
-        <div class="radio"><label><input type="radio" name="advisor-longRun" value="off" ng-model="form.values.longRun" ng-change="setChoice('longRun')"> Off</label></div>
-        <div class="radio"><label><input type="radio" name="advisor-longRun" value="on" ng-model="form.values.longRun" ng-change="setChoice('longRun')"> On</label></div>
-      </div>
-      <div ng-if="route() == 'swarmwarp'" class="advisor-longrun-forced">
-        <div class="radio disabled"><label><input type="radio" name="advisor-longRun-forced" disabled> Off</label></div>
-        <div class="radio disabled"><label><input type="radio" name="advisor-longRun-forced" checked disabled> On</label></div>
-        <p class="help-block">Always on with the swarmwarp route; your choice here is kept for the House of Mirrors route.</p>
-      </div>
+      <div class="radio"><label><input type="radio" name="advisor-longRun" value="off" ng-model="form.values.longRun" ng-change="setChoice('longRun')"> Off</label></div>
+      <div class="radio"><label><input type="radio" name="advisor-longRun" value="on" ng-model="form.values.longRun" ng-change="setChoice('longRun')"> On</label></div>
       <p class="help-block advisor-help-longRun">{{longRunHelp()}}</p>
       <p class="help-block" ng-if="errors.longRun">{{errors.longRun}}</p>
     </div>
@@ -1006,7 +999,7 @@ angular.module('swarmApp').directive 'advisorOptions', ($log, options, advisor, 
             else "Lepidoptera bought with energy, before House of Mirrors from nexus 5: " + fmt(v) + "."
     scope.longRunHelp = ->
       if scope.route() == 'swarmwarp'
-        return "From a run age of 2 days of game time it feeds the tiers above your climb upward (\"feed upward\"), keeping 1% of the larvae for that, and keeps those units from twin upgrades. Stay a couple of minutes per visit: the next steps show once the last ones are bought."
+        return "From a run age of 2 days of game time it feeds the tiers above your climb upward (\"feed upward\"), keeping 1% of the larvae for that, and keeps those units from twin upgrades. This route's simulator figure (141 days) was measured with it on; off is not measured yet. Default: off."
       "For climbing to endless on runs of many days. It does nothing before a run is 2 days old in game time. From then it feeds the tiers above your climb upward (\"feed upward\"), keeping 1% of the larvae for that, keeps those units from twin upgrades, and from day 3 raises the lepidoptera target to 30,000. It trades meat income for progress up the chain, so leave it off for short runs. Default: off."
     limits = ADVISOR_SETTINGS.limits
 

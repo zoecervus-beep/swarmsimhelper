@@ -489,6 +489,7 @@ Measured (days, ideal / human):
 - **The long-run climb mode on**, as specified in ASCENSION.md A.10.2 (pass 4): advisor sizing, the 1% push reserve, LR-3, banking, age multiple 5. The route was simulated with exactly that (`longrun_rules.SPEC4`, which has `advisor_sizing`, honest larvae and the reserve).
 - The lepidoptera target comes from E2, not LR-4.
 - The route should switch the mode on, or ask the player to.
+  - **Port, Nov 21, 2026 (owner's decision):** the advisor leaves it to the Long-run climb setting on this route too, and nothing switches it on. Options says the route's 141 days were measured with it on and that off is not measured. `swarmwarp_check.js` passes it on explicitly, since its cases were made with it.
 - **With the game clock** (12.1) the gate opens at the first strong warp, and the horizon (5 × game run age) grows by years with the warps. Most tiers then pass the plain climb test, and the push matters less. That is the 206 → 141 days.
 
 ### 12.6 Ascension: stages and tests

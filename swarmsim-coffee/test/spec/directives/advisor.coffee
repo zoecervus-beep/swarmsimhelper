@@ -1221,13 +1221,20 @@ describe 'Directive: advisorOptions', ->
     expect(helpOf el, 'longRun').toContain '2 days of game time'
     expect(helpOf el, 'longRun').not.toContain 'day 3'
     expect(helpOf el, 'ageMultiple').toContain 'This route was simulated with 5'
-    # the long-run control: shown on and disabled; the one sentence naming the other route; the stored value untouched
-    forced = el.querySelector '.advisor-longrun-forced'
-    expect(text forced).toBe 'Off On Always on with the swarmwarp route; your choice here is kept for the House of Mirrors route.'
-    expect((r.disabled for r in forced.querySelectorAll 'input')).toEqual [true, true]
-    expect(forced.querySelectorAll('input')[1].checked).toBe true
-    expect(el.querySelectorAll('input[name=advisor-longRun]').length).toBe 0
+    # the long-run control: the owner's choice on this route too (Nov 21, 2026; it used to be forced on), with the
+    # one sentence on what the route's figure assumed
+    expect(el.querySelector '.advisor-longrun-forced').toBe null
+    radios = el.querySelectorAll 'input[name=advisor-longRun]'
+    expect((r.disabled for r in radios)).toEqual [false, false]
+    expect(radios[0].checked).toBe true
+    expect(helpOf el, 'longRun').toContain 'This route\'s simulator figure (141 days) was measured with it on; off is not measured yet.'
+    expect(text el).not.toContain 'Always on with the swarmwarp route'
     expect(options.advisorConfig().longRun).toBe 'off'
+    radios[1].checked = true
+    angular.element(radios[1]).triggerHandler 'click'
+    $rootScope.$digest()
+    expect(options.advisorConfig().longRun).toBe 'on'
+    options.advisorSetting 'longRun', 'off'
     # a higher setting shows in the text
     options.advisorSetting 'moths', 20000
     type el, 'moths', '20000'
@@ -1260,5 +1267,5 @@ describe 'Directive: advisorOptions', ->
     el = render()
     angular.element(el.querySelector '.advisor-options button').triggerHandler 'click'
     $rootScope.$digest()
-    expect(options.advisorConfig()).toEqual {ageMultiple: 5, share: 0.5, cooldown: 60, bank: 3, territory: 0.1, moths: 4000, spareEnergy: 'save', ascension: 'achievements', longRun: 'off', fasterStart: 'on'}
+    expect(options.advisorConfig()).toEqual {ageMultiple: 5, share: 0.5, cooldown: 60, bank: 3, territory: 0.1, moths: 4000, spareEnergy: 'save', ascension: 'achievements', longRun: 'off', fasterStart: 'on', twinDetour: 'on'}
     expect(el.querySelector('#advisor-moths').value).toBe '4000'
