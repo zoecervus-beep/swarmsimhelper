@@ -50,6 +50,34 @@ describe 'Service: advisor, banking (rule 4)', ->
       expect(plain.reason).toBe script.reason
     expect(advisor.DEFAULTS.bankTwin).toBe 'plain'
 
+  # Rule 7, the twin tip, makes the same comparison with a factor of 1: no twin for x while the tier it is paid in
+  # makes more of x than larvae could. Nests (twin 4, 1,000 held) climb; their twin costs 1 greater queen; 10 greater
+  # queens (twin 8) make p nests/s in all. Larvae could make 900 x 4 = 3,600 nests/s (the script: / 8 = 450).
+  mk7 = (p, twins=[4, 8]) ->
+    snap = mksnap p / 10, twins
+    nest = _.find snap.units, name: 'nest'
+    nest.count = D(1000)
+    nest.twinCost = D(1)
+    _.find(snap.units, name: 'greaterqueen').count = D(10)
+    return snap
+  twinTip = (r) -> _.find r.tips, {type: 'twin', unit: 'nest'}
+
+  it 'rule 7: a twin tip while the tier it is paid in makes less than larvae could (larvae/s x the twin)', ->
+    expect(twinTip advisor.advise(mk7(3600 * 0.999999), null, CFG)).toBeDefined()
+    expect(twinTip advisor.advise(mk7(3600 * 1.000001), null, CFG)).toBeUndefined()
+    # the nests are climbing, not banked, on both sides (the bank line is 3 x 3,600)
+    expect(row(advisor.advise(mk7(3600 * 1.000001), null, CFG), 'nest').kind).toBe 'buy'
+
+  it 'rule 7: \'script\' is the old decision (line 450), and equal twins decide as before', ->
+    SCRIPT = _.extend {bankTwin: 'script'}, CFG
+    expect(twinTip advisor.advise(mk7(3600 * 0.999999), null, SCRIPT)).toBeUndefined()
+    expect(twinTip advisor.advise(mk7(450 * 0.999999), null, SCRIPT)).toBeDefined()
+    expect(twinTip advisor.advise(mk7(450 * 1.000001), null, SCRIPT)).toBeUndefined()
+    for p in [3600 * 0.999999, 3600 * 1.000001]
+      plain = twinTip advisor.advise(mk7(p, [4, 1]), null, CFG)
+      script = twinTip advisor.advise(mk7(p, [4, 1]), null, SCRIPT)
+      expect(plain?).toBe script?
+
   describe 'the owner\'s 7.2 d save', ->
     load = ->
       files = window.__karma__?.files ? {}
@@ -98,6 +126,40 @@ describe 'Service: advisor, banking (rule 4)', ->
       expect(buys.toString()).toBe snap.larvae.floor().toString()
       gd = row r, 'goddess'
       expect(gd.buys.times(gd.twin).dividedBy(g.count).toNumber()).toBeCloseTo 19.3, 1
+
+    it 'rule 7: the hive neuron twin (level 19, 1e19 hive networks) is now suggested; bought, each larva makes twice as many', ->
+      {game, cfg} = load()
+      snap = advisor.snapshot game
+      g = _.find snap.units, name: 'goddess'
+      p = _.find snap.units, name: 'pantheon'
+      expect(game.upgrade('goddesstwin').count().toNumber()).toBe 19
+      expect(g.twinCost.toString()).toBe '10000000000000000000'
+      expect(p.count.greaterThanOrEqualTo g.twinCost).toBe true # 1.40e19 held
+      spendable = snap.larvaRate # territory share 0
+      # uRate = 524,288 x min(2.22e18, 4.80e21) = 1.16e24 >= sacrificed = 1e19 x 1,849 = 1.85e22
+      uRate = g.twin.times Decimal.min(spendable, g.count.times(g.prodEach).dividedBy g.cost)
+      expect(uRate.toExponential(2)).toBe '1.16e+24'
+      expect(g.twinCost.times(p.prodEach).toExponential(2)).toBe '1.85e+22'
+      # the hive networks make 2.58e22 hive neurons/s: under 1.16e24 (larvae x the twin), over 4.55e21 (the script's / 256)
+      aboveMakes = p.count.times p.prodEach
+      expect(aboveMakes.lessThan spendable.times(g.twin)).toBe true
+      expect(aboveMakes.greaterThan spendable.times(g.twin).dividedBy(p.twin)).toBe true
+      r = advisor.advise snap, null, cfg
+      tip = _.find r.tips, {type: 'twin', unit: 'goddess'}
+      expect(advisor.renderTip tip).toBe 'twin goddesss (1.00e19 pantheons)'
+      expect(_.find advisor.advise(snap, null, _.extend({bankTwin: 'script'}, cfg)).tips, {type: 'twin', unit: 'goddess'}).toBeUndefined()
+      # follow it in the game
+      before = row r, 'goddess'
+      game.upgrade('goddesstwin').buy 1
+      r2 = advisor.advise advisor.snapshot(game), r.memory, cfg
+      after = row r2, 'goddess'
+      expect(after.kind).toBe 'buy'
+      expect(after.twin.dividedBy(before.twin).toNumber()).toBe 2
+      expect(after.buys.toString()).toBe before.buys.toString()
+      # nothing flips back: no twin tip (level 20 costs 1e20, more than the 4.0e18 left), the tiers below still banked
+      expect(_.find r2.tips, {unit: 'goddess'}).toBeUndefined()
+      expect(row(r2, 'prophet').reason).toBe 'bank'
+      expect(row(r2, 'pantheon').kind).toBe 'buy'
 
     it 'the goddess purchase, made in the game, raises what the pantheons can buy accordingly', ->
       {game, cfg} = load()

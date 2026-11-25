@@ -235,7 +235,10 @@ The advisor drops the divisor (setting `bankTwin` 'plain', the default, not show
 - `early_check.js`, `faster_check.js`, `seed_check.js` and `swarmwarp_check.js`, run with 'plain': no field moved (0 differences each; `swarmwarp_check`'s bank outcomes before and after the warps all still matched). Their reference cases come from the simulator, which uses the script's formula, so they pin 'script'.
 - Spec: `advisorbank.coffee`.
 
-The twin tip rule (rule 7, "do not buy a twin while the tier it is paid in already makes more than larvae could") still uses the script's divisor. Not changed here.
+**Rule 7, the twin tip** (Nov 25, 2026, same setting): "no twin while the tier it is paid in already makes more than larvae could" now compares with larvae/s × the tier's twin too; 'script' keeps the divisor.
+- On the owner's 7.2 d save the hive neuron twin is now suggested. Level 19 costs 1e19 hive networks (1.40e19 held). uRate 1.16e24 ≥ sacrificed 1.85e22. The hive networks make 2.58e22 hive neurons/s, under the 1.16e24 larvae could make (the script's ÷256: 4.55e21, which blocked it).
+- Bought in the game, each larva makes twice as many hive neurons, and nothing flips back (no new twin tip, the tiers below still banked).
+- The four reference checks with 'plain': again no field moved; they stay pinned to 'script'.
 
 ## Rule SEED in the advisor; the long-run check retired (Nov 21, 2026)
 

@@ -29,8 +29,9 @@ angular.module('swarmApp').constant 'ADVISOR_SETTINGS',
     # twin plans (`acquire`): 'on' also takes a detour that needs some of the tier hatched first; 'off' is the
     # console script's planner (advisor/modelcheck/script_vs_port.js). Not shown in Options
     twinDetour: 'on'
-    # rule 4 (banking): 'plain' compares the tier above with larvae/s x the tier's twin; 'script' divides that by the
-    # tier above's twin, as the console script did (advisor/modelcheck/script_vs_port.js). Not shown in Options
+    # rules 4 (banking) and 7 (twin tips): 'plain' compares the tier above with larvae/s x the tier's twin; 'script'
+    # divides that by the tier above's twin, as the console script did (advisor/modelcheck/script_vs_port.js). Not
+    # shown in Options
     bankTwin: 'plain'
   limits:
     ageMultiple: {min: 0.01, max: 1000}
@@ -615,7 +616,10 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
       sacrificed = tc.times payIn.prodEach
       if payIn.count.greaterThanOrEqualTo tc
         aboveMakes = payIn.count.times payIn.prodEach
-        larvaeMake = spendable.times(u.twin).dividedBy(payIn.twin)
+        # what larvae could make of u: larvae/s x u's twin (rule 4's comparison; 'script' divides by the payIn twin)
+        larvaeMake = spendable.times(u.twin)
+        if cfg.bankTwin == 'script'
+          larvaeMake = larvaeMake.dividedBy(payIn.twin)
         if uRate.greaterThanOrEqualTo(sacrificed) and not (payIn.passes and aboveMakes.greaterThan(larvaeMake))
           tips.push {type: 'twin', unit: u.name, payIn: payIn.name, cost: tc}
       else if not payIn.passes and payIn.count.lessThan(tc)
