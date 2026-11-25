@@ -39,7 +39,8 @@ var sameCount = function (a, b) { a = D(a); b = D(b); return b.abs().lessThan(Ma
 // expected (listed by the check as "made with the long-run mode"). The check compares seed lines wherever a case
 // carries them (`seed` in a warp-sequence entry or in `decisions`, as seed_cases/README.md describes them).
 // The old twin planner: the cases predate the prefix detour (with it: no field moves).
-var CFG = {ascension: 'swarmwarp', ageMultiple: 5, spareEnergy: 'save', seed: 'on', territory: 0.1, fasterStart: 'off', twinDetour: 'off'};
+var CFG = {ascension: 'swarmwarp', ageMultiple: 5, spareEnergy: 'save', seed: 'on', territory: 0.1, fasterStart: 'off', twinDetour: 'off',
+  bankTwin: 'script'};   // the simulator's banking comparison (plain: no field moves)
 
 var cases = process.argv.slice(2);
 if (!cases.length) cases = JSON.parse(fs.readFileSync(path.join(DIR, 'index.json'), 'utf8')).cases;

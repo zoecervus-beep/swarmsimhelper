@@ -1227,5 +1227,5 @@ describe 'Directive: advisorOptions', ->
     el = render()
     angular.element(el.querySelector '.advisor-options button').triggerHandler 'click'
     $rootScope.$digest()
-    expect(options.advisorConfig()).toEqual {ageMultiple: 5, share: 0.5, cooldown: 60, bank: 3, territory: 0.1, moths: 4000, spareEnergy: 'save', ascension: 'achievements', seed: 'on', fasterStart: 'on', twinDetour: 'on'}
+    expect(options.advisorConfig()).toEqual {ageMultiple: 5, share: 0.5, cooldown: 60, bank: 3, territory: 0.1, moths: 4000, spareEnergy: 'save', ascension: 'achievements', seed: 'on', fasterStart: 'on', twinDetour: 'on', bankTwin: 'plain'}
     expect(el.querySelector('#advisor-moths').value).toBe '4000'

@@ -42,7 +42,8 @@ cases.forEach(function (name) {
   // takes 1% of the tier below first; every other field matched). Their long_run_mode is the retired mode's.
   var cfg = {ageMultiple: c.config.age_multiple, territory: c.config.territory_share, seed: 'off',
     spareEnergy: 'save', ascension: 'off', fasterStart: 'on',
-    twinDetour: 'off'};   // made with the old twin planner (on: no field moves)
+    twinDetour: 'off',    // made with the old twin planner (on: no field moves)
+    bankTwin: 'script'};  // and the script's banking comparison (plain: no field moves)
   var out = [];
   var say = function (field, ok, text) {
     tally(field, ok);

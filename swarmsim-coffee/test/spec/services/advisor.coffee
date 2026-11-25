@@ -228,8 +228,9 @@ describe 'Service: advisor', ->
 
   describe 'banking larvae', ->
     # queen twin 4, nest twin 2, nest makes 3 queens/s each. Larvae 100/s => 90/s spendable.
-    # Larvae could hatch 90 x 4 / 2 = 180 queens/s (as the script computes it); bank above 3 x 180 = 540,
-    # i.e. above 180 nests.
+    # Larvae could hatch 90 x 4 = 360 queens/s; bank above 3 x 360 = 1,080, i.e. above 360 nests. The console script
+    # divided by the nest twin (setting bankTwin 'script'): 180 queens/s, bank above 180 nests.
+    SCRIPT = {bankTwin: 'script'}
     mk = (nests, nestCost=100) ->
       mksnap larvae: 1e6, larvaRate: 100, units:
         drone: {count: 1e12}
@@ -237,18 +238,23 @@ describe 'Service: advisor', ->
         nest: {count: nests, twin: 2, cost: nestCost}
 
     it 'banks once the tier above makes more than bank x what larvae could', ->
-      queen = tier advisor.advise(mk(181), null, {}), 'queen'
+      queen = tier advisor.advise(mk(361), null, {}), 'queen'
       expect(queen.kind).toBe 'skip'
       expect(queen.reason).toBe 'bank'
       expect(queen.bankFor).toBe 'nest'
       expect(queen.hatching).toBe false
       expect(advisor.renderAction queen).toBe 'skip: bank larvae for nests'
+      # the console script's formula banks from 181
+      expect(tier(advisor.advise(mk(181), null, SCRIPT), 'queen').reason).toBe 'bank'
+      expect(tier(advisor.advise(mk(181), null, {}), 'queen').reason).toBe 'buy'
 
     it 'does not bank at the threshold', ->
-      expect(tier(advisor.advise(mk(180), null, {}), 'queen').reason).toBe 'buy'
+      expect(tier(advisor.advise(mk(360), null, {}), 'queen').reason).toBe 'buy'
+      expect(tier(advisor.advise(mk(180), null, SCRIPT), 'queen').reason).toBe 'buy'
 
     it 'uses the bank setting', ->
-      expect(tier(advisor.advise(mk(180), null, {bank: 2.9}), 'queen').reason).toBe 'bank'
+      expect(tier(advisor.advise(mk(360), null, {bank: 2.9}), 'queen').reason).toBe 'bank'
+      expect(tier(advisor.advise(mk(180), null, _.extend({bank: 2.9}, SCRIPT)), 'queen').reason).toBe 'bank'
 
     it 'does not bank for a tier above that does not pass', ->
       # nest H = 3 x 1e9 / (2 x 3) = 5e8 s

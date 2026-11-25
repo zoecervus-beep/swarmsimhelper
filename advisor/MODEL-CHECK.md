@@ -221,6 +221,22 @@ Result on Nov 12, 2026:
 
 It never ascends. The port deliberately starts a fresh purchase memory after an ascension; the script keeps the last run's stock levels and purchase times.
 
+## Banking without the script's divisor (Nov 25, 2026)
+
+Rule 4 banks a tier x once the tier above makes `bank` (3) times what larvae could make of x. The console script computed the larva side as larvae/s × x's twin **÷ the tier above's twin**. That understates the larvae by the tier above's twin multiplier.
+
+The owner's save (`advisor/sim/example_save_run2_7d.json`, run 2 at 7.2 d, seed off):
+- Hive networks make 2.58e22 hive neurons/s; larvae could make 1.16e24/s. The real ratio is 0.022; the script's formula, with ÷256, gives 5.7, over 3.
+- So hive neurons were banked, the hive networks were limited by hive neurons, and 1.26e22 larvae sat idle.
+- Without the divisor: hive neurons are a buy of all 1.26e22 larvae (6.6e27 hive neurons, 19× those held). The tiers below stay banked: neuroprophets at a real ratio of 1.65e7. Bought in the game, the hive networks' affordable count rises by the same 19.3×.
+
+The advisor drops the divisor (setting `bankTwin` 'plain', the default, not shown in Options). 'script' keeps the old formula:
+- `script_vs_port.js` pins `bankTwin: 'script'`.
+- `early_check.js`, `faster_check.js`, `seed_check.js` and `swarmwarp_check.js`, run with 'plain': no field moved (0 differences each; `swarmwarp_check`'s bank outcomes before and after the warps all still matched). Their reference cases come from the simulator, which uses the script's formula, so they pin 'script'.
+- Spec: `advisorbank.coffee`.
+
+The twin tip rule (rule 7, "do not buy a twin while the tier it is paid in already makes more than larvae could") still uses the script's divisor. Not changed here.
+
 ## Rule SEED in the advisor; the long-run check retired (Nov 21, 2026)
 
 Rule SEED ([ASCENSION.md](ASCENSION.md) A.10.9) replaced the long-run climb mode in `advisor.coffee` (`seedUpward`), on by default, setting `seed` in Options. The mode's code, its setting and `longrun_check.js` with the 30 cases in `longrun_cases/` (and their round trip) are deleted; `longrun_cases/README.md` stays as the record-format reference the other cases cite. `longrun_cases.py` and `longrun_roundtrip.js` stay: the seed, faster and swarmwarp case generators import their trace and round-trip helpers.

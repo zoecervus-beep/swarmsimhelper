@@ -85,7 +85,9 @@ for (var n = 0; n < N; n++) {
     // the twin planner's prefix detour (Nov 21, 2026) is the port's own; the script has the old planner
     twinDetour: 'off',
     // rule SEED (ASCENSION.md A.10.9) is the port's own; the script has none
-    seed: 'off'};
+    seed: 'off',
+    // rule 4's comparison as the script makes it (divided by the tier above's twin); the port's default is 'plain'
+    bankTwin: 'script'};
   var g;
   try { g = G.loadSave(SAVE, mutate); } catch (e) { console.log('state', n, 'does not load:', e.message); differences++; continue; }
   var game = g.game, script = scriptFor(game, cfg), port = g.get('advisor'), memory = null;

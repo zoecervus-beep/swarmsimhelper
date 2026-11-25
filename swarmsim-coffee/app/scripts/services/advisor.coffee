@@ -29,6 +29,9 @@ angular.module('swarmApp').constant 'ADVISOR_SETTINGS',
     # twin plans (`acquire`): 'on' also takes a detour that needs some of the tier hatched first; 'off' is the
     # console script's planner (advisor/modelcheck/script_vs_port.js). Not shown in Options
     twinDetour: 'on'
+    # rule 4 (banking): 'plain' compares the tier above with larvae/s x the tier's twin; 'script' divides that by the
+    # tier above's twin, as the console script did (advisor/modelcheck/script_vs_port.js). Not shown in Options
+    bankTwin: 'plain'
   limits:
     ageMultiple: {min: 0.01, max: 1000}
     share: {min: 0.01, max: 1}
@@ -41,6 +44,7 @@ angular.module('swarmApp').constant 'ADVISOR_SETTINGS',
     seed: {choices: ['off', 'on']}
     fasterStart: {choices: ['off', 'on']}
     twinDetour: {choices: ['off', 'on']}
+    bankTwin: {choices: ['script', 'plain']}
 
 ###*
  # @ngdoc service
@@ -482,11 +486,17 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
     tiers = all.slice 0, shown
 
     spendable = larvaRate.times(1 - cfg.territory) # larvae per second available to the meat units
+    # Rule 4: bank (hatch no more of x) once the tier above makes `bank` times what larvae could make of x: larvae/s
+    # x x's twin multiplier. The console script divided that by the tier above's twin multiplier, which understates
+    # the larvae by that factor (256 on the owner's 7.2 d save: goddesses banked at a real ratio of 0.022 where the
+    # setting says 3); setting bankTwin 'script' keeps its formula for the script comparison (Nov 25, 2026).
     banksFor = (x, up) ->
       if not up or not up.passes or up.count.lessThan(1)
         return false
       madeAbove = up.count.times up.prodEach                   # x per second from the tier above
-      fromLarvae = spendable.times(x.twin).dividedBy(up.twin)  # as the script computes it
+      fromLarvae = spendable.times(x.twin)                     # x per second from the larvae
+      if cfg.bankTwin == 'script'
+        fromLarvae = fromLarvae.dividedBy(up.twin)
       return madeAbove.greaterThan fromLarvae.times(cfg.bank)
 
     energy = null

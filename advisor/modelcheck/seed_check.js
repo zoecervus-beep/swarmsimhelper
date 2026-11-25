@@ -39,7 +39,8 @@ cases.forEach(function (name) {
     if (ok === false || process.env.VERBOSE) out.push((ok === null ? '  info ' : ok ? '  ok   ' : '  DIFF ') + field + ': ' + text);
   };
   // rule SEED alone: rule FA and the twin planner's detour do not change the seed lines (they act after them)
-  var cfg = {ageMultiple: c.config.age_multiple, seed: 'on', ascension: 'off', spareEnergy: 'save', territory: 0.1};
+  // the script's banking comparison, as the simulator made these cases (plain: no field moves)
+  var cfg = {ageMultiple: c.config.age_multiple, seed: 'on', ascension: 'off', spareEnergy: 'save', territory: 0.1, bankTwin: 'script'};
   var snap = adv.snapshot(game);
   // the purchase memory on the game clock: a line in cooldown was hatched since_s ago
   var memory = function () {
