@@ -127,7 +127,7 @@ describe 'Service: advisor, banking (rule 4)', ->
       gd = row r, 'goddess'
       expect(gd.buys.times(gd.twin).dividedBy(g.count).toNumber()).toBeCloseTo 19.3, 1
 
-    it 'rule 7: the hive neuron twin (level 19, 1e19 hive networks) is now suggested; bought, each larva makes twice as many', ->
+    it 'rule 7: the hive neuron twin (level 19, 1e19 neural clusters) is now suggested; bought, each larva makes twice as many', ->
       {game, cfg} = load()
       snap = advisor.snapshot game
       g = _.find snap.units, name: 'goddess'
@@ -140,7 +140,7 @@ describe 'Service: advisor, banking (rule 4)', ->
       uRate = g.twin.times Decimal.min(spendable, g.count.times(g.prodEach).dividedBy g.cost)
       expect(uRate.toExponential(2)).toBe '1.16e+24'
       expect(g.twinCost.times(p.prodEach).toExponential(2)).toBe '1.85e+22'
-      # the hive networks make 2.58e22 hive neurons/s: under 1.16e24 (larvae x the twin), over 4.55e21 (the script's / 256)
+      # the neural clusters make 2.58e22 hive neurons/s: under 1.16e24 (larvae x the twin), over 4.55e21 (the script's / 256)
       aboveMakes = p.count.times p.prodEach
       expect(aboveMakes.lessThan spendable.times(g.twin)).toBe true
       expect(aboveMakes.greaterThan spendable.times(g.twin).dividedBy(p.twin)).toBe true
@@ -157,7 +157,13 @@ describe 'Service: advisor, banking (rule 4)', ->
       expect(after.twin.dividedBy(before.twin).toNumber()).toBe 2
       expect(after.buys.toString()).toBe before.buys.toString()
       # nothing flips back: no twin tip (level 20 costs 1e20, more than the 4.0e18 left), the tiers below still banked
-      expect(_.find r2.tips, {unit: 'goddess'}).toBeUndefined()
+      expect(_.find r2.tips, {type: 'twin', unit: 'goddess'}).toBeUndefined()
+      # level 20 comes as a plan instead (Nov 25, 2026, advisortwinclimb.coffee): with 1.26e22 larvae idle it is free
+      # now, 1.05e6 x 1.26e22 >= 2 x 3.75e27 - 3.42e26 hive neurons: hatch 3.25e21 hive neurons first, then 3.75e17
+      # neural clusters
+      plan = _.find r2.tips, {type: 'twinPlan', unit: 'goddess'}
+      expect(plan.free).toBe true
+      expect(advisor.renderTip plan).toBe 'hatch 3.25e21 goddesss > hatch 3.75e17 pantheons > twin goddesss (free now)'
       expect(row(r2, 'prophet').reason).toBe 'bank'
       expect(row(r2, 'pantheon').kind).toBe 'buy'
 

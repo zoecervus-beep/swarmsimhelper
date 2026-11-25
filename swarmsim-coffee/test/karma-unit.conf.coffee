@@ -67,6 +67,8 @@ module.exports = (config) ->
       {pattern: '../advisor/sim/example_save_run2_72h.json', included: false, served: true, watched: false}
       # fixture for test/spec/services/advisorbank.coffee: the same run at 7.2 d (goddesses banked by the script's formula)
       {pattern: '../advisor/sim/example_save_run2_7d.json', included: false, served: true, watched: false}
+      # fixture for test/spec/services/advisortwinclimb.coffee: the same run minutes later, the 20th hive neuron twin bought
+      {pattern: '../advisor/sim/example_save_run2_7d_b.json', included: false, served: true, watched: false}
       # fixture for test/spec/services/advisortwinplan.coffee: the owner's run-2 save at 3.0 d (the empress twin plan)
       {pattern: '../advisor/sim/example_save_twin_3d.json', included: false, served: true, watched: false}
       {pattern: '../advisor/modelcheck/faster_cases/*.save.json', included: false, served: true, watched: false}

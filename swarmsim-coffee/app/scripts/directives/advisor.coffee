@@ -108,7 +108,8 @@ angular.module('swarmApp').factory 'advisorView', (game, advisor, advisorTerrito
       when 'twinPlan'
         steps = (step(s) for s in t.steps)
         steps.push upgradeLabel(t.unit + 'twin', 'twin ' + plural(t.unit))
-        'plan: ' + steps.join(' › ') + ' (pays back in ' + time(t.payback) + ')'
+        'plan: ' + steps.join(' › ') + ' (' + (if t.free then 'free now' else 'pays back in ' + time(t.payback)) + ')' +
+          (if t.then? then '; then ' + (upgradeLabel(n + 'twin', 'twin ' + plural(n)) for n in t.then).join(', ') + ', re-priced at the next look' else '')
       else advisor.renderTip t
     return {type: t.type, unit: t.unit, text: text, href: href(t.unit)}
 

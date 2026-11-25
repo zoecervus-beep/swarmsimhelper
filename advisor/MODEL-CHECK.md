@@ -226,9 +226,9 @@ It never ascends. The port deliberately starts a fresh purchase memory after an 
 Rule 4 banks a tier x once the tier above makes `bank` (3) times what larvae could make of x. The console script computed the larva side as larvae/s × x's twin **÷ the tier above's twin**. That understates the larvae by the tier above's twin multiplier.
 
 The owner's save (`advisor/sim/example_save_run2_7d.json`, run 2 at 7.2 d, seed off):
-- Hive networks make 2.58e22 hive neurons/s; larvae could make 1.16e24/s. The real ratio is 0.022; the script's formula, with ÷256, gives 5.7, over 3.
-- So hive neurons were banked, the hive networks were limited by hive neurons, and 1.26e22 larvae sat idle.
-- Without the divisor: hive neurons are a buy of all 1.26e22 larvae (6.6e27 hive neurons, 19× those held). The tiers below stay banked: neuroprophets at a real ratio of 1.65e7. Bought in the game, the hive networks' affordable count rises by the same 19.3×.
+- Neural clusters make 2.58e22 hive neurons/s; larvae could make 1.16e24/s. The real ratio is 0.022; the script's formula, with ÷256, gives 5.7, over 3.
+- So hive neurons were banked, the neural clusters were limited by hive neurons, and 1.26e22 larvae sat idle.
+- Without the divisor: hive neurons are a buy of all 1.26e22 larvae (6.6e27 hive neurons, 19× those held). The tiers below stay banked: neuroprophets at a real ratio of 1.65e7. Bought in the game, the neural clusters' affordable count rises by the same 19.3×.
 
 The advisor drops the divisor (setting `bankTwin` 'plain', the default, not shown in Options). 'script' keeps the old formula:
 - `script_vs_port.js` pins `bankTwin: 'script'`.
@@ -236,9 +236,52 @@ The advisor drops the divisor (setting `bankTwin` 'plain', the default, not show
 - Spec: `advisorbank.coffee`.
 
 **Rule 7, the twin tip** (Nov 25, 2026, same setting): "no twin while the tier it is paid in already makes more than larvae could" now compares with larvae/s × the tier's twin too; 'script' keeps the divisor.
-- On the owner's 7.2 d save the hive neuron twin is now suggested. Level 19 costs 1e19 hive networks (1.40e19 held). uRate 1.16e24 ≥ sacrificed 1.85e22. The hive networks make 2.58e22 hive neurons/s, under the 1.16e24 larvae could make (the script's ÷256: 4.55e21, which blocked it).
+- On the owner's 7.2 d save the hive neuron twin is now suggested. Level 19 costs 1e19 neural clusters (1.40e19 held). uRate 1.16e24 ≥ sacrificed 1.85e22. The neural clusters make 2.58e22 hive neurons/s, under the 1.16e24 larvae could make (the script's ÷256: 4.55e21, which blocked it).
 - Bought in the game, each larva makes twice as many hive neurons, and nothing flips back (no new twin tip, the tiers below still banked).
 - The four reference checks with 'plain': again no field moved; they stay pinned to 'script'.
+
+## Twin plans the console script did not make (Nov 25, 2026)
+
+The owner's save a few minutes after the one above (`advisor/sim/example_save_run2_7d_b.json`: the 20th hive neuron twin bought, 1.65e28 hive neurons, 4.77e18 neural clusters at ×256, 1.65e18 neural-cluster hatches affordable, larvae 1.57e19 at +2.44e18/s) had no tip at all. Rule 7 planned a twin only when the paying tier failed the climb test and the units held covered twice the plan. It missed two twins:
+- **Hive neuron L21**, paid in 1e20 neural clusters, a climbing tier. Rule 3's 4.69e15 hatches a look need about 80 looks to gather 1e20.
+- **Neural cluster L9**, paid in 1e8 hive networks = 1e20 neural clusters. 4.77e18 are held; 2e20 would be needed for the 2× test.
+
+`twinPlanNow` in `advisor.coffee` (setting `twinDetour` 'on', the default, not shown in Options) uses `acquire`'s plan, with a first hatch of the unit itself when the units held do not cover the cost. It suggests the plan when two guards hold and at least one test passes.
+
+Guards:
+- The twin gains the unit at least as fast as its price stops making it: uRate ≥ sacrificed.
+- The paying tier does not make more of the unit than uRate. uRate is the twin × the sustainable hatch rate: larvae/s or what the tier below's income pays for, whichever is smaller. With 'plain', this guard is implied by the first one, since fewer than the price are held. It only acts with `bankTwin` 'script', which divides uRate by the paying tier's twin.
+
+Tests (at least one must pass):
+- **Free now.** S = the hatches of the unit affordable now (units of the tier below, larvae, meat), H = the units held, t = the twin, c = the plan's cost in the unit. The test is t × S ≥ c + max(0, c − H). Buying the twin and hatching the rest at 2t then leaves at least as many units as hatching all S at t.
+  - For H < c this equals (S − (c − H)/t) × 2t ≥ H + tS, the brief's S × t + H ≥ 2c.
+  - For H ≥ c the held units do not double, so the test is tS ≥ c (2c − H would pass too early: a spec covers it).
+- **Pays back.** The paying tier passes the climb test, the units held cover twice the plan, and payback × (tier + 1) is inside the horizon. Payback = (c + the unit the plan's extra larvae would have hatched) / (uRate − sacrificed).
+
+Either way, every hatch must be affordable now. Its larvae and meat come out of what the climb leaves after the rows above the highest tier the plan hatches. The plan comes before the climb rows: its counts are what the twin needs, and the rows are re-sized at the next look. Two plans that hatch the same tier show only the higher tier's, with "then twin …, re-priced at the next look". The higher twin first is the cheaper order, since it halves the lower plan's hatches.
+
+On the save the panel shows "hatch 3.72e17 neural clusters › hatch 1.00e8 hive networks › twin neural clusters (free now); then twin hive neurons, re-priced at the next look". The numbers: 256 × 1.65e18 = 4.2e20 ≥ 2 × 1e20 − 4.77e18.
+
+I followed the panel in the real game (`lib/game.js`): twin and plan tips first, then the climb rows, one look every 60 s of game time. Sequence A is the same with the neural cluster twin out of reach.
+
+| | panel | A (no neural cluster twin) |
+| --- | --- | --- |
+| twins | NC L9 and HN L21 at 0 s (L21: 1.95e17 hatches, pays back in 14 min); HN L22 at 2,520 s (5.20e17 hatches) | HN L21 at 0 s (3.72e17, 26 min); HN L22 at 5,760 s (6.35e17) |
+| neural-cluster hatches to HN L22 (rows included) | 2.52e18 (2.52e28 hive neurons) | 4.28e18 (4.28e28 hive neurons) |
+| at 5,760 s: hive neurons held | 7.20e27 | 6.91e27 |
+| at 5,760 s: neural clusters held, hive neurons/s they make | 1.88e21, 3.47e24 | 100, 1.85e5 |
+| hive neurons per larva | 4.19e6 | 4.19e6 |
+
+After L21 the panel is quiet until L22's plan passes its 2× test (1e21 neural clusters, so 1.95e28 hive neurons against 1.08e28 held right after L21).
+
+On the first 7.2 d save, after the 20th twin is bought in the game, the 21st now comes as a plan that is free now with 1.26e22 larvae idle: "hatch 3.25e21 hive neurons › hatch 3.75e17 neural clusters › twin hive neurons". `advisorbank.coffee` asserted no hive neuron tip there; it now asserts no direct twin tip and this plan.
+
+The reference checks with 'on':
+- `script_vs_port.js`: 26 differences in 1,596 comparisons, every one an extra "free now" plan (25 with one, 1 with two). It pins `twinDetour: 'off'`, as before.
+- `early_check.js`, `faster_check.js` and `swarmwarp_check.js`: no field moved. They stay pinned 'off'.
+- `seed_check.js` runs with the default: no field moved.
+
+Specs: `advisortwinclimb.coffee`.
 
 ## Rule SEED in the advisor; the long-run check retired (Nov 21, 2026)
 

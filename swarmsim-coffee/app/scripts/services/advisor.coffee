@@ -26,8 +26,9 @@ angular.module('swarmApp').constant 'ADVISOR_SETTINGS',
     # buying it together with some of its own faster levels pays back inside the horizon. Not shown in Options; 'off'
     # is the console script's climb (advisor/modelcheck/script_vs_port.js) and the older reference cases'
     fasterStart: 'on'
-    # twin plans (`acquire`): 'on' also takes a detour that needs some of the tier hatched first; 'off' is the
-    # console script's planner (advisor/modelcheck/script_vs_port.js). Not shown in Options
+    # twin plans (`acquire`, rule 7): 'on' also takes a detour that needs some of the tier hatched first, and plans a
+    # twin paid in a tier that passes the climb test but holds less than the price; 'off' is the console script's
+    # planner (advisor/modelcheck/script_vs_port.js). Not shown in Options
     twinDetour: 'on'
     # rules 4 (banking) and 7 (twin tips): 'plain' compares the tier above with larvae/s x the tier's twin; 'script'
     # divides that by the tier above's twin, as the console script did (advisor/modelcheck/script_vs_port.js). Not
@@ -528,6 +529,7 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
     if cfg.spareEnergy == 'save'
       nexusHeld = Decimal.min nexusLarvae(energy, snap, cfg), left
       left = left.minus nexusHeld
+    climbLarvae = left # rule 7's plans for a climbing paying tier: the larvae the climb may use (A)
     # rule FA: the meat the climb's purchases above have used this visit (the hatch's meat cap)
     faOn = cfg.fasterStart != 'off'
     meatLeft = snap.meat
@@ -622,18 +624,37 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
           larvaeMake = larvaeMake.dividedBy(payIn.twin)
         if uRate.greaterThanOrEqualTo(sacrificed) and not (payIn.passes and aboveMakes.greaterThan(larvaeMake))
           tips.push {type: 'twin', unit: u.name, payIn: payIn.name, cost: tc}
-      else if not payIn.passes and payIn.count.lessThan(tc)
-        st = ({name: o.name, have: o.count, twin: o.twin, cost: o.cost, twinCost: o.twinCost, twinFactor: o.twinFactor} for o in all)
-        steps = []
-        costInU = acquire st, k + 1, tc, steps, 0, cfg.twinDetour != 'off'
-        if costInU is null
-          continue
-        hatchRate = uRate
-        if hatchRate.lessThanOrEqualTo 0
-          continue
-        twinPayback = costInU.dividedBy hatchRate
-        if u.count.greaterThanOrEqualTo(costInU.times(2)) and twinPayback.times(u.tier + 1).lessThan(horizon)
-          tips.push {type: 'twinPlan', unit: u.name, payIn: payIn.name, cost: tc, steps: steps, planCost: costInU, payback: twinPayback}
+      else
+        plan = null
+        if not payIn.passes
+          # the console script's plan (unchanged): the units held cover twice its cost and it pays back in time
+          st = ({name: o.name, have: o.count, twin: o.twin, cost: o.cost, twinCost: o.twinCost, twinFactor: o.twinFactor} for o in all)
+          steps = []
+          costInU = acquire st, k + 1, tc, steps, 0, cfg.twinDetour != 'off'
+          if costInU isnt null and uRate.greaterThan(0)
+            twinPayback = costInU.dividedBy uRate
+            if u.count.greaterThanOrEqualTo(costInU.times(2)) and twinPayback.times(u.tier + 1).lessThan(horizon)
+              plan = {type: 'twinPlan', unit: u.name, payIn: payIn.name, cost: tc, steps: steps, planCost: costInU, payback: twinPayback}
+        if not plan? and cfg.twinDetour != 'off'
+          plan = twinPlanNow snap, all, tiers, k, uRate, sacrificed, climbLarvae, horizon, cfg
+        if plan?
+          tips.push plan
+
+    # Two plans that hatch the same tier draw on the same stock: only the higher tier's twin is shown (it is the
+    # cheaper order: a twin bought higher up makes the lower plan's hatches cheaper), with the other named as next; it
+    # is re-priced, and shown if it still passes, at the next look.
+    plans = (t for t in tips when t.type == 'twinPlan')
+    if plans.length > 1 and cfg.twinDetour != 'off'
+      hatched = (t) -> (st.unit for st in t.steps when st.type == 'hatch').concat [t.payIn]
+      order = _.sortBy plans, (t) -> -CHAIN.indexOf(t.unit)
+      kept = []
+      for t in order
+        clash = _.find kept, (o) -> _.intersection(hatched(o), hatched(t)).length > 0
+        if clash?
+          clash.then = (clash.then ? []).concat [t.unit]
+          tips = _.without tips, t
+        else
+          kept.push t
 
     ret = {
       now: snap.now
@@ -660,6 +681,95 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
     if seed?
       ret.seed = {frontier: CHAIN[seed.frontier], larvae: seed.A, lines: seed.lines, left: seed.left}
     return ret
+
+  # ---------------------------------------------------------------------------
+  # Rule 7, twin plans the console script did not make (Nov 25, 2026; setting twinDetour 'on'). u = all[k] is being
+  # hatched with larvae; its twin is paid in payIn = all[k + 1], of which fewer than the price are held. The script
+  # planned only when payIn failed the climb test, and only when the units of u held covered twice the plan's cost.
+  # That left two cases on the owner's 7.2 d save without a tip: the 21st hive neuron twin, paid in neural clusters
+  # (a climbing tier: rule 3's 4.69e15 hatches, 1.2e18 neural clusters, a look gather 1e20 only after ~80 looks), and
+  # the 9th neural cluster twin, paid in 1e8 hive networks (1e20 neural clusters, while 4.77e18 are held and 1.65e18
+  # hatches, 4.2e20 neural clusters, are affordable now). The plan is `acquire`'s, with a first hatch of u itself when the units held do
+  # not cover its cost. It is suggested when the guards hold and one of the two tests passes:
+  # - guards: the twin gains u at least as fast as the price stops making it (uRate >= sacrificed; uRate = u's twin x
+  #   u's sustainable hatch rate, larvae/s or what the lower tier's income pays for, whichever is smaller); and the
+  #   paying tier does not already make more of u than that (uRate; 'script' divides it by payIn's twin);
+  # - "free now": with S the hatches of u affordable now (units of the tier below, larvae, meat), H the units of u
+  #   held, t u's twin and c the plan's cost in u, buying the twin and hatching the rest at 2t leaves at least the
+  #   units that hatching all S at t would: t x S >= c + max(0, c - H). (H < c: (S - (c - H)/t) x 2t >= H + S x t;
+  #   H >= c: H - c + 2tS >= H + tS.)
+  # - "pays back": payIn passes the climb test, the units of u held cover twice the plan's cost, and its payback x
+  #   (u's tier + 1) is inside the horizon. Payback = (c + u the plan's extra larvae would have hatched) / (uRate -
+  #   sacrificed): larvae the plan takes beyond the rows of the tiers it hatches would otherwise go to u's row.
+  # - and every hatch in it is affordable now, step by step: u's first hatch at most what the tier below pays for,
+  #   the plan's later hatches from the units it has made (acquire's accounting), its larvae (the sum of its hatch
+  #   counts) at most what the climb leaves after the rows above the highest tier it hatches (the plan comes before
+  #   those tiers' rows and everything below, as larvae go to the highest tier first), and its meat at most the meat
+  #   left after those rows.
+  # The plan is made before the climb rows: its hatch counts are what the twin needs (it takes its larvae ahead of
+  # the rows of the tiers it hatches and those below), and the rows are re-sized at the next look from what is left;
+  # a tier the plan hatched is then in its cooldown, so nothing is hatched twice. A row alone that reaches the price
+  # gives no plan: the next look's twin tip covers it. After the twin the price is the next level's and the same
+  # tests apply, so plans repeat level by level and stop at the first level whose plan fails them.
+  twinPlanNow = (snap, all, tiers, k, uRate, sacrificed, climbLarvae, horizon, cfg) ->
+    u = all[k]
+    payIn = all[k + 1]
+    tc = u.twinCost
+    gain = uRate.minus sacrificed
+    if not gain.greaterThan 0
+      return null
+    inflow = uRate
+    if cfg.bankTwin == 'script'
+      inflow = inflow.dividedBy payIn.twin
+    if payIn.count.times(payIn.prodEach).greaterThan inflow
+      return null
+    rowOf = (i) -> if i < tiers.length then (tiers[i].buys ? ZERO) else ZERO
+    if payIn.count.plus(rowOf(k + 1).times payIn.twin).greaterThanOrEqualTo tc
+      return null
+    st = ({name: o.name, have: o.count, twin: o.twin, cost: o.cost, twinCost: o.twinCost, twinFactor: o.twinFactor} for o in all)
+    steps = []
+    c = acquire st, k + 1, tc, steps, 0, true
+    if c is null
+      return null
+    pre = Decimal.max(c.minus(u.count), 0).dividedBy(u.twin).ceil()
+    if pre.greaterThan 0
+      steps.unshift {type: 'hatch', unit: u.name, count: pre}
+    # the larvae and meat the climb leaves after the rows above the highest tier the plan hatches
+    topIdx = k
+    for s in steps when s.type == 'hatch'
+      topIdx = Math.max topIdx, _.findIndex(all, name: s.unit)
+    larvaeFree = climbLarvae
+    meatFree = snap.meat ? null # (hand-built snapshots may have no meat: no meat check then)
+    for x, j in tiers when j > topIdx
+      took = (x.buys ? ZERO).plus(x.earmarked ? ZERO)
+      larvaeFree = larvaeFree.minus took
+      mc = snap.units[j + 1].meatCost
+      if mc? and meatFree?
+        meatFree = meatFree.minus took.times(mc)
+    planLarvae = ZERO
+    planMeat = ZERO
+    rows = ZERO
+    for s in steps when s.type == 'hatch'
+      planLarvae = planLarvae.plus s.count
+      i = _.findIndex all, name: s.unit
+      rows = rows.plus rowOf(i)
+      mc = snap.units[i + 1].meatCost
+      if mc?
+        planMeat = planMeat.plus s.count.times(mc)
+    if planLarvae.greaterThan(larvaeFree) or (meatFree? and planMeat.greaterThan meatFree) or pre.greaterThan(u.affordable)
+      return null
+    # S: the hatches of u affordable now
+    S = Decimal.min u.affordable, Decimal.max(larvaeFree, 0)
+    if snap.units[k + 1].meatCost? and meatFree?
+      S = Decimal.min S, Decimal.max(meatFree, 0).dividedBy(snap.units[k + 1].meatCost)
+    S = S.floor()
+    free = u.twin.times(S).greaterThanOrEqualTo c.plus(Decimal.max(c.minus(u.count), 0))
+    diverted = Decimal.max planLarvae.minus(rows), 0
+    payback = c.plus(diverted.times u.twin).dividedBy gain
+    paysBack = payIn.passes and u.count.greaterThanOrEqualTo(c.times 2) and payback.times(u.tier + 1).lessThan(horizon)
+    if not (free or paysBack)
+      return null
+    return {type: 'twinPlan', unit: u.name, payIn: payIn.name, cost: tc, steps: steps, planCost: c, payback: payback, free: free, larvae: planLarvae, meat: planMeat}
 
   # ---------------------------------------------------------------------------
   # Rule SEED (ASCENSION.md A.10.9, "Rule SEED (spec for the port; replaces LR-0 to LR-3)"). At every look, before
@@ -1116,7 +1226,8 @@ angular.module('swarmApp').factory 'advisor', ($rootScope, $injector, game, opti
           'faster ' + tip.unit + 's (' + formatNumber(tip.cost) + ')'
       when 'twin' then 'twin ' + tip.unit + 's (' + formatNumber(tip.cost) + ' ' + tip.payIn + 's)'
       when 'twinPlan'
-        (renderStep(s) for s in tip.steps).join(' > ') + ' > twin ' + tip.unit + 's (pays back in ' + formatTime(tip.payback) + ')'
+        (renderStep(s) for s in tip.steps).join(' > ') + ' > twin ' + tip.unit + 's (' + (if tip.free then 'free now' else 'pays back in ' + formatTime(tip.payback)) + ')' +
+          (if tip.then? then '; then twin ' + tip.then.join('s, ') + 's, re-priced at the next look' else '')
       else ''
 
   # Why a lepidoptera target is what it is, when it is not simply the setting.
