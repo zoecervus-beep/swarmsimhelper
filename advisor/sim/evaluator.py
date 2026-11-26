@@ -109,10 +109,12 @@ def flows(s, led, lam_eff, v, planned):
         r[k] = rate * TWO ** led.tw[k]; left = left - rate; meat = meat - rate * sim.MEATC[k]
     return r
 
+ACTUAL = None   # the hybrid: the hatch flows today's climb actually makes (units/s per tier), set by upgrades()
 def J(s, led, lam_eff, T):
     v = values(s, led, T)
     plan, mu = allocate(s, led, v); planned = {k: n for k, n, L, nv in plan}
-    r = flows(s, led, lam_eff, v, planned)
+    if ACTUAL is None: r = flows(s, led, lam_eff, v, planned)
+    else: r = [ACTUAL[k] * TWO ** (led.tw[k] - s.twin[k]) if ACTUAL[k] > 0 else bn.F(0.0) for k in range(sim.K + 1)]
     w, deg = shadow(s, led, v, mu)
     tot = led.M
     for j in range(1, sim.K + 1):
@@ -216,14 +218,22 @@ def upgrades(s, p, avail, T):
     lam_eff = sim.lam(s) * (1 - p.get('f', 0.0))
     led = Led(list(s.c), bn.F(max(0.0, math.floor(avail))) if not bn.isbig(avail) else avail, s.c[0] * p.get('ev_meat', 0.5),
               list(s.twin), list(s.prod), [])
+    global ACTUAL
+    if p.get('ev_flows', 'climb') == 'climb':
+        # the flows J values are the ones today's climb makes: last look's hatches (units) over the gap between looks
+        gap = max(1.0, p.get('ci', 300))
+        ACTUAL = [h / gap if h > 0 else bn.F(0.0) for h in (getattr(s, 'hatched', None) or [0.0] * (sim.K + 2))[:sim.K + 1]]
     out = []
-    for _ in range(p.get('ev_iter', 6)):
-        J0 = J(s, led, lam_eff, T)
-        cands = candidates(s, led, lam_eff, T, ev, J0)
-        if not cands: break
-        nv, kind, k, lv, l2 = max(cands, key=lambda c: c[0])
-        out.append({'kind': kind, 'tier': k, 'levels': lv, 'nv': nv, 'steps': l2.steps[len(led.steps):], 'ledger': led.copy(), 'J': J0[0]})
-        led = l2
+    try:
+        for _ in range(p.get('ev_iter', 6)):
+            J0 = J(s, led, lam_eff, T)
+            cands = candidates(s, led, lam_eff, T, ev, J0)
+            if not cands: break
+            nv, kind, k, lv, l2 = max(cands, key=lambda c: c[0])
+            out.append({'kind': kind, 'tier': k, 'levels': lv, 'nv': nv, 'steps': l2.steps[len(led.steps):], 'ledger': led.copy(), 'J': J0[0]})
+            led = l2
+    finally:
+        ACTUAL = None
     return out
 
 def nv_at(s, led, kind, k, levels, ev, lam_eff, T):

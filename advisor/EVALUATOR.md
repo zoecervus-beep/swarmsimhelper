@@ -293,3 +293,73 @@ One full pass at the current speed is about 1.6 h on 4 cores, and less if it fin
 
 **(c), drop it,** throws away the one measurable gain: the upgrade ranking that handles the owner's catches without special cases.
 
+## 11. The hybrid (Nov 26, 2026): evaluator for upgrades only. **Fails on the swarmwarp route**
+
+**What it is:**
+- Option `evaluator='upgrades'` in `sim.py`; `evaluator.upgrades()` in `evaluator.py`.
+- Hatches are exactly today's native defaults: rule 1, share sizing and the cooldown, plain banking with `bank_pre`, FA, and rule SEED.
+- The evaluator decides only:
+  - a faster level of tier k from stock;
+  - 1–3 twin levels of tier k, paid through `acquire` (stock, hatch, hatch the tier below first, up to two detour levels).
+- There are no jumps. It replaces the 2× faster rule, the twin rules (`twin_r`, `twin_flow`, `twin_used`), twin plans (`twinseek`) and the prefix.
+
+**How they share the look:**
+- The upgrades go first: where today's faster/twin rules and twin plans sit, before territory and the climb.
+- They work on a ledger of the climb's larvae (larvae − reserve − nexus hold) and half the meat. What they spend is gone before the climb runs.
+- Candidates are scored on J with two parts:
+  - **the larva price:** the evaluator's own allocation of the larvae left (μ, the larvae's best use). An upgrade that spends larvae is charged their highest value, which is conservative;
+  - **the flows:** what the hatches will make over the horizon. These were first the evaluator's own; the fix below changed them to today's climb.
+
+**Fix attempt (the one allowed).** On the first pass the swarmwarp route stalled after ascension 14. The day-62 state showed why: twin levels piled on the tiers the evaluator's own allocation hatches (drone 99, queen 101, empress 111, neural cluster 105), and 0 on the tiers SEED and the climb actually hatch (lesser hive mind and up). The evaluator valued flows that today's climb does not make.
+
+**Fix:** J's flows are the hatches today's climb made at the last look, divided by the gap (`ev_flows='climb'`). Twin candidates are considered only for tiers with such a flow.
+
+**Days from each save (ideal / human seed 1); the current rules are from section 6:**
+
+| Start | Current | Hybrid, pass 1 (evaluator flows) | Hybrid, pass 2 (climb flows, the fix) |
+| --- | --- | --- | --- |
+| swarmwarp: all / first endless / 1e62 endless | 84, 51, 56 / 98, 57, 61 | **not by day 250** / not by day 250 | **not by day 250** / **not by day 250** |
+| run 2 at 3.0 d | 167, 44, 51 / 171, 44, 52 | 167, 43, 51 / 171, 44, 52 | 167, 43, 51 / 171, 44, 52 |
+| mirrors 20.1 h | 174, 50, 58 / 181, 52, 60 | 174, 50, 58 / 181, 52, 60 | 174, 50, 58 / 181, 52, 59 |
+
+- **The mirrors route and run 2 are equal or a day better.** First ascension, nexus 5 and the meat marks are equal within 1–3 log10.
+- **The swarmwarp route, pass 2, ideal:** the hybrid matches the current rules to the decimal through ascension 11 (day 42.5, 10^81 against 10^82 premutagen). After that each ascension brings only about 10^3 more, against 10^10 to 10^30 for the current rules:
+  - ascension 16 on day 66 brings 10^96, against 10^190 by then;
+  - ascension 18 comes on day 126, and the route is not finished by day 250.
+
+  At human cadence it reaches ascension 16 by day 75.
+
+**The drain check (risk 2).** Every twin level bought, out of all levels:
+
+| Run | Levels bought | Spending ≥ half the paying tier's stock | An upper tier (top or next) paying for a tier 3+ below |
+| --- | --- | --- | --- |
+| swarmwarp, current rules | 22,655 | 2,452 (11%) | 0 |
+| swarmwarp, hybrid pass 2 | 15,740 | 7,015 (45%) | 0 |
+| mirrors and run 2, current rules | – | about 4% | 0 |
+| mirrors and run 2, hybrid | – | about 98% | 0 |
+
+- **The pattern I was asked about did not show:** no upper tier paid for a twin of a tier three or more below it.
+- **A drain one tier up did show:** almost every hybrid twin level spends at least half of the tier above, which is often the tier SEED and the climb have just started. That pattern is the likeliest cause of the late swarmwarp runs flattening. **Not confirmed:** I did not capture a late-run state after the fix.
+
+**Speed:**
+- The pass took **3,920 s** wall (pass 1, after pruning twin candidates to tiers with a flow) and **6,910 s** (pass 2). The current rules take 18–89 s per run.
+- The cost is J: a full re-plan in big numbers, for every candidate, at every look, at a 5-minute cadence.
+- **The 5-minute target was not met.**
+
+**The seven saves under the hybrid.** At a single save there is no last look, so the flows are the evaluator's own allocation (`ev_flows='evaluator'`); in the simulator they are the climb's. The upgrade purchases are the full evaluator's minus its hatches:
+
+| Save | The hybrid's upgrades | Differs from the full evaluator |
+| --- | --- | --- |
+| 58 h | none; the climb's FA hatches 1e4 hive queens + 1 faster | no |
+| run 2, 45 h | twin hive queens (by hatching 1e7 empresses), +99% | no |
+| run 2, 3.0 d | twin empresses ×2 via the prophet-twin detour, +246% | no |
+| run 2, 7.2 d | twin hive neurons ×2, +285%; the idle larvae are handled by plain banking with `bank_pre` | no |
+| run 2, 7.2 d (b) | twin hive neurons via the neural-cluster twin, +263% | no |
+| run 2, now | ranked: faster neuroprophets +100%, twin neural clusters +56%, twin hive neurons +48% | no. The neural-cluster and hive-neuron twins are a near tie at the same price (1e21 neural clusters), so only one is affordable |
+
+**Verdict: the hybrid fails the acceptance test on the swarmwarp route.** It never finishes and never reaches endless by day 250. It is no worse elsewhere. Per the brief:
+- I made one fix attempt, and it did not help;
+- I did not regenerate the cases or write the hybrid port spec.
+
+**Not run:** busy cadence, and a late-run state table after the fix.
+
