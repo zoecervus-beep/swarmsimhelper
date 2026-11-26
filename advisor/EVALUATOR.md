@@ -8,7 +8,14 @@ The advisor's meat-tier advice is a port of a console script's heuristics, with 
 
 Every defect the owner found had the same cause: the advisor did not compare the available purchases on one scale. So it left a resource idle, or took a dearer path.
 
-This document designs one evaluator to replace that set of rules, and tests it. Status:
+**Where this stopped (Nov 26, 2026). Nothing here is ported; the native advisor is unchanged.**
+- The full evaluator (sections 1–9) loses to the current rules in the simulator: the swarmwarp route never finishes (section 6).
+- The hybrid, evaluator for upgrades only, also fails on the swarmwarp route (section 11).
+- Today's rules with the evaluator's picks added on top match the current rules on the swarmwarp route through ascension 16; the runs were cut off before the finish, and the mirrors route was not run (section 12).
+- The shape that was next in line, not measured: keep the two stock tips (2× faster, rule-7 twin), and let the evaluator replace twin plans, the prefix detour, "free now" and the "hold twice the plan's cost" test.
+- Blocking further work: a swarmwarp run with the evaluator takes more than 2 hours in the simulator. A speed-up was started and not finished or committed.
+
+This document designs one evaluator to replace that set of rules, and tests it. Status as first written:
 - **The design holds up on the owner's seven saves** (section 5), with no special cases.
 - **The simulator comparison (section 6) is a loss:**
   - swarmwarp is not finished by day 500;
