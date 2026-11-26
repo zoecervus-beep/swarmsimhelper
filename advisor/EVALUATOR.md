@@ -363,3 +363,43 @@ One full pass at the current speed is about 1.6 h on 4 cores, and less if it fin
 
 **Not run:** busy cadence, and a late-run state table after the fix.
 
+## 12. Which difference loses the swarmwarp route (Nov 26, 2026): union (U) and hold-twice (C)
+
+The hybrid differs from the current rules on the swarmwarp route in two ways (section 11):
+- it skips about 11,000 cheap twin levels that the current rules buy;
+- it buys 7,015 levels that spend at least half of the paying tier, against 2,452.
+
+Two variants test which difference matters:
+- **U, union:** today's upgrade rules exactly as the native defaults (2× faster, rule-7 twins, twin plans, the prefix detour), then the evaluator's upgrade picks (climb flows) on what is left in the same look. Hatches as today.
+- **C, hold-twice:** the hybrid's pass 2, with one change: an evaluator twin is taken only if the paying tier holds at least twice the price after `acquire`'s hatches.
+
+**The runs hit the 2-hour limit of the environment before writing their summary.** All-done days and the endless days were therefore not recorded. What exists is the tier tables written at ascensions 12, 14 and 16 (`advisor/modelcheck/evaluator_union_tiers.md`).
+
+**Premutagen at each ascension (day, log10 premutagen):**
+
+| Ascension | Current, ideal | U, ideal | Current, human 1 | U, human 1 | Hybrid pass 2, ideal | C, ideal |
+| --- | --- | --- | --- | --- | --- | --- |
+| 12 | 46.8, 93 | 46.7, 93.8 | 50.9, 93 | 50.8, 93.7 | 46.7, 83 | **46.8, 69.8** |
+| 14 | 55.5, 135 | 55.5, 135.3 | 60.8, 134 | 60.0, 134.7 | 55.5, 91 | – (not reached by day 120) |
+| 16 | 64.6, 190 | 64.5, 190.2 | 70.8, 190 | 69.8, 190.1 | 66.0, 96 | – |
+
+- **U matches the current rules through ascension 16 at both cadences:** the same day to ±1, and premutagen within 1 log10. Endless already holds 10^141 units at ascension 16. Its all-done and endless days were not recorded, so **"U matches" is shown through ascension 16 only.**
+- **C is worse than the hybrid:**
+  - at ascension 12 it brings 10^70 against 10^83;
+  - at ascension 12 its twin levels are 0–80 per tier, against about 100 for U;
+  - its CPU time (17 min against 2 h or more for U) says the run went quiet.
+
+  **Holding twice the price does not rescue the hybrid. It makes it worse.**
+
+**What the data supports:**
+- **The loss comes from the first difference:** the cheap twin levels the hybrid skipped. With today's rules buying them, and the evaluator adding its picks on top, the route keeps pace.
+- **The "hold twice the price" rule is not what keeps the current rules on track.** Adding it to the evaluator's twins costs more.
+- This fits the hybrid's pruning: twin candidates only for tiers with a flow, at most 3 levels per pick, at most 6 picks per look. It cannot buy the hundreds of cheap levels a fresh run's tiers take every look.
+
+**Not done:**
+- U's mirrors-route and run-2 runs;
+- the seven saves under U;
+- U's port spec and regenerated cases.
+
+The acceptance test (all-done and endless days within a day, both cadences) is not established. A U run takes more than 2 hours here, which is the environment's limit for one background job, so it cannot finish here as it stands.
+

@@ -19,16 +19,33 @@ F.SAVES['early27'] = 'example_save_27min.json'
 CUR = dict(L.VAR['B1'], bank_twin='plain', bank_pre=True)
 HYB = dict(CUR, evaluator='upgrades', twin_prefix=None)
 EVAL = dict(L.VAR['off'], evaluator=True, faster_aware=None, seed=None, twin_prefix=None)
-VARS = {'current': CUR, 'hybrid': HYB, 'evaluator': EVAL}
+UNION = dict(CUR, evaluator='union')            # today's upgrade rules, then the evaluator's picks on what is left
+HOLD2 = dict(HYB, ev_hold2=True)                 # the hybrid, with today's "hold twice the price" on evaluator twins
+VARS = {'current': CUR, 'hybrid': HYB, 'evaluator': EVAL, 'union': UNION, 'hold2': HOLD2}
+TABLES = (12, 14, 16)   # tier tables written at the end of these runs (just before the ascension)
+def tier_table(s, path, label):
+    lgs = lambda x: '%.2f' % sim.bn.lg(x) if x > 0 else '-'
+    with open(path, 'a') as f:
+        f.write('\n### %s: ascension %d on day %.1f, log10 premutagen %s, log10 mutagen %s\n\n' % (label, s.asc + 1, s.time / 86400, lgs(s.premut), lgs(s.mutagen)))
+        f.write('| tier | log10 count | twin | faster |\n| --- | --- | --- | --- |\n')
+        for k in range(1, sim.K + 1):
+            if s.c[k] > 0: f.write('| %s | %s | %d | %d |\n' % (sim.LABEL.get(sim.NAMES[k], sim.NAMES[k]), lgs(s.c[k]), s.twin[k], s.prod[k]))
 CADS = {'ideal': (None, 1), 'human1': ('human', 1), 'busy': ('busy', 1)}
 STARTS = ('warp', 'run2b', 'mirrors20')
 DAYS = 250
+TABLE_FILE = None   # --tables FILE: tier tables at ascensions 12, 14 and 16
 
 def job(a):
     st, vn, cn = a
     prof, sd = CADS[cn]
     sim.DRAIN = []
     t = time.time()
+    if TABLE_FILE:
+        orig = sim.ascend
+        def ascend(s, p, plan=None, _o=orig):
+            if s.asc + 1 in TABLES: tier_table(s, TABLE_FILE, '%s %s %s' % (st, vn, cn))
+            return _o(s, p, plan)
+        sim.ascend = ascend
     r = F.play(st, VARS[vn], prof, sd, days=DAYS)
     d = sim.DRAIN; sim.DRAIN = None
     # the drain check: twin levels that spent at least half the paying tier, and among them those paid by one of the
@@ -58,6 +75,15 @@ if __name__ == '__main__':
     if '--vars' in sys.argv: vs = sys.argv[sys.argv.index('--vars') + 1].split(','); args.remove(sys.argv[sys.argv.index('--vars') + 1])
     cads = args or ['ideal', 'human1']
     specs = [(st, v, c) for c in cads for st in STARTS for v in vs]
+    def opt(name):
+        if name not in sys.argv: return None
+        x = sys.argv[sys.argv.index(name) + 1]
+        if x in args: args.remove(x)
+        return x
+    if opt("--days"): globals()["DAYS"] = int(sys.argv[sys.argv.index('--days') + 1])
+    if opt("--tables"): globals()["TABLE_FILE"] = sys.argv[sys.argv.index('--tables') + 1]
+    if opt('--specs'): specs = [tuple(x.split(':')) for x in sys.argv[sys.argv.index('--specs') + 1].split(',')]   # start:variant:cadence,...
+    vs = sorted({v for _, v, _ in specs}); cads = sorted({c for _, _, c in specs})
     T = time.time()
     with ProcessPoolExecutor(jobs) as ex: res = list(ex.map(job, specs))
     json.dump(res, open(os.path.join(F.OUTD, 'evaluator_sim_%s_%s.json' % ('_'.join(vs), '_'.join(cads))), 'w'), default=str)

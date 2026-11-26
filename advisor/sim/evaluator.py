@@ -170,7 +170,7 @@ def candidates(s, led, lam_eff, T, ev, J0):
         for lv in range(1, ev.get('ev_levels', 3) + 1):
             c = twin_price(k, l2.tw[k])
             l3 = acquire(s, l2, k + 1, c, 1, 1, ctx)
-            if l3 is None: break
+            if l3 is None or (ev.get('ev_hold2') and l3.S[k + 1] < 2 * c): break   # ev_hold2: today's holding rule (EVALUATOR.md 12)
             l2 = l3.copy(); l2.S[k + 1] = l2.S[k + 1] - c; l2.tw[k] += 1; l2.steps.append(('twin', k, 1))
             out.append(('twin', k, lv, l2))
         if k >= sink and ev.get('ev_jumps', True):

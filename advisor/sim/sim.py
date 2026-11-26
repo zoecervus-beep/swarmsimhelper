@@ -430,7 +430,7 @@ def policy(s,p,gained):
     if p.get('hatch_dyn') and 'mutatehatchery' in s.unlocked: mutant_hatchery_dyn(s,p)
     top=max([k for k in range(1,K+1) if s.c[k]>0] or [1])   # [1]: a fresh run owns no drones yet
     # --- prod upgrades
-    for k in (range(1,K+1) if not p.get('evaluator') else ()):   # evaluator (default off): advisor/EVALUATOR.md, evaluator.py
+    for k in (range(1,K+1) if p.get('evaluator') in (None,False,'union') else ()):   # evaluator (default off): advisor/EVALUATOR.md, evaluator.py
         while True:
             cost=prod_cost(s,k)
             if s.c[k]>=p['prod_mult']*cost:
@@ -438,9 +438,9 @@ def policy(s,p,gained):
                 if TRACE is not None: tr('faster',k,s.prod[k])
             else: break
     # --- twin upgrades (twin of tier k costs tier k+1)
-    if not p.get('evaluator'): twin_pass(s,p)
+    if p.get('evaluator') in (None,False,'union'): twin_pass(s,p)   # 'union': today's upgrade rules, then the evaluator's
     # --- twin seeking: hatch just enough tier k+1 units to afford twin_k when its payback is short
-    if p.get('twinseek') and not p.get('evaluator'):
+    if p.get('twinseek') and p.get('evaluator') in (None,False,'union'):
         for k in range(1,K):
             if allowed(s,p,k+1): continue
             need=twin_cost(s,k)-s.c[k+1]
@@ -457,7 +457,7 @@ def policy(s,p,gained):
                 drain(s,k,twin_cost(s,k)); s.c[k+1]-=twin_cost(s,k); s.twin[k]+=1
     # --- evaluator='upgrades' (EVALUATOR.md section 11, the hybrid): faster and twin levels by the evaluator, before
     # territory and the climb, on the larvae the climb could use; the hatches stay with the climb below
-    if p.get('evaluator')=='upgrades':
+    if p.get('evaluator') in ('upgrades','union'):
         import evaluator
         out=evaluator.upgrades(s,p,s.larva-s.reserve-s.nexres,p['theta'])
         if TRACE is not None: tr('evaluator',[(o['kind'],o['tier'],o.get('levels')) for o in out])
@@ -501,7 +501,7 @@ def policy(s,p,gained):
     if TRACE is not None:
         tr('before_climb',avail,top)
         if CAPTURE is not None: CAPTURE.append(copy.deepcopy(s))   # the state the climb and push rules see (longrun_cases.py)
-    if p.get('evaluator') and p['evaluator']!='upgrades':
+    if p.get('evaluator') and p['evaluator'] not in ('upgrades','union'):
         import evaluator
         s.hprev=s.hatched; s.hatched=[0.0]*(K+2)
         if p.get('seed') and avail>=1: avail=seed_up(s,p,avail)   # evaluator + rule SEED (EVALUATOR.md: the one rule kept)
