@@ -1,0 +1,89 @@
+{
+ "case": "run2_7d",
+ "catch": "4+5: run 2, 7.2 d",
+ "save": "advisor/sim/example_save_run2_7d.json",
+ "run_age_s": 618624.968,
+ "age_multiple": 5,
+ "horizon_s": 3093124.84,
+ "territory_share": 0.0,
+ "larvae_for_look": "1.260648e+22",
+ "larva_income_per_s": "2.219399e+18",
+ "meat_share": 0.5,
+ "log10_meat_by_horizon_per_unit": {
+  "drone": 19.298,
+  "queen": 37.0458,
+  "nest": 53.246,
+  "greaterqueen": 67.9015,
+  "hive": 81.316,
+  "hivequeen": 93.7936,
+  "empress": 105.036,
+  "prophet": 115.3471,
+  "goddess": 125.0306,
+  "pantheon": 133.788,
+  "pantheon2": 140.4176,
+  "pantheon3": 147.029
+ },
+ "purchases": [
+  {
+   "kind": "twin",
+   "name": "goddess",
+   "n": null,
+   "levels": 2,
+   "faster_after": null,
+   "steps": [
+    [
+     "twin",
+     "goddess",
+     "1.000000e+00"
+    ],
+    [
+     "hatch",
+     "goddess",
+     "3.251591e+21"
+    ],
+    [
+     "hatch",
+     "pantheon",
+     "3.751120e+17"
+    ],
+    [
+     "twin",
+     "goddess",
+     "1.000000e+00"
+    ]
+   ],
+   "raises_J_pct": 284.93377911847097,
+   "payback_s": 184.10406391666203
+  },
+  {
+   "kind": "hatch",
+   "name": "goddess",
+   "n": "9.354513e+21",
+   "levels": null,
+   "faster_after": 0,
+   "steps": [
+    [
+     "hatch",
+     "goddess",
+     "9.354513e+21"
+    ]
+   ],
+   "raises_J_pct": null,
+   "payback_s": 1.000000025733394
+  }
+ ],
+ "first_pick_alternatives": [
+  {
+   "kind": "twin",
+   "name": "goddess",
+   "levels": 2,
+   "raises_J_pct": 284.93377911847097
+  },
+  {
+   "kind": "twin",
+   "name": "goddess",
+   "levels": 1,
+   "raises_J_pct": 94.62531162667332
+  }
+ ]
+}

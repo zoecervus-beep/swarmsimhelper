@@ -427,7 +427,7 @@ def policy(s,p,gained):
     if p.get('hatch_dyn') and 'mutatehatchery' in s.unlocked: mutant_hatchery_dyn(s,p)
     top=max([k for k in range(1,K+1) if s.c[k]>0] or [1])   # [1]: a fresh run owns no drones yet
     # --- prod upgrades
-    for k in range(1,K+1):
+    for k in (range(1,K+1) if not p.get('evaluator') else ()):   # evaluator (default off): advisor/EVALUATOR.md, evaluator.py
         while True:
             cost=prod_cost(s,k)
             if s.c[k]>=p['prod_mult']*cost:
@@ -435,9 +435,9 @@ def policy(s,p,gained):
                 if TRACE is not None: tr('faster',k,s.prod[k])
             else: break
     # --- twin upgrades (twin of tier k costs tier k+1)
-    twin_pass(s,p)
+    if not p.get('evaluator'): twin_pass(s,p)
     # --- twin seeking: hatch just enough tier k+1 units to afford twin_k when its payback is short
-    if p.get('twinseek'):
+    if p.get('twinseek') and not p.get('evaluator'):
         for k in range(1,K):
             if allowed(s,p,k+1): continue
             need=twin_cost(s,k)-s.c[k+1]
@@ -491,6 +491,15 @@ def policy(s,p,gained):
     if TRACE is not None:
         tr('before_climb',avail,top)
         if CAPTURE is not None: CAPTURE.append(copy.deepcopy(s))   # the state the climb and push rules see (longrun_cases.py)
+    if p.get('evaluator'):
+        import evaluator
+        s.hprev=s.hatched; s.hatched=[0.0]*(K+2)
+        if p.get('seed') and avail>=1: avail=seed_up(s,p,avail)   # evaluator + rule SEED (EVALUATOR.md: the one rule kept)
+        out,led,mu=evaluator.look(s,dict(p,f=f),avail,p['theta'])
+        if TRACE is not None: tr('evaluator',[(o['kind'],o['tier'],o.get('n',o.get('levels'))) for o in out])
+        evaluator.apply(s,p,out,tnow(s,p))
+        earn_achievements(s)
+        return
     _climb_and_push(s,p,avail,top,f)
 def twin_prefix(s,p,k,short,nb):
     """Option `twin_prefix` (default off; ASCENSION.md A.10 pass 5): the twin of tier k is paid in tier k+1 units, which

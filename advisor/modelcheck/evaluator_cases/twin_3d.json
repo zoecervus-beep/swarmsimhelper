@@ -1,0 +1,122 @@
+{
+ "case": "twin_3d",
+ "catch": "3: run 2, 3.0 d",
+ "save": "advisor/sim/example_save_twin_3d.json",
+ "run_age_s": 262176.498,
+ "age_multiple": 5,
+ "horizon_s": 1310882.4900000002,
+ "territory_share": 0.0,
+ "larvae_for_look": "8.306045e+10",
+ "larva_income_per_s": "1.555439e+11",
+ "meat_share": 0.5,
+ "log10_meat_by_horizon_per_unit": {
+  "drone": 13.2056,
+  "queen": 25.162,
+  "nest": 36.1729,
+  "greaterqueen": 46.2411,
+  "hive": 55.6705,
+  "hivequeen": 64.4639,
+  "empress": 72.6242,
+  "prophet": 79.2511,
+  "goddess": 85.5515
+ },
+ "purchases": [
+  {
+   "kind": "twin",
+   "name": "empress",
+   "n": null,
+   "levels": 2,
+   "faster_after": null,
+   "steps": [
+    [
+     "hatch",
+     "prophet",
+     "1.000000e+09"
+    ],
+    [
+     "hatch",
+     "goddess",
+     "1.000000e+00"
+    ],
+    [
+     "twin",
+     "prophet",
+     "1.000000e+00"
+    ],
+    [
+     "hatch",
+     "prophet",
+     "5.000000e+09"
+    ],
+    [
+     "hatch",
+     "goddess",
+     "1.000000e+01"
+    ],
+    [
+     "twin",
+     "prophet",
+     "1.000000e+00"
+    ],
+    [
+     "hatch",
+     "prophet",
+     "2.500000e+09"
+    ],
+    [
+     "twin",
+     "empress",
+     "1.000000e+00"
+    ],
+    [
+     "hatch",
+     "prophet",
+     "2.500000e+10"
+    ],
+    [
+     "twin",
+     "empress",
+     "1.000000e+00"
+    ]
+   ],
+   "raises_J_pct": 245.7362989026486,
+   "payback_s": 60270.56245118751
+  },
+  {
+   "kind": "hatch",
+   "name": "empress",
+   "n": "4.956045e+10",
+   "levels": null,
+   "faster_after": 0,
+   "steps": [
+    [
+     "hatch",
+     "empress",
+     "4.956045e+10"
+    ]
+   ],
+   "raises_J_pct": null,
+   "payback_s": 22.125283090047038
+  }
+ ],
+ "first_pick_alternatives": [
+  {
+   "kind": "twin",
+   "name": "empress",
+   "levels": 2,
+   "raises_J_pct": 245.7362989026486
+  },
+  {
+   "kind": "twin",
+   "name": "empress",
+   "levels": 1,
+   "raises_J_pct": 84.7517890107736
+  },
+  {
+   "kind": "twin",
+   "name": "prophet",
+   "levels": 2,
+   "raises_J_pct": 0.2893700438898268
+  }
+ ]
+}

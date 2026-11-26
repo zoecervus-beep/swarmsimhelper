@@ -1,0 +1,85 @@
+{
+ "case": "run2_45h",
+ "catch": "2: run 2, 45 h",
+ "save": "advisor/sim/example_save_run2_45h.json",
+ "run_age_s": 162728.864,
+ "age_multiple": 5,
+ "horizon_s": 813644.3200000001,
+ "territory_share": 0.0,
+ "larvae_for_look": "1.596189e+13",
+ "larva_income_per_s": "1.800891e+09",
+ "meat_share": 0.5,
+ "log10_meat_by_horizon_per_unit": {
+  "drone": 11.4933,
+  "queen": 22.0385,
+  "nest": 31.6381,
+  "greaterqueen": 40.2951,
+  "hive": 48.3132,
+  "hivequeen": 55.9964,
+  "empress": 62.1434,
+  "prophet": 68.2622
+ },
+ "purchases": [
+  {
+   "kind": "twin",
+   "name": "hivequeen",
+   "n": null,
+   "levels": 1,
+   "faster_after": null,
+   "steps": [
+    [
+     "hatch",
+     "empress",
+     "9.999998e+06"
+    ],
+    [
+     "twin",
+     "hivequeen",
+     "1.000000e+00"
+    ]
+   ],
+   "raises_J_pct": 99.24210121658578,
+   "payback_s": 2214.202078007827
+  },
+  {
+   "kind": "hatch",
+   "name": "hivequeen",
+   "n": "2.116018e+11",
+   "levels": null,
+   "faster_after": 0,
+   "steps": [
+    [
+     "hatch",
+     "hivequeen",
+     "2.116018e+11"
+    ]
+   ],
+   "raises_J_pct": null,
+   "payback_s": 65.91542047799203
+  },
+  {
+   "kind": "hatch",
+   "name": "hive",
+   "n": "1.575028e+13",
+   "levels": null,
+   "faster_after": 0,
+   "steps": [
+    [
+     "hatch",
+     "hive",
+     "1.575028e+13"
+    ]
+   ],
+   "raises_J_pct": null,
+   "payback_s": 1.52415442018091
+  }
+ ],
+ "first_pick_alternatives": [
+  {
+   "kind": "twin",
+   "name": "hivequeen",
+   "levels": 1,
+   "raises_J_pct": 99.24210121658578
+  }
+ ]
+}

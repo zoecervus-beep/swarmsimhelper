@@ -1,0 +1,122 @@
+{
+ "case": "run2_now",
+ "catch": "7: run 2, now",
+ "save": "advisor/sim/example_save_run2_now.json",
+ "run_age_s": 621970.608,
+ "age_multiple": 5,
+ "horizon_s": 3109853.04,
+ "territory_share": 0.0,
+ "larvae_for_look": "3.221872e+18",
+ "larva_income_per_s": "2.705973e+18",
+ "meat_share": 0.5,
+ "log10_meat_by_horizon_per_unit": {
+  "drone": 19.3004,
+  "queen": 37.0505,
+  "nest": 53.253,
+  "greaterqueen": 67.9108,
+  "hive": 81.3277,
+  "hivequeen": 93.8077,
+  "empress": 105.0524,
+  "prophet": 115.3659,
+  "goddess": 125.0516,
+  "pantheon": 133.8114,
+  "pantheon2": 140.4434,
+  "pantheon3": 147.0571
+ },
+ "purchases": [
+  {
+   "kind": "faster",
+   "name": "prophet",
+   "n": null,
+   "levels": 1,
+   "faster_after": null,
+   "steps": [
+    [
+     "faster",
+     "prophet",
+     "1.000000e+00"
+    ]
+   ],
+   "raises_J_pct": 99.99967952385639,
+   "payback_s": 10495.420093397235
+  },
+  {
+   "kind": "twin",
+   "name": "pantheon",
+   "n": null,
+   "levels": 1,
+   "faster_after": null,
+   "steps": [
+    [
+     "hatch",
+     "pantheon",
+     "1.940036e+18"
+    ],
+    [
+     "hatch",
+     "pantheon2",
+     "1.000000e+09"
+    ],
+    [
+     "twin",
+     "pantheon",
+     "1.000000e+00"
+    ]
+   ],
+   "raises_J_pct": 55.82727875296926,
+   "payback_s": 77308.69692883357
+  },
+  {
+   "kind": "hatch",
+   "name": "pantheon",
+   "n": "2.070922e+17",
+   "levels": null,
+   "faster_after": 0,
+   "steps": [
+    [
+     "hatch",
+     "pantheon",
+     "2.070922e+17"
+    ]
+   ],
+   "raises_J_pct": null,
+   "payback_s": 52809.20048232032
+  },
+  {
+   "kind": "hatch",
+   "name": "goddess",
+   "n": "1.074744e+18",
+   "levels": null,
+   "faster_after": 0,
+   "steps": [
+    [
+     "hatch",
+     "goddess",
+     "1.074744e+18"
+    ]
+   ],
+   "raises_J_pct": null,
+   "payback_s": 1.000000025733394
+  }
+ ],
+ "first_pick_alternatives": [
+  {
+   "kind": "faster",
+   "name": "prophet",
+   "levels": 1,
+   "raises_J_pct": 99.99967952385639
+  },
+  {
+   "kind": "twin",
+   "name": "pantheon",
+   "levels": 1,
+   "raises_J_pct": 55.82718929641424
+  },
+  {
+   "kind": "twin",
+   "name": "goddess",
+   "levels": 1,
+   "raises_J_pct": 48.18757505825437
+  }
+ ]
+}
