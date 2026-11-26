@@ -24,6 +24,7 @@ import sim, bignum as bn
 
 TWO = bn.F(2.0)
 
+
 class Led:
     """What the look still has: stocks (S), larvae (L), meat budget (M), twin and faster levels, and the steps taken."""
     __slots__ = ('S', 'L', 'M', 'tw', 'pr', 'steps')
@@ -159,7 +160,10 @@ def candidates(s, led, lam_eff, T, ev, J0):
     top = max([k for k in range(1, sim.K + 1) if led.S[k] > 0] or [1])
     sink = max([k for k, n, L, nv in plan] or [1])
     out = []
+    hatched = {k for k, n, L, nv in plan}
     for k in range(1, min(top + 2, sim.K)):
+        # without jumps, a twin of a tier that neither hatches this look nor has a steady flow adds nothing to J
+        if not ev.get('ev_jumps', True) and k not in hatched and not r[k] > 0: continue
         l2 = led.copy()
         for lv in range(1, ev.get('ev_levels', 3) + 1):
             c = twin_price(k, l2.tw[k])
@@ -167,7 +171,7 @@ def candidates(s, led, lam_eff, T, ev, J0):
             if l3 is None: break
             l2 = l3.copy(); l2.S[k + 1] = l2.S[k + 1] - c; l2.tw[k] += 1; l2.steps.append(('twin', k, 1))
             out.append(('twin', k, lv, l2))
-        if k >= sink:
+        if k >= sink and ev.get('ev_jumps', True):
             for lv in JUMPS:
                 c = twin_price(k, led.tw[k]) * (twin_price(k, lv) - 1) / (sim.TWINF[k] - 1)
                 l3 = acquire(s, led, k + 1, c, 0, 1, ctx)
@@ -204,6 +208,24 @@ def look(s, p, avail, T):
                     'ledger': led.copy(), 'J': tot})
     return out, led, mu
 
+def upgrades(s, p, avail, T):
+    """The hybrid (evaluator='upgrades', EVALUATOR.md section 11): faster and twin levels only, no jumps; the look's
+    hatches stay with today's climb. The candidates are scored on J with the evaluator's own allocation of the larvae
+    left (the larvae's best use, so an upgrade that spends larvae is charged their highest value)."""
+    ev = dict(p, ev_jumps=False)
+    lam_eff = sim.lam(s) * (1 - p.get('f', 0.0))
+    led = Led(list(s.c), bn.F(max(0.0, math.floor(avail))) if not bn.isbig(avail) else avail, s.c[0] * p.get('ev_meat', 0.5),
+              list(s.twin), list(s.prod), [])
+    out = []
+    for _ in range(p.get('ev_iter', 6)):
+        J0 = J(s, led, lam_eff, T)
+        cands = candidates(s, led, lam_eff, T, ev, J0)
+        if not cands: break
+        nv, kind, k, lv, l2 = max(cands, key=lambda c: c[0])
+        out.append({'kind': kind, 'tier': k, 'levels': lv, 'nv': nv, 'steps': l2.steps[len(led.steps):], 'ledger': led.copy(), 'J': J0[0]})
+        led = l2
+    return out
+
 def nv_at(s, led, kind, k, levels, ev, lam_eff, T):
     if kind == 'hatch': return hatch_nv(s, led, k, levels, values(s, led, T))[0]
     for c in candidates(s, led, lam_eff, T, ev, J(s, led, lam_eff, T)):
@@ -232,7 +254,10 @@ def apply(s, p, out, now):
             elif kind == 'twin':
                 for _ in range(x):
                     c = twin_price(k, s.twin[k])
-                    if s.c[k + 1] >= c: s.c[k + 1] = s.c[k + 1] - c; s.twin[k] += 1
+                    if s.c[k + 1] >= c:
+                        # the drain check (EVALUATOR.md 11): sim.drain logs the share of the paying tier spent
+                        sim.drain(s, k, c)
+                        s.c[k + 1] = s.c[k + 1] - c; s.twin[k] += 1
                     else: break
             elif kind == 'faster':
                 c = faster_price(s.prod[k])

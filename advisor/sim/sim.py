@@ -38,6 +38,9 @@ def log_ach(s,name):
 CAPTURE=None   # with TRACE: a list that receives a copy of the state as the climb starts
 TRACE=None   # a list to record the policy's decisions (longrun_cases.py); None: off, nothing recorded
 def tr(*a): TRACE.append(a)
+DRAIN=None   # a list to record every twin level bought: (tier, share of the paying tier's stock spent, highest owned tier)
+def drain(s,k,cost):
+    if DRAIN is not None: DRAIN.append((k,float(cost/s.c[k+1]),max([j for j in range(1,K+1) if s.c[j]>0] or [1])))
 def buy_stat(s,name,twinnum): s.bought[name]=s.bought.get(name,0.0)+twinnum
 K=20  # meat tiers 1..K (drone=1 ... endless=overmind6=20)
 NAMES=['meat','drone','queen','nest','greaterqueen','hive','hivequeen','empress','prophet','goddess','pantheon','pantheon2','pantheon3',
@@ -451,7 +454,14 @@ def policy(s,p,gained):
             if R<=0: continue
             if (k+1)*costk/R<p['theta']*p.get('seek_f',1) and s.c[k]>=costk*p.get('seek_mult',1) and s.larva-s.reserve-s.nexres>=nb and s.c[0]>=nb*MEATC[k+1]:
                 s.c[k]-=costk; s.c[0]-=nb*MEATC[k+1]; s.larva-=nb; s.c[k+1]+=nb*TWO**s.twin[k+1]; buy_stat(s,NAMES[k+1],nb*TWO**s.twin[k+1])
-                s.c[k+1]-=twin_cost(s,k); s.twin[k]+=1
+                drain(s,k,twin_cost(s,k)); s.c[k+1]-=twin_cost(s,k); s.twin[k]+=1
+    # --- evaluator='upgrades' (EVALUATOR.md section 11, the hybrid): faster and twin levels by the evaluator, before
+    # territory and the climb, on the larvae the climb could use; the hatches stay with the climb below
+    if p.get('evaluator')=='upgrades':
+        import evaluator
+        out=evaluator.upgrades(s,p,s.larva-s.reserve-s.nexres,p['theta'])
+        if TRACE is not None: tr('evaluator',[(o['kind'],o['tier'],o.get('levels')) for o in out])
+        evaluator.apply(s,p,out,tnow(s,p))
     # --- territory
     f=p['f']
     if s.casts.get('mirror') and 'f_mirror' in p: f=p['f_mirror']
@@ -491,7 +501,7 @@ def policy(s,p,gained):
     if TRACE is not None:
         tr('before_climb',avail,top)
         if CAPTURE is not None: CAPTURE.append(copy.deepcopy(s))   # the state the climb and push rules see (longrun_cases.py)
-    if p.get('evaluator'):
+    if p.get('evaluator') and p['evaluator']!='upgrades':
         import evaluator
         s.hprev=s.hatched; s.hatched=[0.0]*(K+2)
         if p.get('seed') and avail>=1: avail=seed_up(s,p,avail)   # evaluator + rule SEED (EVALUATOR.md: the one rule kept)
@@ -711,7 +721,7 @@ def twin_pass(s,p):
                 break
             if s.c[k+1]>=p['twin_mult']*cost and s.c[k+1]>=cost:
                 if TRACE is not None: tr('twin',k,'buys',cost,s.c[k+1])
-                s.c[k+1]-=cost; s.twin[k]+=1
+                drain(s,k,cost); s.c[k+1]-=cost; s.twin[k]+=1
             else: break
 def faster_aware_passes(s,p,k,n):
     """Policy option `faster_aware` (default off). A tier that fails the run-age test may still be climbed
