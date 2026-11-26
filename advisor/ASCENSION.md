@@ -525,6 +525,8 @@ The policy option `empower` follows the native advisor's `empowerAdvice` rule: e
 
 #### A.10.9 Pass 5 (Nov 21, 2026): cut, keep or replace the mode?
 
+> **Nov 25, 2026:** every figure in A.10.9 was made with the console script's banking divisor. The re-measurement with plain banking is in A.10.10 below: the divisor accounts for none of the ~78 days or of "swarmwarp never finishes", and rule SEED stays.
+
 The owner turned the long-run mode off and asked for it to be cut or reworked. It had to be switchable on the swarmwarp route too.
 
 Since pass 4, rule FA (MODEL-CHECK.md, faster-aware pass 2, variant c2) is native and always on, the advisor has the game clock, and the default multiple is 5. Measured with all of that:
@@ -686,6 +688,90 @@ New `sim.py` options, all off by default. With them off, `run_example.py` (both 
 | `twin_prefix` | twin seeking may first hatch the tier-k units that pay for the detour (when the tier below could hatch twice that) |
 | `seed` | rule SEED: `{'f': share}`, or `{'f': 'payback', 'cap': c}` |
 | `horizon_fn` | a function raising the horizon (candidate (a)) |
+
+#### A.10.10 Banking without the script's divisor (Nov 25, 2026)
+
+**The bug.** Rule 4 banks tier k when the tier above makes more than bank × larva income × (1 − territory) × twin_k / twin_{k+1}. The division by twin_{k+1} comes from the console script and understates what larvae could hatch. Rule 7 (twin tips) has the same divisor. The native advisor drops it in both (`bankTwin: 'plain'`). The owner's save at run 2, 7.2 d (`advisor/sim/example_save_run2_7d.json`) shows it: 1.26e22 larvae idle, queen to goddess banked.
+
+**The owner's bet:** the ~78 days that seed off costs are partly this bug. **In the simulator they are not.**
+
+**What was run.** `advisor/sim/bank_plain.py`, with:
+- FA on, the advisor's sizing, multiple 5;
+- seed off = A.10.9 "mode off"; seed on = rule SEED, 1%;
+- ideal and human seed 1 only.
+
+New `sim.py` options, off by default (the four regression runs stay byte-identical):
+- `bank_twin`: 'script' (default), 'plain' (no divisor in banking or the twin rule `twin_r`), 'plain_bank' (banking only);
+- `bank_pre`: banking judged on the counts before the climb, as the native advisor does. Without it, the simulator re-reads the tier above after buying from it. A tier emptied by that purchase is then never banked, so the simulator never leaves larvae idle.
+
+At the 7.2 d save's first look:
+- script with `bank_pre` leaves the 1.26e22 larvae idle, as the owner's advisor did;
+- plain hatches 6.3e27 goddesses.
+
+**Which rows used which:**
+- **"plain_bank":** the main and extra tables ran with the divisor dropped in banking only, without `bank_pre`.
+- **"plain+pre" and "script+pre":** the headline rows (3.0 d save and the swarmwarp route) were re-run with both rules plain and with `bank_pre`, plus the script with `bank_pre` for comparison.
+
+##### Script against plain (days from the save; "a / b" = ideal / human seed 1)
+
+| Start | Seed | Banking | Every achievement | First endless | 1e62 endless | Top tier day 20 / 60 (ideal) | Idle larvae, seconds of income, days 1 / 7 / 20 / 60 (ideal) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| run2 (45 h) | off | script / plain_bank | 247 / 252 both | 173 / 172 both | 173 / 173 both | pantheon2 / pantheon5 | ~0 at every mark |
+| run2 (45 h) | on | script | 168 / 173 | 45 / 45 | 56 / 57 | overmind2 / overmind6 | 0.09 / 0.03 / 0.003 / 0 |
+| run2 (45 h) | on | plain_bank | 168 / 173 | 45 / 45 | **53 / 53** | overmind2 / overmind6 | same |
+| run2b (3.0 d) | off | script / plain_bank / script+pre / plain+pre | 245 / 250 in all four | 171 / 171 | 171 / 171 | pantheon2 / pantheon5 | ~0 at every mark |
+| run2b (3.0 d) | on | script (and script+pre) | 167 / 171 | 44 / 44 | 55 / 55 | overmind2 / overmind6 | **2e4 / 2e4 / 9e3** / 0 |
+| run2b (3.0 d) | on | plain_bank | 167 / 171 | 44 / 44 | **51 / 52** | overmind2 / overmind6 | 0 / 4e3 / 0 / 0 |
+| run2b (3.0 d) | on | plain+pre | 167 / 171 | 44 / 44 | **51 / 52** | overmind2 / overmind6 | 0 / 0 / 0 / 0 |
+| run2c (7.2 d) | off | script / plain_bank | 241 / 244 both | 167 / 167 | 167 / 167 | pantheon3 / overmind | ~0 at every mark |
+| run2c (7.2 d) | on | script | 162 / 168 | 39 / 40 | 50 / 52 | overmind3 / overmind6 | 0 / 2e4 / 0 / 2e4 |
+| run2c (7.2 d) | on | plain_bank | 162 / 168 | 39 / 40 | **47 / 48** | overmind3 / overmind6 | ~0 at every mark |
+| mirrors20 | off | script / plain_bank | 253 / 259 both | 178 / 179 | 179 / 179 | pantheon / pantheon5 | ~0 at every mark |
+| mirrors20 | on | script | 174 / 181 | 50 / 52 | 61 / 64 | overmind / overmind6 | 0 / 0 / 0 / 2e4 |
+| mirrors20 | on | plain_bank | 174 / 181 | 50 / 52 | **58 / 60** | overmind / overmind6 | ~0 at every mark |
+| warp | off | all four | **not by day 500** (both cadences) | never | never | empress / pantheon2 | ~0 (30 s on day 7 with the script) |
+| warp | on | all four | 84 / 98 | 51–52 / 57 | 56 / 61 | pantheon4 / overmind6 | ~0 |
+
+**How much of the 78 days was the banking bug:**
+- **None.** Seed off finishes on the same day with either formula, from every start.
+- With seed off the larvae are not idle, under either formula, so the bug has nothing to free. The stall is elsewhere: the tiers above the frontier are never started, and the climb tops out with endless waiting for the quick runs (day 167–178).
+- **"Swarmwarp never finishes" with seed off is unchanged as well.**
+
+**Where the bug does show: with seed on.**
+- The script's divisor leaves 9e3–2e4 seconds of larva income idle at some marks.
+- Plain banking spends them, and 1e62 endless comes **3–4 days sooner** on the mirrors route (all four mirrors starts). Totals do not move.
+- On the swarmwarp route it changes nothing measurable.
+
+##### Seed under plain banking (one row each; ideal / human seed 1, "plain_bank" rows)
+
+| Question | run2b | mirrors20 | warp | Answer |
+| --- | --- | --- | --- | --- |
+| Still needed? (seed off) | 245 / 250 | 253 / 259 | not by 500 | **yes**, unchanged |
+| Still harmless? (seed on, against the mode-on / SEED figures above) | 167 / 171 | 174 / 181 | 84 / 98 | **yes**: first ascension and quick runs as before; totals equal |
+| Flat in f? f = 1e-3 / 0.01 / 0.1 | 167 / 167 / 167 | 174 / 174 / 174 | 84 / 84 / 83 | **yes** (1e62: 52 / 51 / 51 on run2b) |
+| Never bank, against plain bank 3 | 167 / 171 (= bank 3) | 174 / 181 (=) | 84 / 98 (=) | **the same to the day** (1e62 51 / 52 on run2b, 58 / 60 on mirrors20, as bank 3). Never bank with seed off: 245 / 250, 253 / 259, not by 500 |
+
+**Verdict:**
+- Rule SEED stays, with f = 1%.
+- Plain banking is right, and worth 3–4 days to 1e62 endless with SEED; it does not replace SEED.
+- Bank 3 and never-bank are indistinguishable in the simulator once the divisor is gone.
+
+**Grade:** **likely** for "the bug costs nothing with seed off, a few days with seed on". Five starts, two cadences, consistent, with the `bank_pre` cross-check on the headline rows.
+
+**What the simulator cannot settle:** why the owner's advisor still sat on 1.26e22 larvae with the script formula. In the simulator the climb's lower tiers take those larvae within a visit or two, even with `bank_pre`. If the native advisor keeps them idle for days, seed off costs it more than the simulator shows, and plain banking recovers that difference.
+
+**Not re-run:**
+- human seeds 2 and 3, busy and twice a day;
+- the A.10.9 ablations;
+- `bank_pre` on run2, run2c and mirrors20;
+- the f sweep and never-bank with `bank_pre`.
+
+**Reproduce:**
+
+```sh
+python3 -I advisor/sim/bank_plain.py --jobs 4          # main (~15 min) + extra (~15 min)
+python3 -I advisor/sim/bank_plain.py both --jobs 4     # headline rows, both rules plain, with bank_pre (~12 min)
+```
 
 ### A.11 Early game: the fastest path to the first mirror cast
 

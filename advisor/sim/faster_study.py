@@ -51,14 +51,14 @@ def load(start):
 class MRoute(W.Route):
     """The mirrors route with the long-run mode on in its long run only, territory share 0 once mirrors are cast."""
     def policy(self, s):
-        p = W.mirror_policy(s, f_mirror=0.0)
+        p = W.mirror_policy(s, climb='mode', f_mirror=0.0)   # the mode (pass 4) as studied; variants override it
         if W.mirror_stage(s) != 'longRun': p.update(push=None, lr_age=None)
         p.update(self.over)
         return p
 
 def route_for(start, over):
     if start == 'warp':
-        r = W.Route('warp'); r.over = dict(over); return r
+        r = W.Route('warp', {'climb': 'mode'}); r.over = dict(over); return r   # the mode's settings; the variant overrides them
     return MRoute('mirror', over=dict(over))
 
 def play(start, var, prof, seed, days=420):

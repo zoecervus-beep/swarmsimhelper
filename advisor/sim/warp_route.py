@@ -39,7 +39,16 @@ FIXED = {'mutantnexus': 1e6, 'mutantfreq': 1e6}                                 
 SHARES = [('mutantswarmwarp', 0.1), ('mutantbat', 0.1), ('mutantarmy', 0.3), ('mutanteach', 0.01)]   # of W, see mutagen_steps
 CFG = {'test': ('ratio', 1000.0), 'final': 270.0, 'free_unlocks': 3, 'unlock_share': 0.3, 'guard': None, 'respec': True, 'max_wall_days': None,
        'guard_exp': 100, 'stall_days': None, 'moths': 10000, 'bats': 2000,
-       'clock': 'game', 'age': 'game', 'visits': True}   # timers and run age on the game clock (wall + skipped), buy between warps
+       'clock': 'game', 'age': 'game', 'visits': True,   # timers and run age on the game clock (wall + skipped), buy between warps
+       'climb': 'seed'}    # ASCENSION.md A.10.9: rule SEED always on, the long-run mode off, rule FA on ('mode': the pass-4 mode, no FA)
+# The climb the advisor will have (ASCENSION.md A.10.9): rule SEED (1%), no long-run mode (no gate, no push shares, no twin
+# guard), rule FA (variant c2, not gated), twin plans that may hatch part of the tier first, and the advisor's own H.
+# Banking (rule 4) and the twin rule (rule 7) without the console script's divisor (bank_twin 'plain', the native default
+# since Nov 25 2026), banking judged on the counts before the climb as the native advisor does (bank_pre); ASCENSION.md,
+# note after A.10.9. A route cfg {'bank_twin': 'script'} gives the script's divisor back.
+SEED_CLIMB = dict(push=None, lr_age=None, seed={'f': 1e-2}, faster_aware='multi', fa_n='afford', fa_ungated=True, twin_prefix=True,
+                  bank_twin='plain', bank_pre=True)
+sim.H_MUT = True
 
 def earned(s, name):
     if name in s.ach_have: return True
@@ -166,6 +175,8 @@ def policy(cfg=CFG, **over):
     p = dict(SPEC4, spells=['warp'], bat_N=cfg.get('bats', 2000), empower=True, moth_late=None, moth_N=4000)
     if cfg.get('a11', True): p.update(A11, moth_N5=cfg.get('moths', 4000))
     else: p['moth_N'] = cfg.get('moths', 4000)
+    if cfg.get('climb', 'seed') == 'seed': p.update(SEED_CLIMB)
+    if cfg.get('bank_twin'): p['bank_twin'] = cfg['bank_twin']
     p['game_clock'] = cfg.get('clock') == 'game'
     p['game_age'] = cfg.get('age') == 'game'
     p['warp_visits'] = bool(cfg.get('visits'))
@@ -182,9 +193,12 @@ def mirror_stage(s):
     if left: return 'longRun'
     return 'quickRun' if s.asc < ASC_GOAL else 'done'
 
-def mirror_policy(s, **over):
+def mirror_policy(s, climb='seed', **over):
+    """The mirrors route as the advisor plays it. climb 'seed': rule SEED and FA in every run (A.10.9); 'mode': the
+    long-run mode (SPEC4) in every run, as pass 1-2 of NO-MIRRORS.md simulated it."""
     st = mirror_stage(s)
     p = dict(SPEC4, spells=['mirror', 'larvarush'], empower=True, moth_late=None, **A11)
+    if climb == 'seed': p.update(SEED_CLIMB)
     p['moth_N5'] = {'firstRun': 10000, 'needMutation': 10000, 'quickRun': 30000}.get(st, 4000)
     if st == 'longRun': p['moth_late'] = (3 * 86400, 30000)
     p['ascend_rule'] = lambda s: ({'after': 0} if mirror_stage(s) in ('firstRun', 'needMutation', 'quickRun') else None)
@@ -220,7 +234,8 @@ class Route:
             if stage(s, self.cfg) == 'mirrorsLongRun' and self.cfg.get('guard_mode', 'keep') == 'keep':
                 p['spells'] = ['mirror']; p['moth_late'] = (3 * 86400, 30000)   # finish the mirrors long run as the mirrors route would
             return p
-        return mirror_policy(s, **self.over)
+        bt = {'bank_twin': self.cfg['bank_twin']} if self.cfg.get('bank_twin') else {}
+        return mirror_policy(s, climb=self.cfg.get('climb', 'seed'), **dict(bt, **self.over))
     def plan(self, s):
         return apply_mutagen(s, self.cfg) if self.name == 'warp' else mirror_mutagen(s)
     def stage(self, s):
@@ -291,20 +306,13 @@ def run_par(specs, jobs):
 AGE_SCHED = ('age', [(10, 6), (32, 16), (1e9, 0)])        # NO-MIRRORS.md's schedule: days by log10 mutagen held
 
 def section_validate(jobs):
+    """The headline: the route with rule SEED (the climb the advisor will have, A.10.9) beside the route with the pass-4
+    long-run mode (NO-MIRRORS.md section 14 as first published), at every cadence."""
     W = lambda **c: Route('warp', c)
-    WALL = dict(clock='wall', age='wall', visits=False)
-    STUDY = dict(WALL, test=AGE_SCHED, a11=False, final=250, guard=None, moths=4000)
-    specs = [('the study route (wall clock, warps back to back, age schedule, lepidoptera 4,000)', W(**STUDY), {}),
-             ('the study route, human', W(**STUDY), {'prof': 'human'}),
-             ('the spec on the wall clock (warps back to back)', W(**WALL), {}),
-             ('the spec on the wall clock, human', W(**WALL), {'prof': 'human'}),
-             ('the spec on the wall clock, busy', W(**WALL), {'prof': 'busy'}),
-             ('the spec on the wall clock, twice a day', W(**WALL), {'prof': 'twice', 'days': 500}),
-             ('the spec, game clock for timers only (run age on the wall clock)', W(age='wall'), {}),
-             ('the spec, game clock for timers only, human', W(age='wall'), {'prof': 'human'}),
-             ('**the spec** (game clock, one warp at a time)', W(), {})]
-    specs += [('the spec, human seed %d' % sd, W(), {'prof': 'human', 'seed': sd}) for sd in (1, 2, 3)]
-    specs += [('the spec, %s' % c, W(), {'prof': c, 'days': 500}) for c in ('busy', 'glance+', 'every120', 'twice')]
+    CAD = [('ideal', {}), ('human seed 1', {'prof': 'human', 'seed': 1}), ('human seed 2', {'prof': 'human', 'seed': 2}),
+           ('human seed 3', {'prof': 'human', 'seed': 3}), ('busy', {'prof': 'busy', 'days': 500}), ('twice a day', {'prof': 'twice', 'days': 500})]
+    specs = [('**rule SEED**, %s' % c, W(), dict(kw)) for c, kw in CAD]
+    specs += [('long-run mode (pass 4, as first published), %s' % c, W(climb='mode'), dict(kw)) for c, kw in CAD]
     res = run_par(specs, jobs); dump('validate', res); table(res, 'Re-validation: advisor sizing, honest larvae (days from the 20.1 h save)')
     return res
 
@@ -339,8 +347,10 @@ def section_final(jobs):
     return res
 
 def section_mirrors(jobs):
-    specs = [('mirrors route (advisor today), ideal', Route('mirror'), {}), ('mirrors route, human seed 1', Route('mirror'), {'prof': 'human'}),
-             ('mirrors route, human seed 2', Route('mirror'), {'prof': 'human', 'seed': 2}), ('mirrors route, busy', Route('mirror'), {'prof': 'busy'})]
+    CAD = [('ideal', {}), ('human seed 1', {'prof': 'human', 'seed': 1}), ('human seed 2', {'prof': 'human', 'seed': 2}),
+           ('human seed 3', {'prof': 'human', 'seed': 3}), ('busy', {'prof': 'busy'}), ('twice a day', {'prof': 'twice', 'days': 500})]
+    specs = [('mirrors route, rule SEED, %s' % c, Route('mirror'), dict(kw)) for c, kw in CAD]
+    specs += [('mirrors route, long-run mode (as first published), %s' % c, Route('mirror', {'climb': 'mode'}), dict(kw)) for c, kw in CAD]
     res = run_par(specs, jobs); dump('mirrors', res); table(res, 'The mirrors route as the advisor plays it (days from the save)')
     return res
 
@@ -391,7 +401,7 @@ def section_switch(jobs):
     specs = [(l, mkroute(f), mkroute(t), c, {}) for l, f, t, c in SWITCHES]
     with ProcessPoolExecutor(jobs) as ex:
         res = list(ex.map(switch_run, specs))
-    dump('switch', res); table(res, 'Switching routes (days from the save; the routes alone: mirrors 174, swarmwarp 141)')
+    dump('switch', res); table(res, 'Switching routes (days from the save; both routes with rule SEED)')
     print('\n| switch | at day | ascensions | expansions this run | log10 mutagen held | log10 premutagen this run | then |')
     print('| --- | --- | --- | --- | --- | --- | --- |')
     for r in res:
@@ -400,6 +410,71 @@ def section_switch(jobs):
         print('| %s | %s | %s | %s | %s | %s | %s |' % (r['label'], '%.1f' % w['day'] if w else '-', w.get('asc', '-'), w.get('exp', '-'),
               '%.1f' % w['lmut'] if w else '-', '%.1f' % w['lpremut'] if w else '-',
               '; '.join('next ascension day %.1f (run %.1f d, %d exp)' % (x['day'], x['run_days'], x['exp']) for x in after)))
+    return res
+
+FA_ON = {'faster_aware': 'multi', 'fa_n': 'afford', 'fa_ungated': True}
+SEEDCHECK = [('long-run mode + FA (A.10.9 "on"), script banking', {'climb': 'mode'}, FA_ON),
+             ('long-run mode + FA, plain banking', {'climb': 'mode', 'bank_twin': 'plain'}, dict(FA_ON, bank_pre=True)),
+             ('long-run mode + FA, no twin guard, plain banking', {'climb': 'mode', 'bank_twin': 'plain'}, dict(FA_ON, push='noguard', bank_pre=True)),
+             ('FA only (no mode, no seed), plain banking', {'climb': 'mode', 'bank_twin': 'plain'}, dict(FA_ON, push=None, lr_age=None, twin_prefix=True, bank_pre=True)),
+             ('rule SEED, script banking', {'bank_twin': 'script'}, {'bank_pre': False}),
+             ('rule SEED, plain banking', {}, {}),
+             ('rule SEED, plain banking, twins at 10x their price', {}, {'twin_mult': 10})]
+
+def seedcheck_run(args):
+    """One swarmwarp route with a per-ascension timeline and, every 5 days, the twin levels of the tiers above the
+    frontier and the top tier, for the sanity check of A.10.9 (why dropping the twin guard is worth ~55 days)."""
+    label, cfg, over = args
+    over = dict(over)
+    if over.get('push') == 'noguard': over['push'] = dict(SPEC4['push'], twin_mult=1)
+    route = Route('warp', cfg, over)
+    s = start_save(); sim.EMPOWER_MODEL = True
+    marks = {}; MK = [5, 10, 20, 30, 45, 60]
+    def look(st):
+        p = route.policy(st); age = sim.run_age(st, p); hz = p['theta_age'] * age
+        fr = max([k for k in range(1, sim.K + 1) if st.c[k] > 0 and (k < 2 or sim.H(st, k) <= hz)] + [1])
+        top = max([k for k in range(1, sim.K + 1) if st.c[k] > 0] or [1])
+        return {'asc': st.asc, 'frontier': sim.NAMES[fr], 'top': sim.NAMES[top], 'lmeat': lg(st.c[1] * sim.P(st, 1)),
+                'twins_above_frontier': sum(st.twin[k] for k in range(fr + 1, sim.K)), 'twins_all': sum(st.twin[1:sim.K]),
+                'lmut': lg(st.mutagen) if st.mutagen > 0 else 0.0, 'lpremut': lg(st.premut) if st.premut > 0 else 0.0}
+    end_h = 24 * 300.0; runs = []
+    while s.time < end_h * 3600 - 1 and not all_done(s):
+        p = route.policy(s); a0 = s.asc; st0 = route.stage(s); n0 = len(s.asc_log)
+        def until(st):
+            for m in MK:
+                if m not in marks and st.time >= m * 86400: marks[m] = look(st)
+            return st.asc != a0 or route.stage(st) != st0 or all_done(st)
+        s, rows, log = sim.run_cycles(p, 300, end_h, plans=[route.plan] * 1000, s0=s, every=86400, until=until)
+        if len(log) > n0:
+            r = log[-1]; runs.append({'day': r['time'] / 86400, 'lpremut': lg(r['premut']), 'lmut_after': lg(r['mutagen_after']), 'exp': r['exp']})
+    first = lambda m: next((x['day'] for x in runs if x['lmut_after'] >= m), None)
+    return {'label': label, 'end_day': s.time / 86400 if all_done(s) else None, 'runs': runs, 'marks': marks,
+            'reach': {m: first(m) for m in (15, 32, 100, 270)}, 'when': {n: t / 86400 for t, n in s.ach_log}}
+
+def section_seedcheck(jobs):
+    with ProcessPoolExecutor(jobs) as ex:
+        res = list(ex.map(seedcheck_run, SEEDCHECK))
+    dump('seedcheck', res)
+    print('\n### Where the days go on the swarmwarp route (ideal)\n')
+    print('| variant | all done | mutagen held 1e15 / 1e32 / 1e100 / 1e270 (day) | ascensions | 5,000 expansions |')
+    print('| --- | --- | --- | --- | --- |')
+    for r in res:
+        rc = r['reach']
+        print('| %s | %s | %s | %d | %s |' % (r['label'], '%.0f' % r['end_day'] if r['end_day'] else '-', ' / '.join('%.0f' % rc[m] if rc[m] else '-' for m in (15, 32, 100, 270)),
+                                             len(r['runs']), '%.0f' % r['when']['expansion9'] if 'expansion9' in r['when'] else '-'))
+    print('\n### Each ascension: day and log10 premutagen it brought\n')
+    n = max(len(r['runs']) for r in res)
+    print('| # | ' + ' | '.join(r['label'] for r in res) + ' |'); print('|' + ' --- |' * (len(res) + 1))
+    for i in range(n):
+        print('| %d | %s |' % (i + 1, ' | '.join('%.1f: %.0f' % (r['runs'][i]['day'], r['runs'][i]['lpremut']) if i < len(r['runs']) else '' for r in res)))
+    print('\n### Every 5-15 days: frontier, top tier, twin levels above the frontier (all tiers), log10 meat/s\n')
+    print('| variant | ' + ' | '.join('day %d' % m for m in (5, 10, 20, 30, 45, 60)) + ' |'); print('|' + ' --- |' * 7)
+    for r in res:
+        cells = []
+        for m in (5, 10, 20, 30, 45, 60):
+            x = r['marks'].get(m)
+            cells.append('%s/%s, %d (%d), %.0f' % (sim.LABEL.get(x['frontier'], x['frontier']), sim.LABEL.get(x['top'], x['top']), x['twins_above_frontier'], x['twins_all'], x['lmeat']) if x else '-')
+        print('| %s | %s |' % (r['label'], ' | '.join(cells)))
     return res
 
 def dump(name, res):

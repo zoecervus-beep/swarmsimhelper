@@ -25,7 +25,7 @@ import sim, faster_study as F, warp_route as W
 F.SAVES['run2b'] = 'example_save_run2_72h.json'
 def _mpolicy(self, s):
     """The mirrors route: the variant's settings, and the long-run mode (push, gate) only in its long run."""
-    p = W.mirror_policy(s, f_mirror=0.0); p.update(self.over)
+    p = W.mirror_policy(s, climb='mode', f_mirror=0.0); p.update(self.over)
     if W.mirror_stage(s) != 'longRun': p.update(push=None, lr_age=None)
     return p
 F.MRoute.policy = _mpolicy

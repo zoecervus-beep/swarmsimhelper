@@ -521,7 +521,7 @@ def seed_up(s,p,A):
         n=math.floor(min(caps))
         if n<1: continue
         hatch(s,k,n,now); left-=n
-        if TRACE is not None: tr('seed',k,n,f)
+        if TRACE is not None: tr('seed',k,n,f,['share of the tier below','share of the larvae','half the meat','larvae left'][caps.index(min(caps))],s.c[k-1]+n*UNITC[k],A)   # binding cap; tier below held and A before this line
     return left
 def _climb_and_push(s,p,avail,top,f):
     """The climb (top down), twins after it, the push, achievements: the end of policy(), run on the state as the
@@ -535,6 +535,7 @@ def _climb_and_push(s,p,avail,top,f):
         if TRACE is not None: tr('reserve',held,avail)
         avail=avail-held
     if p.get('seed') and avail>=1: avail=seed_up(s,p,avail)   # option (default off)
+    cpre=list(s.c) if p.get('bank_pre') else s.c   # bank_pre (default off): banking judged on the counts before the climb, as the native advisor does
     for k in range(min(top+1,K),0,-1):
         fa=False   # tier passes only on the faster-aware test (see faster_aware below)
         if not allowed(s,p,k):
@@ -543,7 +544,10 @@ def _climb_and_push(s,p,avail,top,f):
                 continue
             fa=True
         if k<=p.get('min_tier',1)-1: continue
-        if p.get('bank') and k<K and s.c[k+1]>0 and allowed(s,p,k+1) and s.c[k+1]*P(s,k+1) > p['bank']*lam(s)*(1-p['f'])*TWO**s.twin[k]/TWO**s.twin[k+1]:
+        # bank_twin (default 'script'): the console script divides larva income by the tier above's twin multiplier,
+        # which understates what larvae could hatch; 'plain' drops the division (fromLarvae = income x twin_k) here and in
+        # the twin rule twin_r; 'plain_bank' drops it in banking only (the first Nov 25 2026 runs)
+        if p.get('bank') and k<K and cpre[k+1]>0 and allowed(s,p,k+1) and cpre[k+1]*P(s,k+1) > p['bank']*lam(s)*(1-p['f'])*TWO**s.twin[k]/(1 if p.get('bank_twin') in ('plain','plain_bank') else TWO**s.twin[k+1]):
             if TRACE is not None: tr('climb',k,'bank')
             continue
         carried=0; carry0=s.carry[k]
@@ -688,7 +692,7 @@ def twin_pass(s,p):
         while True:
             cost=twin_cost(s,k)
             if p.get('twin_used') and tnow(s,p)-s.lastbuy[k]>p['twin_used']+(p['ci'] if p.get('twin_used_gap') else 0): break   # twin_used_gap: 'recently' counts from the previous visit
-            if p.get('twin_r') and s.c[k+1]*P(s,k+1) > p['twin_r']*lam(s)*(1-p['f'])*TWO**s.twin[k]/TWO**s.twin[k+1]: break
+            if p.get('twin_r') and s.c[k+1]*P(s,k+1) > p['twin_r']*lam(s)*(1-p['f'])*TWO**s.twin[k]/(1 if p.get('bank_twin')=='plain' else TWO**s.twin[k+1]): break
             if p.get('twin_flow'):
                 inc=(s.c[k]*P(s,k)/UNITC[k]) if k>=2 else 1e99
                 R=TWO**s.twin[k]*min(lam(s)*(1-p['f']),inc)
